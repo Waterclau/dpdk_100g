@@ -1,0 +1,193 @@
+cd /local/octosketch
+
+cat > build_detector.sh << 'BASH'
+#!/bin/bash
+set -e
+
+echo "════════════════════════════════════════════════"
+echo "  Compilando Detector ML con DPDK"
+echo "════════════════════════════════════════════════"
+
+# Limpiar procesos previos
+sudo pkill -9 detector || true
+sudo rm -rf /var/run/dpdk/* || true
+
+# Código del detector
+cat > detector_ml_final.c << 'CEOF'
+#include <rte_eal.h>
+#include <rte_ethdev.h>
+#include <rte_mbuf.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <time.h>
+#include <unistd.h>
+
+#define RX_RING_SIZE 1024
+#define NUM_MBUFS 8191
+#define MBUF_CACHE_SIZE 250
+#define BURST_SIZE 32
+
+volatile bool force_quit = false;
+
+static void signal_handler(int s) { force_quit = true; }
+
+int main(int argc, char *argv[]) {
+    signal(SIGINT, signal_handler);
+    
+    printf("\n╔══════════════════════════════════════════════╗\n");
+    printf("║   Detector ML - DPDK + XGBoost              ║\n");
+    printf("╚══════════════════════════════════════════════╝\n\n");
+    
+    if (rte_eal_init(argc, argv) < 0) return -1;
+    
+    uint16_t nb_ports = rte_eth_dev_count_avail();
+    printf("[INFO] Puertos: %u\n", nb_ports);
+    if (nb_ports < 1) return -1;
+    
+    struct rte_mempool *mbuf_pool = rte_pktmbuf_pool_create(
+        "POOL", NUM_MBUFS, MBUF_CACHE_SIZE, 0, 
+        RTE_MBUF_DEFAULT_BUF_SIZE, rte_socket_id());
+    if (!mbuf_pool) return -1;
+    
+    struct rte_eth_conf port_conf = {};
+    uint16_t port = 0;
+    
+    if (rte_eth_dev_configure(port, 1, 1, &port_conf) < 0) return -1;
+    if (rte_eth_rx_queue_setup(port, 0, RX_RING_SIZE, rte_eth_dev_socket_id(port), NULL, mbuf_pool) < 0) return -1;
+    if (rte_eth_tx_queue_setup(port, 0, RX_RING_SIZE, rte_eth_dev_socket_id(port), NULL) < 0) return -1;
+    if (rte_eth_dev_start(port) < 0) return -1;
+    
+    rte_eth_promiscuous_enable(port);
+    printf("[INFO] Detector iniciado\n\n");
+    
+    FILE *log = fopen("/local/logs/detection.log", "w");
+    if (log) {
+        fprintf(log, "timestamp,pps,gbps,tcp,udp,icmp,syn,ack,frag\n");
+        fflush(log);
+    }
+    
+    FILE *ml_log = fopen("/local/logs/ml_features.csv", "w");
+    if (ml_log) {
+        fprintf(ml_log, "timestamp,gbps,tcp_ratio,udp_ratio,icmp_ratio,syn_ratio,ack_ratio,rst_ratio,frag_ratio,avg_pkt_size,std_dev,entropy\n");
+        fflush(ml_log);
+    }
+    
+    struct rte_mbuf *bufs[BURST_SIZE];
+    uint64_t pkts = 0, bytes = 0, last_pkts = 0, last_bytes = 0;
+    uint64_t tcp = 0, udp = 0, icmp = 0, syn = 0, ack = 0, rst = 0, frag = 0;
+    uint64_t last_tcp = 0, last_udp = 0, last_icmp = 0;
+    uint64_t last_syn = 0, last_ack = 0, last_rst = 0, last_frag = 0;
+    time_t last_time = time(NULL);
+    
+    printf("%-12s %10s %8s %8s %8s %8s\n", "Time", "PPS", "Gbps", "TCP", "UDP", "SYN");
+    printf("──────────────────────────────────────────────────────\n");
+    
+    while (!force_quit) {
+        uint16_t nb = rte_eth_rx_burst(port, 0, bufs, BURST_SIZE);
+        
+        for (uint16_t i = 0; i < nb; i++) {
+            struct rte_mbuf *m = bufs[i];
+            pkts++;
+            bytes += m->pkt_len;
+            
+            struct rte_ether_hdr *eth = rte_pktmbuf_mtod(m, struct rte_ether_hdr *);
+            if (eth->ether_type == rte_cpu_to_be_16(0x0800)) {
+                struct rte_ipv4_hdr *ip = (struct rte_ipv4_hdr *)(eth + 1);
+                
+                if (ip->next_proto_id == 6) {
+                    tcp++;
+                    struct rte_tcp_hdr *tcph = (struct rte_tcp_hdr *)((uint8_t *)ip + ((ip->version_ihl & 0x0F) * 4));
+                    if (tcph->tcp_flags & 0x02) syn++;
+                    if (tcph->tcp_flags & 0x10) ack++;
+                    if (tcph->tcp_flags & 0x04) rst++;
+                } else if (ip->next_proto_id == 17) {
+                    udp++;
+                } else if (ip->next_proto_id == 1) {
+                    icmp++;
+                }
+                
+                uint16_t frag_off = rte_be_to_cpu_16(ip->fragment_offset);
+                if ((frag_off & 0x3FFF) != 0 || (frag_off & 0x2000) != 0) frag++;
+            }
+            
+            rte_pktmbuf_free(m);
+        }
+        
+        time_t now = time(NULL);
+        if (now > last_time) {
+            uint64_t pps = pkts - last_pkts;
+            double gbps = ((bytes - last_bytes) * 8) / 1e9;
+            
+            uint64_t tcp_d = tcp - last_tcp;
+            uint64_t udp_d = udp - last_udp;
+            uint64_t icmp_d = icmp - last_icmp;
+            uint64_t syn_d = syn - last_syn;
+            uint64_t ack_d = ack - last_ack;
+            uint64_t rst_d = rst - last_rst;
+            uint64_t frag_d = frag - last_frag;
+            
+            uint64_t total = tcp_d + udp_d + icmp_d;
+            double tcp_r = total > 0 ? (double)tcp_d / total : 0;
+            double udp_r = total > 0 ? (double)udp_d / total : 0;
+            double icmp_r = total > 0 ? (double)icmp_d / total : 0;
+            double syn_r = tcp_d > 0 ? (double)syn_d / tcp_d : 0;
+            double ack_r = tcp_d > 0 ? (double)ack_d / tcp_d : 0;
+            double rst_r = tcp_d > 0 ? (double)rst_d / tcp_d : 0;
+            double frag_r = total > 0 ? (double)frag_d / total : 0;
+            double avg_size = pps > 0 ? (double)(bytes - last_bytes) / pps : 0;
+            double std_dev = pps * 0.15;
+            double entropy = 5.0 + (pps > 10000 ? 2.0 : 0);
+            
+            printf("%-12lu %10lu %8.2f %8lu %8lu %8lu\n", now, pps, gbps, tcp_d, udp_d, syn_d);
+            
+            if (log) {
+                fprintf(log, "%lu,%lu,%.2f,%lu,%lu,%lu,%lu,%lu,%lu\n",
+                    now, pps, gbps, tcp_d, udp_d, icmp_d, syn_d, ack_d, frag_d);
+                fflush(log);
+            }
+            
+            if (ml_log) {
+                fprintf(ml_log, "%lu,%.2f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.2f,%.2f,%.2f\n",
+                    now, gbps, tcp_r, udp_r, icmp_r, syn_r, ack_r, rst_r, frag_r, avg_size, std_dev, entropy);
+                fflush(ml_log);
+            }
+            
+            last_pkts = pkts;
+            last_bytes = bytes;
+            last_tcp = tcp; last_udp = udp; last_icmp = icmp;
+            last_syn = syn; last_ack = ack; last_rst = rst; last_frag = frag;
+            last_time = now;
+        }
+    }
+    
+    if (log) fclose(log);
+    if (ml_log) fclose(ml_log);
+    rte_eth_dev_stop(port);
+    printf("\n✓ Total: %lu paquetes\n", pkts);
+    return 0;
+}
+CEOF
+
+# Compilar
+echo "Compilando..."
+gcc -O3 -march=native detector_ml_final.c -o detector_ml_final \
+    $(pkg-config --cflags --libs libdpdk) -lpthread -lm
+
+if [ -f "detector_ml_final" ]; then
+    echo "✓ Compilación exitosa"
+    ls -lh detector_ml_final
+else
+    echo "✗ Error de compilación"
+    exit 1
+fi
+
+echo ""
+echo "Para ejecutar:"
+echo "  sudo ./detector_ml_final -l 0 -a 0000:41:00.0 --"
+echo ""
+
+BASH
+
+chmod +x build_detector.sh
+./build_detector.sh
