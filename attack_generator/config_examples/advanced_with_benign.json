@@ -1,0 +1,28 @@
+{
+  "target_ip": "10.10.1.2",
+  "output_dir": "/local/pcaps/realistic",
+  "seed": 12345,
+  "dataset_path": "/local/datasets/cicids2017_dist.json",
+  "mix_benign": "/local/pcaps/benign_traffic.pcap",
+  "attack_ratio": 0.25,
+  "attacks": [
+    {
+      "type": "syn_flood",
+      "num_packets": 50000,
+      "pps": 5000,
+      "comment": "SYN flood moderado mezclado con tráfico benigno"
+    },
+    {
+      "type": "http_flood",
+      "num_packets": 20000,
+      "pps": 2000,
+      "comment": "Ataque HTTP de capa 7 más sigiloso"
+    },
+    {
+      "type": "volumetric",
+      "num_packets": 80000,
+      "pps": 15000,
+      "comment": "Ataque volumétrico mixto realista"
+    }
+  ]
+}

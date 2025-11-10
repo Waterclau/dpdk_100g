@@ -1,0 +1,52 @@
+{
+  "target_ip": "10.10.1.2",
+  "output_dir": "/local/pcaps",
+  "seed": 42,
+  "attacks": [
+    {
+      "type": "syn_flood",
+      "num_packets": 100000,
+      "pps": 10000
+    },
+    {
+      "type": "udp_flood",
+      "num_packets": 150000,
+      "pps": 15000
+    },
+    {
+      "type": "dns_amp",
+      "num_packets": 80000,
+      "pps": 8000
+    },
+    {
+      "type": "ntp_amp",
+      "num_packets": 70000,
+      "pps": 7000
+    },
+    {
+      "type": "http_flood",
+      "num_packets": 30000,
+      "pps": 3000
+    },
+    {
+      "type": "icmp_flood",
+      "num_packets": 50000,
+      "pps": 5000
+    },
+    {
+      "type": "fragmentation",
+      "num_packets": 60000,
+      "pps": 5000
+    },
+    {
+      "type": "ack_flood",
+      "num_packets": 90000,
+      "pps": 9000
+    },
+    {
+      "type": "volumetric",
+      "num_packets": 105000,
+      "pps": 20000
+    }
+  ]
+}
