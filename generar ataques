@@ -1,0 +1,99 @@
+cd /local/pcaps
+
+cat > generate_attacks.sh << 'BASH'
+#!/bin/bash
+
+cat > gen.py << 'PYEOF'
+from scapy.all import *
+import random
+
+print("Generando ataques para 100G...")
+
+# 1. SYN Flood
+print("[1/9] SYN Flood...")
+syn = []
+for i in range(100000):
+    pkt = Ether()/IP(src=f"{random.randint(1,223)}.{random.randint(0,255)}.{random.randint(0,255)}.{random.randint(1,254)}", 
+                     dst="10.10.1.2")/TCP(sport=random.randint(1024,65535), dport=80, flags='S')
+    syn.append(pkt)
+wrpcap("syn_flood_100g.pcap", syn)
+
+# 2. UDP Flood
+print("[2/9] UDP Flood...")
+udp = []
+for i in range(150000):
+    pkt = Ether()/IP(src=f"{random.randint(1,223)}.{random.randint(0,255)}.{random.randint(0,255)}.{random.randint(1,254)}", 
+                     dst="10.10.1.2")/UDP(sport=random.randint(1024,65535), dport=53)/Raw(b"X"*512)
+    udp.append(pkt)
+wrpcap("udp_flood_100g.pcap", udp)
+
+# 3. DNS Amp
+print("[3/9] DNS Amp...")
+dns = []
+for i in range(80000):
+    pkt = Ether()/IP(src=f"8.8.{random.randint(1,8)}.{random.randint(1,254)}", 
+                     dst="10.10.1.2")/UDP(sport=53, dport=random.randint(1024,65535))/Raw(b"google.com"*20)
+    dns.append(pkt)
+wrpcap("dns_amp_100g.pcap", dns)
+
+# 4. NTP Amp
+print("[4/9] NTP Amp...")
+ntp = []
+for i in range(70000):
+    pkt = Ether()/IP(src=f"129.6.{random.randint(1,15)}.{random.randint(1,254)}", 
+                     dst="10.10.1.2")/UDP(sport=123, dport=random.randint(1024,65535))/Raw(b"X"*468)
+    ntp.append(pkt)
+wrpcap("ntp_amp_100g.pcap", ntp)
+
+# 5. HTTP Flood
+print("[5/9] HTTP Flood...")
+http = []
+for i in range(30000):
+    pkt = Ether()/IP(src=f"192.168.{random.randint(1,254)}.{random.randint(1,254)}", 
+                     dst="10.10.1.2")/TCP(sport=random.randint(10000,60000), dport=80, flags='PA')/Raw(b"GET / HTTP/1.1\r\n\r\n")
+    http.append(pkt)
+wrpcap("http_flood_100g.pcap", http)
+
+# 6. ICMP Flood
+print("[6/9] ICMP Flood...")
+icmp = []
+for i in range(50000):
+    pkt = Ether()/IP(src=f"{random.randint(1,223)}.{random.randint(0,255)}.{random.randint(0,255)}.{random.randint(1,254)}", 
+                     dst="10.10.1.2")/ICMP()/Raw(b"X"*1400)
+    icmp.append(pkt)
+wrpcap("icmp_flood_100g.pcap", icmp)
+
+# 7. Fragmentation
+print("[7/9] Fragmentation...")
+frag = []
+for i in range(60000):
+    for offset in [0,1,2,3]:
+        pkt = Ether()/IP(src=f"{random.randint(1,223)}.{random.randint(0,255)}.{random.randint(0,255)}.{random.randint(1,254)}", 
+                         dst="10.10.1.2", flags="MF", frag=offset*2)/UDP(dport=80)/Raw(b"X"*8)
+        frag.append(pkt)
+wrpcap("fragmentation_100g.pcap", frag)
+
+# 8. ACK Flood
+print("[8/9] ACK Flood...")
+ack = []
+for i in range(90000):
+    pkt = Ether()/IP(src=f"{random.randint(1,223)}.{random.randint(0,255)}.{random.randint(0,255)}.{random.randint(1,254)}", 
+                     dst="10.10.1.2")/TCP(sport=random.randint(1024,65535), dport=80, flags='A', window=0)
+    ack.append(pkt)
+wrpcap("ack_flood_100g.pcap", ack)
+
+# 9. Volumetric
+print("[9/9] Volumetric...")
+vol = syn[:30000] + udp[:40000] + icmp[:15000] + ack[:20000]
+random.shuffle(vol)
+wrpcap("volumetric_100g.pcap", vol)
+
+print("✓ Todos generados!")
+PYEOF
+
+python3 gen.py
+ls -lh *.pcap
+
+BASH
+
+chmod +x generate_attacks.sh
