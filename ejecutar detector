@@ -1,0 +1,38 @@
+cd /local/octosketch
+
+cat > run_detector.sh << 'BASH'
+#!/bin/bash
+
+echo "════════════════════════════════════════════════"
+echo "  Iniciando Detector ML"
+echo "════════════════════════════════════════════════"
+
+# Limpiar
+sudo pkill -9 detector || true
+sudo rm -rf /var/run/dpdk/* || true
+sleep 2
+
+# Crear logs
+sudo mkdir -p /local/logs
+sudo chmod 777 /local/logs
+
+# Ejecutar en background
+nohup sudo ./detector_ml_final -l 0 -a 0000:41:00.0 -- > /tmp/detector.log 2>&1 &
+
+sleep 3
+
+# Verificar
+if pgrep -f detector_ml_final > /dev/null; then
+    echo "✓ Detector corriendo (PID: $(pgrep -f detector_ml_final))"
+    echo ""
+    echo "Ver logs:"
+    echo "  tail -f /local/logs/detection.log"
+    echo "  tail -f /local/logs/ml_features.csv"
+else
+    echo "✗ Error al iniciar"
+    cat /tmp/detector.log
+fi
+
+BASH
+
+chmod +x run_detector.sh
