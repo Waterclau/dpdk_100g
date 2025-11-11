@@ -1,0 +1,29 @@
+{
+  "target_ip": "10.10.1.2",
+  "output_dir": "/local/pcaps/realistic_mix",
+  "seed": 42,
+  "generate_benign": true,
+  "benign_duration": 120,
+  "benign_profile": "normal",
+  "attack_ratio": 0.20,
+  "attacks": [
+    {
+      "type": "syn_flood",
+      "num_packets": 50000,
+      "pps": 5000,
+      "comment": "SYN flood mezclado con tráfico normal (20% ataque)"
+    },
+    {
+      "type": "http_flood",
+      "num_packets": 20000,
+      "pps": 2000,
+      "comment": "HTTP flood sigiloso"
+    },
+    {
+      "type": "dns_amp",
+      "num_packets": 30000,
+      "pps": 3000,
+      "comment": "DNS amplification"
+    }
+  ]
+}

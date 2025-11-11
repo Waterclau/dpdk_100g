@@ -55,26 +55,27 @@ O copiar directamente el directorio `attack_generator/` a tu proyecto.
 
 ```bash
 # Generar SYN flood simple
-python -m attack_generator.generator \
-    --target-ip 10.10.1.2 \
-    --attack syn_flood \
-    --num-packets 100000 \
-    --pps 10000 \
-    --output-dir ./pcaps
+sudo python3 -m attack_generator.generator \
+  --target-ip 10.10.1.2 \
+  --attack syn_flood \
+  --num-packets 100000 \
+  --pps 10000 \
+  --output-dir ./pcaps
+
 
 # Especificar duración en lugar de número de paquetes
-python -m attack_generator.generator \
-    --target-ip 10.10.1.2 \
-    --attack udp_flood \
-    --duration 60 \
-    --pps 15000
+sudo python3 -m attack_generator.generator \
+  --target-ip 10.10.1.2 \
+  --attack udp_flood \
+  --duration 60 \
+  --pps 15000
 
 # Ver estadísticas sin generar (dry-run)
-python -m attack_generator.generator \
-    --target-ip 10.10.1.2 \
-    --attack http_flood \
-    --num-packets 50000 \
-    --dry-run
+sudo python3 -m attack_generator.generator \
+  --target-ip 10.10.1.2 \
+  --attack http_flood \
+  --num-packets 50000 \
+  --dry-run
 ```
 
 ### 2. Configuración JSON (Recomendado)
@@ -109,7 +110,7 @@ Crear `attacks_config.json`:
 Ejecutar:
 
 ```bash
-python -m attack_generator.generator --config attacks_config.json
+sudo python3 -m attack_generator.generator --config attacks_config.json
 ```
 
 ### 3. Uso con Datasets
@@ -117,20 +118,24 @@ python -m attack_generator.generator --config attacks_config.json
 Primero, extraer distribuciones de un PCAP real:
 
 ```bash
-# Extraer distribuciones estadísticas de un PCAP
-python -m attack_generator.generator \
-    --extract-dataset /path/to/real_traffic.pcap
-# Genera: real_traffic_dist.json
+# Extraer distribuciones estadísticas de un PCAP (genera automáticamente <input>_dist.json)
+sudo python3 -m attack_generator.generator \
+  --extract-dataset /path/to/real_traffic.pcap
+
+# O especificar archivo de salida personalizado
+sudo python3 -m attack_generator.generator \
+  --extract-dataset /local/data/ctu13/mawi_data/analysis/202401011400.pcap \
+  --output /local/data/ctu13/mawi_data/analysis/202401011400_stats.json
 ```
 
 Luego usar esas distribuciones:
 
 ```bash
-python -m attack_generator.generator \
-    --target-ip 10.10.1.2 \
-    --attack syn_flood \
-    --num-packets 50000 \
-    --dataset-path real_traffic_dist.json
+sudo python3 -m attack_generator.generator \
+  --target-ip 10.10.1.2 \
+  --attack syn_flood \
+  --num-packets 50000 \
+  --dataset-path real_traffic_dist.json
 ```
 
 O en JSON:
@@ -143,17 +148,83 @@ O en JSON:
 }
 ```
 
-### 4. Mezcla con Tráfico Benigno
+### 4. Generación de Tráfico Benigno
+
+El generador puede crear tráfico benigno sintético realista automáticamente:
 
 ```bash
-python -m attack_generator.generator \
-    --target-ip 10.10.1.2 \
-    --attack syn_flood \
-    --num-packets 50000 \
-    --mix-benign /path/to/benign_traffic.pcap \
-    --attack-ratio 0.25
+# Generar solo tráfico benigno
+sudo python3 -m attack_generator \
+  --benign-only \
+  --output /local/pcaps/benign_traffic.pcap \
+  --benign-duration 10000 \
+  --benign-profile heavy
+
+# Perfiles disponibles:
+# - light: ~10 eventos/segundo (HTTP, DNS, SSH, ICMP, NTP)
+# - normal: ~50 eventos/segundo (default)
+# - heavy: ~200 eventos/segundo
+```
+
+El tráfico benigno incluye:
+- **Sesiones HTTP completas**: 3-way handshake, GET/POST requests, responses, FIN
+- **Consultas DNS**: Queries y responses realistas
+- **Sesiones SSH**: Handshake + datos encriptados simulados
+- **ICMP ping**: Echo request/reply
+- **Consultas NTP**: Sincronización de tiempo
+
+### 5. Mezcla con Tráfico Benigno
+
+**Opción A: Auto-generar tráfico benigno**
+
+```bash
+# El generador crea tráfico benigno automáticamente y lo mezcla
+sudo python3 -m attack_generator.generator \
+  --target-ip 10.10.1.2 \
+  --attack syn_flood \
+  --num-packets 50000 \
+  --generate-benign \
+  --benign-duration 60 \
+  --benign-profile normal \
+  --attack-ratio 0.25
 # Genera: syn_flood.pcap (ataque puro) + syn_flood_mixed.pcap (25% ataque, 75% benigno)
 ```
+sudo python3 -m attack_generator \
+  --target-ip 10.10.1.2 \
+  --mix-benign /local/pcaps/benign_traffic.pcap \
+  --attack-ratio 0.25 \
+  --config - <<'EOF'
+{
+  "target_ip": "10.10.1.2",
+  "output_dir": "/local/pcaps",
+  "seed": 42,
+  "attacks": [
+    {"type": "syn_flood", "num_packets": 50000, "pps": 10000},
+    {"type": "udp_flood", "num_packets": 150000, "pps": 15000},
+    {"type": "dns_amp", "num_packets": 80000, "pps": 8000},
+    {"type": "ntp_amp", "num_packets": 70000, "pps": 7000},
+    {"type": "http_flood", "num_packets": 30000, "pps": 3000},
+    {"type": "icmp_flood", "num_packets": 50000, "pps": 5000},
+    {"type": "fragmentation", "num_packets": 60000, "pps": 5000},
+    {"type": "ack_flood", "num_packets": 90000, "pps": 9000},
+    {"type": "volumetric", "num_packets": 105000, "pps": 20000}
+  ]
+}
+EOF
+
+
+
+**Opción B: Usar PCAP benigno existente**
+
+```bash
+sudo python3 -m attack_generator.generator \
+  --target-ip 10.10.1.2 \
+  --attack syn_flood \
+  --num-packets 50000 \
+  --mix-benign /local/pcaps/benign_traffic.pcap \
+  --attack-ratio 0.25
+```
+
 
 O en JSON:
 
@@ -166,18 +237,20 @@ O en JSON:
 }
 ```
 
-### 5. Reproducibilidad
+### 6. Reproducibilidad
 
 ```bash
-# Mismo seed = mismos paquetes
-python -m attack_generator.generator \
-    --config config.json \
-    --seed 12345
+# Mismo seed = mismos paquetes (tanto ataques como tráfico benigno)
+sudo python3 -m attack_generator.generator \
+  --attack syn_flood \
+  --generate-benign \
+  --seed 12345
 
 # Regenerar con mismo seed produce resultados idénticos
-python -m attack_generator.generator \
-    --config config.json \
-    --seed 12345
+sudo python3 -m attack_generator.generator \
+  --attack syn_flood \
+  --generate-benign \
+  --seed 12345
 ```
 
 ## Integración con CloudLab/DPDK
@@ -320,29 +393,41 @@ generator.generate_from_config(config['attacks'])
 ## Parámetros CLI Completos
 
 ```
+# Parámetros básicos
 --target-ip IP          IP destino del ataque (default: 10.10.1.2)
---output-dir DIR        Directorio de salida (default: ./pcaps)
+--output-dir DIR        Directorio de salida para PCAPs (default: ./pcaps)
 --seed SEED             Seed para reproducibilidad
 
+# Configuración de ataques
 --attack TYPE           Tipo de ataque a generar
 --num-packets N         Número de paquetes
 --pps RATE              Paquetes por segundo
 --duration SECS         Duración en segundos (alternativa a --num-packets)
 
+# Configuración avanzada
 --config FILE           Archivo JSON con configuración completa
 --dataset-path FILE     PCAP o JSON con distribuciones estadísticas
 --mix-benign FILE       PCAP con tráfico benigno para mezclar
 --attack-ratio RATIO    Ratio de ataque en mezcla (0.0-1.0, default: 0.3)
 
+# Generación de tráfico benigno
+--generate-benign       Auto-generar tráfico benigno antes de mezclar
+--benign-duration SECS  Duración del tráfico benigno (default: 60)
+--benign-profile PROF   Perfil: light, normal, heavy (default: normal)
+--benign-only           Solo generar tráfico benigno (sin ataques)
+
+# Modos especiales
 --dry-run               Solo calcular métricas sin escribir PCAPs
 --extract-dataset FILE  Extraer distribuciones de PCAP a JSON
+--output FILE           Archivo de salida para --extract-dataset o --benign-only
 ```
 
 ## Ejemplos de Configuración Completa
 
 Ver `config_examples/` para:
 - `basic_attacks.json` - Generación simple de 9 tipos de ataques
-- `advanced_with_benign.json` - Configuración avanzada con datasets y mezcla
+- `advanced_with_benign.json` - Configuración avanzada con datasets y mezcla con PCAP existente
+- `with_benign_autogen.json` - Auto-generación de tráfico benigno y mezcla
 
 ## Contribución
 

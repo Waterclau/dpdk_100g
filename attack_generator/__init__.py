@@ -13,6 +13,11 @@ from .utils import (
     IPGenerator,
     extract_dataset_distributions
 )
+from .benign_traffic import (
+    BenignTrafficGenerator,
+    BenignTrafficMixer,
+    generate_benign_pcap
+)
 
 __all__ = [
     'ATTACK_GENERATORS',
@@ -22,4 +27,7 @@ __all__ = [
     'RealisticPayloadGenerator',
     'IPGenerator',
     'extract_dataset_distributions',
+    'BenignTrafficGenerator',
+    'BenignTrafficMixer',
+    'generate_benign_pcap',
 ]

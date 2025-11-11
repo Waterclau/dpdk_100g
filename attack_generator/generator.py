@@ -13,6 +13,7 @@ from scapy.all import PcapWriter, rdpcap, wrpcap
 
 from .attacks import ATTACK_GENERATORS
 from .utils import DistributionSampler, extract_dataset_distributions
+from .benign_traffic import generate_benign_pcap
 
 
 class AttackPcapGenerator:
@@ -244,19 +245,28 @@ def main():
         epilog="""
 Ejemplos:
   # Generar SYN flood básico
-  %(prog)s --target-ip 10.10.1.2 --attack syn_flood --num-packets 100000 --pps 10000
+  sudo python3 -m %(prog)s --target-ip 10.10.1.2 --attack syn_flood --num-packets 100000 --pps 10000
 
   # Generar múltiples ataques desde JSON
-  %(prog)s --config attacks_config.json
+  sudo python3 -m %(prog)s --config attacks_config.json
 
-  # Mezclar con tráfico benigno
-  %(prog)s --target-ip 10.10.1.2 --attack udp_flood --mix-benign benign.pcap
+  # Auto-generar tráfico benigno y mezclarlo con ataque
+  sudo python3 -m %(prog)s --attack syn_flood --generate-benign --benign-duration 60 --attack-ratio 0.3
+
+  # Solo generar tráfico benigno
+  sudo python3 -m %(prog)s --benign-only --output benign.pcap --benign-duration 120 --benign-profile heavy
+
+  # Extraer distribuciones de un PCAP
+  sudo python3 -m %(prog)s --extract-dataset /path/to/traffic.pcap --output traffic_stats.json
+
+  # Mezclar con tráfico benigno existente
+  sudo python3 -m %(prog)s --target-ip 10.10.1.2 --attack udp_flood --mix-benign benign.pcap
 
   # Dry-run para ver métricas
-  %(prog)s --config attacks_config.json --dry-run
+  sudo python3 -m %(prog)s --config attacks_config.json --dry-run
 
   # Usar dataset para distribuciones realistas
-  %(prog)s --target-ip 10.10.1.2 --attack syn_flood --dataset cicids2017_dist.json
+  sudo python3 -m %(prog)s --target-ip 10.10.1.2 --attack syn_flood --dataset-path cicids2017_dist.json
         """
     )
 
@@ -288,25 +298,56 @@ Ejemplos:
     parser.add_argument('--attack-ratio', type=float, default=0.3,
                        help='Ratio de ataque en mezcla (0.0-1.0)')
 
+    # Generación de tráfico benigno
+    parser.add_argument('--generate-benign', action='store_true',
+                       help='Generar tráfico benigno automáticamente antes de mezclar')
+    parser.add_argument('--benign-duration', type=int, default=60,
+                       help='Duración del tráfico benigno en segundos (default: 60)')
+    parser.add_argument('--benign-profile', type=str,
+                       choices=['light', 'normal', 'heavy'], default='normal',
+                       help='Perfil de tráfico benigno: light, normal, heavy')
+
     # Modos especiales
     parser.add_argument('--dry-run', action='store_true',
                        help='Solo calcular métricas sin escribir PCAPs')
     parser.add_argument('--extract-dataset', type=str,
                        help='Extraer distribuciones de un PCAP a JSON')
+    parser.add_argument('--output', type=str,
+                       help='Archivo de salida para --extract-dataset (default: <input>_dist.json)')
+    parser.add_argument('--benign-only', action='store_true',
+                       help='Solo generar tráfico benigno (sin ataques)')
 
     args = parser.parse_args()
 
     # Modo especial: extraer dataset
     if args.extract_dataset:
-        output_json = args.extract_dataset.replace('.pcap', '_dist.json')
+        if args.output:
+            output_json = args.output
+        else:
+            output_json = args.extract_dataset.replace('.pcap', '_dist.json')
         extract_dataset_distributions(args.extract_dataset, output_json)
+        return
+
+    # Modo especial: solo generar tráfico benigno
+    if args.benign_only:
+        output_file = args.output or f"{args.output_dir}/benign_traffic.pcap"
+        generate_benign_pcap(
+            output_file=output_file,
+            duration_sec=args.benign_duration,
+            traffic_profile=args.benign_profile,
+            seed=args.seed
+        )
         return
 
     # Construir configuración
     if args.config:
         # Cargar desde JSON
-        with open(args.config, 'r') as f:
-            config = json.load(f)
+        if args.config == '-':
+            # Leer desde stdin
+            config = json.load(sys.stdin)
+        else:
+            with open(args.config, 'r') as f:
+                config = json.load(f)
     else:
         # Construir desde argumentos CLI
         if not args.attack:
@@ -330,6 +371,19 @@ Ejemplos:
                 'pps': args.pps
             }]
         }
+
+    # Auto-generar tráfico benigno si se solicita
+    if args.generate_benign and not args.dry_run:
+        benign_file = f"{args.output_dir}/benign_traffic_auto.pcap"
+        print(f"\n[*] Auto-generando tráfico benigno: {benign_file}")
+        generate_benign_pcap(
+            output_file=benign_file,
+            duration_sec=args.benign_duration,
+            traffic_profile=args.benign_profile,
+            seed=args.seed
+        )
+        # Actualizar config para usar el tráfico benigno generado
+        config['mix_benign'] = benign_file
 
     # Generar
     generator = AttackPcapGenerator(config)
