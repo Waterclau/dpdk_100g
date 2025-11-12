@@ -352,7 +352,331 @@ payload = b'X' * pkt_size
 
 ---
 
+### 5. Shell Scripts - Automation Helpers
+
+The attack generator includes three important shell scripts that automate the dataset generation workflow. These scripts wrap the Python module and handle common operations.
+
+#### Script: `regenerate_mixed_attacks.sh`
+
+**Purpose**: One-step generation of attacks with automatic benign traffic mixing using the generator's built-in `--mix-benign` functionality.
+
+**Usage**:
+```bash
+./regenerate_mixed_attacks.sh [TARGET_IP] [ATTACK_RATIO] [PCAP_DIR]
+# Example:
+./regenerate_mixed_attacks.sh 10.10.1.2 0.25 /local/pcaps
+```
+
+**Key Workflow**:
+```bash
+# Step 1: Generate benign traffic (if not exists)
+if [ ! -f "$BENIGN_PCAP" ]; then
+    sudo python3 -m attack_generator \
+      --benign-only \
+      --output "$BENIGN_PCAP" \
+      --benign-duration 120 \
+      --benign-profile heavy \
+      --seed 42
+fi
+
+# Step 2: Generate attacks WITH automatic mixing
+sudo python3 -m attack_generator \
+  --target-ip "$TARGET_IP" \
+  --mix-benign "$BENIGN_PCAP" \
+  --attack-ratio "$ATTACK_RATIO" \
+  --config - <<EOF
+{
+  "target_ip": "$TARGET_IP",
+  "output_dir": "$PCAP_DIR",
+  "seed": 42,
+  "mix_benign": "$BENIGN_PCAP",
+  "attack_ratio": 0.25,
+  "attacks": [
+    {"type": "syn_flood", "num_packets": 50000, "pps": 10000},
+    {"type": "udp_flood", "num_packets": 150000, "pps": 15000},
+    ...
+  ]
+}
+EOF
+```
+
+**What it does**:
+1. **Checks for benign traffic**: If `benign_traffic.pcap` doesn't exist, generates it first
+2. **Benign generation parameters**:
+   - 120 seconds duration
+   - "heavy" profile (20K PPS average)
+   - Seed 42 for reproducibility
+3. **Passes mixing parameters to generator**: The Python code handles the mixing internally
+4. **Output**: Creates `*_mixed.pcap` files with specified attack ratio
+
+**Attack Ratio Explanation**:
+```bash
+ATTACK_RATIO=0.25  # 25% attack, 75% benign
+# If attack has 50K packets, benign will have 150K packets
+# Total: 200K packets (25% attack)
+```
+
+**When to use**: When you want the generator to handle mixing internally with precise ratio control.
+
+---
+
+#### Script: `regenerate_simple_mixed.sh`
+
+**Purpose**: Two-step workflow that generates pure attacks first, then mixes them manually using inline Python/Scapy.
+
+**Usage**:
+```bash
+./regenerate_simple_mixed.sh [TARGET_IP] [PCAP_DIR]
+# Example:
+./regenerate_simple_mixed.sh 10.10.1.2 /local/pcaps
+```
+
+**Key Workflow**:
+```bash
+# Step 1: Generate benign traffic (same as above)
+
+# Step 2: Generate PURE attacks (WITHOUT mixing)
+sudo python3 -m attack_generator \
+  --target-ip "$TARGET_IP" \
+  --config - <<EOF
+{
+  "target_ip": "$TARGET_IP",
+  "output_dir": "$PCAP_DIR",
+  "seed": 42,
+  "attacks": [
+    {"type": "syn_flood", "num_packets": 50000, "pps": 10000},
+    ...
+  ]
+}
+EOF
+
+# Step 3: Mix each attack manually with inline Python
+mix_pcaps() {
+    local attack_pcap=$1
+    local output_pcap=$2
+
+    python3 << PYMIX
+from scapy.all import rdpcap, wrpcap
+
+# Load both PCAPs
+attack = rdpcap("${attack_pcap}")
+benign = rdpcap("${BENIGN_PCAP}")
+
+# Combine ALL packets (no ratio control)
+mixed = list(attack) + list(benign)
+
+# Sort by timestamp
+mixed.sort(key=lambda p: p.time if hasattr(p, 'time') else 0)
+
+# Save
+wrpcap("${output_pcap}", mixed)
+PYMIX
+}
+
+# Call for each attack type
+for attack in "${ATTACK_TYPES[@]}"; do
+    mix_pcaps "$PCAP_DIR/${attack}.pcap" "$PCAP_DIR/${attack}_mixed.pcap"
+done
+```
+
+**What it does**:
+1. **Generates pure attack PCAPs** without any mixing
+2. **Uses inline Python** (heredoc) to mix each attack separately
+3. **Simple concatenation**: Adds ALL benign packets to each attack (no ratio calculation)
+4. **Sorts by timestamp**: Ensures temporal ordering
+
+**Key Difference from `regenerate_mixed_attacks.sh`**:
+- **No ratio control**: Adds the entire benign PCAP to each attack
+- **Post-processing approach**: Mixing happens after generation
+- **Simpler logic**: Just concatenate and sort
+- **More flexible**: Can customize mixing logic inline
+
+**When to use**: When you want full benign traffic added to each attack without ratio constraints, or when you want to customize the mixing logic.
+
+---
+
+#### Script: `test_mix.sh`
+
+**Purpose**: Quick validation script to verify that the mixing workflow works correctly. Generates a small test case.
+
+**Usage**:
+```bash
+./test_mix.sh
+```
+
+**Key Workflow**:
+```bash
+# Generate small benign traffic (30 seconds)
+if [ ! -f "/local/pcaps/benign_traffic.pcap" ]; then
+    sudo python3 -m attack_generator \
+      --benign-only \
+      --output /local/pcaps/benign_traffic.pcap \
+      --benign-duration 30 \
+      --benign-profile normal \
+      --seed 42
+fi
+
+# Generate single attack (5000 packets)
+sudo python3 -m attack_generator \
+  --target-ip 10.10.1.2 \
+  --config - <<'EOF'
+{
+  "attacks": [
+    {"type": "syn_flood", "num_packets": 5000, "pps": 5000}
+  ]
+}
+EOF
+
+# Mix using mergecap (if available) or Python fallback
+if command -v mergecap &> /dev/null; then
+    mergecap -w /local/pcaps/syn_flood_mixed.pcap \
+             /local/pcaps/syn_flood.pcap \
+             /local/pcaps/benign_traffic.pcap
+else
+    # Python fallback (same logic as regenerate_simple_mixed.sh)
+    python3 << 'PYMIX'
+from scapy.all import rdpcap, wrpcap
+attack = rdpcap("/local/pcaps/syn_flood.pcap")
+benign = rdpcap("/local/pcaps/benign_traffic.pcap")
+mixed = list(attack) + list(benign)
+mixed.sort(key=lambda p: p.time if hasattr(p, 'time') else 0)
+wrpcap("/local/pcaps/syn_flood_mixed.pcap", mixed)
+PYMIX
+fi
+
+# Verify and display results
+tcpdump -r /local/pcaps/syn_flood_mixed.pcap -n -c 10
+```
+
+**What it does**:
+1. **Generates minimal test data**: 30 seconds benign + 5000 packet attack
+2. **Tests two mixing methods**:
+   - **mergecap** (Wireshark tool) if available - faster, native binary
+   - **Python/Scapy** fallback if mergecap not installed
+3. **Validates output**: Uses `tcpdump` to verify mixed PCAP structure
+4. **Quick feedback**: Completes in seconds for rapid iteration
+
+**Why two mixing methods**:
+```bash
+# mergecap: Fast, native tool from Wireshark
+mergecap -w output.pcap input1.pcap input2.pcap
+# Pros: Very fast, low memory
+# Cons: Requires Wireshark installation
+
+# Python/Scapy: Always available
+rdpcap() + wrpcap()
+# Pros: No dependencies (Scapy already required)
+# Cons: Slower, higher memory usage
+```
+
+**When to use**: When you're developing/debugging the mixing functionality or verifying the setup on a new machine.
+
+---
+
+## Script Comparison Table
+
+| Feature | regenerate_mixed_attacks.sh | regenerate_simple_mixed.sh | test_mix.sh |
+|---------|----------------------------|----------------------------|-------------|
+| **Mixing approach** | Built-in (generator does it) | Manual (post-processing) | Manual (test) |
+| **Ratio control** | ✅ Precise (0.25 = 25% attack) | ❌ No (adds all benign) | ❌ No |
+| **Performance** | Faster (single pass) | Slower (two passes) | Fast (small data) |
+| **Flexibility** | Limited to generator logic | High (customize Python code) | High (test tool) |
+| **Output** | `*_mixed.pcap` with ratio | `*_mixed.pcap` without ratio | Single test PCAP |
+| **Use case** | Production datasets | Exploratory analysis | Development/testing |
+
+---
+
+## Common Workflow Scenarios
+
+### Scenario 1: Generate ML Training Dataset (with precise ratios)
+```bash
+# Use regenerate_mixed_attacks.sh for controlled ratios
+./regenerate_mixed_attacks.sh 10.10.1.2 0.10 /local/pcaps
+# Result: 10% attack, 90% benign (realistic imbalance)
+```
+
+### Scenario 2: Generate Analysis Dataset (all benign + each attack)
+```bash
+# Use regenerate_simple_mixed.sh for full benign background
+./regenerate_simple_mixed.sh 10.10.1.2 /local/pcaps
+# Result: Each attack PCAP contains full benign traffic
+```
+
+### Scenario 3: Quick Verification
+```bash
+# Use test_mix.sh to verify setup
+./test_mix.sh
+# Result: Small test PCAP in seconds
+```
+
+### Scenario 4: Custom Ratio Not Supported by Generator
+```bash
+# Modify regenerate_simple_mixed.sh inline Python:
+mixed = attack[:5000] + benign[:20000]  # Custom 1:4 ratio
+```
+
+---
+
+## Important Implementation Details
+
+### 1. Seed Consistency
+All scripts use `seed: 42` for reproducibility:
+```bash
+# Same seed across all generations
+--seed 42
+
+# This ensures:
+# - Identical output on re-runs
+# - Reproducible experiments
+# - Consistent baselines
+```
+
+### 2. Benign Profile Selection
+```bash
+# Heavy profile for mixed attacks (more realistic)
+--benign-profile heavy  # 20K PPS, 80% TCP
+
+# Normal profile for testing (faster)
+--benign-profile normal  # 5K PPS, 75% TCP
+```
+
+**Why heavy for production**: ML detectors need realistic background noise to avoid overfitting to low-traffic scenarios.
+
+### 3. PCAP Naming Convention
+```bash
+# Pure attacks (no benign)
+/local/pcaps/syn_flood.pcap
+
+# Mixed attacks (with benign)
+/local/pcaps/syn_flood_mixed.pcap
+
+# Benign reference
+/local/pcaps/benign_traffic.pcap
+```
+
+This naming allows easy filtering:
+```bash
+# List only mixed PCAPs
+ls /local/pcaps/*_mixed.pcap
+
+# List only pure attacks
+ls /local/pcaps/*.pcap | grep -v "_mixed"
+```
+
+### 4. Error Handling
+```bash
+set -e  # Exit on any error
+
+# Prevents partial generation:
+# - If benign generation fails, attacks won't be created
+# - If mixing fails, incomplete PCAPs won't be used
+```
+
+---
+
 ## Key Design Patterns
+
+
 
 ### 1. Strategy Pattern (Attack Types)
 
