@@ -1,95 +1,101 @@
-# Detector DDoS - DPDK + Sketches + ML
+# DDoS Detector - DPDK + Sketches + ML
 
-Sistema completo de detección de ataques DDoS en tiempo real para redes de alta velocidad (100G) usando DPDK, estructuras de datos probabilísticas (Sketches) y Machine Learning.
+Complete real-time DDoS attack detection system for high-speed networks (100G) using DPDK, probabilistic data structures (Sketches), and Machine Learning.
 
-## Características
+## Features
 
-### Core del Detector (C + DPDK)
-- **Procesamiento zero-copy** con DPDK para máximo rendimiento
-- **Count-Min Sketch** para conteo eficiente de flujos
-- **HyperLogLog** para estimación de cardinalidad de IPs/puertos únicos
-- **Bloom Filter** para detección rápida de IPs vistas
-- **Extracción de 19 features ML** en tiempo real
-- **Umbrales configurables** para detección rule-based
-- **Logging estructurado** (CSV) para análisis posterior
+### Detector Core (C + DPDK)
+- **Zero-copy packet processing** with DPDK for maximum throughput (line-rate capable)
+- **Count-Min Sketch** for efficient flow counting and heavy hitter detection
+- **HyperLogLog** for cardinality estimation of unique IPs/ports with minimal memory
+- **Bloom Filter** for fast membership testing of seen IPs
+- **Real-time extraction of 19 ML features** for attack classification
+- **Configurable thresholds** for rule-based detection alongside ML
+- **Structured logging** (CSV format) for offline analysis and model training
 
-### Sistema de Análisis (Python)
-- **Feature Extractor**: Extrae características estadísticas desde logs
-- **Model Inferencer**: Inferencia ML con modelos pre-entrenados (XGBoost, RF, etc.)
-- **Detección de tipos de ataque**: SYN flood, UDP flood, HTTP flood, etc.
-- **Análisis en tiempo real y post-mortem**
+### Analysis System (Python)
+- **Feature Extractor**: Extracts statistical characteristics from detector logs
+- **Model Inferencer**: ML inference with pre-trained models (XGBoost, Random Forest, etc.)
+- **Attack type detection**: Identifies SYN flood, UDP flood, HTTP flood, DNS amplification, and more
+- **Real-time and post-mortem analysis** capabilities
 
-## Arquitectura
+## Architecture
 
 ```
 detector_system/
-├── detector_dpdk.c          # Core DPDK en C
-├── config.py                # Configuración centralizada
-├── feature_extractor.py     # Extracción de features
-├── model_inferencer.py      # Inferencia ML
+├── detector_dpdk.c          # Core DPDK detector in C
+├── config.py                # Centralized configuration
+├── feature_extractor.py     # Feature extraction module
+├── model_inferencer.py      # ML inference module
 ├── scripts/
-│   ├── build.sh            # Compilar detector
-│   ├── run.sh              # Ejecutar en foreground
-│   ├── run_background.sh   # Ejecutar en background
-│   └── analyze.py          # Análisis de logs
+│   ├── build.sh            # Build detector binary
+│   ├── run.sh              # Run in foreground (debug mode)
+│   ├── run_background.sh   # Run as background daemon
+│   └── analyze.py          # Log analysis script
 └── README.md
 ```
 
-## Requisitos
+## Requirements
 
-### Sistema
+### System Dependencies
 ```bash
 # Ubuntu 20.04+ / CloudLab
 sudo apt update
 sudo apt install -y build-essential pkg-config python3 python3-pip
 
-# DPDK (ya instalado en CloudLab)
+# DPDK (pre-installed on CloudLab, otherwise install manually)
 sudo apt install -y dpdk dpdk-dev
+
+# Additional libraries
+sudo apt install -y libdpdk-dev libnuma-dev
 ```
 
-### Python
+### Python Dependencies
 ```bash
-pip3 install pandas numpy scikit-learn xgboost
+pip3 install pandas numpy scikit-learn xgboost matplotlib seaborn
 ```
 
-## Instalación y Compilación
+**Note**: The detector requires DPDK 20.11 or higher and Python 3.7+.
 
-### 1. Clonar o copiar el proyecto
+## Installation and Compilation
+
+### 1. Clone or Copy the Project
 ```bash
 cd /local
-git clone <tu-repo> dpdk_100g
+git clone <your-repo> dpdk_100g
 cd dpdk_100g/detector_system
 ```
 
-### 2. Compilar el detector DPDK
+### 2. Compile the DPDK Detector
 ```bash
 chmod +x scripts/*.sh
 ./scripts/build.sh
 ```
 
-Esto genera el binario `detector_dpdk`.
+This generates the `detector_dpdk` binary in the current directory.
 
-### 3. Verificar tu NIC
+### 3. Verify Your Network Interface Card (NIC)
 ```bash
-# Listar dispositivos DPDK
+# List DPDK-compatible devices
 dpdk-devbind.py --status
 
-# Ejemplo de salida:
+# Example output:
 # 0000:41:00.0 'Ethernet Controller 10G X550T' drv=vfio-pci unused=ixgbe
+# This shows a 10G Intel NIC bound to DPDK
 ```
 
-Anota el PCI address (e.g., `0000:41:00.0`) para usarlo en los comandos.
+**Important**: Note the PCI address (e.g., `0000:41:00.0`) - you'll need this for all run commands.
 
-## Uso
+## Usage
 
-### Modo 1: Ejecución en Foreground (Recomendado para debugging)
+### Mode 1: Foreground Execution (Recommended for Debugging)
 
 ```bash
-# Ejecutar con tu PCI address
+# Run with your PCI address
 sudo ./scripts/run.sh 0000:41:00.0
 ```
 
-Verás output en tiempo real:
+You'll see real-time output on the terminal:
 
 ```
 Timestamp         PPS       Gbps        TCP        UDP        SYN
@@ -98,112 +104,134 @@ Timestamp         PPS       Gbps        TCP        UDP        SYN
 1705334402     130250      12.05    100000      30000      70000
 ```
 
-Para detener: `Ctrl+C`
+To stop: Press `Ctrl+C`
 
-### Modo 2: Ejecución en Background
+**Use this mode when**: Testing configuration, debugging, or monitoring traffic patterns in real-time.
+
+### Mode 2: Background Execution (Production Mode)
 
 ```bash
-# Iniciar en background
+# Start detector as background daemon
 sudo ./scripts/run_background.sh 0000:41:00.0
 
-# Ver logs en tiempo real
-tail -f /local/logs/detection.log
-tail -f /local/logs/ml_features.csv
-tail -f /local/logs/alerts.log
+# Monitor logs in real-time (open multiple terminals)
+tail -f /local/logs/detection.log      # Basic traffic statistics
+tail -f /local/logs/ml_features.csv    # ML features (19 columns)
+tail -f /local/logs/alerts.log         # Attack alerts
 
-# Detener
+# Stop the detector
 sudo pkill -9 detector_dpdk
 ```
 
-### Modo 3: Análisis de Logs (Post-Mortem o Tiempo Real)
+**Use this mode for**: Long-running experiments, automated testing, production deployments.
 
-Una vez que el detector está corriendo y generando logs:
+### Mode 3: Log Analysis (Post-Mortem or Real-Time)
+
+Once the detector is running and generating logs:
 
 ```bash
-# Análisis básico
+# Basic analysis (statistics only)
 python3 scripts/analyze.py
 
-# Con modelo ML
+# ML-based classification (requires trained model)
 python3 scripts/analyze.py --model-path /local/models/xgboost_detector.pkl
 
-# Exportar features para entrenamiento
+# Export features for model training
 python3 scripts/analyze.py --export-features /local/training_data.csv
 
-# Análisis con ventana personalizada
+# Custom analysis window (30 second intervals)
 python3 scripts/analyze.py --window-size 30
 ```
 
-## Logs Generados
+## Generated Log Files
 
-El detector crea 3 archivos de log en `/local/logs/`:
+The detector creates 3 log files in `/local/logs/`:
 
-### 1. `detection.log` - Estadísticas básicas
+### 1. `detection.log` - Basic Traffic Statistics
 ```csv
 timestamp,pps,gbps,tcp,udp,icmp,syn,ack,rst,fin,frag
 1705334401,125340,11.23,95000,30000,340,65000,80000,200,150,50
 ```
 
-### 2. `ml_features.csv` - Features para ML (19 columnas)
+**Purpose**: Basic per-second traffic counters for quick analysis and visualization.
+
+**Columns**: Unix timestamp, packets per second, gigabits per second, protocol counts, TCP flag counts, fragmented packet count.
+
+### 2. `ml_features.csv` - ML Features (19 columns)
 ```csv
 timestamp,gbps,pps,avg_pkt_size,std_dev,tcp_ratio,udp_ratio,icmp_ratio,syn_ratio,ack_ratio,rst_ratio,fin_ratio,frag_ratio,small_pkt_ratio,entropy_src_ip,entropy_dst_port,unique_src_ips,unique_dst_ports,syn_per_sec,ack_per_sec
 1705334401,11.23,125340,950.2,142.5,0.758,0.239,0.003,0.684,0.842,0.002,0.001,0.0004,0.123,7.82,9.45,15234,8945,65000,80000
 ```
 
-### 3. `alerts.log` - Alertas de seguridad
+**Purpose**: Complete feature set for machine learning classification and attack detection.
+
+**Use cases**: Model training, inference, feature importance analysis, attack characterization.
+
+### 3. `alerts.log` - Security Alerts
 ```csv
 timestamp,alert_type,severity,details
 1705334401,SYN_FLOOD,CRITICAL,syn_ratio=0.78
 1705334402,HIGH_PPS,HIGH,pps=250000
 ```
 
-## Features Extraídas (19 total)
+**Purpose**: Real-time attack alerts based on threshold violations.
 
-| Feature | Descripción |
-|---------|-------------|
-| `gbps` | Gigabits por segundo |
-| `pps` | Paquetes por segundo |
-| `avg_pkt_size` | Tamaño promedio de paquetes (bytes) |
-| `std_dev` | Desviación estándar del tamaño |
-| `tcp_ratio` | Ratio TCP / Total |
-| `udp_ratio` | Ratio UDP / Total |
-| `icmp_ratio` | Ratio ICMP / Total |
-| `syn_ratio` | Ratio SYN / TCP |
-| `ack_ratio` | Ratio ACK / TCP |
-| `rst_ratio` | Ratio RST / TCP |
-| `fin_ratio` | Ratio FIN / TCP |
-| `frag_ratio` | Ratio paquetes fragmentados |
-| `small_pkt_ratio` | Ratio paquetes < 100 bytes |
-| `entropy_src_ip` | Entropía de IPs origen |
-| `entropy_dst_port` | Entropía de puertos destino |
-| `unique_src_ips` | IPs origen únicas (HyperLogLog) |
-| `unique_dst_ports` | Puertos destino únicos (HyperLogLog) |
-| `syn_per_sec` | SYN por segundo |
-| `ack_per_sec` | ACK por segundo |
+**Severity levels**: CRITICAL (immediate response), HIGH (investigate), MEDIUM (monitor), LOW (informational).
 
-## Umbrales de Detección (Configurables en `config.py`)
+## Extracted Features (19 Total)
+
+| Feature | Description | Attack Indicator |
+|---------|-------------|------------------|
+| `gbps` | Gigabits per second | Volumetric attacks (high) |
+| `pps` | Packets per second | Packet-rate attacks (high) |
+| `avg_pkt_size` | Average packet size (bytes) | Small packets indicate certain attack types |
+| `std_dev` | Standard deviation of packet size | Low variance may indicate attack |
+| `tcp_ratio` | TCP packets / Total packets | TCP-based attacks (high) |
+| `udp_ratio` | UDP packets / Total packets | UDP floods (high) |
+| `icmp_ratio` | ICMP packets / Total packets | ICMP floods (high) |
+| `syn_ratio` | SYN / Total TCP packets | SYN floods (very high, >0.7) |
+| `ack_ratio` | ACK / Total TCP packets | Normal traffic (high), SYN flood (low) |
+| `rst_ratio` | RST / Total TCP packets | Scan activity (high) |
+| `fin_ratio` | FIN / Total TCP packets | Normal teardowns |
+| `frag_ratio` | Fragmented packets / Total | Fragmentation attacks (high) |
+| `small_pkt_ratio` | Packets < 100 bytes / Total | Certain attack types prefer small packets |
+| `entropy_src_ip` | Source IP entropy | Low entropy indicates single source |
+| `entropy_dst_port` | Destination port entropy | Low entropy indicates port targeting |
+| `unique_src_ips` | Unique source IPs (HyperLogLog) | DDoS: high, single attacker: low |
+| `unique_dst_ports` | Unique destination ports (HyperLogLog) | Port scans: high |
+| `syn_per_sec` | SYN packets per second | SYN flood indicator (absolute count) |
+| `ack_per_sec` | ACK packets per second | Normal traffic indicator |
+
+**Note**: All ratio features are normalized (0.0 - 1.0). Cardinality features use HyperLogLog for memory efficiency.
+
+## Detection Thresholds (Configurable in `config.py`)
 
 ```python
 THRESHOLDS = {
-    'pps_threshold': 100000,         # PPS para alerta volumétrica
-    'gbps_threshold': 10.0,          # Gbps para alerta
-    'syn_ratio_threshold': 0.7,      # SYN flood
-    'udp_ratio_threshold': 0.8,      # UDP flood
-    'frag_ratio_threshold': 0.3,     # Ataque de fragmentación
-    'entropy_threshold_low': 3.0,    # Entropía baja (mismo origen)
-    'small_packet_ratio': 0.6,       # Muchos paquetes pequeños
+    'pps_threshold': 100000,         # PPS for volumetric attack alert
+    'gbps_threshold': 10.0,          # Gbps threshold for bandwidth attacks
+    'syn_ratio_threshold': 0.7,      # SYN flood detection (70% of TCP are SYN)
+    'udp_ratio_threshold': 0.8,      # UDP flood detection (80% UDP traffic)
+    'frag_ratio_threshold': 0.3,     # Fragmentation attack (30% fragmented)
+    'entropy_threshold_low': 3.0,    # Low entropy indicates single source/target
+    'small_packet_ratio': 0.6,       # Many small packets (60% < 100 bytes)
 }
 ```
 
-## Integración con Generador de Ataques
+**Customization**: Adjust thresholds based on your network baseline. Lower thresholds increase sensitivity but may cause false positives.
 
-### Flujo completo de experimentación:
+**Recommendation**: Run benign traffic first to establish baseline, then set thresholds 2-3 standard deviations above normal.
+
+## Integration with Attack Generator
+
+### Complete Experiment Workflow:
 
 ```bash
-# Terminal 1: Iniciar detector en background
+# Terminal 1: Start detector in background
 cd /local/dpdk_100g/detector_system
 sudo ./scripts/run_background.sh 0000:41:00.0
 
-# Terminal 2: Generar ataques
+# Terminal 2: Generate attack PCAPs
 cd /local/dpdk_100g
 sudo python3 -m attack_generator \
   --target-ip 10.10.1.2 \
@@ -219,66 +247,85 @@ sudo python3 -m attack_generator \
 }
 EOF
 
-# Terminal 3: Replay con tcpreplay
+# Terminal 3: Replay traffic with tcpreplay
 sudo tcpreplay -i <interface> --mbps 10000 /local/pcaps/syn_flood.pcap
 
-# Terminal 4: Monitorear logs en tiempo real
+# Terminal 4: Monitor logs in real-time
 tail -f /local/logs/ml_features.csv
 
-# Después del experimento: Analizar
+# After experiment: Analyze results
 cd /local/dpdk_100g/detector_system
 python3 scripts/analyze.py \
   --export-features /local/experiment_features.csv
 ```
 
-## Configuración Avanzada
+**Tip**: For mixed traffic experiments, use `--mix-benign` flag in attack generator to simulate realistic scenarios.
 
-### Ajustar parámetros de Sketches
+## Advanced Configuration
 
-Editar `detector_dpdk.c`:
+### Adjusting Sketch Parameters
+
+Edit `detector_dpdk.c`:
 
 ```c
-// Para mayor precisión (más memoria):
-#define CM_WIDTH 4096      // Default: 2048
-#define CM_DEPTH 6         // Default: 4
-#define HLL_PRECISION 16   // Default: 14 (2^16 = 65536 buckets)
+// For higher precision (more memory):
+#define CM_WIDTH 4096      // Default: 2048 (doubles memory, ~0.06% error)
+#define CM_DEPTH 6         // Default: 4 (improves accuracy)
+#define HLL_PRECISION 16   // Default: 14 (2^16 = 65536 buckets, ~0.4% error)
 ```
 
-Luego recompilar:
+Then recompile:
 ```bash
 ./scripts/build.sh
 ```
 
-### Ajustar parámetros DPDK
+**Trade-offs**:
+- **Higher WIDTH/DEPTH**: Better accuracy, more memory, slightly slower
+- **Higher HLL_PRECISION**: Better cardinality estimates, exponentially more memory
 
-Editar `config.py`:
+### Adjusting DPDK Parameters
+
+Edit `config.py`:
 
 ```python
 class DetectorConfig:
-    RX_RING_SIZE = 4096      # Default: 2048
-    NUM_MBUFS = 32767        # Default: 16383
-    BURST_SIZE = 128         # Default: 64
+    RX_RING_SIZE = 4096      # Default: 2048 (higher = more buffering)
+    NUM_MBUFS = 32767        # Default: 16383 (must be 2^n - 1)
+    BURST_SIZE = 128         # Default: 64 (higher = better throughput)
 ```
 
-### Usar múltiples cores
+**Guidelines**:
+- **RX_RING_SIZE**: Increase for high packet loss, but uses more memory
+- **NUM_MBUFS**: Increase for high-rate traffic (formula: 2 × RX_RING_SIZE + burst_size)
+- **BURST_SIZE**: Optimal is 32-128 packets; higher may increase latency
 
-Modificar `scripts/run.sh`:
+### Using Multiple CPU Cores
+
+Modify `scripts/run.sh`:
 
 ```bash
-# Usar cores 0-3
+# Use cores 0-3 for packet processing
 sudo ./detector_dpdk -l 0-3 -a 0000:41:00.0 --
 ```
 
-## Tipos de Ataque Detectados
+**Performance tip**: Pin detector to isolated cores for consistent performance:
+```bash
+# Isolate cores 2-3 for DPDK (add to kernel boot params)
+isolcpus=2,3
+```
 
-El detector identifica:
+## Detected Attack Types
 
-1. **SYN Flood**: Alto `syn_ratio`, bajo `ack_ratio`
-2. **UDP Flood**: Alto `udp_ratio`, alto `pps`
-3. **HTTP Flood**: Alto `tcp_ratio`, SYN moderado
-4. **DNS Amplification**: Paquetes pequeños + alto UDP
-5. **Fragmentation**: Alto `frag_ratio`
-6. **Volumetric**: Alto `gbps` o `pps`
+The detector identifies the following attack patterns:
+
+1. **SYN Flood**: High `syn_ratio` (>0.7), low `ack_ratio` (<0.3), many unique source IPs
+2. **UDP Flood**: High `udp_ratio` (>0.8), high `pps`, random ports
+3. **HTTP Flood**: High `tcp_ratio`, moderate SYN ratio (normal handshakes), application-layer
+4. **DNS Amplification**: Small packets, high UDP ratio, low unique sources, high bandwidth
+5. **Fragmentation Attack**: High `frag_ratio` (>0.3), used to evade detection or exhaust resources
+6. **Volumetric Attack**: Very high `gbps` or `pps` regardless of protocol
+
+**Detection Confidence**: Combining multiple features improves accuracy. For example, SYN Flood detection uses `syn_ratio`, `ack_ratio`, `unique_src_ips`, and `pps` together.
 
 ## Troubleshooting
 

@@ -348,6 +348,14 @@ Ejemplos:
         else:
             with open(args.config, 'r') as f:
                 config = json.load(f)
+
+        # Fusionar con argumentos CLI (CLI tiene prioridad)
+        if args.mix_benign:
+            config['mix_benign'] = args.mix_benign
+        if args.attack_ratio is not None:
+            config['attack_ratio'] = args.attack_ratio
+        if args.dataset_path:
+            config['dataset_path'] = args.dataset_path
     else:
         # Construir desde argumentos CLI
         if not args.attack:
