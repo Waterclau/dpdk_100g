@@ -3,7 +3,7 @@
 ## 1. Project Objective
 
 ### Primary Goal
-Develop a **high-performance DDoS detection system** capable of processing network traffic at **100 Gbps line rate** using DPDK technology, combined with realistic attack traffic generation for comprehensive security research and validation.
+My goal is to develop a **high-performance DDoS detection system** capable of processing network traffic at **100 Gbps line rate** using DPDK technology, combined with realistic attack traffic generation for comprehensive security research and validation.
 
 ### Specific Objectives
 
@@ -32,7 +32,7 @@ Develop a **high-performance DDoS detection system** capable of processing netwo
 
 ---
 
-## 2. What We Have Accomplished So Far
+## 2. What I Have Accomplished So Far
 
 ### 2.1 Attack Traffic Generator (✅ Complete)
 
@@ -201,26 +201,26 @@ Develop a **high-performance DDoS detection system** capable of processing netwo
 
 ---
 
-## 3. How We Built It
+## 3. How I Built It
 
 ### 3.1 Development Methodology
 
-**Iterative Approach**:
-1. **Design**: Research DPDK architecture and probabilistic algorithms
-2. **Prototype**: Build minimal viable detector with basic attack generation
-3. **Validate**: Test on CloudLab with real 100G hardware
-4. **Refine**: Optimize performance and add features based on results
-5. **Document**: Create comprehensive technical documentation
+**My Iterative Approach**:
+1. **Design**: I researched DPDK architecture and probabilistic algorithms
+2. **Prototype**: I built a minimal viable detector with basic attack generation
+3. **Validate**: I tested on CloudLab with real 100G hardware
+4. **Refine**: I optimized performance and added features based on results
+5. **Document**: I created comprehensive technical documentation
 
-**Key Design Decisions**:
+**My Key Design Decisions**:
 
 | Decision | Rationale | Impact |
 |----------|-----------|--------|
-| **Use DPDK instead of kernel networking** | Linux kernel can't sustain 100 Gbps | Achieved line-rate processing |
+| **Use DPDK instead of kernel networking** | Linux kernel can't sustain 100 Gbps | I achieved line-rate processing |
 | **Probabilistic structures (CM Sketch, HLL)** | Exact counting requires GB of memory | 175 KB total memory, sub-1μs latency |
 | **Scapy for packet generation** | Easy protocol layering, Python flexibility | Fast development, complex attacks |
 | **Separate generator and detector** | Isolate workloads, prevent interference | Clean experiments, no resource contention |
-| **Multiple documentation levels** | Serve different user expertise | Researchers, operators, developers all supported |
+| **Multiple documentation levels** | Serve different user expertise | I support researchers, operators, and developers |
 
 ---
 
@@ -332,22 +332,22 @@ elif http_indicators:
 
 ### 3.3 Testing and Validation
 
-**Test Environment**:
+**My Test Environment**:
 - Platform: CloudLab (c6525-100g nodes)
 - NICs: Intel E810 100 Gbps
 - OS: Ubuntu 20.04 LTS
 - DPDK: Version 20.11.11
 
-**Validation Methods**:
+**My Validation Methods**:
 
 1. **Functionality Testing**:
-   - Generated 9 attack types, verified packet structures with Wireshark
-   - Confirmed detector correctly identifies attacks (100% accuracy on pure attacks)
-   - Validated ML features match calculated values (manual verification)
+   - I generated 9 attack types and verified packet structures with Wireshark
+   - I confirmed my detector correctly identifies attacks (100% accuracy on pure attacks)
+   - I validated ML features match calculated values (manual verification)
 
 2. **Performance Testing**:
-   - Sustained 100 Gbps traffic replay (148 Mpps)
-   - Measured latency: <1μs per packet (DPDK cycle counters)
+   - I sustained 100 Gbps traffic replay (148 Mpps)
+   - I measured latency: <1μs per packet (DPDK cycle counters)
    - Memory usage: Stable at 175 KB for sketches (valgrind profiling)
 
 3. **Accuracy Testing**:
@@ -363,7 +363,9 @@ elif http_indicators:
 
 ### 3.4 Documentation Strategy
 
-**Principle**: Progressive Disclosure
+**My Principle**: Progressive Disclosure
+
+I created documentation at multiple levels:
 
 1. **README.md**: High-level overview (what/why)
 2. **QUICKSTART.md**: Fast hands-on guide (how - minimal)
@@ -376,13 +378,15 @@ elif http_indicators:
 - Detector System: 4 docs
 - Analysis Tool: 2 docs (simpler, no ARCHITECTURE/USAGE needed)
 
-**Total Documentation**: 17 markdown files + code comments
+**Total Documentation I Created**: 17 markdown files + code comments
 
 ---
 
-## 4. Future Work and Roadmap
+## 4. Future Work and My Roadmap
 
 ### 4.1 Enhanced Attack Generation (High Priority)
+
+These are the improvements I plan to implement:
 
 #### More Sophisticated Attack Types
 
@@ -447,23 +451,23 @@ elif http_indicators:
 
 ### 4.2 Improved Detection Rules (High Priority)
 
-#### Current Limitations
+#### Current Limitations in My System
 
 1. **Fixed Thresholds**:
-   - Problem: Single threshold doesn't fit all networks
+   - Problem: My single threshold doesn't fit all networks
    - Example: 50K PPS is normal for large ISPs, attack for small networks
 
 2. **Simple Heuristics**:
-   - Problem: Ratio-based rules miss sophisticated attacks
+   - Problem: My ratio-based rules miss sophisticated attacks
    - Example: Slowloris has normal protocol ratios
 
 3. **No Adaptive Baseline**:
-   - Problem: Can't distinguish attack from legitimate traffic spike
+   - Problem: My system can't distinguish attack from legitimate traffic spike
    - Example: Flash crowd vs. DDoS
 
 ---
 
-#### Proposed Enhancements
+#### My Proposed Enhancements
 
 **1. Dynamic Baseline Learning**
 
@@ -597,12 +601,12 @@ if (src_entropy > 7.0 && dst_cardinality < 10) {
 
 ### 4.3 Machine Learning Integration (Medium Priority)
 
-#### Current State
-- Feature extraction: ✅ Implemented (19 features)
-- Model training: ❌ Not implemented
-- Real-time inference: ❌ Not implemented
+#### Current State of My System
+- Feature extraction: ✅ I have implemented this (19 features)
+- Model training: ❌ I have not implemented this yet
+- Real-time inference: ❌ I have not implemented this yet
 
-#### Proposed Implementation
+#### My Proposed Implementation
 
 **Phase 1: Offline Model Training**
 
@@ -773,12 +777,12 @@ def compare_detectors(exp1_log, exp2_log):
 
 ### 4.5 P4 Programmable Switch Integration (Research Direction)
 
-#### Motivation
+#### My Motivation
 - Hardware offload for even higher performance (Tbps scale)
 - Sketch updates in switch ASIC (ns latency)
 - Flow sampling and telemetry
 
-#### Proposed Architecture
+#### My Proposed Architecture
 
 ```
 DPDK Detector (Current)          P4 Switch (Future)
@@ -845,44 +849,44 @@ action update_cm_sketch() {
 
 ### Current Status Summary
 
-We have successfully built a **production-ready DDoS detection platform** with three fully functional components:
+I have successfully built a **production-ready DDoS detection platform** with three fully functional components:
 
 1. ✅ Attack Generator: 9 attack types, realistic benign traffic, reproducible experiments
 2. ✅ DPDK Detector: 100 Gbps line-rate processing, probabilistic data structures, ML feature extraction
 3. ✅ Analysis Tool: Automatic classification, professional visualizations, statistical analysis
 
-**Key Metrics**:
+**Key Metrics of My Work**:
 - Lines of code: ~8,000 (3,000 Python + 4,500 C + 500 Bash)
 - Documentation: 17 markdown files (~15,000 words)
 - Test coverage: Functional validation on CloudLab 100G hardware
-- Performance: Sustained 148 Mpps (100 Gbps) with <1μs latency
+- Performance: I sustained 148 Mpps (100 Gbps) with <1μs latency
 
-### Next Steps
+### My Next Steps
 
-**Immediate priorities** (next 1-2 months):
-1. Implement 5 new attack types (Slowloris, DNS Water Torture, Pulsing, etc.)
-2. Add dynamic baseline learning to detector
-3. Enhance detection rules with multi-feature correlation
+**My immediate priorities** (next 1-2 months):
+1. I will implement 5 new attack types (Slowloris, DNS Water Torture, Pulsing, etc.)
+2. I will add dynamic baseline learning to my detector
+3. I will enhance detection rules with multi-feature correlation
 
-**Medium-term goals** (3-6 months):
-4. Train and integrate ML models for classification
-5. Deploy ONNX runtime for real-time inference
-6. Develop comparative analysis tooling
+**My medium-term goals** (3-6 months):
+4. I will train and integrate ML models for classification
+5. I will deploy ONNX runtime for real-time inference
+6. I will develop comparative analysis tooling
 
-**Long-term vision** (6-12 months):
-7. P4 switch integration for hardware acceleration
-8. Distributed detection across multiple nodes
-9. Public dataset release for research community
+**My long-term vision** (6-12 months):
+7. I will integrate P4 switch for hardware acceleration
+8. I will implement distributed detection across multiple nodes
+9. I will release a public dataset for the research community
 
-### Impact
+### Impact of My Work
 
-This project provides the research community with:
+My project provides the research community with:
 - A complete platform for DDoS research and validation
 - Reproducible experiments for algorithm development
 - High-quality documentation for education and training
 - A foundation for advancing detection techniques
 
-**The system is ready for immediate use in academic research, security testing, and educational contexts.**
+**My system is ready for immediate use in academic research, security testing, and educational contexts.**
 
 ---
 
