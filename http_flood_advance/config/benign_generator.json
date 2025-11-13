@@ -1,0 +1,184 @@
+{
+  "description": "Configuration for benign HTTP traffic generator",
+  "version": "1.0",
+
+  "network": {
+    "src_ip_base": "192.168.",
+    "dst_ip": "10.0.0.1",
+    "src_mac": "aa:aa:aa:aa:aa:aa",
+    "dst_mac": "bb:bb:bb:bb:bb:bb",
+    "dst_port": 80,
+    "src_port_range": [32768, 65535]
+  },
+
+  "dpdk_config": {
+    "nic_pci": "0000:81:00.0",
+    "port_id": 0,
+    "num_cores": 8,
+    "hugepages": 8192,
+    "mbuf_pool_size": 524288,
+    "rx_ring_size": 4096,
+    "tx_ring_size": 4096,
+    "burst_size": 128
+  },
+
+  "traffic_profile": {
+    "target_rate_gbps": 80,
+    "target_pps": 12500000,
+    "comment": "Target: 80 Gbps = 80% of 100G link capacity",
+
+    "packet_size": {
+      "min": 64,
+      "max": 1518,
+      "average": 800,
+      "comment": "Realistic HTTP packet sizes"
+    },
+
+    "session_profile": {
+      "requests_per_session": {
+        "min": 1,
+        "max": 20,
+        "average": 5,
+        "distribution": "exponential"
+      },
+      "think_time_ms": {
+        "min": 1,
+        "max": 100,
+        "average": 20,
+        "comment": "Time between requests in a session"
+      },
+      "session_duration_sec": {
+        "min": 0.1,
+        "max": 30,
+        "average": 5
+      }
+    },
+
+    "http_methods": {
+      "GET": 0.70,
+      "POST": 0.20,
+      "PUT": 0.05,
+      "DELETE": 0.02,
+      "HEAD": 0.02,
+      "OPTIONS": 0.01
+    }
+  },
+
+  "dataset_generation": {
+    "num_sessions": 1000000,
+    "comment": "1M sessions = ~5M HTTP requests",
+
+    "output_dir": "./benign_traffic_data",
+    "pcap_file_prefix": "benign_traffic",
+    "stats_file_prefix": "benign_stats",
+
+    "split_files": true,
+    "packets_per_file": 10000000,
+    "comment_split": "Split into multiple files for manageability"
+  },
+
+  "node_assignments": {
+    "comment": "4-node setup for advanced HTTP flood experiment",
+
+    "node_controller": {
+      "hostname": "node-controller",
+      "role": "benign_traffic_generator",
+      "description": "Generates baseline benign HTTP traffic",
+      "tasks": [
+        "Generate benign HTTP traffic at 80 Gbps",
+        "Maintain realistic traffic patterns",
+        "Continue during attack phase"
+      ]
+    },
+
+    "node_tg": {
+      "hostname": "node-tg",
+      "role": "attack_generator",
+      "description": "Generates HTTP flood attack",
+      "tasks": [
+        "Wait for baseline establishment",
+        "Launch HTTP flood attack",
+        "Target same destination as benign traffic"
+      ]
+    },
+
+    "node_monitor": {
+      "hostname": "node-monitor",
+      "role": "detector",
+      "description": "DPDK + OctoStack detection system",
+      "tasks": [
+        "Monitor all incoming traffic",
+        "Detect attack using OctoStack",
+        "Log detection metrics"
+      ]
+    },
+
+    "node_target": {
+      "hostname": "node-target",
+      "role": "target_server",
+      "description": "Target web server (optional)",
+      "tasks": [
+        "Accept HTTP connections",
+        "Process requests",
+        "Monitor performance degradation"
+      ]
+    }
+  },
+
+  "experiment_phases": {
+    "phase1_baseline": {
+      "duration_sec": 300,
+      "description": "Establish baseline with benign traffic only",
+      "actions": [
+        "Start benign traffic generator on node_controller",
+        "Monitor on node_monitor",
+        "Collect baseline metrics"
+      ]
+    },
+
+    "phase2_attack": {
+      "duration_sec": 300,
+      "description": "Attack phase with mixed traffic",
+      "actions": [
+        "Continue benign traffic from node_controller",
+        "Start HTTP flood from node_tg",
+        "Detect and classify on node_monitor",
+        "Measure detection accuracy"
+      ]
+    },
+
+    "phase3_cooldown": {
+      "duration_sec": 60,
+      "description": "Return to baseline",
+      "actions": [
+        "Stop attack from node_tg",
+        "Continue benign traffic",
+        "Verify system recovery"
+      ]
+    }
+  },
+
+  "performance_targets": {
+    "c6525_100g_specs": {
+      "nic_speed_gbps": 100,
+      "target_utilization": 0.80,
+      "target_rate_gbps": 80,
+      "expected_pps": 12500000,
+      "comment": "Based on 800-byte average packet size"
+    },
+
+    "baseline_metrics": {
+      "avg_latency_ms": 5,
+      "p99_latency_ms": 20,
+      "packet_loss_rate": 0.0001,
+      "cpu_utilization": 0.60
+    },
+
+    "attack_detection": {
+      "detection_time_sec": 5,
+      "false_positive_rate": 0.01,
+      "true_positive_rate": 0.99,
+      "accuracy": 0.98
+    }
+  }
+}

@@ -2,13 +2,13 @@
 
 ## Overview
 
-This document explains the complete traffic generation and detection methodology used in our DDoS detection system. It covers:
+This document explains the complete traffic generation and detection methodology I use in my DDoS detection system. It covers:
 
-1. **Benign Traffic Generation**: How we create realistic legitimate network traffic
-2. **Attack Traffic Generation**: How we synthesize various DDoS attack types
-3. **Detection Rules**: The logic used to identify attacks in the detector
+1. **Benign Traffic Generation**: How I create realistic legitimate network traffic
+2. **Attack Traffic Generation**: How I synthesize various DDoS attack types
+3. **Detection Rules**: The logic I use to identify attacks in my detector
 
-The system is designed to generate ground-truth labeled traffic for testing and training machine learning models, while the detector applies real-time rules to classify traffic patterns.
+My system is designed to generate ground-truth labeled traffic for testing and training machine learning models, while my detector applies real-time rules to classify traffic patterns.
 
 ---
 
@@ -80,7 +80,7 @@ The system is designed to generate ground-truth labeled traffic for testing and 
 
 ### 1.1 Traffic Profiles
 
-We define three benign traffic profiles to simulate different network loads:
+I define three benign traffic profiles to simulate different network loads:
 
 | Profile | Events/Sec | Target PPS | Use Case |
 |---------|------------|------------|----------|
@@ -96,7 +96,7 @@ We define three benign traffic profiles to simulate different network loads:
 
 ### 1.2 Protocol Mix
 
-Each profile has a different protocol distribution:
+I configure each profile with a different protocol distribution:
 
 | Protocol | Light | Normal | Heavy | Description |
 |----------|-------|--------|-------|-------------|
@@ -106,13 +106,13 @@ Each profile has a different protocol distribution:
 | **ICMP** | 15% | 10% | 5% | Ping, diagnostics |
 | **NTP** | 5% | 5% | 5% | Time synchronization |
 
-**Rationale**:
+**My Rationale**:
 - **Heavy profile**: More HTTP (web-heavy data center traffic)
 - **Light profile**: More DNS/ICMP (diagnostic-heavy small network)
 
 ---
 
-### 1.3 Protocol Implementations
+### 1.3 My Protocol Implementations
 
 #### HTTP Session (Complete TCP Lifecycle)
 
@@ -135,14 +135,14 @@ Client                                    Server
   │                                         │
 ```
 
-**Key characteristics**:
+**Key characteristics I implement**:
 - **Proper 3-way handshake** (SYN, SYN-ACK, ACK)
 - **Data transfer with PSH flag** (indicates payload)
 - **Graceful teardown** (FIN-ACK sequence)
 - **Realistic timing**: 1-5ms between packets, 50-200ms for server processing
 - **Variable payload**: HTTP request ~150 bytes, response ~512 bytes
 
-**Code** (`benign_traffic.py:27-131`):
+**My Code** (`benign_traffic.py:27-131`):
 ```python
 def generate_http_session(self, writer, client_ip, server_ip, start_time):
     # 1. SYN (Client → Server)
@@ -170,14 +170,14 @@ Client                    DNS Server
   │                           │
 ```
 
-**Key characteristics**:
+**Key characteristics I implement**:
 - **UDP-based** (port 53)
 - **Query**: ~40 bytes (DNSQR with domain name)
 - **Response**: ~60-100 bytes (DNSRR with IP)
 - **Realistic domains**: google.com, facebook.com, github.com, etc.
 - **Timing**: 10-50ms response time
 
-**Code** (`benign_traffic.py:133-168`):
+**My Code** (`benign_traffic.py:133-168`):
 ```python
 def generate_dns_query_response(self, writer, client_ip, dns_server, start_time):
     # Query
@@ -211,7 +211,7 @@ Client                    SSH Server
   │                           │
 ```
 
-**Key characteristics**:
+**Key characteristics I implement**:
 - **TCP port 22**
 - **Multiple PSH-ACK packets** (bidirectional data)
 - **Variable payload sizes**: 64-512 bytes (simulates encrypted commands)
@@ -231,7 +231,7 @@ Client                    Target
   │                         │
 ```
 
-**Key characteristics**:
+**Key characteristics I implement**:
 - **ICMP types**: 8 (request), 0 (reply)
 - **Payload**: 56 bytes (standard ping size)
 - **Timing**: 1-50ms RTT (round-trip time)
@@ -250,14 +250,14 @@ Client                    NTP Server
   │                           │
 ```
 
-**Key characteristics**:
+**Key characteristics I implement**:
 - **UDP port 123**
 - **Fixed payload**: 48 bytes (NTP protocol)
 - **Timing**: 10-100ms response
 
 ---
 
-### 1.4 Benign Traffic Characteristics Summary
+### 1.4 My Benign Traffic Characteristics Summary
 
 | Metric | Value | Reasoning |
 |--------|-------|-----------|
@@ -273,7 +273,7 @@ Client                    NTP Server
 | **Unique dest ports** | 100-1000 | Various services accessed |
 | **Packet rate** | Varies by profile | Light: 500 PPS, Normal: 2.5K PPS, Heavy: 10K PPS |
 
-**Key insight**: Benign traffic is **balanced** and **session-oriented** (complete TCP lifecycles).
+**Key insight**: My benign traffic is **balanced** and **session-oriented** (complete TCP lifecycles).
 
 ---
 
@@ -281,7 +281,7 @@ Client                    NTP Server
 
 ### 2.1 Attack Types Overview
 
-We implement 9 distinct DDoS attack types:
+I implement 9 distinct DDoS attack types:
 
 | Attack Type | Layer | Primary Protocol | Mechanism | Typical PPS |
 |-------------|-------|------------------|-----------|-------------|
@@ -303,10 +303,10 @@ We implement 9 distinct DDoS attack types:
 
 **Objective**: Exhaust server connection table (backlog queue)
 
-**Mechanism**:
-- Send **SYN packets only** (never complete handshake)
-- Use **spoofed source IPs** (prevents SYN-ACK replies)
-- Target **common ports** (80, 443, 8080)
+**My Implementation**:
+- I send **SYN packets only** (never complete handshake)
+- I use **spoofed source IPs** (prevents SYN-ACK replies)
+- I target **common ports** (80, 443, 8080)
 
 **Packet structure**:
 ```
@@ -330,7 +330,7 @@ if tcp_ratio > 0.9 and syn_ratio > 0.7:
     alert("SYN_FLOOD")
 ```
 
-**Code** (`attacks.py:39-70`):
+**My Code** (`attacks.py:39-70`):
 ```python
 class SYNFloodGenerator(AttackGenerator):
     def generate_streaming(self, writer, num_packets, start_time, pps=10000):
@@ -354,9 +354,9 @@ class SYNFloodGenerator(AttackGenerator):
 
 **Objective**: Saturate bandwidth and overwhelm processing
 
-**Mechanism**:
-- Send **UDP packets** with **large payloads**
-- Target **various ports** (harder to filter)
+**My Implementation**:
+- I send **UDP packets** with **large payloads**
+- I target **various ports** (harder to filter)
 - **No connection state** (can't be filtered by stateful firewalls)
 
 **Packet structure**:
@@ -380,7 +380,7 @@ if udp_ratio > 0.8 and pps > 10000:
     alert("UDP_FLOOD")
 ```
 
-**Code** (`attacks.py:72-97`):
+**My Code** (`attacks.py:72-97`):
 ```python
 class UDPFloodGenerator(AttackGenerator):
     def generate_streaming(self, writer, num_packets, start_time, pps=15000):
@@ -402,10 +402,10 @@ class UDPFloodGenerator(AttackGenerator):
 
 **Objective**: Exhaust application resources (web server)
 
-**Mechanism**:
-- Send **valid HTTP requests** (bypass WAF/firewalls)
-- Use **PSH-ACK flags** (data transfer)
-- Target **resource-intensive pages** (/search, /login)
+**My Implementation**:
+- I send **valid HTTP requests** (bypass WAF/firewalls)
+- I use **PSH-ACK flags** (data transfer)
+- I target **resource-intensive pages** (/search, /login)
 
 **Packet structure**:
 ```
@@ -429,7 +429,7 @@ if tcp_ratio > 0.9 and psh_ratio > 0.8 and dport in [80, 443]:
     alert("HTTP_FLOOD")
 ```
 
-**Code** (`attacks.py:162-193`):
+**My Code** (`attacks.py:162-193`):
 ```python
 class HTTPFloodGenerator(AttackGenerator):
     def generate_streaming(self, writer, num_packets, start_time, pps=3000):
@@ -457,9 +457,9 @@ class HTTPFloodGenerator(AttackGenerator):
 
 **Objective**: Amplify attack bandwidth using DNS resolvers
 
-**Mechanism**:
-- Query **open DNS resolvers** with spoofed source IP (victim)
-- Request large records (e.g., TXT, ANY queries)
+**My Implementation**:
+- I query **open DNS resolvers** with spoofed source IP (victim)
+- I request large records (e.g., TXT, ANY queries)
 - **Amplification factor**: 10-50x (small query → large response)
 
 **Packet structure**:
@@ -489,7 +489,7 @@ if udp_ratio > 0.9 and avg_pkt_size > 500 and src_port == 53:
     alert("DNS_AMPLIFICATION")
 ```
 
-**Code** (`attacks.py:99-131`):
+**My Code** (`attacks.py:99-131`):
 ```python
 class DNSAmplificationGenerator(AttackGenerator):
     def generate_streaming(self, writer, num_packets, start_time, pps=8000):
@@ -512,12 +512,12 @@ class DNSAmplificationGenerator(AttackGenerator):
 
 **Objective**: Similar to DNS amplification, using NTP
 
-**Mechanism**:
-- Exploit **NTP monlist command** (returns 600+ bytes)
-- Query open NTP servers with spoofed victim IP
+**My Implementation**:
+- I exploit **NTP monlist command** (returns 600+ bytes)
+- I query open NTP servers with spoofed victim IP
 - **Amplification factor**: 20-200x
 
-**Key characteristics**:
+**Key characteristics I generate**:
 ```
 • Protocol: 100% UDP
 • Source port: 123 (NTP)
@@ -525,7 +525,7 @@ class DNSAmplificationGenerator(AttackGenerator):
 • Amplification: Query 48B → Response 600B (12x)
 ```
 
-**Code** (`attacks.py:133-160`):
+**My Code** (`attacks.py:133-160`):
 ```python
 class NTPAmplificationGenerator(AttackGenerator):
     def generate_streaming(self, writer, num_packets, start_time, pps=7000):
@@ -545,12 +545,12 @@ class NTPAmplificationGenerator(AttackGenerator):
 
 **Objective**: Saturate bandwidth with ICMP
 
-**Mechanism**:
-- Send **ICMP Echo Requests** (ping)
+**My Implementation**:
+- I send **ICMP Echo Requests** (ping)
 - Variable payload sizes (small to MTU)
 - High packet rate
 
-**Key characteristics**:
+**Key characteristics I generate**:
 ```
 • Protocol: 100% ICMP
 • ICMP types: 8 (Echo Request), 0 (Reply), 3 (Unreachable)
@@ -564,7 +564,7 @@ if icmp_ratio > 0.6 and pps > 5000:
     alert("ICMP_FLOOD")
 ```
 
-**Code** (`attacks.py:195-226`):
+**My Code** (`attacks.py:195-226`):
 ```python
 class ICMPFloodGenerator(AttackGenerator):
     def generate_streaming(self, writer, num_packets, start_time, pps=5000):
@@ -583,10 +583,10 @@ class ICMPFloodGenerator(AttackGenerator):
 
 **Objective**: Exhaust reassembly resources
 
-**Mechanism**:
-- Fragment packets into **many small pieces**
-- Set **More Fragments (MF)** flag
-- Force target to buffer fragments waiting for reassembly
+**My Implementation**:
+- I fragment packets into **many small pieces**
+- I set **More Fragments (MF)** flag
+- I force target to buffer fragments waiting for reassembly
 
 **Packet structure**:
 ```
@@ -615,7 +615,7 @@ if frag_ratio > 0.5:
     alert("FRAGMENTATION_ATTACK")
 ```
 
-**Code** (`attacks.py:228-260`):
+**My Code** (`attacks.py:228-260`):
 ```python
 class FragmentationAttackGenerator(AttackGenerator):
     def generate_streaming(self, writer, num_packets, start_time, pps=5000):
@@ -639,12 +639,12 @@ class FragmentationAttackGenerator(AttackGenerator):
 
 **Objective**: Bypass stateful firewalls (ACK packets pass through)
 
-**Mechanism**:
-- Send **ACK-only packets** (no SYN handshake)
-- Appears to be part of existing connection
+**My Implementation**:
+- I send **ACK-only packets** (no SYN handshake)
+- They appear to be part of existing connection
 - Firewalls often allow ACK packets through
 
-**Key characteristics**:
+**Key characteristics I generate**:
 ```
 • Protocol: 100% TCP
 • TCP flags: ACK only (no SYN, PSH, FIN)
@@ -659,7 +659,7 @@ if tcp_ratio > 0.9 and ack_ratio > 0.9 and syn_ratio < 0.1:
     alert("ACK_FLOOD")
 ```
 
-**Code** (`attacks.py:262-288`):
+**My Code** (`attacks.py:262-288`):
 ```python
 class ACKFloodGenerator(AttackGenerator):
     def generate_streaming(self, writer, num_packets, start_time, pps=9000):
@@ -680,12 +680,12 @@ class ACKFloodGenerator(AttackGenerator):
 
 **Objective**: Combine multiple attack vectors simultaneously
 
-**Mechanism**:
-- Mix of **SYN, UDP, ICMP, ACK** floods
+**My Implementation**:
+- I mix **SYN, UDP, ICMP, ACK** floods
 - Interleaved temporally (not bursted by type)
 - Harder to detect with single-metric rules
 
-**Mix ratios** (default):
+**My Mix ratios** (default):
 ```
 • SYN Flood: 30%
 • UDP Flood: 35%
@@ -706,7 +706,7 @@ if pps > 50000 and no_single_protocol_dominant:
     alert("VOLUMETRIC_MIX")
 ```
 
-**Code** (`attacks.py:290-395`):
+**My Code** (`attacks.py:290-395`):
 ```python
 class VolumetricMixGenerator(AttackGenerator):
     def __init__(self, target_ip, seed=None, mix_ratios=None):
@@ -749,13 +749,13 @@ class VolumetricMixGenerator(AttackGenerator):
 
 ---
 
-## 3. Detection Rules
+## 3. My Detection Rules
 
-### 3.1 Current Implementation (detector_dpdk.c)
+### 3.1 My Current Implementation (detector_dpdk.c)
 
-#### Features Extracted (19 Total)
+#### Features I Extract (19 Total)
 
-The detector extracts these features every second:
+My detector extracts these features every second:
 
 | # | Feature | Description | Use |
 |---|---------|-------------|-----|
@@ -782,9 +782,9 @@ The detector extracts these features every second:
 
 ---
 
-#### Implemented Detection Rule
+#### My Implemented Detection Rule
 
-**Single rule** in `detector_dpdk.c:334-337`:
+**My single rule** in `detector_dpdk.c:334-337`:
 
 ```c
 if (syn_r > 0.7 && alerts_log) {
@@ -817,7 +817,7 @@ SYN Flood:
 
 ---
 
-### 3.2 Proposed Detection Rules
+### 3.2 My Proposed Detection Rules
 
 #### Rule 1: UDP Flood
 
@@ -828,9 +828,9 @@ if (udp_ratio > 0.80 && pps > 10000) {
 }
 ```
 
-**Logic**:
-- UDP > 80% of traffic (benign: 15-20%)
-- High packet rate (benign: <10K PPS)
+**My Logic**:
+- UDP > 80% of traffic (my benign: 15-20%)
+- High packet rate (my benign: <10K PPS)
 
 ---
 
@@ -843,8 +843,8 @@ if (icmp_ratio > 0.50 && pps > 5000) {
 }
 ```
 
-**Logic**:
-- ICMP > 50% of traffic (benign: 5-10%)
+**My Logic**:
+- ICMP > 50% of traffic (my benign: 5-10%)
 - Moderate packet rate
 
 ---
@@ -859,13 +859,13 @@ if (tcp_ratio > 0.90 && psh_ratio > 0.70 &&
 }
 ```
 
-**Logic**:
+**My Logic**:
 - High TCP ratio
 - High PSH flag (data packets)
 - Concentrated on web ports (80, 443)
 - Moderate PPS (lower than volumetric, but CPU-heavy)
 
-**Note**: Requires tracking destination port distribution (not currently implemented)
+**Note**: This requires tracking destination port distribution (I haven't implemented this yet)
 
 ---
 
@@ -880,13 +880,13 @@ if (udp_ratio > 0.90 && avg_pkt_size > 400 &&
 }
 ```
 
-**Logic**:
+**My Logic**:
 - High UDP ratio
 - Large packets (amplified responses)
 - Source port 53 (DNS) or 123 (NTP)
 - Few source IPs (amplification servers)
 
-**Note**: Requires tracking source port distribution
+**Note**: This requires tracking source port distribution (future work)
 
 ---
 
@@ -899,7 +899,7 @@ if (frag_ratio > 0.50 && avg_pkt_size < 100) {
 }
 ```
 
-**Logic**:
+**My Logic**:
 - High fragmentation ratio
 - Small packet sizes (tiny fragments)
 
@@ -914,7 +914,7 @@ if (tcp_ratio > 0.90 && ack_ratio > 0.90 && syn_ratio < 0.10 && pps > 8000) {
 }
 ```
 
-**Logic**:
+**My Logic**:
 - High TCP ratio
 - High ACK ratio (>90%)
 - Low SYN ratio (<10%) - no handshakes
@@ -933,16 +933,16 @@ if (pps > 50000 &&
 }
 ```
 
-**Logic**:
+**My Logic**:
 - Very high PPS (>50K)
 - No single protocol dominates (mixed)
 - Multiple protocols active simultaneously
 
 ---
 
-### 3.3 Multi-Feature Correlation (Advanced)
+### 3.3 My Multi-Feature Correlation (Advanced)
 
-Instead of single-rule detection, combine multiple weak signals:
+Instead of single-rule detection, I plan to combine multiple weak signals:
 
 ```c
 struct detection_vector {
@@ -979,16 +979,16 @@ if (score >= 15) {
 }
 ```
 
-**Advantages**:
+**Advantages of My Approach**:
 - **Reduces false positives**: Requires multiple indicators
 - **Detects unknown attacks**: Doesn't rely on exact pattern match
 - **Weighted scoring**: Prioritizes strong indicators (high cardinality)
 
 ---
 
-## 4. Attack Detection Mapping
+## 4. My Attack Detection Mapping
 
-### 4.1 Detection Decision Tree
+### 4.1 My Detection Decision Tree
 
 ```
                          Start
@@ -1022,7 +1022,7 @@ if (score >= 15) {
 
 ---
 
-### 4.2 Per-Attack Detection Summary
+### 4.2 My Per-Attack Detection Summary
 
 | Attack Type | Primary Indicators | Secondary Indicators | Threshold |
 |-------------|-------------------|---------------------|-----------|
@@ -1038,24 +1038,24 @@ if (score >= 15) {
 
 ---
 
-## 5. Testing and Validation
+## 5. My Testing and Validation
 
-### 5.1 Experiment Workflow
+### 5.1 My Experiment Workflow
 
 ```
-1. Generate Traffic
+1. I Generate Traffic
    ├─> Benign PCAP (60-120 seconds, profile: normal)
    └─> Attack PCAP (50K-150K packets per type)
 
-2. Mix Traffic (Optional)
+2. I Mix Traffic (Optional)
    ├─> Attack ratio: 10-30%
    └─> Interleave packets by timestamp
 
-3. Replay to Detector
+3. I Replay to Detector
    ├─> Use tcpreplay at line rate
    └─> Monitor: tail -f /local/logs/detection.log
 
-4. Analyze Results
+4. I Analyze Results
    ├─> Run analyze_attack.py
    ├─> Check classification accuracy
    └─> Validate detection timing
@@ -1063,7 +1063,7 @@ if (score >= 15) {
 
 ---
 
-### 5.2 Expected Detection Results
+### 5.2 My Expected Detection Results
 
 **Test Case 1: Pure SYN Flood**
 ```
@@ -1093,9 +1093,9 @@ Expected Output:
 
 ---
 
-## 6. Future Enhancements
+## 6. My Future Enhancements
 
-### 6.1 Advanced Attack Types
+### 6.1 Advanced Attack Types I Plan to Implement
 
 #### Slowloris (HTTP Slow Attack)
 ```python
@@ -1131,9 +1131,9 @@ if (dns_queries > 10000 && unique_subdomains > 5000) {
 
 ---
 
-### 6.2 Machine Learning Integration
+### 6.2 My Machine Learning Integration Plan
 
-**Feature matrix** (19 features × N seconds):
+**My feature matrix** (19 features × N seconds):
 ```
 ┌────────┬──────┬──────┬─────┬───────────┬─────────┬─────┐
 │  Time  │ PPS  │ Gbps │ TCP%│ SYN Ratio │ Unique  │ ... │
@@ -1165,37 +1165,37 @@ print(model.feature_importances_)
 
 ## 7. Conclusion
 
-### Key Takeaways
+### My Key Takeaways
 
-1. **Benign traffic** is characterized by:
+1. **My benign traffic** is characterized by:
    - Complete TCP sessions (handshake → data → teardown)
    - Balanced protocol mix (70% TCP, 20% UDP, 10% ICMP)
    - Low SYN ratio (5-10% of TCP)
    - Moderate PPS (<10K)
 
-2. **Attack traffic** is characterized by:
+2. **My attack traffic** is characterized by:
    - Incomplete sessions (SYN-only, ACK-only)
    - Skewed protocol distribution (>80% single protocol)
    - Anomalous flag ratios (SYN >70%, ACK >90%)
    - High PPS (>10K)
    - High source IP cardinality (>5K unique)
 
-3. **Detection rules** leverage:
+3. **My detection rules** leverage:
    - Protocol ratios (TCP/UDP/ICMP distribution)
    - TCP flag analysis (SYN, ACK, PSH, FIN ratios)
    - Packet rate thresholds (PPS, Gbps)
    - Cardinality estimates (unique sources, destinations)
    - Packet size distributions
 
-4. **Current implementation** detects:
-   - SYN Flood (implemented)
-   - 8 other attacks (rules proposed, not implemented)
+4. **My current implementation** detects:
+   - SYN Flood (I have implemented this)
+   - 8 other attacks (I have proposed rules, not implemented yet)
 
-5. **Future work**:
-   - Implement remaining detection rules
-   - Add entropy calculations (source IP, dest port)
-   - Integrate machine learning models
-   - Dynamic baseline learning (adaptive thresholds)
+5. **My future work**:
+   - I will implement remaining detection rules
+   - I will add entropy calculations (source IP, dest port)
+   - I will integrate machine learning models
+   - I will add dynamic baseline learning (adaptive thresholds)
 
 ---
 
@@ -1216,4 +1216,4 @@ print(model.feature_importances_)
 
 ---
 
-*This document provides the complete methodology for generating and detecting DDoS attacks in our system. For implementation details, see `attack_generator/` and `detector_system/` modules.*
+*This document provides the complete methodology for generating and detecting DDoS attacks in my system. For implementation details, see `attack_generator/` and `detector_system/` modules.*

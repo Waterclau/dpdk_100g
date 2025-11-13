@@ -1,0 +1,284 @@
+{
+  "description": "Node Controller - Realistic Baseline Traffic Configuration",
+  "version": "2.0",
+  "last_updated": "2025-11-13",
+
+  "node_info": {
+    "role": "controller",
+    "purpose": "Generate realistic baseline HTTP traffic for DDoS detection experiments",
+    "hostname": "node-controller",
+    "note": "This is a MANUAL configuration - adjust values for your hardware"
+  },
+
+  "network": {
+    "comment": "Update these values for your network setup",
+    "src_ip_base": "192.168.0.0",
+    "src_ip_mask": "255.255.0.0",
+    "src_ip_pool_size": 65536,
+    "dst_ip": "10.0.0.1",
+    "src_mac": "aa:aa:aa:aa:aa:aa",
+    "dst_mac": "bb:bb:bb:bb:bb:bb",
+    "dst_port": 80,
+    "src_port_range": [32768, 65535]
+  },
+
+  "dpdk_config": {
+    "comment": "DPDK configuration - adjust for your hardware",
+    "nic_pci": "0000:81:00.0",
+    "port_id": 0,
+    "num_cores": 4,
+    "hugepages": 4096,
+    "mbuf_pool_size": 65536,
+    "rx_ring_size": 2048,
+    "tx_ring_size": 2048,
+    "burst_size": 32,
+    "note": "Use 4 cores for baseline traffic (not 8 like high-performance mode)"
+  },
+
+  "traffic_profiles": {
+    "comment": "Choose ONE profile based on your baseline needs",
+
+    "very_low": {
+      "base_rate_pps": 100,
+      "peak_rate_pps": 300,
+      "description": "Very light traffic - small website or test",
+      "typical_mbps": "0.1 - 0.3",
+      "use_case": "Small blog, testing"
+    },
+
+    "low": {
+      "base_rate_pps": 1000,
+      "peak_rate_pps": 3000,
+      "description": "Low traffic - small business website",
+      "typical_mbps": "1 - 3",
+      "use_case": "Small business, personal site"
+    },
+
+    "medium": {
+      "base_rate_pps": 10000,
+      "peak_rate_pps": 30000,
+      "description": "Medium traffic - popular website (RECOMMENDED for baseline)",
+      "typical_mbps": "10 - 30",
+      "use_case": "Popular website, standard baseline"
+    },
+
+    "high": {
+      "base_rate_pps": 50000,
+      "peak_rate_pps": 150000,
+      "description": "High traffic - large e-commerce or news site",
+      "typical_mbps": "50 - 150",
+      "use_case": "Large e-commerce, major news site"
+    },
+
+    "very_high": {
+      "base_rate_pps": 100000,
+      "peak_rate_pps": 300000,
+      "description": "Very high traffic - major platform",
+      "typical_mbps": "100 - 300",
+      "use_case": "Major platform, stress testing"
+    },
+
+    "selected_profile": "medium",
+    "note": "Change 'selected_profile' to one of the above"
+  },
+
+  "baseline_behavior": {
+    "comment": "Realistic baseline traffic characteristics",
+
+    "enable_time_variations": true,
+    "variation_period_seconds": 3600,
+    "variation_description": "Simulates daily traffic patterns (low at night, peak at 2pm)",
+
+    "time_of_day_patterns": {
+      "night_hours": {
+        "hours": "00:00 - 06:00",
+        "rate_multiplier": 0.3,
+        "description": "30% of base rate"
+      },
+      "morning_hours": {
+        "hours": "06:00 - 12:00",
+        "rate_multiplier": 0.7,
+        "description": "70% of base rate, rising"
+      },
+      "peak_hours": {
+        "hours": "12:00 - 18:00",
+        "rate_multiplier": 1.0,
+        "description": "100% of base rate (peak)"
+      },
+      "evening_hours": {
+        "hours": "18:00 - 24:00",
+        "rate_multiplier": 0.6,
+        "description": "60% of base rate, declining"
+      }
+    },
+
+    "random_variations": {
+      "enabled": true,
+      "noise_percentage": 15,
+      "burst_variations": true,
+      "description": "Add ±15% random noise to make traffic more realistic"
+    },
+
+    "think_time": {
+      "enabled": true,
+      "min_microseconds": 10,
+      "max_microseconds": 100,
+      "frequency": "every 100 bursts",
+      "description": "Occasional small pauses to simulate real user behavior"
+    }
+  },
+
+  "http_traffic_distribution": {
+    "comment": "Realistic HTTP request distribution",
+
+    "methods": {
+      "GET": 0.75,
+      "POST": 0.20,
+      "PUT": 0.03,
+      "DELETE": 0.01,
+      "HEAD": 0.01
+    },
+
+    "content_types": {
+      "html_pages": 0.40,
+      "api_calls": 0.25,
+      "static_resources": 0.20,
+      "dynamic_content": 0.15
+    },
+
+    "session_patterns": {
+      "requests_per_session": {
+        "min": 1,
+        "max": 10,
+        "average": 3.5,
+        "distribution": "weighted (most users make 2-5 requests)"
+      },
+      "session_percentage": 0.30,
+      "single_request_percentage": 0.70
+    },
+
+    "source_ip_distribution": {
+      "unique_ips": 65536,
+      "distribution": "random across /16 network",
+      "description": "Simulates many different clients"
+    }
+  },
+
+  "experiment_settings": {
+    "comment": "Settings for running baseline phase",
+
+    "baseline_duration_seconds": 300,
+    "total_experiment_duration": 660,
+
+    "phases": {
+      "phase1_baseline": {
+        "duration": 300,
+        "description": "Establish baseline (5 minutes)",
+        "action": "Run baseline traffic generator"
+      },
+      "phase2_attack": {
+        "duration": 300,
+        "description": "Mixed traffic with attack (5 minutes)",
+        "action": "Continue baseline traffic while attack generator runs"
+      },
+      "phase3_recovery": {
+        "duration": 60,
+        "description": "Recovery period (1 minute)",
+        "action": "Baseline traffic only, verify system recovery"
+      }
+    }
+  },
+
+  "output_settings": {
+    "data_directory": "./baseline_traffic_data",
+    "pcap_enabled": false,
+    "pcap_sample_size": 10000,
+    "stats_file": "baseline_stats_{timestamp}.json",
+    "log_file": "baseline_generator_{timestamp}.log",
+    "save_interval_seconds": 60,
+    "note": "PCAP disabled by default for performance"
+  },
+
+  "manual_commands": {
+    "comment": "Copy-paste these commands for manual operation",
+
+    "setup": {
+      "hugepages": "echo 4096 | sudo tee /proc/sys/vm/nr_hugepages",
+      "bind_nic": "sudo dpdk-devbind.py --bind=vfio-pci 0000:81:00.0",
+      "check_binding": "sudo dpdk-devbind.py --status"
+    },
+
+    "build": {
+      "command": "cd benign_generator && make clean && make",
+      "verify": "ls -lh build/"
+    },
+
+    "run_dpdk_baseline": {
+      "basic": "sudo ./build/baseline_traffic_gen -l 0-3 -n 4 --proc-type=primary",
+      "with_config": "sudo ./build/baseline_traffic_gen -l 0-3 -n 4 --proc-type=primary --file-prefix=baseline",
+      "note": "Use 4 cores (0-3) for realistic baseline traffic"
+    },
+
+    "run_python_dataset": {
+      "quick_test": "python3 baseline_dataset_generator.py -d 60 -p medium",
+      "5min_baseline": "python3 baseline_dataset_generator.py -d 300 -p medium -o baseline_5min.pcap",
+      "full_experiment": "python3 baseline_dataset_generator.py -d 660 -p medium --start-hour 14",
+      "note": "Use -p [very_low|low|medium|high|very_high] to select profile"
+    },
+
+    "monitoring": {
+      "stats": "tail -f baseline_traffic_data/baseline_stats_*.json",
+      "packets": "sudo tcpdump -i eth0 -c 100 -nn",
+      "rate": "watch -n 1 'ethtool -S eth0 | grep -E \"tx_packets|tx_bytes\"'"
+    }
+  },
+
+  "troubleshooting": {
+    "low_rate": {
+      "issue": "Traffic rate lower than expected",
+      "check": [
+        "Verify hugepages: cat /proc/meminfo | grep Huge",
+        "Check CPU isolation: cat /proc/cmdline | grep isolcpus",
+        "Verify NIC binding: dpdk-devbind.py --status",
+        "Increase num_cores in config"
+      ]
+    },
+    "packet_drops": {
+      "issue": "Seeing packet drops",
+      "check": [
+        "Reduce target rate",
+        "Increase TX ring buffers",
+        "Check NIC statistics: ethtool -S eth0",
+        "Verify no other processes using NIC"
+      ]
+    },
+    "cannot_allocate_mbuf": {
+      "issue": "Cannot allocate mbuf error",
+      "fix": [
+        "Increase hugepages: echo 8192 | sudo tee /proc/sys/vm/nr_hugepages",
+        "Check hugepage mount: mount | grep huge",
+        "Reduce traffic rate temporarily"
+      ]
+    }
+  },
+
+  "recommended_workflow": {
+    "step1": "Setup system (hugepages, NIC binding) - see manual_commands.setup",
+    "step2": "Build generators - see manual_commands.build",
+    "step3": "Quick test (60 seconds) - python3 baseline_dataset_generator.py -d 60 -p low",
+    "step4": "Run full baseline (300 seconds) - see manual_commands.run_dpdk_baseline",
+    "step5": "Monitor in separate terminal - see manual_commands.monitoring",
+    "step6": "Collect results from baseline_traffic_data/ directory",
+    "note": "Start with low profile for testing, then use medium for actual experiments"
+  },
+
+  "important_notes": [
+    "This generates BASELINE traffic, not DDoS attack traffic",
+    "Traffic has realistic variations (time of day, random noise)",
+    "Use 'medium' profile for typical baseline experiments",
+    "DPDK generator is for real-time traffic, Python generator is for datasets",
+    "Always test with short duration first",
+    "Monitor system resources during generation",
+    "Results are saved to baseline_traffic_data/ directory"
+  ]
+}
