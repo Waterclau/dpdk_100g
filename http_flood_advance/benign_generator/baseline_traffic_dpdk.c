@@ -13,6 +13,8 @@
 #include <time.h>
 #include <signal.h>
 #include <math.h>
+#include <stdbool.h>
+#include <unistd.h>
 
 #include <rte_common.h>
 #include <rte_memory.h>
@@ -147,25 +149,29 @@ static void signal_handler(int signum)
 /* Initialize port configuration */
 static const struct rte_eth_conf port_conf_default = {
     .rxmode = {
-        .max_lro_pkt_size = RTE_ETHER_MAX_LEN,
+        .max_rx_pkt_len = RTE_ETHER_MAX_LEN,
     },
     .txmode = {
-        .mq_mode = RTE_ETH_MQ_TX_NONE,
-        .offloads = RTE_ETH_TX_OFFLOAD_IPV4_CKSUM |
-                    RTE_ETH_TX_OFFLOAD_TCP_CKSUM,
+        .mq_mode = ETH_MQ_TX_NONE,
+        .offloads = DEV_TX_OFFLOAD_IPV4_CKSUM |
+                    DEV_TX_OFFLOAD_TCP_CKSUM,
     },
 };
 
 /* Calculate checksums */
 static uint16_t calc_ip_checksum(struct rte_ipv4_hdr *ipv4_hdr)
 {
-    uint16_t *ptr16 = (uint16_t *)ipv4_hdr;
     uint32_t sum = 0;
+    uint16_t val;
+    int i;
 
     ipv4_hdr->hdr_checksum = 0;
 
-    for (int i = 0; i < 10; i++) {
-        sum += rte_be_to_cpu_16(ptr16[i]);
+    // Access via memcpy to avoid alignment warnings
+    uint8_t *bytes = (uint8_t *)ipv4_hdr;
+    for (i = 0; i < 20; i += 2) {
+        val = (bytes[i] << 8) | bytes[i + 1];
+        sum += val;
     }
 
     sum = (sum & 0xFFFF) + (sum >> 16);
@@ -243,8 +249,8 @@ static struct rte_mbuf *generate_baseline_packet(struct rte_mempool *mbuf_pool,
 
     // Ethernet header
     eth_hdr = rte_pktmbuf_mtod(mbuf, struct rte_ether_hdr *);
-    rte_ether_addr_copy(&gen_config.dst_mac, &eth_hdr->dst_addr);
-    rte_ether_addr_copy(&gen_config.src_mac, &eth_hdr->src_addr);
+    rte_ether_addr_copy(&gen_config.dst_mac, &eth_hdr->d_addr);
+    rte_ether_addr_copy(&gen_config.src_mac, &eth_hdr->s_addr);
     eth_hdr->ether_type = rte_cpu_to_be_16(RTE_ETHER_TYPE_IPV4);
 
     // IPv4 header - varied source IPs for realistic traffic
@@ -289,7 +295,7 @@ static struct rte_mbuf *generate_baseline_packet(struct rte_mempool *mbuf_pool,
     mbuf->pkt_len = mbuf->data_len;
 
     // Enable checksum offload
-    mbuf->ol_flags |= RTE_MBUF_F_TX_IPV4 | RTE_MBUF_F_TX_IP_CKSUM | RTE_MBUF_F_TX_TCP_CKSUM;
+    mbuf->ol_flags |= PKT_TX_IPV4 | PKT_TX_IP_CKSUM | PKT_TX_TCP_CKSUM;
     mbuf->l2_len = sizeof(struct rte_ether_hdr);
     mbuf->l3_len = sizeof(struct rte_ipv4_hdr);
     mbuf->l4_len = sizeof(struct rte_tcp_hdr);
@@ -565,7 +571,7 @@ int main(int argc, char *argv[])
     printf("Press Ctrl+C to stop...\n\n");
 
     // Launch traffic generation on all worker cores
-    rte_eal_mp_remote_launch(lcore_baseline_traffic, NULL, SKIP_MAIN);
+    rte_eal_mp_remote_launch(lcore_baseline_traffic, NULL, SKIP_MASTER);
 
     // Main core: print statistics every second
     while (!force_quit) {
@@ -574,16 +580,13 @@ int main(int argc, char *argv[])
     }
 
     // Wait for all cores to finish
-    RTE_LCORE_FOREACH_WORKER(lcore_id) {
+    RTE_LCORE_FOREACH_SLAVE(lcore_id) {
         if (rte_eal_wait_lcore(lcore_id) < 0)
             break;
     }
 
-    // Stop port
-    ret = rte_eth_dev_stop(portid);
-    if (ret != 0)
-        printf("rte_eth_dev_stop failed: %d\n", ret);
-
+    // Stop port (void return in DPDK 19.11)
+    rte_eth_dev_stop(portid);
     rte_eth_dev_close(portid);
 
     printf("\n=== Generator stopped ===\n");

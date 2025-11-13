@@ -166,20 +166,43 @@ fi
 echo ""
 grep Huge /proc/meminfo
 
-# 5. Cargar módulo VFIO-PCI
-print_header "5. Cargando Módulo VFIO-PCI"
+# 5. Detectar tipo de NIC
+print_header "5. Detectando Tipo de NIC"
 
-if lsmod | grep -q vfio_pci; then
-    print_info "✅ Módulo vfio-pci ya cargado"
-else
-    print_info "Cargando módulo vfio-pci..."
-    modprobe vfio-pci
-    if lsmod | grep -q vfio_pci; then
-        print_info "✅ Módulo vfio-pci cargado"
-    else
-        print_error "❌ Error al cargar módulo vfio-pci"
-        exit 1
+IS_MELLANOX=false
+if lspci -s $NIC_PCI | grep -qi "mellanox"; then
+    print_info "✅ NIC Mellanox detectada"
+    NIC_MODEL=$(lspci -s $NIC_PCI | grep -oP "Mellanox.*" | head -n1)
+    print_info "Modelo: $NIC_MODEL"
+    IS_MELLANOX=true
+
+    # Verificar driver actual
+    NIC_DRIVER=$(ethtool -i $NIC_INTERFACE 2>/dev/null | grep "driver:" | awk '{print $2}')
+    print_info "Driver actual: $NIC_DRIVER"
+
+    if [ "$NIC_DRIVER" = "mlx5_core" ] || [ "$NIC_DRIVER" = "mlx4_core" ]; then
+        print_info "✅ Driver Mellanox correcto ($NIC_DRIVER)"
+        print_info "ℹ️  Mellanox NO requiere unbind para DPDK"
+
+        # Verificar librerías MLX5
+        print_info "Verificando librerías MLX5..."
+        if ldconfig -p | grep -q "libmlx5"; then
+            print_info "✅ Librerías MLX5 instaladas"
+        else
+            print_warning "⚠️  Librerías MLX5 no encontradas"
+            print_info "Instalar con: sudo apt-get install libibverbs-dev libmlx5-1 libmnl-dev"
+            read -p "¿Instalar ahora? (y/n): " install_mlx
+            if [ "$install_mlx" = "y" ]; then
+                apt-get update
+                apt-get install -y libibverbs-dev libmlx5-1 libmnl-dev
+                print_info "✅ Librerías instaladas"
+            fi
+        fi
     fi
+else
+    print_info "NIC genérica detectada (no Mellanox)"
+    NIC_MODEL=$(lspci -s $NIC_PCI | cut -d':' -f3-)
+    print_info "Modelo: $NIC_MODEL"
 fi
 
 # 6. Verificar que DPDK está instalado
@@ -194,25 +217,67 @@ else
     exit 1
 fi
 
-# 7. Bindear NIC a DPDK
-print_header "7. Bindeando NIC a DPDK"
+# 7. Configurar NIC para DPDK
+print_header "7. Configurando NIC para DPDK"
 
-print_warning "⚠️  Esto desconectará el NIC del kernel"
-print_warning "    SSH management sigue funcionando (usa eno33)"
-echo ""
-read -p "¿Bindear $NIC_INTERFACE ($NIC_PCI) a DPDK? (y/n): " bind_confirm
-if [ "$bind_confirm" != "y" ]; then
-    print_info "Binding cancelado. Puedes hacerlo manualmente después con:"
-    echo "  sudo dpdk-devbind.py --bind=vfio-pci $NIC_PCI"
+if [ "$IS_MELLANOX" = true ]; then
+    print_info "═══════════════════════════════════════"
+    print_info "  MELLANOX: NO REQUIERE BINDING"
+    print_info "═══════════════════════════════════════"
+    echo ""
+    print_info "✅ La NIC Mellanox funciona directamente con DPDK"
+    print_info "   usando el driver mlx5_core (bifurcated driver)"
+    echo ""
+    print_info "ℹ️  NO necesitas hacer unbind ni usar vfio-pci"
+    print_info "   La interfaz seguirá visible en el kernel"
+    echo ""
+    print_info "Uso en aplicaciones DPDK:"
+    echo "  sudo ./app -l 0-3 -n 4 -a $NIC_PCI -- [parámetros]"
+    echo ""
+
+    SKIP_BINDING=true
 else
-    print_info "Bindeando $NIC_PCI a vfio-pci..."
-    dpdk-devbind.py --bind=vfio-pci $NIC_PCI
+    # NIC no-Mellanox: Intentar binding tradicional
+    print_warning "⚠️  NIC no-Mellanox: requiere binding a DPDK"
 
-    if [ $? -eq 0 ]; then
-        print_info "✅ NIC bindeado exitosamente"
+    # Intentar cargar VFIO o UIO
+    print_info "Intentando cargar módulo vfio-pci..."
+    if modprobe vfio-pci 2>/dev/null && lsmod | grep -q vfio_pci; then
+        print_info "✅ Módulo vfio-pci cargado"
+        DPDK_DRIVER="vfio-pci"
     else
-        print_error "❌ Error al bindear NIC"
-        exit 1
+        print_warning "⚠️  vfio-pci no disponible, intentando uio_pci_generic..."
+        if modprobe uio_pci_generic 2>/dev/null && lsmod | grep -q uio_pci_generic; then
+            print_info "✅ Módulo uio_pci_generic cargado"
+            DPDK_DRIVER="uio_pci_generic"
+        else
+            print_error "❌ No se pudo cargar ningún driver DPDK"
+            print_error "Necesitas habilitar IOMMU en GRUB"
+            print_info "Ejecuta: sudo ./scripts/fix_vfio_iommu.sh"
+            exit 1
+        fi
+    fi
+
+    echo ""
+    print_warning "⚠️  Esto desconectará el NIC del kernel"
+    print_warning "    SSH management sigue funcionando (usa eno33)"
+    echo ""
+    read -p "¿Bindear $NIC_INTERFACE ($NIC_PCI) a $DPDK_DRIVER? (y/n): " bind_confirm
+    if [ "$bind_confirm" != "y" ]; then
+        print_info "Binding cancelado. Puedes hacerlo manualmente después con:"
+        echo "  sudo dpdk-devbind.py --bind=$DPDK_DRIVER $NIC_PCI"
+        SKIP_BINDING=true
+    else
+        print_info "Bindeando $NIC_PCI a $DPDK_DRIVER..."
+        dpdk-devbind.py --bind=$DPDK_DRIVER $NIC_PCI
+
+        if [ $? -eq 0 ]; then
+            print_info "✅ NIC bindeado exitosamente"
+            SKIP_BINDING=false
+        else
+            print_error "❌ Error al bindear NIC"
+            exit 1
+        fi
     fi
 fi
 
@@ -266,8 +331,18 @@ print_header "✅ Setup Completo"
 echo ""
 echo "Configuración aplicada:"
 echo "  ✅ Hugepages:       $(cat /proc/sys/vm/nr_hugepages)"
-echo "  ✅ VFIO-PCI:        Cargado"
-echo "  ✅ NIC Binding:     $NIC_PCI → vfio-pci"
+if [ "$IS_MELLANOX" = true ]; then
+    echo "  ✅ NIC Type:        Mellanox ($NIC_DRIVER)"
+    echo "  ✅ NIC Mode:        Bifurcated Driver (NO binding requerido)"
+    echo "  ✅ NIC PCI:         $NIC_PCI"
+else
+    if [ "$SKIP_BINDING" = false ]; then
+        echo "  ✅ DPDK Driver:     $DPDK_DRIVER"
+        echo "  ✅ NIC Binding:     $NIC_PCI → $DPDK_DRIVER"
+    else
+        echo "  ⚠️  NIC Binding:     Pendiente (no realizado)"
+    fi
+fi
 echo "  ✅ Conectividad:    $CONTROLLER_IP → $MONITOR_IP OK"
 echo "  ✅ Directorio:      $DATA_DIR"
 echo ""
@@ -279,27 +354,39 @@ print_info "========================================="
 echo ""
 echo "Comandos para ejecutar:"
 echo ""
-echo "  # DPDK (tiempo real):"
-echo "  sudo ./build/baseline_traffic_gen -l 0-3 -n 4 --proc-type=primary"
+if [ "$IS_MELLANOX" = true ]; then
+    echo "  # DPDK (tiempo real) - Mellanox con -a:"
+    echo "  sudo ./build/baseline_traffic_gen -l 0-3 -n 4 -a $NIC_PCI --proc-type=primary"
+else
+    echo "  # DPDK (tiempo real):"
+    echo "  sudo ./build/baseline_traffic_gen -l 0-3 -n 4 --proc-type=primary"
+fi
 echo ""
 echo "  # Python (dataset):"
 echo "  python3 baseline_dataset_generator.py -d 300 -p medium \\"
 echo "    --dst-ip $MONITOR_IP --dst-mac $MONITOR_MAC"
 echo ""
 echo "  # Monitoreo (en otra terminal):"
-echo "  watch -n 1 'ethtool -S $NIC_INTERFACE | grep tx_packets'"
+if [ "$IS_MELLANOX" = true ]; then
+    echo "  watch -n 1 'ethtool -S $NIC_INTERFACE | grep tx_packets'"
+else
+    echo "  watch -n 1 'cat /proc/interrupts | grep mlx'"
+fi
 echo ""
 
 print_info "Ver guía completa en: SETUP_MIS_NODOS.md"
 
 # Crear archivo de comandos de referencia
 COMMANDS_FILE="$HOME/dpdk_100g/http_flood_advance/MY_COMMANDS.txt"
+if [ "$IS_MELLANOX" = true ]; then
 cat > "$COMMANDS_FILE" << EOF
 # Comandos de Referencia - Node Controller
 # Generados por setup: $(date)
+# NIC: Mellanox (Bifurcated Driver - NO binding)
 
 # === EJECUTAR GENERADOR DPDK ===
-sudo ./build/baseline_traffic_gen -l 0-3 -n 4 --proc-type=primary
+# IMPORTANTE: Usar -a (allowlist) para Mellanox
+sudo ./build/baseline_traffic_gen -l 0-3 -n 4 -a $NIC_PCI --proc-type=primary
 
 # === EJECUTAR GENERADOR PYTHON ===
 python3 baseline_dataset_generator.py -d 300 -p medium \\
@@ -313,9 +400,38 @@ sudo tcpdump -i $NIC_INTERFACE -c 20 -nn host $MONITOR_IP
 ping $MONITOR_IP
 sudo dpdk-devbind.py --status
 cat /proc/meminfo | grep Huge
+ethtool -i $NIC_INTERFACE
+
+# === NOTA: NO HACER UNBIND ===
+# Mellanox funciona con mlx5_core (bifurcated driver)
+# La interfaz está disponible tanto en kernel como en DPDK
+EOF
+else
+cat > "$COMMANDS_FILE" << EOF
+# Comandos de Referencia - Node Controller
+# Generados por setup: $(date)
+
+# === EJECUTAR GENERADOR DPDK ===
+sudo ./build/baseline_traffic_gen -l 0-3 -n 4 --proc-type=primary
+
+# === EJECUTAR GENERADOR PYTHON ===
+python3 baseline_dataset_generator.py -d 300 -p medium \\
+  --dst-ip $MONITOR_IP --dst-mac $MONITOR_MAC
+
+# === MONITOREO ===
+watch -n 1 'cat /proc/interrupts | grep eth'
+sudo tcpdump -i $NIC_INTERFACE -c 20 -nn host $MONITOR_IP
+
+# === VERIFICAR ===
+ping $MONITOR_IP
+sudo dpdk-devbind.py --status
+cat /proc/meminfo | grep Huge
 
 # === UNBIND (restaurar) ===
 sudo dpdk-devbind.py --bind=mlx5_core $NIC_PCI
+EOF
+fi
+cat >> "$COMMANDS_FILE" << EOF
 
 # === Tu Configuración ===
 Controller IP:  $CONTROLLER_IP
