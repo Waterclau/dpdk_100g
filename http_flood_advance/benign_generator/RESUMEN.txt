@@ -1,0 +1,239 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║            GENERADOR DE TRÁFICO BASELINE HTTP CON TCPREPLAY               ║
+║                         (Controlador -> Monitor)                          ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+RESUMEN DE LA SOLUCIÓN
+======================
+
+Esta solución reemplaza el enfoque DPDK anterior (que tenía problemas de
+segmentation fault) por un sistema más confiable basado en:
+
+  1. Python + Scapy: Generación de archivos PCAP con tráfico HTTP realista
+  2. Tcpreplay: Reproducción de PCAPs a altas velocidades (hasta 100 Gbps)
+
+VENTAJAS sobre DPDK:
+  ✓ Más confiable (sin problemas de compatibilidad con NICs)
+  ✓ Más simple (sin compilación compleja)
+  ✓ Reproducible (PCAPs reutilizables)
+  ✓ Tráfico real (HTTP sobre TCP, no UDP)
+  ✓ Flexible (fácil modificar patrones)
+  ✓ Alto rendimiento (40-100 Gbps alcanzable)
+
+ARCHIVOS CREADOS
+================
+
+Generación de PCAPs:
+  • generate_baseline_pcap.py    - Genera PCAPs con tráfico HTTP realista
+  • generate_pcap_suite.sh        - Genera suite completa (5 tamaños)
+  • analyze_pcap.py               - Analiza y verifica PCAPs generados
+
+Reproducción de Tráfico:
+  • replay_baseline.sh            - Reproduce PCAPs con tcpreplay
+  • quick_start.sh                - Script interactivo guiado
+
+Documentación:
+  • README.md                     - Documentación completa y detallada
+  • QUICKSTART.md                 - Guía de inicio rápido
+  • config.example                - Configuración de ejemplo
+
+Otros:
+  • requirements.txt              - Dependencias Python
+  • RESUMEN.txt                   - Este archivo
+
+Archivos antiguos:
+  • _old/                         - Código DPDK anterior (movido)
+
+CARACTERÍSTICAS DEL TRÁFICO GENERADO
+=====================================
+
+Distribución de peticiones HTTP (realista):
+  • Homepage (30%):  GET /, /index.html, /home
+  • API (25%):       GET/POST /api/v1/*, /api/v2/*
+  • Estáticos (25%): CSS, JS, imágenes, fonts
+  • Dinámico (15%):  Búsquedas, productos, perfiles
+  • Realtime (5%):   WebSocket, polling
+
+Características técnicas:
+  • Protocolo: HTTP sobre TCP (no UDP)
+  • IPs origen: Randomizadas en /16 (ej: 192.168.X.X)
+  • Puertos origen: Aleatorios (1024-65535)
+  • User-Agents: 5 navegadores realistas
+  • Headers HTTP: Completos y realistas
+  • Métodos: GET (90%), POST (10%)
+
+INICIO RÁPIDO
+=============
+
+1. Instalar dependencias:
+   $ pip install -r requirements.txt
+   $ sudo apt-get install tcpreplay
+
+2. Generar PCAP:
+   $ python3 generate_baseline_pcap.py -n 1000000
+
+3. Reproducir:
+   $ sudo ./replay_baseline.sh -i eth0 -r 10000
+
+O usar modo interactivo:
+   $ ./quick_start.sh
+
+EJEMPLOS DE USO
+===============
+
+Testing rápido (1 Gbps):
+  $ python3 generate_baseline_pcap.py -n 10000 -o test.pcap
+  $ sudo ./replay_baseline.sh -i eth0 -f test.pcap -r 1000
+
+Baseline normal (10 Gbps, 5 minutos):
+  $ python3 generate_baseline_pcap.py -n 1000000
+  $ sudo timeout 300 ./replay_baseline.sh -i eth0 -r 10000
+
+Alto rendimiento (40 Gbps):
+  $ python3 generate_baseline_pcap.py -n 5000000 -o baseline_5M.pcap -v
+  $ sudo ./replay_baseline.sh -i eth0 -f baseline_5M.pcap -r 40000 -p
+
+Máximo rendimiento (100 Gbps):
+  $ python3 generate_baseline_pcap.py -n 10000000 -o baseline_10M.pcap -v
+  $ sudo ./replay_baseline.sh -i eth0 -f baseline_10M.pcap -t -p
+
+Generar suite completa:
+  $ ./generate_pcap_suite.sh
+
+WORKFLOW TÍPICO PARA ATAQUE HTTP FLOOD
+=======================================
+
+1. Generar PCAP baseline (una vez):
+   $ python3 generate_baseline_pcap.py -n 5000000 -o baseline.pcap -v
+
+2. Verificar PCAP:
+   $ python3 analyze_pcap.py baseline.pcap
+
+3. Preparar interfaz en Controlador:
+   $ sudo ip link set eth0 up
+   $ sudo ethtool -K eth0 gro off gso off tso off
+
+4. Iniciar captura en Monitor:
+   (ejecutar tu aplicación DPDK/OctoSketch)
+
+5. Enviar tráfico baseline (5 minutos):
+   $ sudo timeout 300 ./replay_baseline.sh -i eth0 -f baseline.pcap -r 10000
+
+6. Esperar estabilización:
+   $ sleep 10
+
+7. Lanzar ataque HTTP flood:
+   (ejecutar tu generador de ataque)
+
+8. Comparar métricas:
+   Analizar diferencias baseline vs ataque en OctoSketch
+
+CONFIGURACIÓN PARA TU ENTORNO
+==============================
+
+Editar las siguientes variables según tu setup:
+
+En generate_baseline_pcap.py:
+  • DEFAULT_SRC_IP = "192.168.1.0"      # Red controlador
+  • DEFAULT_DST_IP = "10.0.0.1"         # IP Monitor
+  • DEFAULT_DST_MAC = "04:3f:72:ac:cd:e7"  # MAC Monitor
+
+En replay_baseline.sh:
+  • INTERFACE: Tu interfaz de red (ej: ens3f0)
+
+O usar config.example como plantilla:
+  $ cp config.example config.sh
+  $ nano config.sh
+
+RENDIMIENTO ESPERADO
+====================
+
+Generación de PCAPs (Python):
+  • 100K paquetes:   ~5-10s    (~15 MB)
+  • 1M paquetes:     ~30-60s   (~150 MB)
+  • 10M paquetes:    ~5-10min  (~1.5 GB)
+
+Replay con Tcpreplay:
+  • 1 Gbps:      Fácil, 10-20% CPU
+  • 10 Gbps:     Fácil, 30-50% CPU
+  • 40 Gbps:     Alcanzable, 70-90% CPU, NIC 100G
+  • 100 Gbps:    Alcanzable, 95-100% CPU, NIC 100G + preload
+
+Para máximo rendimiento usar:
+  • -p (preload PCAP en RAM)
+  • Deshabilitar offloads NIC
+  • Cores dedicados (taskset)
+
+VERIFICACIÓN
+============
+
+Analizar PCAP generado:
+  $ python3 analyze_pcap.py baseline_traffic.pcap
+
+Capturar en Monitor:
+  $ sudo tcpdump -i <interface> -n tcp port 80 -c 10 -A
+
+Ver estadísticas de envío:
+  $ watch -n 1 'ethtool -S eth0 | grep tx_packets'
+
+Verificar contenido HTTP:
+  $ sudo tcpdump -i <interface> tcp port 80 -c 5 -A | grep "GET\|POST"
+
+TROUBLESHOOTING
+===============
+
+Error "Cannot open device":
+  → Ejecutar con sudo
+
+Error "No such device":
+  → Verificar nombre interfaz: ip link show
+
+Bajo rendimiento:
+  → Deshabilitar offloads: ethtool -K <iface> gro off gso off tso off
+  → Usar preload: -p
+  → Verificar CPU: top
+
+Paquetes no llegan:
+  → Verificar link: ethtool <iface> | grep "Link detected"
+  → Verificar routing/firewall
+  → Capturar en ambos extremos con tcpdump
+
+DOCUMENTACIÓN ADICIONAL
+========================
+
+Ver archivos para más detalles:
+  • README.md        - Documentación completa
+  • QUICKSTART.md    - Guía rápida de inicio
+
+Scripts con ayuda integrada:
+  $ python3 generate_baseline_pcap.py --help
+  $ ./replay_baseline.sh -h
+
+NOTAS IMPORTANTES
+=================
+
+• Los archivos PCAP se pueden reutilizar múltiples veces
+• Generar PCAP una vez, reproducir muchas veces
+• Tcpreplay soporta loop infinito (-l 0)
+• Para tráfico continuo, usar loops en lugar de PCAPs enormes
+• El tráfico es unidireccional (Controlador -> Monitor)
+• No hay respuestas del Monitor (esperado para baseline)
+
+CONTACTO Y SOPORTE
+==================
+
+Para problemas:
+  1. Revisar README.md
+  2. Verificar configuración de red
+  3. Analizar PCAPs generados
+  4. Verificar logs de tcpreplay con -v
+
+═══════════════════════════════════════════════════════════════════════════
+
+Fecha de creación: 2025-11-17
+Versión: 1.0
+Licencia: GPL v2
+
+═══════════════════════════════════════════════════════════════════════════

@@ -327,6 +327,10 @@ class BaselineTrafficGenerator:
 
         packets_generated = 0
         elapsed = 0
+        last_progress_second = -1
+
+        print("\nProgress:")
+        print("=" * 80)
 
         while elapsed < duration_seconds:
             # Calculate current rate based on time of day
@@ -348,24 +352,40 @@ class BaselineTrafficGenerator:
                     packets_generated += len(session_pkts)
 
             elapsed = time.time() - start_time
+            current_second = int(elapsed)
 
             # Progress update every 10 seconds
-            if int(elapsed) % 10 == 0 and int(elapsed) > 0:
-                print(f"  Progress: {int(elapsed)}/{duration_seconds}s - "
-                      f"Generated {packets_generated} packets "
-                      f"(current rate: {current_rps} rps)")
+            if current_second != last_progress_second and current_second % 10 == 0 and current_second > 0:
+                last_progress_second = current_second
+                progress_pct = (current_second / duration_seconds) * 100
+                avg_rate = packets_generated / elapsed if elapsed > 0 else 0
+                eta_seconds = (duration_seconds - current_second)
+                eta_minutes = eta_seconds // 60
+                eta_secs = eta_seconds % 60
+
+                print(f"[{current_second:5d}/{duration_seconds}s] "
+                      f"Progress: {progress_pct:5.1f}% | "
+                      f"Packets: {packets_generated:,} | "
+                      f"Rate: {current_rps:,} rps | "
+                      f"Avg: {avg_rate:,.0f} pps | "
+                      f"ETA: {int(eta_minutes)}m {int(eta_secs)}s")
+                sys.stdout.flush()
 
         total_time = time.time() - start_time
         avg_rate = packets_generated / total_time
 
-        print(f"\nGenerated {packets_generated} packets in {total_time:.2f} seconds")
-        print(f"Average rate: {avg_rate:.2f} pps")
+        print("=" * 80)
+        print(f"\n✅ Generation Complete!")
+        print(f"   Total packets: {packets_generated:,}")
+        print(f"   Total time:    {total_time:.2f} seconds")
+        print(f"   Average rate:  {avg_rate:,.0f} pps")
+        print(f"   Total size:    {sum(len(p) for p in all_packets):,} bytes ({sum(len(p) for p in all_packets)/1024/1024:.2f} MB)")
 
         # Save to PCAP if requested
         if output_file:
-            print(f"Saving to {output_file}...")
+            print(f"\n💾 Saving to {output_file}...")
             wrpcap(output_file, all_packets)
-            print(f"Saved {len(all_packets)} packets")
+            print(f"   ✅ Saved {len(all_packets):,} packets successfully")
 
         self.packets = all_packets
         return all_packets

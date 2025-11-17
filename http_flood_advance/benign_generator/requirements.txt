@@ -1,0 +1,2 @@
+# Dependencias Python para generador de tráfico baseline
+scapy>=2.5.0

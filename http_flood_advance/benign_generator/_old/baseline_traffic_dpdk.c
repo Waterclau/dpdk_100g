@@ -39,9 +39,10 @@
 
 #define RX_RING_SIZE 2048
 #define TX_RING_SIZE 2048
-#define NUM_MBUFS 65536       // Reduced for normal traffic
-#define MBUF_CACHE_SIZE 256
+#define NUM_MBUFS 262144      // Increased: 256K mbufs to prevent exhaustion
+#define MBUF_CACHE_SIZE 512   // Increased cache per core
 #define BURST_SIZE 32         // Smaller bursts for realistic traffic
+#define MBUF_REFILL_THRESHOLD 1000  // Warn if free mbufs below this
 
 // Realistic baseline traffic rates (much lower than DDoS)
 // Typical web server: 10K - 500K requests/sec
@@ -68,6 +69,7 @@ struct traffic_stats {
     uint64_t tx_packets;
     uint64_t tx_bytes;
     uint64_t tx_dropped;
+    uint64_t alloc_failed;     // Track allocation failures
     uint64_t sessions_created;
     double current_rate_pps;
     double current_rate_mbps;
@@ -75,6 +77,7 @@ struct traffic_stats {
 } __rte_cache_aligned;
 
 static volatile bool force_quit = false;
+static volatile bool port_ready = false;  // Signal when port is ready
 static struct traffic_stats stats[RTE_MAX_LCORE];
 
 // Realistic HTTP request templates (diverse web application traffic)
@@ -153,8 +156,8 @@ static const struct rte_eth_conf port_conf_default = {
     },
     .txmode = {
         .mq_mode = ETH_MQ_TX_NONE,
-        .offloads = DEV_TX_OFFLOAD_IPV4_CKSUM |
-                    DEV_TX_OFFLOAD_TCP_CKSUM,
+        // Disable offloads initially to avoid Mellanox issues
+        .offloads = 0,
     },
 };
 
@@ -178,6 +181,42 @@ static uint16_t calc_ip_checksum(struct rte_ipv4_hdr *ipv4_hdr)
     sum = (sum & 0xFFFF) + (sum >> 16);
 
     return rte_cpu_to_be_16((uint16_t)~sum);
+}
+
+/* Calculate TCP checksum */
+static uint16_t calc_tcp_checksum(struct rte_ipv4_hdr *ipv4_hdr,
+                                   struct rte_tcp_hdr *tcp_hdr,
+                                   uint16_t tcp_len)
+{
+    uint32_t sum = 0;
+    uint8_t *bytes = (uint8_t *)tcp_hdr;
+    uint16_t val;
+    int i;
+
+    // Pseudo header
+    sum += (ipv4_hdr->src_addr >> 16) & 0xFFFF;
+    sum += ipv4_hdr->src_addr & 0xFFFF;
+    sum += (ipv4_hdr->dst_addr >> 16) & 0xFFFF;
+    sum += ipv4_hdr->dst_addr & 0xFFFF;
+    sum += rte_cpu_to_be_16(IPPROTO_TCP);
+    sum += rte_cpu_to_be_16(tcp_len);
+
+    // TCP header and data - use byte access to avoid alignment issues
+    tcp_hdr->cksum = 0;
+    for (i = 0; i < tcp_len - 1; i += 2) {
+        val = (bytes[i] << 8) | bytes[i + 1];
+        sum += val;
+    }
+
+    // Handle odd length
+    if (tcp_len & 1) {
+        sum += bytes[tcp_len - 1] << 8;
+    }
+
+    sum = (sum & 0xFFFF) + (sum >> 16);
+    sum = (sum & 0xFFFF) + (sum >> 16);
+
+    return (uint16_t)~sum;
 }
 
 /* Select HTTP template based on probability distribution */
@@ -281,12 +320,16 @@ static struct rte_mbuf *generate_baseline_packet(struct rte_mempool *mbuf_pool,
     tcp_hdr->data_off = 0x50;  // 20 bytes
     tcp_hdr->tcp_flags = RTE_TCP_PSH_FLAG | RTE_TCP_ACK_FLAG;
     tcp_hdr->rx_win = rte_cpu_to_be_16(65535);
-    tcp_hdr->cksum = 0;  // Offload to NIC
+    tcp_hdr->cksum = 0;
     tcp_hdr->tcp_urp = 0;
 
     // HTTP payload
     payload = (uint8_t *)(tcp_hdr + 1);
     memcpy(payload, http_template, http_len);
+
+    // Calculate TCP checksum manually (since offload is disabled)
+    uint16_t tcp_len = sizeof(struct rte_tcp_hdr) + http_len;
+    tcp_hdr->cksum = calc_tcp_checksum(ipv4_hdr, tcp_hdr, tcp_len);
 
     // Set packet length
     mbuf->data_len = sizeof(struct rte_ether_hdr) +
@@ -294,8 +337,8 @@ static struct rte_mbuf *generate_baseline_packet(struct rte_mempool *mbuf_pool,
                      sizeof(struct rte_tcp_hdr) + http_len;
     mbuf->pkt_len = mbuf->data_len;
 
-    // Enable checksum offload
-    mbuf->ol_flags |= PKT_TX_IPV4 | PKT_TX_IP_CKSUM | PKT_TX_TCP_CKSUM;
+    // No offload flags needed (software checksums calculated above)
+    mbuf->ol_flags = 0;
     mbuf->l2_len = sizeof(struct rte_ether_hdr);
     mbuf->l3_len = sizeof(struct rte_ipv4_hdr);
     mbuf->l4_len = sizeof(struct rte_tcp_hdr);
@@ -313,6 +356,7 @@ static int lcore_baseline_traffic(__rte_unused void *arg)
     uint32_t seq_num = lcore_id * 1000000;
     time_t start_time = time(NULL);
     uint32_t burst_count = 0;
+    uint32_t consecutive_alloc_fails = 0;
 
     // Calculate packets per core per second
     uint32_t nb_lcores = rte_lcore_count() - 1;  // Exclude main lcore
@@ -327,6 +371,29 @@ static int lcore_baseline_traffic(__rte_unused void *arg)
            gen_config.profile == TRAFFIC_PROFILE_MEDIUM ? "MEDIUM" :
            gen_config.profile == TRAFFIC_PROFILE_HIGH ? "HIGH" : "VARIABLE");
 
+    // Wait for port to be ready before starting traffic
+    printf("Core %u: Waiting for port to be ready...\n", lcore_id);
+    while (!port_ready && !force_quit) {
+        usleep(100000);  // 100ms
+    }
+
+    if (force_quit) {
+        printf("Core %u: Quit signaled before start\n", lcore_id);
+        return 0;
+    }
+
+    printf("Core %u: Port ready, starting traffic generation\n", lcore_id);
+
+    // Verify port is actually started
+    struct rte_eth_dev_info dev_info;
+    if (rte_eth_dev_info_get(gen_config.port_id, &dev_info) == 0) {
+        printf("Core %u: Port device info retrieved\n", lcore_id);
+    }
+
+    // Small initial delay per core to stagger startup
+    usleep(lcore_id * 100000);  // lcore_id * 100ms
+
+    printf("Core %u: Beginning packet transmission\n", lcore_id);
     prev_tsc = rte_rdtsc();
 
     while (!force_quit) {
@@ -347,31 +414,79 @@ static int lcore_baseline_traffic(__rte_unused void *arg)
                 actual_burst = BURST_SIZE * 3 / 4 + (rand() % (BURST_SIZE / 2));
             }
 
-            // Generate packets
+            // Ensure at least 1 packet
+            if (actual_burst < 1) actual_burst = 1;
+
+            // Generate packets with improved error handling
             int generated = 0;
             for (int i = 0; i < actual_burst; i++) {
                 bufs[i] = generate_baseline_packet(gen_config.mbuf_pool, seq_num++);
                 if (bufs[i] == NULL) {
-                    actual_burst = i;
+                    // Allocation failed - stop generating this burst
+                    stats[lcore_id].alloc_failed++;
+                    consecutive_alloc_fails++;
+
+                    // If too many consecutive failures, pause briefly
+                    if (consecutive_alloc_fails > 10) {
+                        rte_delay_us_block(1000); // 1ms pause
+                        if (consecutive_alloc_fails > 100) {
+                            printf("Core %u: Critical - sustained mbuf allocation failures!\n", lcore_id);
+                            rte_delay_us_block(10000); // 10ms pause
+                        }
+                    }
                     break;
                 }
                 generated++;
             }
 
-            // Send burst
-            uint16_t nb_tx = rte_eth_tx_burst(gen_config.port_id, 0, bufs, actual_burst);
+            // Update actual burst size to number of successfully generated packets
+            actual_burst = generated;
 
-            // Update statistics
-            stats[lcore_id].tx_packets += nb_tx;
-            for (int i = 0; i < nb_tx; i++) {
-                stats[lcore_id].tx_bytes += bufs[i]->pkt_len;
-            }
+            // Only send if we generated packets
+            if (actual_burst > 0) {
+                // Reset consecutive failure counter on success
+                consecutive_alloc_fails = 0;
 
-            // Free unsent packets
-            if (unlikely(nb_tx < actual_burst)) {
-                stats[lcore_id].tx_dropped += (actual_burst - nb_tx);
-                for (int i = nb_tx; i < actual_burst; i++) {
-                    rte_pktmbuf_free(bufs[i]);
+                // Send burst - wrap in error detection
+                uint16_t nb_tx = 0;
+
+                // Try to send with error checking
+                nb_tx = rte_eth_tx_burst(gen_config.port_id, 0, bufs, actual_burst);
+
+                // Check if transmission failed completely
+                if (nb_tx == 0 && actual_burst > 0) {
+                    // All packets failed to send - this might indicate QP error
+                    static uint64_t tx_fail_count = 0;
+                    tx_fail_count++;
+
+                    if (tx_fail_count < 10) {
+                        printf("Core %u: WARNING - TX burst returned 0 (attempt %lu)\n",
+                               lcore_id, tx_fail_count);
+                    }
+
+                    if (tx_fail_count >= 100) {
+                        printf("Core %u: CRITICAL - Sustained TX failures, stopping\n", lcore_id);
+                        // Free all packets and stop
+                        for (int i = 0; i < actual_burst; i++) {
+                            rte_pktmbuf_free(bufs[i]);
+                        }
+                        force_quit = true;
+                        break;
+                    }
+                }
+
+                // Update statistics
+                stats[lcore_id].tx_packets += nb_tx;
+                for (int i = 0; i < nb_tx; i++) {
+                    stats[lcore_id].tx_bytes += bufs[i]->pkt_len;
+                }
+
+                // CRITICAL: Free unsent packets to return mbufs to pool
+                if (unlikely(nb_tx < actual_burst)) {
+                    stats[lcore_id].tx_dropped += (actual_burst - nb_tx);
+                    for (int i = nb_tx; i < actual_burst; i++) {
+                        rte_pktmbuf_free(bufs[i]);
+                    }
                 }
             }
 
@@ -383,11 +498,23 @@ static int lcore_baseline_traffic(__rte_unused void *arg)
                 // Small delay every 100 bursts (~10-100 microseconds)
                 rte_delay_us_block(10 + (rand() % 90));
             }
+
+            // Check mempool health periodically
+            if (burst_count % 1000 == 0) {
+                unsigned available = rte_mempool_avail_count(gen_config.mbuf_pool);
+                unsigned in_use = rte_mempool_in_use_count(gen_config.mbuf_pool);
+
+                if (available < MBUF_REFILL_THRESHOLD) {
+                    printf("Core %u WARNING: Low mbuf count! Available=%u, InUse=%u\n",
+                           lcore_id, available, in_use);
+                }
+            }
         }
     }
 
-    printf("Core %u: Stopping. Sent %lu packets (%lu bytes)\n",
-           lcore_id, stats[lcore_id].tx_packets, stats[lcore_id].tx_bytes);
+    printf("Core %u: Stopping. Sent %lu packets (%lu bytes), Alloc Failures: %lu\n",
+           lcore_id, stats[lcore_id].tx_packets, stats[lcore_id].tx_bytes,
+           stats[lcore_id].alloc_failed);
 
     return 0;
 }
@@ -398,6 +525,7 @@ static void print_stats(void)
     uint64_t total_tx_packets = 0;
     uint64_t total_tx_bytes = 0;
     uint64_t total_dropped = 0;
+    uint64_t total_alloc_failed = 0;
     static uint64_t prev_packets = 0;
     static uint64_t prev_bytes = 0;
     static uint64_t prev_tsc = 0;
@@ -407,7 +535,12 @@ static void print_stats(void)
         total_tx_packets += stats[i].tx_packets;
         total_tx_bytes += stats[i].tx_bytes;
         total_dropped += stats[i].tx_dropped;
+        total_alloc_failed += stats[i].alloc_failed;
     }
+
+    // Get mempool statistics
+    unsigned mbuf_available = rte_mempool_avail_count(gen_config.mbuf_pool);
+    unsigned mbuf_in_use = rte_mempool_in_use_count(gen_config.mbuf_pool);
 
     // Calculate rates
     uint64_t cur_tsc = rte_rdtsc();
@@ -424,11 +557,13 @@ static void print_stats(void)
         printf("Total Packets:  %20lu\n", total_tx_packets);
         printf("Total Bytes:    %20lu (%.2f MB)\n", total_tx_bytes, total_tx_bytes / 1e6);
         printf("Dropped:        %20lu\n", total_dropped);
+        printf("Alloc Failed:   %20lu\n", total_alloc_failed);
         printf("Current Rate:   %20.2f pps (%.2f Kpps)\n", pps, pps / 1e3);
         printf("Throughput:     %20.2f Mbps (%.3f Gbps)\n", mbps, mbps / 1e3);
         printf("Avg Packet:     %20.2f bytes\n",
                pkt_diff > 0 ? (double)byte_diff / pkt_diff : 0);
         printf("Base Rate:      %20u pps\n", gen_config.base_rate_pps);
+        printf("Mempool:        %u available, %u in use\n", mbuf_available, mbuf_in_use);
         printf("=============================================\n");
     }
 
@@ -447,9 +582,12 @@ static int port_init(uint16_t port, struct rte_mempool *mbuf_pool)
     int retval;
     struct rte_eth_dev_info dev_info;
     struct rte_eth_txconf txconf;
+    struct rte_eth_link link;
 
-    if (!rte_eth_dev_is_valid_port(port))
+    if (!rte_eth_dev_is_valid_port(port)) {
+        printf("Port %u is not valid\n", port);
         return -1;
+    }
 
     retval = rte_eth_dev_info_get(port, &dev_info);
     if (retval != 0) {
@@ -457,40 +595,106 @@ static int port_init(uint16_t port, struct rte_mempool *mbuf_pool)
         return retval;
     }
 
+    printf("Configuring port %u...\n", port);
     retval = rte_eth_dev_configure(port, rx_rings, tx_rings, &port_conf);
-    if (retval != 0)
+    if (retval != 0) {
+        printf("Error configuring port %u: %s\n", port, strerror(-retval));
         return retval;
+    }
 
     retval = rte_eth_dev_adjust_nb_rx_tx_desc(port, &nb_rxd, &nb_txd);
-    if (retval != 0)
+    if (retval != 0) {
+        printf("Error adjusting descriptors: %s\n", strerror(-retval));
         return retval;
+    }
 
+    printf("Setting up RX queue (descriptors: %u)...\n", nb_rxd);
     retval = rte_eth_rx_queue_setup(port, 0, nb_rxd,
                                      rte_eth_dev_socket_id(port),
                                      NULL, mbuf_pool);
-    if (retval < 0)
+    if (retval < 0) {
+        printf("Error setting up RX queue: %s\n", strerror(-retval));
         return retval;
+    }
 
-    txconf = dev_info.default_txconf;
-    txconf.offloads = port_conf.txmode.offloads;
+    printf("Setting up TX queue (descriptors: %u)...\n", nb_txd);
+
+    // For Mellanox NICs: Use minimal configuration to avoid QP issues
+    memset(&txconf, 0, sizeof(txconf));
+    txconf.tx_thresh.pthresh = 0;
+    txconf.tx_thresh.hthresh = 0;
+    txconf.tx_thresh.wthresh = 0;
+    txconf.tx_rs_thresh = 0;
+    txconf.tx_free_thresh = 0;
+    txconf.offloads = 0;  // No offloads
+
     retval = rte_eth_tx_queue_setup(port, 0, nb_txd,
                                      rte_eth_dev_socket_id(port),
                                      &txconf);
-    if (retval < 0)
+    if (retval < 0) {
+        printf("Error setting up TX queue: %s\n", strerror(-retval));
         return retval;
+    }
+    printf("TX queue configured successfully\n");
 
+    printf("Starting port %u...\n", port);
     retval = rte_eth_dev_start(port);
-    if (retval < 0)
+    if (retval < 0) {
+        printf("Error starting port %u: %s\n", port, strerror(-retval));
         return retval;
+    }
+    printf("Port %u started successfully\n", port);
+
+    // Give the port time to initialize (critical for Mellanox)
+    printf("Waiting for port initialization...\n");
+    usleep(1000000);  // 1 second using usleep instead of rte_delay_ms
+    printf("Initialization delay complete\n");
+
+    // Wait for link to come up
+    printf("Checking link status...\n");
+    int wait_count = 0;
+    memset(&link, 0, sizeof(link));
+
+    do {
+        printf("Attempt %d to get link status...\n", wait_count + 1);
+        retval = rte_eth_link_get_nowait(port, &link);
+        if (retval < 0) {
+            printf("Error getting link info: %s\n", strerror(-retval));
+            return retval;
+        }
+
+        printf("Link status: %s\n", link.link_status == ETH_LINK_UP ? "UP" : "DOWN");
+
+        if (link.link_status == ETH_LINK_UP) {
+            printf("Link is UP - Speed: %u Mbps, Duplex: %s\n",
+                   link.link_speed,
+                   link.link_duplex == ETH_LINK_FULL_DUPLEX ? "Full" : "Half");
+            break;
+        }
+
+        usleep(100000);  // 100ms
+        wait_count++;
+
+        if (wait_count > 50) {  // 5 seconds timeout
+            printf("WARNING: Link still DOWN after 5 seconds, continuing anyway...\n");
+            break;
+        }
+    } while (link.link_status == ETH_LINK_DOWN);
+
+    printf("Link check complete\n");
 
     retval = rte_eth_promiscuous_enable(port);
-    if (retval != 0)
-        return retval;
+    if (retval != 0) {
+        printf("Warning: Cannot enable promiscuous mode: %s\n", strerror(-retval));
+        // Don't return error - continue anyway
+    }
 
     struct rte_ether_addr addr;
     retval = rte_eth_macaddr_get(port, &addr);
-    if (retval != 0)
+    if (retval != 0) {
+        printf("Error getting MAC address: %s\n", strerror(-retval));
         return retval;
+    }
 
     printf("Port %u MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",
            port,
@@ -526,16 +730,53 @@ int main(int argc, char *argv[])
 
     printf("Found %u Ethernet ports\n", gen_config.nb_ports);
 
-    // Create mbuf pool (smaller for baseline traffic)
-    gen_config.mbuf_pool = rte_pktmbuf_pool_create("MBUF_POOL", NUM_MBUFS,
+    // Find first usable port (skip ports that fail link check)
+    uint16_t first_port = RTE_MAX_ETHPORTS;
+    uint16_t port_id;
+
+    RTE_ETH_FOREACH_DEV(port_id) {
+        // Try to get link status (this will fail if port can't be used)
+        struct rte_eth_dev_info dev_info;
+        ret = rte_eth_dev_info_get(port_id, &dev_info);
+        if (ret == 0) {
+            first_port = port_id;
+            printf("Using port %u\n", first_port);
+            break;
+        }
+    }
+
+    if (first_port == RTE_MAX_ETHPORTS) {
+        // Fallback to port 0
+        first_port = 0;
+        printf("Warning: Using default port 0\n");
+    }
+
+    portid = first_port;
+    gen_config.port_id = portid;
+
+    // Create mbuf pool with sufficient size to prevent exhaustion
+    // Calculate optimal size based on cores and burst size
+    uint32_t nb_workers = rte_lcore_count() - 1;
+    if (nb_workers == 0) nb_workers = 1;
+
+    // Ensure we have enough mbufs: NUM_MBUFS should handle all cores bursting
+    uint32_t optimal_mbufs = NUM_MBUFS;
+    printf("Creating mbuf pool with %u mbufs for %u worker cores\n",
+           optimal_mbufs, nb_workers);
+
+    gen_config.mbuf_pool = rte_pktmbuf_pool_create("MBUF_POOL", optimal_mbufs,
                                                     MBUF_CACHE_SIZE, 0,
                                                     RTE_MBUF_DEFAULT_BUF_SIZE,
                                                     rte_socket_id());
     if (gen_config.mbuf_pool == NULL)
-        rte_exit(EXIT_FAILURE, "Cannot create mbuf pool\n");
+        rte_exit(EXIT_FAILURE, "Cannot create mbuf pool: %s\n",
+                 rte_strerror(rte_errno));
+
+    printf("Mbuf pool created successfully: %u available\n",
+           rte_mempool_avail_count(gen_config.mbuf_pool));
 
     // Initialize configuration with realistic baseline values
-    gen_config.port_id = 0;
+    // port_id already set above
     gen_config.base_rate_pps = DEFAULT_BASE_RATE_PPS;  // 50K pps default
     gen_config.profile = TRAFFIC_PROFILE_VARIABLE;
     gen_config.dst_port = 80;
@@ -555,11 +796,22 @@ int main(int argc, char *argv[])
     if (port_init(portid, gen_config.mbuf_pool) != 0)
         rte_exit(EXIT_FAILURE, "Cannot init port %u\n", portid);
 
+    // Get port MAC address
+    struct rte_ether_addr port_mac;
+    rte_eth_macaddr_get(portid, &port_mac);
+
+    printf("Port %u MAC: %02x:%02x:%02x:%02x:%02x:%02x\n",
+           portid,
+           port_mac.addr_bytes[0], port_mac.addr_bytes[1],
+           port_mac.addr_bytes[2], port_mac.addr_bytes[3],
+           port_mac.addr_bytes[4], port_mac.addr_bytes[5]);
+
     // Install signal handlers
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
 
     printf("\n=== Realistic Baseline Traffic Generator ===\n");
+    printf("Using Port:        %u\n", portid);
     printf("Base Rate:         %u pps (%.2f Kpps)\n",
            gen_config.base_rate_pps, gen_config.base_rate_pps / 1e3);
     printf("Rate Range:        %u - %u pps\n", MIN_RATE_PPS, MAX_RATE_PPS);
@@ -570,8 +822,42 @@ int main(int argc, char *argv[])
     printf("HTTP Templates:    %d (weighted distribution)\n", NUM_HTTP_TEMPLATES);
     printf("Press Ctrl+C to stop...\n\n");
 
+    // Warm-up: Send a test packet to initialize the TX queue properly
+    printf("Warming up TX queue...\n");
+    struct rte_mbuf *test_pkt = generate_baseline_packet(gen_config.mbuf_pool, 0);
+    if (test_pkt != NULL) {
+        uint16_t sent = rte_eth_tx_burst(portid, 0, &test_pkt, 1);
+        if (sent == 0) {
+            printf("Warning: Warm-up packet failed to send\n");
+            rte_pktmbuf_free(test_pkt);
+        } else {
+            printf("Warm-up successful - TX queue is operational\n");
+        }
+    }
+
+    // Additional stabilization delay
+    usleep(500000);  // 500ms
+
     // Launch traffic generation on all worker cores
     rte_eal_mp_remote_launch(lcore_baseline_traffic, NULL, SKIP_MASTER);
+
+    // Give worker cores time to initialize and port to stabilize
+    printf("Waiting for worker cores to initialize...\n");
+    sleep(1);
+
+    // Additional wait for Mellanox port to be fully ready
+    printf("Waiting for port to be fully operational...\n");
+    sleep(2);
+
+    // Signal that port is ready for traffic
+    printf("Signaling port ready for traffic...\n");
+    port_ready = true;
+    rte_mb();  // Memory barrier to ensure visibility
+
+    // Additional delay to ensure all cores see the signal
+    usleep(500000);  // 500ms
+
+    printf("Traffic generation started!\n\n");
 
     // Main core: print statistics every second
     while (!force_quit) {

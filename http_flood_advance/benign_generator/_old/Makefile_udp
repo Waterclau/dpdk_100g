@@ -1,0 +1,21 @@
+# Makefile for UDP HTTP Baseline Traffic Generator
+
+APP = udp_http_baseline
+
+SRCS-y := udp_http_baseline.c
+
+PKGCONF ?= pkg-config
+
+# Default target
+all: $(APP)
+
+# Build with pkg-config
+$(APP): $(SRCS-y) Makefile_udp
+	$(CC) $(SRCS-y) -o $(APP) \
+		$$($(PKGCONF) --cflags --libs libdpdk) \
+		-O3 -march=native -Wall -Wextra
+
+clean:
+	rm -f $(APP) *.o
+
+.PHONY: all clean

@@ -1,0 +1,60 @@
+# Configuración de ejemplo para generación de tráfico baseline
+# Copiar a config.sh y editar según tu entorno
+
+# ========================================
+# Configuración de Red
+# ========================================
+
+# Controlador (origen del tráfico)
+SRC_IP_BASE="192.168.1.0"      # IP base /16, se randomiza
+SRC_MAC="00:11:22:33:44:55"     # MAC del controlador
+
+# Monitor (destino del tráfico)
+DST_IP="10.0.0.1"               # IP del monitor
+DST_MAC="04:3f:72:ac:cd:e7"     # MAC del monitor
+
+# Interfaz de red para envío
+INTERFACE="ens3f0"              # Cambiar según tu NIC
+
+# ========================================
+# Configuración de Tráfico
+# ========================================
+
+# Tasa de replay (en Mbps)
+RATE_MBPS=10000                 # 10 Gbps
+# Opciones: 1000 (1G), 10000 (10G), 40000 (40G), 100000 (100G)
+
+# Número de paquetes a generar en PCAP
+NUM_PACKETS=1000000             # 1M paquetes (~150 MB)
+
+# Archivo PCAP
+PCAP_FILE="baseline_traffic.pcap"
+
+# Loop infinito (0) o número específico de repeticiones
+LOOP_COUNT=0
+
+# ========================================
+# Optimizaciones
+# ========================================
+
+# Preload PCAP en RAM (mejor para archivos grandes)
+PRELOAD_PCAP=true
+
+# Deshabilitar offloads de NIC
+DISABLE_OFFLOADS=true
+
+# ========================================
+# Ejemplos de Uso
+# ========================================
+
+# 1. Testing rápido (1 Gbps)
+#    RATE_MBPS=1000 NUM_PACKETS=10000
+
+# 2. Baseline normal (10 Gbps)
+#    RATE_MBPS=10000 NUM_PACKETS=1000000
+
+# 3. Alto rendimiento (40 Gbps)
+#    RATE_MBPS=40000 NUM_PACKETS=5000000 PRELOAD_PCAP=true
+
+# 4. Máximo rendimiento (100 Gbps)
+#    RATE_MBPS=100000 NUM_PACKETS=10000000 PRELOAD_PCAP=true

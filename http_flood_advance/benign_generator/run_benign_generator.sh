@@ -14,7 +14,7 @@ PORT_ID=0
 NIC_PCI="0000:81:00.0"  # Update this to match your NIC
 NUM_CORES=8             # Number of CPU cores to use
 DURATION=300            # Duration in seconds (5 minutes)
-TARGET_RATE_GBPS=80     # Target: 80 Gbps (80% of 100G)
+TARGET_RATE_GBPS=10     # Target: 80 Gbps (80% of 100G)
 HUGE_PAGES=8192         # Number of 2MB hugepages
 
 # Source and destination configuration
