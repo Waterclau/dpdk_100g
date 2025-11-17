@@ -1,0 +1,2 @@
+# Dependencias para generador de ataques HTTP flood
+scapy>=2.5.0
