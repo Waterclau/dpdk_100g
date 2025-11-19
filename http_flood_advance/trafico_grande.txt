@@ -5,10 +5,19 @@ Perfecto, aquí están todos los comandos actualizados:
   En Controlador - Baseline 10M
 
   cd /local/dpdk_100g/http_flood_advance/benign_generator
+  pip install scapy
 
-  python3 generate_baseline_pcap.py \
-      -n 10000000 \
-      -o baseline_10M.pcap \
+  sudo python3 generate_baseline_pcap.py \
+      -n 5000000 \
+      -o baseline_5M.pcap \
+      -s 192.168.1.0 \
+      -d 10.0.0.1 \
+      --dst-mac 0c:42:a1:8c:dd:0c \
+      -v
+
+sudo python3 generate_baseline_pcap.py \
+      -n 500 \
+      -o test.pcap \
       -s 192.168.1.0 \
       -d 10.0.0.1 \
       --dst-mac 0c:42:a1:8c:dd:0c \
@@ -21,12 +30,12 @@ Perfecto, aquí están todos los comandos actualizados:
 
   cd /local/dpdk_100g/http_flood_advance/attack_generator
 
-  python3 generate_http_flood.py \
+  sudo python3 generate_http_flood.py \
       -t mixed \
       -n 5000000 \
-      -o attack_mixed_10M.pcap \
-      -d 10.0.0.1 \
-      --dst-mac 0c:42:a1:8c:dd:0c \
+      -o attack_mixed_5M.pcap \
+      -d 10.10.1.2 \
+      --dst-mac 0c:42:a1:dd:5b:28 \
       -b 100 \
       -v
 

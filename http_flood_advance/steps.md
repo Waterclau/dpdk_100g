@@ -57,7 +57,8 @@ ip link show ens1f0
 
 ```bash
 cd /local/dpdk_100g/http_flood_advance/detector_system
-
+ sudo apt-get update
+  sudo apt-get install -y dpdk dpdk-dev libdpdk-dev
 # Clean and build
 make clean
 make
@@ -79,13 +80,22 @@ cd /local/dpdk_100g/http_flood_advance/detector_system
 
 # Run detector for 510 seconds (experiment + margin)
 # For Mellanox ConnectX-5, use the PCI address with -a flag
-sudo timeout 510 ./build/http_flood_detector -l 1-2 -n 4 -a 0000:41:00.0 -- -p 0 2>&1 | tee ../../results/results_http_flood_500s_2.log
+sudo rm -rf /var/run/dpdk/*
+sudo rm -rf /dev/hugepages/*
+sudo umount /mnt/huge 2>/dev/null
+sudo mkdir -p /mnt/huge
+sudo mount -t hugetlbfs nodev /mnt/huge
+grep Huge /proc/meminfo
+echo 2048 | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+
+
+sudo timeout 510 ./http_flood_detector -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0 #2>&1 | tee ../../results/results_http_flood_500s_2.log
 ```
 
 **Parameters:**
 - `-l 1-2`: Use CPU cores 1-2
 - `-n 4`: 4 memory channels
-- `-a 0000:41:00.0`: PCI address of NIC (ens1f0)
+- `-w 0000:41:00.0`: PCI address of NIC (ens1f0)
 - `-- -p 0`: Port 0
 - `timeout 510`: Run for 510 seconds
 
@@ -103,10 +113,10 @@ sudo timeout 510 ./build/http_flood_detector -l 1-2 -n 4 --vdev="net_mlx5_0,ifac
 
 ```bash
 # Check interface is up
-ip link show ens1f0
+sudo ip link show ens1f0
 
 # If down, bring it up
-ip link set ens1f0 up
+sudo ip link set ens1f0 up
 
 # Verify
 ifconfig ens1f0
@@ -134,14 +144,14 @@ Wait 5 seconds after starting the detector on Node 1 before generating traffic.
 ```bash
 cd /local/dpdk_100g/http_flood_advance
 
-# 50 instances × 40,000 pps = 2M pps (~11 Gbps)
-for i in {1..50}; do
-    sudo timeout 500 tcpreplay --intf1=ens1f0 --pps=40000 --loop=0 --quiet baseline_5M.pcap &
+# 25 instances × 50,000 pps = 1.25M pps (~7 Gbps, ~28% of 25G link)
+for i in {1..25}; do
+    sudo timeout 500 tcpreplay --intf1=ens1f0 --pps=50000 --loop=0 --quiet baseline_5M.pcap &
 done
 
 # Verify processes started
 ps aux | grep tcpreplay | wc -l
-# Should show ~50 processes
+# Should show ~25 processes
 ```
 
 ### Step 5: Start Attack Traffic (after 200 seconds)
@@ -151,14 +161,16 @@ ps aux | grep tcpreplay | wc -l
 ```bash
 cd /local/dpdk_100g/http_flood_advance
 
-# 100 instances × 30,000 pps = 3M pps (~17 Gbps)
-for i in {1..100}; do
-    sudo timeout 300 tcpreplay --intf1=ens1f0 --pps=30000 --loop=0 --quiet attack_mixed_1M.pcap &
+# 50 instances × 37,500 pps = 1.875M pps (~10.5 Gbps)
+# Total with baseline: ~3.125M pps (~17.5 Gbps, ~70% of 25G link)
+# Ratio: 40% baseline / 60% attack
+for i in {1..50}; do
+    sudo timeout 300 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 --quiet attack_mixed_1M.pcap &
 done
 
 # Verify processes
 ps aux | grep tcpreplay | wc -l
-# Should show ~150 processes (50 baseline + 100 attack)
+# Should show ~75 processes (25 baseline + 50 attack)
 ```
 
 ---
@@ -169,10 +181,10 @@ ps aux | grep tcpreplay | wc -l
 Time    Node 1 (Detector)              Node 2 (Traffic Generator)
 ────────────────────────────────────────────────────────────────────
 0s      Start detector                 -
-5s      -                              Start baseline (50 instances)
-5-200s  Monitoring baseline            Baseline running (~2M pps)
-205s    -                              Start attack (100 instances)
-205-500s Detecting attack              Baseline + Attack (~5M pps)
+5s      -                              Start baseline (25 instances)
+5-200s  Monitoring baseline            Baseline running (~1.25M pps, ~7 Gbps)
+205s    -                              Start attack (50 instances)
+205-500s Detecting attack              Baseline + Attack (~3.125M pps, ~17.5 Gbps)
 500s    -                              Traffic stops
 510s    Detector stops                 -
 ```
@@ -330,7 +342,18 @@ make clean && make
 mkdir -p /local/dpdk_100g/results
 
 # Run
-sudo timeout 510 ./build/http_flood_detector -l 1-2 -n 4 -a 0000:41:00.0 -- -p 0 2>&1 | tee ../../results/results_http_flood_500s_2.log
+sudo rm -rf /var/run/dpdk/*
+sudo rm -rf /dev/hugepages/*
+sudo umount /mnt/huge 2>/dev/null
+sudo mkdir -p /mnt/huge
+sudo mount -t hugetlbfs nodev /mnt/huge
+grep Huge /proc/meminfo
+echo 2048 | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+
+
+sudo timeout 510 ./http_flood_detector -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0
+sudo timeout 110 ./http_flood_detector -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0
+
 ```
 
 ### Node 2 (Traffic Generator)
@@ -339,23 +362,29 @@ sudo timeout 510 ./build/http_flood_detector -l 1-2 -n 4 -a 0000:41:00.0 -- -p 0
 cd /local/dpdk_100g/http_flood_advance
 
 # Baseline (immediately after detector starts)
-for i in {1..50}; do sudo timeout 500 tcpreplay --intf1=ens1f0 --pps=40000 --loop=0 --quiet baseline_5M.pcap & done
+for i in {1..25}; do sudo timeout 500 tcpreplay --intf1=ens1f0 --pps=50000 --loop=0 --quiet baseline_5M.pcap & done
+for i in {1..25}; do sudo timeout 100 tcpreplay --intf1=ens1f0 --pps=50000 --loop=0 --quiet baseline_5M.pcap & done
+
+sudo tcpreplay --intf1=ens1f0 --pps=50000 --loop=0 --quiet baseline_5M.pcap
 
 # Attack (200 seconds later)
-for i in {1..100}; do sudo timeout 300 tcpreplay --intf1=ens1f0 --pps=30000 --loop=0 --quiet attack_mixed_1M.pcap & done
+for i in {1..50}; do sudo timeout 300 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 --quiet attack_mixed_5M.pcap & done
+for i in {1..50}; do sudo timeout 50 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 --quiet attack_mixed_5M.pcap & done
+
 ```
 
 ---
 
-## Expected Results
+## Expected Results (25G Link)
 
 | Metric | Expected Value |
 |--------|----------------|
 | Baseline duration | 200 seconds |
 | Attack duration | 300 seconds |
-| Baseline throughput | ~11 Gbps (2M pps) |
-| Attack throughput | ~17 Gbps (3M pps) |
-| Total during attack | ~28 Gbps (5M pps) |
-| Link utilization | ~28% |
+| Baseline throughput | ~7 Gbps (1.25M pps) |
+| Attack throughput | ~10.5 Gbps (1.875M pps) |
+| Total during attack | ~17.5 Gbps (3.125M pps) |
+| Link utilization (baseline) | ~28% of 25G |
+| Link utilization (attack) | ~70% of 25G |
 | Baseline/Attack ratio | 40%/60% |
 | Detection delay | < 5 seconds |
