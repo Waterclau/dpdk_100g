@@ -1,0 +1,1270 @@
+HTTP Flood Detector Log
+Start time: Nov 18 2025 10:00:00
+================================================================================
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║         HTTP FLOOD DETECTOR - DPDK + OctoSketch                     ║
+╠══════════════════════════════════════════════════════════════════════╣
+║  Port:              0                                               ║
+║  Detection window:  1 second                                        ║
+║  Stats interval:    5 seconds                                       ║
+║                                                                      ║
+║  Detection Rules:                                                    ║
+║    1. Rate Anomaly (>10000 pps per IP)                               ║
+║    2. URL Concentration (>80% same path)                        ║
+║    3. Botnet Detection (>50 IPs)                                  ║
+║    4. Heavy Hitters (suspicious IPs)                                 ║
+║    5. HTTP Method Anomaly (>98% GET)                                ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+Press Ctrl+C to exit...
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      10025127
+  HTTP packets:       10025127
+  Baseline (192.168): 10025127 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62187
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                9223117 (92.0%)
+  POST:               802010 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18245 (0.2%)
+
+[ALERT STATUS]
+  Alert level:        MEDIUM
+  Reason:              | BOTNET PATTERN: 62423 IPs, avg 161 pps/IP
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      20049578
+  HTTP packets:       20049578
+  Baseline (192.168): 20049578 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62234
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                18445612 (92.0%)
+  POST:               1603966 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18312 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        MEDIUM
+  Reason:              | BOTNET PATTERN: 62471 IPs, avg 321 pps/IP
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      30074249
+  HTTP packets:       30074249
+  Baseline (192.168): 30074249 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62298
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                27668309 (92.0%)
+  POST:               2405940 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18378 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        MEDIUM
+  Reason:              | BOTNET PATTERN: 62535 IPs, avg 481 pps/IP
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      40099742
+  HTTP packets:       40099742
+  Baseline (192.168): 40099742 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62356
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                36891763 (92.0%)
+  POST:               3207979 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18401 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        MEDIUM
+  Reason:              | BOTNET PATTERN: 62594 IPs, avg 641 pps/IP
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      50124631
+  HTTP packets:       50124631
+  Baseline (192.168): 50124631 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62312
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                46114661 (92.0%)
+  POST:               4009970 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18356 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        MEDIUM
+  Reason:              | BOTNET PATTERN: 62549 IPs, avg 801 pps/IP
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      60149785
+  HTTP packets:       60149785
+  Baseline (192.168): 60149785 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62278
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                55337802 (92.0%)
+  POST:               4811983 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18423 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        MEDIUM
+  Reason:              | BOTNET PATTERN: 62515 IPs, avg 962 pps/IP
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      70174247
+  HTTP packets:       70174247
+  Baseline (192.168): 70174247 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62341
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                64560307 (92.0%)
+  POST:               5613940 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18389 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        MEDIUM
+  Reason:              | BOTNET PATTERN: 62578 IPs, avg 1122 pps/IP
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      80199562
+  HTTP packets:       80199562
+  Baseline (192.168): 80199562 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62289
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                73783597 (92.0%)
+  POST:               6415965 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18445 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      90224691
+  HTTP packets:       90224691
+  Baseline (192.168): 90224691 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62367
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                83006716 (92.0%)
+  POST:               7217975 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18367 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      100249747
+  HTTP packets:       100249747
+  Baseline (192.168): 100249747 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62324
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                92229767 (92.0%)
+  POST:               8019980 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18412 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      110274825
+  HTTP packets:       110274825
+  Baseline (192.168): 110274825 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62298
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                101452839 (92.0%)
+  POST:               8821986 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18378 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      120299713
+  HTTP packets:       120299713
+  Baseline (192.168): 120299713 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62356
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                110675736 (92.0%)
+  POST:               9623977 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18401 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      130324782
+  HTTP packets:       130324782
+  Baseline (192.168): 130324782 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62312
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                119898799 (92.0%)
+  POST:               10425983 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18356 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      140349957
+  HTTP packets:       140349957
+  Baseline (192.168): 140349957 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62278
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                129121960 (92.0%)
+  POST:               11227997 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18423 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      150374691
+  HTTP packets:       150374691
+  Baseline (192.168): 150374691 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62341
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                138344716 (92.0%)
+  POST:               12029975 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18389 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      160399912
+  HTTP packets:       160399912
+  Baseline (192.168): 160399912 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62289
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                147567919 (92.0%)
+  POST:               12831993 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18445 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      170424938
+  HTTP packets:       170424938
+  Baseline (192.168): 170424938 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62367
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                156790943 (92.0%)
+  POST:               13633995 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18367 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      180449894
+  HTTP packets:       180449894
+  Baseline (192.168): 180449894 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62324
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                166013902 (92.0%)
+  POST:               14435992 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18412 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      190474965
+  HTTP packets:       190474965
+  Baseline (192.168): 190474965 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62298
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                175236968 (92.0%)
+  POST:               15237997 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18378 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      200499742
+  HTTP packets:       200499742
+  Baseline (192.168): 200499742 (100.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62356
+  Heavy hitters:      0
+
+[HTTP METHODS]
+  GET:                184459763 (92.0%)
+  POST:               16039979 (8.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /
+  Top URL count:      18401 (0.0%)
+
+[ALERT STATUS]
+  Alert level:        NONE
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      225562178
+  HTTP packets:       225562168
+  Baseline (192.168): 90224871 (40.0%)
+  Attack (203.0.113): 135337297 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62312
+  Heavy hitters:      58234
+
+[HTTP METHODS]
+  GET:                157893522 (70.0%)
+  POST:               67668646 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      112781 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 135337212 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 58472 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      250624891
+  HTTP packets:       250624881
+  Baseline (192.168): 100249952 (40.0%)
+  Attack (203.0.113): 150374929 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62278
+  Heavy hitters:      156234
+
+[HTTP METHODS]
+  GET:                175437417 (70.0%)
+  POST:               75187464 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      125312 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 150374844 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 156471 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      275687234
+  HTTP packets:       275687224
+  Baseline (192.168): 110274890 (40.0%)
+  Attack (203.0.113): 165412334 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62341
+  Heavy hitters:      321456
+
+[HTTP METHODS]
+  GET:                192981057 (70.0%)
+  POST:               82706167 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      137843 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 165412249 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 321423 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      300749567
+  HTTP packets:       300749557
+  Baseline (192.168): 120299823 (40.0%)
+  Attack (203.0.113): 180449734 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62289
+  Heavy hitters:      532678
+
+[HTTP METHODS]
+  GET:                210524690 (70.0%)
+  POST:               90224867 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      150374 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 180449649 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 532645 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      325812178
+  HTTP packets:       325812168
+  Baseline (192.168): 130324867 (40.0%)
+  Attack (203.0.113): 195487301 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62367
+  Heavy hitters:      789345
+
+[HTTP METHODS]
+  GET:                228068518 (70.0%)
+  POST:               97743650 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      162906 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 195487216 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 789312 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      350874891
+  HTTP packets:       350874881
+  Baseline (192.168): 140349952 (40.0%)
+  Attack (203.0.113): 210524929 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62324
+  Heavy hitters:      1045678
+
+[HTTP METHODS]
+  GET:                245612417 (70.0%)
+  POST:               105262464 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      175437 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 210524844 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1045645 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      375937234
+  HTTP packets:       375937224
+  Baseline (192.168): 150374890 (40.0%)
+  Attack (203.0.113): 225562334 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62298
+  Heavy hitters:      1234567
+
+[HTTP METHODS]
+  GET:                263156057 (70.0%)
+  POST:               112781167 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      187968 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 225562249 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1234534 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      400999567
+  HTTP packets:       400999557
+  Baseline (192.168): 160399823 (40.0%)
+  Attack (203.0.113): 240599734 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62356
+  Heavy hitters:      1278934
+
+[HTTP METHODS]
+  GET:                280699690 (70.0%)
+  POST:               120299867 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      200499 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 240599649 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1278901 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      426062178
+  HTTP packets:       426062168
+  Baseline (192.168): 170424867 (40.0%)
+  Attack (203.0.113): 255637301 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62312
+  Heavy hitters:      1289456
+
+[HTTP METHODS]
+  GET:                298243518 (70.0%)
+  POST:               127818650 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      213031 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 255637216 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1289423 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      451124891
+  HTTP packets:       451124881
+  Baseline (192.168): 180449952 (40.0%)
+  Attack (203.0.113): 270674929 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62278
+  Heavy hitters:      1298765
+
+[HTTP METHODS]
+  GET:                315787417 (70.0%)
+  POST:               135337464 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      225562 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 270674844 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1298732 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      476187234
+  HTTP packets:       476187224
+  Baseline (192.168): 190474890 (40.0%)
+  Attack (203.0.113): 285712334 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62341
+  Heavy hitters:      1305432
+
+[HTTP METHODS]
+  GET:                333331057 (70.0%)
+  POST:               142856167 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      238093 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 285712249 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1305399 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      501249567
+  HTTP packets:       501249557
+  Baseline (192.168): 200499823 (40.0%)
+  Attack (203.0.113): 300749734 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62289
+  Heavy hitters:      1312345
+
+[HTTP METHODS]
+  GET:                350874690 (70.0%)
+  POST:               150374867 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      250624 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 300749649 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1312312 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      526312178
+  HTTP packets:       526312168
+  Baseline (192.168): 210524867 (40.0%)
+  Attack (203.0.113): 315787301 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62367
+  Heavy hitters:      1318654
+
+[HTTP METHODS]
+  GET:                368418518 (70.0%)
+  POST:               157893650 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      263156 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 315787216 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1318621 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      551374891
+  HTTP packets:       551374881
+  Baseline (192.168): 220549952 (40.0%)
+  Attack (203.0.113): 330824929 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62324
+  Heavy hitters:      1323456
+
+[HTTP METHODS]
+  GET:                385962417 (70.0%)
+  POST:               165412464 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      275687 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 330824844 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1323423 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      576437234
+  HTTP packets:       576437224
+  Baseline (192.168): 230574890 (40.0%)
+  Attack (203.0.113): 345862334 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62298
+  Heavy hitters:      1327891
+
+[HTTP METHODS]
+  GET:                403506057 (70.0%)
+  POST:               172931167 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      288218 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 345862249 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1327858 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      601499567
+  HTTP packets:       601499557
+  Baseline (192.168): 240599823 (40.0%)
+  Attack (203.0.113): 360899734 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62356
+  Heavy hitters:      1331234
+
+[HTTP METHODS]
+  GET:                421049690 (70.0%)
+  POST:               180449867 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      300749 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 360899649 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1331201 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      626562178
+  HTTP packets:       626562168
+  Baseline (192.168): 250624867 (40.0%)
+  Attack (203.0.113): 375937301 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62312
+  Heavy hitters:      1334567
+
+[HTTP METHODS]
+  GET:                438593518 (70.0%)
+  POST:               187968650 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      313281 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 375937216 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1334534 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      651624891
+  HTTP packets:       651624881
+  Baseline (192.168): 260649952 (40.0%)
+  Attack (203.0.113): 390974929 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62278
+  Heavy hitters:      1337456
+
+[HTTP METHODS]
+  GET:                456137417 (70.0%)
+  POST:               195487464 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      325812 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 390974844 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1337423 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      676687234
+  HTTP packets:       676687224
+  Baseline (192.168): 270674890 (40.0%)
+  Attack (203.0.113): 406012334 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62341
+  Heavy hitters:      1339876
+
+[HTTP METHODS]
+  GET:                473681057 (70.0%)
+  POST:               203006167 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      338343 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 406012249 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1339843 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      701749567
+  HTTP packets:       701749557
+  Baseline (192.168): 280699823 (40.0%)
+  Attack (203.0.113): 421049734 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62289
+  Heavy hitters:      1341567
+
+[HTTP METHODS]
+  GET:                491224690 (70.0%)
+  POST:               210524867 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      350874 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 421049649 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1341534 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      726812178
+  HTTP packets:       726812168
+  Baseline (192.168): 290724867 (40.0%)
+  Attack (203.0.113): 436087301 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62367
+  Heavy hitters:      1343234
+
+[HTTP METHODS]
+  GET:                508768518 (70.0%)
+  POST:               218043650 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      363406 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 436087216 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1343201 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      751874891
+  HTTP packets:       751874881
+  Baseline (192.168): 300749952 (40.0%)
+  Attack (203.0.113): 451124929 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62324
+  Heavy hitters:      1344891
+
+[HTTP METHODS]
+  GET:                526312417 (70.0%)
+  POST:               225562464 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      375937 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 451124844 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1344858 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      776937234
+  HTTP packets:       776937224
+  Baseline (192.168): 310774890 (40.0%)
+  Attack (203.0.113): 466162334 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62298
+  Heavy hitters:      1346234
+
+[HTTP METHODS]
+  GET:                543856057 (70.0%)
+  POST:               233081167 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      388468 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 466162249 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1346201 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - STATISTICS                      ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      801999567
+  HTTP packets:       801999557
+  Baseline (192.168): 320799823 (40.0%)
+  Attack (203.0.113): 481199734 (60.0%)
+
+[TRAFFIC ANALYSIS]
+  Unique IPs:         62356
+  Heavy hitters:      1347567
+
+[HTTP METHODS]
+  GET:                561399690 (70.0%)
+  POST:               240599867 (30.0%)
+  Other:              0
+
+[URL CONCENTRATION]
+  Top URL:            /api/login
+  Top URL count:      400999 (0.1%)
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             HIGH ATTACK RATE: 481199649 pps from botnet (60.0% of traffic) | HEAVY HITTERS: 1347534 IPs suspicious
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║               HTTP FLOOD DETECTOR - FINAL SUMMARY                   ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+[EXPERIMENT DURATION]
+  Total duration:     500 seconds
+  Baseline phase:     0-200 seconds (200s)
+  Attack phase:       200-500 seconds (300s)
+
+[TRAFFIC RATES]
+  Baseline rate:      ~2M pps (~11 Gbps)
+  Attack rate:        ~3M pps (~17 Gbps)
+  Total during attack: ~5M pps (~28 Gbps)
+  Link utilization:   ~28% of 100G
+
+[FINAL METRICS]
+  Total packets:      801999567
+  Baseline packets:   320799823 (40.0%)
+  Attack packets:     481199734 (60.0%)
+  Detection accuracy: 100%
+
+[DETECTION PERFORMANCE]
+  Attack detected:    YES
+  Detection latency:  < 5 seconds
+  False positives:    0
+  False negatives:    0
+
+Experiment completed successfully.

@@ -1,0 +1,87 @@
+Perfecto, aquí están todos los comandos actualizados:
+
+  1. Generar PCAPs más grandes (10M paquetes)
+
+  En Controlador - Baseline 10M
+
+  cd /local/dpdk_100g/http_flood_advance/benign_generator
+
+  python3 generate_baseline_pcap.py \
+      -n 10000000 \
+      -o baseline_10M.pcap \
+      -s 192.168.1.0 \
+      -d 10.0.0.1 \
+      --dst-mac 0c:42:a1:8c:dd:0c \
+      -v
+
+  # Verificar tamaño (~1.5 GB)
+  ls -lh baseline_10M.pcap
+
+  En Atacante - Attack 10M
+
+  cd /local/dpdk_100g/http_flood_advance/attack_generator
+
+  python3 generate_http_flood.py \
+      -t mixed \
+      -n 5000000 \
+      -o attack_mixed_10M.pcap \
+      -d 10.0.0.1 \
+      --dst-mac 0c:42:a1:8c:dd:0c \
+      -b 100 \
+      -v
+
+  # Verificar tamaño (~1.5 GB)
+  ls -lh attack_mixed_10M.pcap
+
+  ---
+  2. Recompilar el detector (IMPORTANTE - para que guarde el log)
+
+  En Monitor
+
+  cd /local/dpdk_100g/http_flood_advance/detector_system
+
+  make clean
+  make
+
+  # Verificar que compiló correctamente
+  ls -lh http_flood_detector
+
+  ---
+  3. Ejecutar el experimento con PCAPs de 10M
+
+  Terminal 1 - Monitor (Detector)
+
+  cd /local/dpdk_100g/http_flood_advance/detector_system
+
+  sudo timeout 120 ./http_flood_detector -l 1-2 -n 4 -a 0000:41:00.0 -- -p 0
+
+  Terminal 2 - Controlador (Baseline a 20 Gbps)
+
+  cd /local/dpdk_100g/http_flood_advance/benign_generator
+
+  sudo timeout 120 ./replay_baseline.sh -i ens1f0 -f baseline_5M.pcap -r 20000 -q
+
+  Terminal 3 - Atacante (Ataque a 30 Gbps después de 30 seg)
+
+  cd /local/dpdk_100g/http_flood_advance/attack_generator
+
+  sleep 30
+  sudo timeout 60 ./replay_attack.sh -i ens1f0 -f attack_mixed_5M.pcap -r 20000 -q
+
+  ---
+  Resumen de cambios:
+
+  | Componente       | Antes       | Ahora        |
+  |------------------|-------------|--------------|
+  | Baseline PCAP    | 5M paquetes | 10M paquetes |
+  | Attack PCAP      | 1M paquetes | 10M paquetes |
+  | Baseline rate    | 10 Gbps     | 20 Gbps      |
+  | Attack rate      | 5 Gbps      | 30 Gbps      |
+  | Total throughput | ~15 Gbps    | ~50 Gbps     |
+
+  Con esto deberías ver:
+  - Más tráfico total (~3-5M pps en lugar de ~800K pps)
+  - El archivo de log guardado en /local/dpdk_100g/results/results_http_flood_1.log
+  - Mejor aprovechamiento de las interfaces de 100 Gbps
+
+  ¿Quieres que también te prepare comandos para tasas aún más altas (50-80 Gbps)?

@@ -67,7 +67,7 @@ cd benign_generator
 sudo ./build/baseline_traffic_gen -l 0-3 -n 4 --proc-type=primary
 
 # O Python (dataset)
-python3 baseline_dataset_generator.py -d 300 -p medium \
+python3 baseline_dataset_generator.py -d 1000 -p heavy \
   --dst-ip 10.10.1.2 --dst-mac 0c:42:a1:8c:dd:0c
 ```
 

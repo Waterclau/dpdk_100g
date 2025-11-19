@@ -147,11 +147,14 @@ struct detector_config {
 
 /* Global state */
 static volatile bool force_quit = false;
+static FILE *g_log_file = NULL;
 static struct rte_mempool *mbuf_pool = NULL;
 static struct count_min_sketch *ip_sketch = NULL;
 static struct count_min_sketch *url_sketch = NULL;
 static struct detection_stats g_stats;
-static struct rte_hash *ip_hash = NULL;
+
+/* Forward declarations */
+static void close_log_file(void);
 
 /* Signal handler */
 static void signal_handler(int signum)
@@ -159,6 +162,67 @@ static void signal_handler(int signum)
     if (signum == SIGINT || signum == SIGTERM) {
         printf("\n\nSignal %d received, preparing to exit...\n", signum);
         force_quit = true;
+
+        /* Close log file immediately */
+        if (g_log_file) {
+            fprintf(g_log_file, "\n================================================================================\n");
+            fprintf(g_log_file, "Detector stopped by signal %d\n", signum);
+            fflush(g_log_file);
+            fclose(g_log_file);
+            g_log_file = NULL;
+            printf("[*] Log file closed by signal handler\n");
+        }
+    }
+}
+
+/* Open log file for automatic saving */
+static int open_log_file(void)
+{
+    char log_path[] = "/local/dpdk_100g/results/results_http_flood_1.log";
+
+    g_log_file = fopen(log_path, "w");
+    if (!g_log_file) {
+        fprintf(stderr, "Warning: Could not open log file %s: %s\n",
+                log_path, strerror(errno));
+        fprintf(stderr, "Continuing without file logging (output to stdout only)\n");
+        return -1;
+    }
+
+    printf("[*] Log file opened: %s\n", log_path);
+    fprintf(g_log_file, "HTTP Flood Detector Log\n");
+    fprintf(g_log_file, "Start time: %s\n", __DATE__ " " __TIME__);
+    fprintf(g_log_file, "================================================================================\n\n");
+    fflush(g_log_file);
+
+    return 0;
+}
+
+/* Close log file */
+static void close_log_file(void)
+{
+    if (g_log_file) {
+        fprintf(g_log_file, "\n================================================================================\n");
+        fprintf(g_log_file, "Detector stopped\n");
+        fclose(g_log_file);
+        g_log_file = NULL;
+        printf("[*] Log file closed\n");
+    }
+}
+
+/* Dual output function - print to both stdout and log file */
+static void dual_printf(const char *format, ...)
+{
+    va_list args1, args2;
+
+    va_start(args1, format);
+    vprintf(format, args1);
+    va_end(args1);
+
+    if (g_log_file) {
+        va_start(args2, format);
+        vfprintf(g_log_file, format, args2);
+        va_end(args2);
+        fflush(g_log_file);
     }
 }
 
@@ -481,53 +545,53 @@ static void print_stats(void)
 
     g_stats.last_stats_tsc = cur_tsc;
 
-    printf("\n");
-    printf("╔══════════════════════════════════════════════════════════════════════╗\n");
-    printf("║               HTTP FLOOD DETECTOR - STATISTICS                      ║\n");
-    printf("╚══════════════════════════════════════════════════════════════════════╝\n");
+    dual_printf("\n");
+    dual_printf("╔══════════════════════════════════════════════════════════════════════╗\n");
+    dual_printf("║               HTTP FLOOD DETECTOR - STATISTICS                      ║\n");
+    dual_printf("╚══════════════════════════════════════════════════════════════════════╝\n");
 
-    printf("\n[PACKET COUNTERS]\n");
-    printf("  Total packets:      %lu\n", g_stats.total_packets);
-    printf("  HTTP packets:       %lu\n", g_stats.http_packets);
-    printf("  Baseline (192.168): %lu (%.1f%%)\n",
+    dual_printf("\n[PACKET COUNTERS]\n");
+    dual_printf("  Total packets:      %lu\n", g_stats.total_packets);
+    dual_printf("  HTTP packets:       %lu\n", g_stats.http_packets);
+    dual_printf("  Baseline (192.168): %lu (%.1f%%)\n",
            g_stats.baseline_packets,
            g_stats.http_packets > 0 ? (double)g_stats.baseline_packets / g_stats.http_packets * 100 : 0);
-    printf("  Attack (203.0.113): %lu (%.1f%%)\n",
+    dual_printf("  Attack (203.0.113): %lu (%.1f%%)\n",
            g_stats.attack_packets,
            g_stats.http_packets > 0 ? (double)g_stats.attack_packets / g_stats.http_packets * 100 : 0);
 
-    printf("\n[TRAFFIC ANALYSIS]\n");
-    printf("  Unique IPs:         %lu\n", g_stats.unique_ips);
-    printf("  Heavy hitters:      %lu\n", g_stats.heavy_hitters);
+    dual_printf("\n[TRAFFIC ANALYSIS]\n");
+    dual_printf("  Unique IPs:         %lu\n", g_stats.unique_ips);
+    dual_printf("  Heavy hitters:      %lu\n", g_stats.heavy_hitters);
 
-    printf("\n[HTTP METHODS]\n");
-    printf("  GET:                %lu (%.1f%%)\n",
+    dual_printf("\n[HTTP METHODS]\n");
+    dual_printf("  GET:                %lu (%.1f%%)\n",
            g_stats.get_requests,
            g_stats.http_packets > 0 ? (double)g_stats.get_requests / g_stats.http_packets * 100 : 0);
-    printf("  POST:               %lu (%.1f%%)\n",
+    dual_printf("  POST:               %lu (%.1f%%)\n",
            g_stats.post_requests,
            g_stats.http_packets > 0 ? (double)g_stats.post_requests / g_stats.http_packets * 100 : 0);
-    printf("  Other:              %lu\n", g_stats.other_methods);
+    dual_printf("  Other:              %lu\n", g_stats.other_methods);
 
-    printf("\n[URL CONCENTRATION]\n");
-    printf("  Top URL:            %s\n", g_stats.top_url[0] ? g_stats.top_url : "(none)");
-    printf("  Top URL count:      %lu (%.1f%%)\n",
+    dual_printf("\n[URL CONCENTRATION]\n");
+    dual_printf("  Top URL:            %s\n", g_stats.top_url[0] ? g_stats.top_url : "(none)");
+    dual_printf("  Top URL count:      %lu (%.1f%%)\n",
            g_stats.top_url_count,
            g_stats.http_packets > 0 ? (double)g_stats.top_url_count / g_stats.http_packets * 100 : 0);
 
-    printf("\n[ALERT STATUS]\n");
+    dual_printf("\n[ALERT STATUS]\n");
     const char *alert_names[] = {"NONE", "LOW", "MEDIUM", "HIGH", "CRITICAL"};
     const char *alert_colors[] = {"\033[0m", "\033[33m", "\033[93m", "\033[91m", "\033[1;91m"};
 
-    printf("  Alert level:        %s%s\033[0m\n",
+    dual_printf("  Alert level:        %s%s\033[0m\n",
            alert_colors[g_stats.alert_level],
            alert_names[g_stats.alert_level]);
 
     if (g_stats.alert_level > ALERT_NONE) {
-        printf("  Reason:             %s\n", g_stats.alert_reason);
+        dual_printf("  Reason:             %s\n", g_stats.alert_reason);
     }
 
-    printf("\n");
+    dual_printf("\n");
 }
 
 /* Port initialization */
@@ -535,7 +599,7 @@ static int port_init(uint16_t port, struct rte_mempool *mbuf_pool)
 {
     struct rte_eth_conf port_conf = {
         .rxmode = {
-            .max_rx_pkt_len = RTE_ETHER_MAX_LEN,
+            .mtu = RTE_ETHER_MAX_LEN - RTE_ETHER_HDR_LEN - RTE_ETHER_CRC_LEN,
         },
     };
 
@@ -660,22 +724,25 @@ int main(int argc, char **argv)
     /* Initialize stats */
     memset(&g_stats, 0, sizeof(g_stats));
 
-    printf("\n");
-    printf("╔══════════════════════════════════════════════════════════════════════╗\n");
-    printf("║         HTTP FLOOD DETECTOR - DPDK + OctoSketch                     ║\n");
-    printf("╠══════════════════════════════════════════════════════════════════════╣\n");
-    printf("║  Port:              %u                                               ║\n", g_config.port_id);
-    printf("║  Detection window:  %u second                                        ║\n", DETECTION_WINDOW_SEC);
-    printf("║  Stats interval:    %u seconds                                       ║\n", STATS_INTERVAL_SEC);
-    printf("║                                                                      ║\n");
-    printf("║  Detection Rules:                                                    ║\n");
-    printf("║    1. Rate Anomaly (>%u pps per IP)                               ║\n", RATE_THRESHOLD_PPS);
-    printf("║    2. URL Concentration (>%.0f%% same path)                        ║\n", URL_CONCENTRATION_THRESHOLD * 100);
-    printf("║    3. Botnet Detection (>%u IPs)                                  ║\n", BOTNET_IPS_THRESHOLD);
-    printf("║    4. Heavy Hitters (suspicious IPs)                                 ║\n");
-    printf("║    5. HTTP Method Anomaly (>98%% GET)                                ║\n");
-    printf("╚══════════════════════════════════════════════════════════════════════╝\n");
-    printf("\nPress Ctrl+C to exit...\n\n");
+    /* Open log file */
+    open_log_file();
+
+    dual_printf("\n");
+    dual_printf("╔══════════════════════════════════════════════════════════════════════╗\n");
+    dual_printf("║         HTTP FLOOD DETECTOR - DPDK + OctoSketch                     ║\n");
+    dual_printf("╠══════════════════════════════════════════════════════════════════════╣\n");
+    dual_printf("║  Port:              %u                                               ║\n", g_config.port_id);
+    dual_printf("║  Detection window:  %u second                                        ║\n", DETECTION_WINDOW_SEC);
+    dual_printf("║  Stats interval:    %u seconds                                       ║\n", STATS_INTERVAL_SEC);
+    dual_printf("║                                                                      ║\n");
+    dual_printf("║  Detection Rules:                                                    ║\n");
+    dual_printf("║    1. Rate Anomaly (>%u pps per IP)                               ║\n", RATE_THRESHOLD_PPS);
+    dual_printf("║    2. URL Concentration (>%.0f%% same path)                        ║\n", URL_CONCENTRATION_THRESHOLD * 100);
+    dual_printf("║    3. Botnet Detection (>%u IPs)                                  ║\n", BOTNET_IPS_THRESHOLD);
+    dual_printf("║    4. Heavy Hitters (suspicious IPs)                                 ║\n");
+    dual_printf("║    5. HTTP Method Anomaly (>98%% GET)                                ║\n");
+    dual_printf("╚══════════════════════════════════════════════════════════════════════╝\n");
+    dual_printf("\nPress Ctrl+C to exit...\n\n");
 
     /* Run detection */
     detection_loop(NULL);
