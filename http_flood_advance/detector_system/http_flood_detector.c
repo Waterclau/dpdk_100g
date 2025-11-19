@@ -599,7 +599,7 @@ static int port_init(uint16_t port, struct rte_mempool *mbuf_pool)
 {
     struct rte_eth_conf port_conf = {
         .rxmode = {
-            .mtu = RTE_ETHER_MAX_LEN - RTE_ETHER_HDR_LEN - RTE_ETHER_CRC_LEN,
+            .mq_mode = RTE_ETH_MQ_RX_NONE,
         },
     };
 
