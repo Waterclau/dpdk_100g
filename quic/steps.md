@@ -56,8 +56,8 @@ pip3 install scapy
 
 # Generate 1M packets of Optimistic ACK attack
 python3 generate_optimistic_ack_attack.py \
-    --output ../attack_quic_optimistic_ack_1M.pcap \
-    --packets 1000000 \
+    --output ../attack_quic_optimistic_ack_5M.pcap \
+    --packets 5000000 \
     --dst-mac 0c:42:a1:dd:5b:28 \
     --attack-range 203.0.113.0/24 \
     --server-ip 10.0.0.1 \

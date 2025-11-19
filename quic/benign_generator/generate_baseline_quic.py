@@ -210,12 +210,13 @@ def generate_baseline_quic_traffic(output_file, num_packets,
                                                 flow['scid'], flow['dcid'],
                                                 flow['server_pkt_num'])
                 # Server Initial with ACK
-                payload = create_ack_frame(flow['client_pkt_num'] - 1, 10, 0)
+                largest_ack = max(0, flow['client_pkt_num'] - 1)
+                payload = create_ack_frame(largest_ack, 10, 0)
                 crypto_data = bytes([random.randint(0, 255) for _ in range(150)])
                 payload += create_crypto_frame(0, crypto_data)
                 payload += create_padding(max(0, 1200 - len(header) - len(payload)))
                 flow['server_pkt_num'] += 1
-                flow['last_acked'] = flow['client_pkt_num'] - 1
+                flow['last_acked'] = largest_ack
 
             # Progress state after some packets
             if flow['client_pkt_num'] > 2:
@@ -227,7 +228,8 @@ def generate_baseline_quic_traffic(output_file, num_packets,
                 header = create_quic_long_header(QUIC_HANDSHAKE, QUIC_VERSION_1,
                                                 flow['dcid'], flow['scid'],
                                                 flow['client_pkt_num'])
-                payload = create_ack_frame(flow['server_pkt_num'] - 1, 5, 0)
+                largest_ack = max(0, flow['server_pkt_num'] - 1)
+                payload = create_ack_frame(largest_ack, 5, 0)
                 crypto_data = bytes([random.randint(0, 255) for _ in range(100)])
                 payload += create_crypto_frame(flow['stream_offset'], crypto_data)
                 flow['client_pkt_num'] += 1
@@ -235,11 +237,12 @@ def generate_baseline_quic_traffic(output_file, num_packets,
                 header = create_quic_long_header(QUIC_HANDSHAKE, QUIC_VERSION_1,
                                                 flow['scid'], flow['dcid'],
                                                 flow['server_pkt_num'])
-                payload = create_ack_frame(flow['client_pkt_num'] - 1, 8, 0)
+                largest_ack = max(0, flow['client_pkt_num'] - 1)
+                payload = create_ack_frame(largest_ack, 8, 0)
                 crypto_data = bytes([random.randint(0, 255) for _ in range(80)])
                 payload += create_crypto_frame(flow['stream_offset'], crypto_data)
                 flow['server_pkt_num'] += 1
-                flow['last_acked'] = flow['client_pkt_num'] - 1
+                flow['last_acked'] = largest_ack
 
             # Progress to data state
             if flow['client_pkt_num'] > 5:
