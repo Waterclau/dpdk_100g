@@ -29,7 +29,7 @@ sudo apt-get install -y python3-pip
 pip3 install scapy
 
 # Generate 5M packets of legitimate QUIC traffic
-python3 generate_baseline_quic.py \
+sudo python3 generate_baseline_quic.py \
     --output ../baseline_quic_5M.pcap \
     --packets 5000000 \
     --dst-mac 0c:42:a1:dd:5b:28 \
@@ -55,7 +55,7 @@ sudo apt-get install -y python3-pip
 pip3 install scapy
 
 # Generate 1M packets of Optimistic ACK attack
-python3 generate_optimistic_ack_attack.py \
+sudo python3 generate_optimistic_ack_attack.py \
     --output ../attack_quic_optimistic_ack_5M.pcap \
     --packets 5000000 \
     --dst-mac 0c:42:a1:dd:5b:28 \
@@ -145,7 +145,7 @@ mkdir -p /local/dpdk_100g/quic/results
 cd /local/dpdk_100g/quic/detector_system
 
 # Run detector for 510 seconds
-sudo timeout 510 ./quic_optimistic_ack_detector \
+sudo timeout 530 ./quic_optimistic_ack_detector \
     -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0 \
     2>&1 | tee ../results/results_quic_optimistic_ack.log
 ```
@@ -229,8 +229,9 @@ cd /local/dpdk_100g/quic
 
 # 50 instances x 37,500 pps = 1.875M pps (~10.5 Gbps)
 # Total with baseline: ~3.125M pps (~17.5 Gbps, ~70% of 25G)
+sleep 100
 for i in {1..50}; do
-    sudo timeout 300 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 attack_quic_optimistic_ack_1M.pcap &
+    sudo timeout 250 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 attack_quic_optimistic_ack_5M.pcap &
 done
 
 # Verify processes

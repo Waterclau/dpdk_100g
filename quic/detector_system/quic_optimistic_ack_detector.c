@@ -74,11 +74,11 @@
 /* OctoSketch parameters */
 #define SKETCH_WIDTH 65536    // 64K buckets
 #define SKETCH_DEPTH 4        // 4 hash functions
-#define HEAVY_HITTER_THRESHOLD 500  // Paquetes para ser heavy hitter
+#define HEAVY_HITTER_THRESHOLD 10000  // ACKs para ser heavy hitter (por ventana)
 
 /* Detection thresholds */
 #define ACK_RATE_THRESHOLD 5000       // >5000 ACKs/s por IP = sospechoso
-#define BYTES_RATIO_THRESHOLD 10.0    // bytes_out/bytes_in > 10 = ataque
+#define BYTES_RATIO_THRESHOLD 8.0     // bytes_out/bytes_in > 8 = ataque
 #define PKT_NUM_JUMP_THRESHOLD 1000   // Salto >1000 en pkt number = sospechoso
 #define BURST_THRESHOLD 100           // >100 ACKs en 100ms = burst
 #define MIN_PACKETS_FOR_DETECTION 500 // Minimo de paquetes para analisis
@@ -487,8 +487,9 @@ static void detect_optimistic_ack(void)
         }
     }
 
-    /* Rule 3: Heavy hitter ACKers (IPs with excessive ACKs) */
-    if (g_stats.heavy_hitters > 5) {
+    /* Rule 3: Heavy hitter ACKers - only alert if significant portion or attack traffic present */
+    if (g_stats.heavy_hitters > 20 ||
+        (g_stats.heavy_hitters > 5 && g_stats.attack_packets > 0)) {
         if (g_stats.alert_level < ALERT_MEDIUM) {
             g_stats.alert_level = ALERT_MEDIUM;
         }
@@ -618,16 +619,19 @@ static void process_packet(struct rte_mbuf *pkt)
     if (ack_count > 0) {
         g_stats.total_acks += ack_count;
 
+        /* Get previous ACK count before update */
+        uint32_t prev_ack_count = cms_query(ip_ack_sketch, src_ip);
+
         /* Update ACK count per IP */
         cms_update(ip_ack_sketch, src_ip, ack_count);
         uint32_t ip_ack_count = cms_query(ip_ack_sketch, src_ip);
 
-        if (ip_ack_count == ack_count) {
+        if (prev_ack_count == 0) {
             g_stats.unique_ips++;
         }
 
-        /* Check for heavy hitter */
-        if (ip_ack_count > HEAVY_HITTER_THRESHOLD) {
+        /* Check for heavy hitter - only count when crossing threshold */
+        if (prev_ack_count <= HEAVY_HITTER_THRESHOLD && ip_ack_count > HEAVY_HITTER_THRESHOLD) {
             g_stats.heavy_hitters++;
         }
 
