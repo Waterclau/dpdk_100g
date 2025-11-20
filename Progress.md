@@ -60,7 +60,7 @@ python3 generate_baseline_traffic.py \
 ```
 
 **Baseline PCAP Contents** (`baseline_5M.pcap`):
-- **Size**: ~3.2 GB
+- **Size**: 3.2 GB
 - **Packets**: 5,000,000
 - **Flows**: 1,000 unique client IPs (192.168.1.0/24)
 - **HTTP Methods**:
@@ -88,7 +88,7 @@ python3 generate_attack_traffic.py \
 ```
 
 **Attack PCAP Contents** (`attack_mixed_1M.pcap`):
-- **Size**: ~650 MB
+- **Size**: 650 MB
 - **Packets**: 1,000,000
 - **Attacker IPs**: 500 unique sources (203.0.113.0/24)
 - **HTTP Methods**:
@@ -114,87 +114,15 @@ We use **parallel tcpreplay instances** to saturate the 25G link:
 ##### Why Parallel Instances?
 
 Single tcpreplay instance is limited by:
-- **CPU single-thread bottleneck**: ~2-3 Gbps max throughput
-- **Kernel network stack overhead**: System calls and context switches
-- **Memory copying**: Data moves through multiple buffers
+- CPU single-thread bottleneck (~2-3 Gbps max)
+- Kernel network stack overhead
 
-Our target: **17.5 Gbps sustained throughput** during attack phase.
-
-**The Challenge**: How do we generate 3+ million packets/second?
-
-**Solution**: Horizontal scaling with parallel tcpreplay instances.
-
-##### The Parallel Instance Strategy
+**Solution**: Run **many parallel instances** from the same PCAP with `--loop=0` (infinite loop):
 
 ```bash
 # Each instance reads the PCAP independently
-# They share the same NIC but operate in parallel
-# Combined throughput: N instances × per-instance rate
+# Combined they achieve line-rate throughput
 ```
-
-**Key insight**: Modern NICs and CPUs can handle many concurrent senders:
-
-```
-        Instance 1 ──┐
-        Instance 2 ──┤
-        Instance 3 ──┤
-           ...       ├──► NIC TX queue ──► 25G link ──► Monitor
-        Instance N-1 ─┤
-        Instance N ───┘
-```
-
-Each instance:
-1. Opens the PCAP file (read-only, cached in RAM)
-2. Loops through packets at specified rate (`--pps`)
-3. Sends to NIC independently
-4. When PCAP ends, restarts from beginning (`--loop=0`)
-
-**What we're testing**:
-
-| Goal | Why It Matters |
-|------|----------------|
-| **Saturate 25G link** | Prove detector can handle line-rate traffic |
-| **Realistic mix** | 40% baseline + 60% attack mimics real DDoS scenario |
-| **Sustained load** | 500 seconds of continuous traffic tests stability |
-| **Resource limits** | Push detector to find memory/CPU bottlenecks |
-| **Detection accuracy** | High throughput shouldn't cause missed detections |
-
-**Instance count calculation**:
-
-We need to reach target throughput without exceeding:
-- NIC TX queue capacity
-- CPU processing capability
-- Kernel network buffer limits
-
-```python
-# Example calculation for baseline
-target_throughput = 7 Gbps
-avg_packet_size = 550 bytes
-target_pps = (7e9 / 8) / 550 ≈ 1,590,000 pps
-
-# Single instance limit
-max_pps_per_instance = 50,000 pps  # Conservative, stable rate
-
-# Required instances
-instances_needed = ceil(1,590,000 / 50,000) ≈ 32 instances
-
-# We use 25 (slightly lower) to leave headroom for variations
-```
-
-**Why not fewer, faster instances?**
-
-| Approach | Problem |
-|----------|---------|
-| 1 instance @ 1.25M pps | CPU bottleneck, drops packets |
-| 5 instances @ 250K pps | Still CPU-bound, unstable |
-| 25 instances @ 50K pps | ✅ Stable, no drops, sustainable |
-
-**Why not more, slower instances?**
-
-| Approach | Problem |
-|----------|---------|
-| 100 instances @ 12.5K pps | Too many file handles, context switching overhead |
-| 200 instances @ 6.25K pps | Process management overhead exceeds gains |
 
 ##### Baseline Traffic Replay (controller → monitor)
 
@@ -349,7 +277,17 @@ Time (s)    Event                           Expected Detection
 
 ### 2.2 The Optimistic ACK Attack - A Novel Threat
 
-This is a **recently discovered attack** (2022) that exploits fundamental QUIC design decisions.
+NORMAL QUIC FLOW                             OPTIMISTIC ACK ATTACK
+------------------                           -----------------------
+ClientHello  ───────►                        ClientHello ───────►
+                 ◄──── ServerHello                     ◄──── ServerHello
+Encrypted Req ──►                        Encrypted Req ──►
+                 ◄──── Normal DATA                     ◄──── Normal DATA
+Normal ACKs   ──►                        ❌ ACKs for packets NEVER received ──►
+                 ◄──── Server slows/adjusts          ❌ Server SPEEDS UP (amplifies)
+Stable traffic                           ❌ Massive bursts from server
+Graceful close                           ❌ Server overload / DDoS
+
 
 #### QUIC Congestion Control Background
 
