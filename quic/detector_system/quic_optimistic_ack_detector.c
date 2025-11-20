@@ -74,11 +74,11 @@
 /* OctoSketch parameters */
 #define SKETCH_WIDTH 65536    // 64K buckets
 #define SKETCH_DEPTH 4        // 4 hash functions
-#define HEAVY_HITTER_THRESHOLD 10000  // ACKs para ser heavy hitter (por ventana)
+#define HEAVY_HITTER_THRESHOLD 5000   // ACKs para ser heavy hitter (por ventana) - was 10000
 
-/* Detection thresholds */
-#define ACK_RATE_THRESHOLD 5000       // >5000 ACKs/s por IP = sospechoso
-#define BYTES_RATIO_THRESHOLD 8.0     // bytes_out/bytes_in > 8 = ataque
+/* Detection thresholds - ADJUSTED for real attack patterns */
+#define ACK_RATE_THRESHOLD 1000       // >1000 ACKs/s por IP = sospechoso (was 5000)
+#define BYTES_RATIO_THRESHOLD 1.5     // bytes_out/bytes_in > 1.5 = ataque (was 8.0)
 #define PKT_NUM_JUMP_THRESHOLD 1000   // Salto >1000 en pkt number = sospechoso
 #define BURST_THRESHOLD 100           // >100 ACKs en 100ms = burst
 #define MIN_PACKETS_FOR_DETECTION 500 // Minimo de paquetes para analisis

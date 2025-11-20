@@ -117,13 +117,19 @@ def generate_optimistic_ack_attack(output_file, num_packets,
                                     attack_ip_range, server_ip,
                                     num_attackers=500,
                                     ack_jump_factor=100,
-                                    acks_per_packet=3):
+                                    acks_per_packet=3,
+                                    amplification_factor=45):
     """
     Generate QUIC Optimistic ACK attack traffic pcap
 
+    Simulates the REAL Optimistic ACK attack where:
+    - Client sends small ACK packets (~100 bytes)
+    - Server responds with amplified data (~45x amplification)
+    - Total packets = client_acks + (client_acks * amplification_factor)
+
     Args:
         output_file: Output pcap file path
-        num_packets: Total number of packets to generate
+        num_packets: Total number of packets to generate (client + server)
         src_mac: Source MAC address
         dst_mac: Destination MAC address
         attack_ip_range: Attacker IP range (e.g., "203.0.113.0/24")
@@ -131,15 +137,17 @@ def generate_optimistic_ack_attack(output_file, num_packets,
         num_attackers: Number of attacking IPs
         ack_jump_factor: How far ahead to ACK (multiplier for packet number jumps)
         acks_per_packet: Number of ACK frames per packet
+        amplification_factor: Server response amplification (default: 45x like Chromium)
     """
 
-    print(f"Generating {num_packets:,} QUIC Optimistic ACK attack packets...")
+    print(f"Generating {num_packets:,} QUIC Optimistic ACK attack packets (with {amplification_factor}x amplification)...")
     print(f"Output file: {output_file}")
     print(f"Attack IP range: {attack_ip_range}")
     print(f"Server IP: {server_ip}")
     print(f"Number of attackers: {num_attackers}")
     print(f"ACK jump factor: {ack_jump_factor}x")
     print(f"ACKs per packet: {acks_per_packet}")
+    print(f"Amplification factor: {amplification_factor}x")
 
     # Parse attack IP range
     base_ip = attack_ip_range.split('/')[0]
@@ -165,12 +173,25 @@ def generate_optimistic_ack_attack(output_file, num_packets,
         }
         attackers.append(attacker)
 
+    # Calculate distribution: client ACKs vs server responses
+    # With amplification_factor=45, for every 1 client ACK, server sends 45 responses
+    # So if total = 1000 packets: ~22 client ACKs + ~978 server responses
+    client_packet_ratio = 1.0 / (1.0 + amplification_factor)
+    num_client_packets = int(num_packets * client_packet_ratio)
+    num_server_packets = num_packets - num_client_packets
+
+    print(f"\n  Packet distribution:")
+    print(f"    Client ACK packets: {num_client_packets:,} ({num_client_packets*100//num_packets}%)")
+    print(f"    Server response packets: {num_server_packets:,} ({num_server_packets*100//num_packets}%)")
+    print(f"    Expected bytes ratio: ~{amplification_factor:.1f}x\n")
+
     packets = []
     packets_per_update = num_packets // 10
 
-    for i in range(num_packets):
-        if i > 0 and i % packets_per_update == 0:
-            print(f"  Progress: {i:,}/{num_packets:,} ({i*100//num_packets}%)")
+    # Generate client ACK packets first
+    for i in range(num_client_packets):
+        if i > 0 and i % (packets_per_update // 10) == 0:
+            print(f"  Progress (client ACKs): {i:,}/{num_client_packets:,} ({i*100//num_client_packets}%)")
 
         # Select random attacker
         attacker = random.choice(attackers)
@@ -244,7 +265,47 @@ def generate_optimistic_ack_attack(output_file, num_packets,
 
         packets.append(pkt)
 
-    print(f"  Writing {len(packets):,} packets to {output_file}...")
+    # Generate server response packets (amplification)
+    print(f"\n  Generating server amplified responses...")
+    for i in range(num_server_packets):
+        if i > 0 and i % (packets_per_update * 2) == 0:
+            print(f"  Progress (server): {i:,}/{num_server_packets:,} ({i*100//num_server_packets}%)")
+
+        # Select random attacker to respond to
+        attacker = random.choice(attackers)
+
+        # Server -> Client direction
+        src_ip = server_ip
+        dst_ip = attacker['ip']
+        src_port = 443
+        dst_port = attacker['port']
+
+        # Create server response with STREAM data (large payload)
+        header = create_quic_short_header(attacker['scid'], random.randint(1000, 100000))
+
+        # Server sends STREAM frames with data (simulating retransmissions)
+        # This is what causes the amplification - server thinks packets were lost
+        stream_data = bytes([random.randint(0, 255) for _ in range(random.randint(800, 1200))])
+
+        # Simple STREAM frame: frame_type + stream_id + offset + length + data
+        stream_frame = bytes([FRAME_STREAM | 0x06])  # STREAM with OFF and LEN bits
+        stream_frame += encode_variable_int(0)  # Stream ID
+        stream_frame += encode_variable_int(random.randint(0, 100000))  # Offset
+        stream_frame += encode_variable_int(len(stream_data))  # Length
+        stream_frame += stream_data
+
+        payload = stream_frame
+
+        quic_payload = header + payload
+
+        pkt = Ether(src=src_mac, dst=dst_mac) / \
+              IP(src=src_ip, dst=dst_ip) / \
+              UDP(sport=src_port, dport=dst_port) / \
+              Raw(load=quic_payload)
+
+        packets.append(pkt)
+
+    print(f"\n  Writing {len(packets):,} packets to {output_file}...")
     wrpcap(output_file, packets)
 
     # Calculate statistics
@@ -254,7 +315,10 @@ def generate_optimistic_ack_attack(output_file, num_packets,
     print(f"\n  Attack Statistics:")
     print(f"    File size: {file_size / (1024*1024):.2f} MB")
     print(f"    Avg fake pkt number: {avg_fake_pkt_num:,.0f}")
-    print(f"    Total ACK frames: ~{num_packets * acks_per_packet:,}")
+    print(f"    Client ACK packets: {num_client_packets:,}")
+    print(f"    Server response packets: {num_server_packets:,}")
+    print(f"    Total ACK frames: ~{num_client_packets * acks_per_packet:,}")
+    print(f"    Amplification factor: {num_server_packets/num_client_packets:.1f}x")
     print(f"Done!")
 
     return len(packets)
@@ -393,6 +457,8 @@ def main():
                        help='ACK jump factor (default: 100)')
     parser.add_argument('--acks-per-packet', type=int, default=3,
                        help='Number of ACK frames per packet (default: 3)')
+    parser.add_argument('--amplification-factor', type=int, default=45,
+                       help='Server response amplification factor (default: 45x, like Chromium)')
     parser.add_argument('--mixed', action='store_true',
                        help='Generate mixed attack with varying intensities')
 
@@ -418,7 +484,8 @@ def main():
             args.server_ip,
             args.attackers,
             args.jump_factor,
-            args.acks_per_packet
+            args.acks_per_packet,
+            args.amplification_factor
         )
 
 

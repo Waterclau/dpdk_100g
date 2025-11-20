@@ -25,12 +25,13 @@ import os
 
 
 class QUICOptimisticACKAnalyzer:
-    def __init__(self, log_file, output_dir, avg_packet_size=700, link_capacity_gbps=25):
+    def __init__(self, log_file, output_dir, avg_packet_size=700, link_capacity_gbps=25, attack_start_time=130):
         self.log_file = log_file
         self.output_dir = output_dir
         self.snapshots = []
         self.avg_packet_size = avg_packet_size
         self.link_capacity_gbps = link_capacity_gbps
+        self.attack_start_time = attack_start_time  # When attack traffic starts
 
         os.makedirs(output_dir, exist_ok=True)
         self.parse_log()
@@ -54,6 +55,9 @@ class QUICOptimisticACKAnalyzer:
             snapshot = self.parse_snapshot(section, i)
             if snapshot:
                 self.snapshots.append(snapshot)
+
+        # Post-process to calculate throughput
+        self.calculate_throughput()
 
     def parse_snapshot(self, section, index):
         """Parse individual snapshot of statistics"""
@@ -152,13 +156,42 @@ class QUICOptimisticACKAnalyzer:
 
         return snapshot if snapshot.get('total_packets') else None
 
+    def calculate_throughput(self):
+        """Calculate throughput for each snapshot based on packet deltas"""
+        for i, snapshot in enumerate(self.snapshots):
+            # Set timestamp
+            snapshot['timestamp'] = snapshot['interval']
+
+            if i == 0:
+                # First snapshot - calculate from 0
+                baseline_pps = snapshot.get('baseline_packets', 0) / 5.0
+                attack_pps = snapshot.get('attack_packets', 0) / 5.0
+                total_pps = snapshot.get('quic_packets', 0) / 5.0
+            else:
+                # Calculate delta from previous snapshot
+                prev = self.snapshots[i - 1]
+                baseline_delta = snapshot.get('baseline_packets', 0) - prev.get('baseline_packets', 0)
+                attack_delta = snapshot.get('attack_packets', 0) - prev.get('attack_packets', 0)
+                total_delta = snapshot.get('quic_packets', 0) - prev.get('quic_packets', 0)
+
+                # Convert to pps (interval is 5 seconds)
+                baseline_pps = max(0, baseline_delta / 5.0)
+                attack_pps = max(0, attack_delta / 5.0)
+                total_pps = max(0, total_delta / 5.0)
+
+            # Convert to Gbps
+            snapshot['baseline_throughput_gbps'] = self.pps_to_gbps(baseline_pps)
+            snapshot['attack_throughput_gbps'] = self.pps_to_gbps(attack_pps)
+            snapshot['total_throughput_gbps'] = self.pps_to_gbps(total_pps)
+
     def calculate_metrics(self):
         """Calculate comprehensive experiment metrics"""
         if not self.snapshots:
             return {}
 
-        baseline_phase = [s for s in self.snapshots if s.get('attack_percent', 0) == 0]
-        attack_phase = [s for s in self.snapshots if s.get('attack_percent', 0) > 0]
+        # Use actual attack start time instead of attack_percent
+        baseline_phase = [s for s in self.snapshots if s['interval'] < self.attack_start_time]
+        attack_phase = [s for s in self.snapshots if s['interval'] >= self.attack_start_time]
 
         metrics = {
             'total_snapshots': len(self.snapshots),
@@ -498,6 +531,7 @@ class QUICOptimisticACKAnalyzer:
     def plot_detection_efficacy(self):
         """Generate detection efficacy analysis"""
         if not self.snapshots:
+            print("No data to plot")
             return
 
         fig, axes = plt.subplots(2, 2, figsize=(16, 12))
@@ -505,9 +539,137 @@ class QUICOptimisticACKAnalyzer:
 
         intervals = [s['interval'] for s in self.snapshots]
         metrics = self.calculate_metrics()
+        attack_percent = [s.get('attack_percent', 0) for s in self.snapshots]
 
-        # Similar to HTTP flood analyzer...
-        # (Simplified for brevity - full implementation would mirror HTTP analyzer)
+        # 1. Detection timeline
+        ax1 = axes[0, 0]
+        alert_levels = [s.get('alert_level', 'NONE') for s in self.snapshots]
+
+        # Plot attack intensity as background
+        ax1_twin = ax1.twinx()
+        line1 = ax1.plot(intervals, attack_percent, 'r-', linewidth=3, label='Attack Intensity (%)', alpha=0.7)
+
+        # Plot detection events
+        detection_times = []
+        detection_levels = []
+        for i, s in enumerate(self.snapshots):
+            if s.get('alert_level') == 'HIGH':
+                detection_times.append(s['interval'])
+                detection_levels.append(s.get('attack_percent', 0))
+
+        if detection_times:
+            line2 = ax1.scatter(detection_times, detection_levels, color='darkred', s=100, marker='X',
+                               label='HIGH Alert', zorder=5, edgecolors='black', linewidths=1)
+
+        # Mark attack start
+        if metrics.get('attack_start_time'):
+            ax1.axvline(x=metrics['attack_start_time'], color='orange', linestyle='--',
+                       linewidth=2, label=f"Attack Start ({metrics['attack_start_time']}s)")
+
+        # Mark first detection
+        if metrics.get('time_to_detection'):
+            ax1.axvline(x=metrics['time_to_detection'], color='blue', linestyle='--',
+                       linewidth=2, label=f"First Detection ({metrics['time_to_detection']}s)")
+
+        ax1.set_xlabel('Time (seconds)', fontsize=12)
+        ax1.set_ylabel('Attack Traffic (%)', fontsize=12, color='r')
+        ax1.set_title('Detection Timeline', fontsize=14, fontweight='bold')
+        ax1.tick_params(axis='y', labelcolor='r')
+        ax1.set_ylim(0, 100)
+        ax1.legend(loc='upper left')
+        ax1.grid(True, alpha=0.3)
+
+        # 2. ACK rate over time
+        ax2 = axes[0, 1]
+        total_acks = [s.get('total_acks', 0) for s in self.snapshots]
+        ack_rates = []
+        for i in range(len(self.snapshots)):
+            if i == 0:
+                rate = total_acks[i] / 5 if total_acks[i] > 0 else 0
+            else:
+                rate = (total_acks[i] - total_acks[i-1]) / 5
+            ack_rates.append(rate)
+
+        ax2.plot(intervals, ack_rates, 'b-', linewidth=2, marker='o', markersize=3, label='ACK Rate', alpha=0.7)
+        ax2.axhline(y=5000, color='orange', linestyle='--', linewidth=2, label='Warning threshold')
+        ax2.set_xlabel('Time (seconds)', fontsize=12)
+        ax2.set_ylabel('ACKs per Second', fontsize=12)
+        ax2.set_title('ACK Rate Over Time', fontsize=14, fontweight='bold')
+        ax2.legend()
+        ax2.grid(True, alpha=0.3)
+
+        # 3. Detection confusion matrix
+        ax3 = axes[1, 0]
+
+        baseline_phase = [s for s in self.snapshots if s.get('attack_percent', 0) == 0]
+        attack_phase = [s for s in self.snapshots if s.get('attack_percent', 0) > 0]
+
+        # True Negatives: Baseline with no alert
+        tn = sum(1 for s in baseline_phase if s.get('alert_level') in ['NONE', None])
+        # False Positives: Baseline with alert
+        fp = sum(1 for s in baseline_phase if s.get('alert_level') not in ['NONE', None])
+        # True Positives: Attack with HIGH alert
+        tp = sum(1 for s in attack_phase if s.get('alert_level') == 'HIGH')
+        # False Negatives: Attack with no HIGH alert
+        fn = sum(1 for s in attack_phase if s.get('alert_level') != 'HIGH')
+
+        confusion_matrix = np.array([[tn, fp], [fn, tp]])
+
+        im = ax3.imshow(confusion_matrix, cmap='RdYlGn', alpha=0.8)
+        ax3.set_xticks([0, 1])
+        ax3.set_yticks([0, 1])
+        ax3.set_xticklabels(['No Attack\n(Predicted)', 'Attack\n(Predicted)'])
+        ax3.set_yticklabels(['No Attack\n(Actual)', 'Attack\n(Actual)'])
+        ax3.set_title('Detection Confusion Matrix', fontsize=14, fontweight='bold')
+
+        # Add text annotations
+        for i in range(2):
+            for j in range(2):
+                total = confusion_matrix.sum()
+                if total > 0:
+                    text = ax3.text(j, i, f'{confusion_matrix[i, j]}\n({confusion_matrix[i, j]/total*100:.1f}%)',
+                                   ha="center", va="center", color="black", fontsize=14, fontweight='bold')
+
+        plt.colorbar(im, ax=ax3)
+
+        # 4. Efficacy metrics summary
+        ax4 = axes[1, 1]
+        ax4.axis('off')
+
+        # Calculate metrics
+        precision = (tp / (tp + fp) * 100) if (tp + fp) > 0 else 0
+        recall = (tp / (tp + fn) * 100) if (tp + fn) > 0 else 0
+        f1_score = (2 * precision * recall / (precision + recall)) if (precision + recall) > 0 else 0
+        accuracy = ((tp + tn) / (tp + tn + fp + fn) * 100) if (tp + tn + fp + fn) > 0 else 0
+
+        summary_text = f"""
+DETECTION EFFICACY SUMMARY
+
+Performance Metrics:
+  • Accuracy:        {accuracy:.1f}%
+  • Precision:       {precision:.1f}%
+  • Recall:          {recall:.1f}%
+  • F1 Score:        {f1_score:.1f}%
+
+Detection Stats:
+  • True Positives:  {tp} snapshots
+  • True Negatives:  {tn} snapshots
+  • False Positives: {fp} snapshots
+  • False Negatives: {fn} snapshots
+
+Timing:
+  • Attack Start:    {metrics.get('attack_start_time', 0)}s
+  • First Detection: {metrics.get('time_to_detection', 0)}s
+  • Detection Delay: {metrics.get('detection_delay', 0)}s
+
+Attack Indicators:
+  • Max Bytes Ratio: {metrics.get('max_bytes_ratio', 0):.2f}
+  • Max ACK Rate:    {metrics.get('max_ack_rate', 0):,}
+        """
+
+        ax4.text(0.1, 0.95, summary_text, transform=ax4.transAxes, fontsize=11,
+                verticalalignment='top', fontfamily='monospace',
+                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
 
         plt.tight_layout()
         output_path = os.path.join(self.output_dir, '02_detection_efficacy.png')
@@ -518,11 +680,117 @@ class QUICOptimisticACKAnalyzer:
     def plot_baseline_vs_attack(self):
         """Generate baseline vs attack comparison"""
         if not self.snapshots:
+            print("No data to plot")
             return
 
-        # Similar to HTTP flood analyzer
         fig, axes = plt.subplots(2, 2, figsize=(16, 12))
         fig.suptitle('Baseline vs Attack Traffic Comparison', fontsize=16, fontweight='bold')
+
+        metrics = self.calculate_metrics()
+        intervals = [s['interval'] for s in self.snapshots]
+
+        # 1. Packet distribution comparison
+        ax1 = axes[0, 0]
+        categories = ['Total Packets', 'Average PPS', 'Total ACKs']
+        baseline_values = [
+            metrics.get('baseline_total_packets', 0),
+            metrics.get('baseline_avg_pps', 0),
+            metrics.get('baseline_total_acks', 0)
+        ]
+        attack_values = [
+            metrics.get('total_attack_packets', 0),
+            metrics.get('attack_avg_pps', 0),
+            0  # Attack ACKs not separately tracked
+        ]
+
+        x = np.arange(len(categories))
+        width = 0.35
+
+        bars1 = ax1.bar(x - width/2, baseline_values, width, label='Baseline', color='green', alpha=0.7)
+        bars2 = ax1.bar(x + width/2, attack_values, width, label='Attack', color='red', alpha=0.7)
+
+        ax1.set_ylabel('Values', fontsize=12)
+        ax1.set_title('Traffic Comparison: Baseline vs Attack', fontsize=14, fontweight='bold')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(categories)
+        ax1.legend()
+        ax1.grid(True, alpha=0.3, axis='y')
+
+        # Add value labels on bars
+        for bars in [bars1, bars2]:
+            for bar in bars:
+                height = bar.get_height()
+                if height > 0:
+                    ax1.annotate(f'{height:,.0f}',
+                                xy=(bar.get_x() + bar.get_width() / 2, height),
+                                xytext=(0, 3),
+                                textcoords="offset points",
+                                ha='center', va='bottom', fontsize=8)
+
+        # 2. QUIC packet types
+        ax2 = axes[0, 1]
+        long_headers = [s.get('long_headers', 0) for s in self.snapshots]
+        short_headers = [s.get('short_headers', 0) for s in self.snapshots]
+
+        ax2.plot(intervals, long_headers, 'b-', linewidth=2, marker='o', markersize=3, label='Long Headers', alpha=0.7)
+        ax2.plot(intervals, short_headers, 'g-', linewidth=2, marker='s', markersize=3, label='Short Headers', alpha=0.7)
+        ax2.set_xlabel('Time (seconds)', fontsize=12)
+        ax2.set_ylabel('Cumulative Count', fontsize=12)
+        ax2.set_title('QUIC Header Types Over Time', fontsize=14, fontweight='bold')
+        ax2.legend()
+        ax2.grid(True, alpha=0.3)
+
+        # 3. Attack percentage distribution
+        ax3 = axes[1, 0]
+        attack_percent = [s.get('attack_percent', 0) for s in self.snapshots]
+
+        # Count snapshots by attack percentage ranges
+        ranges = [(0, 0, 'No Attack'), (0.1, 20, 'Low'), (20, 40, 'Medium'), (40, 100, 'High')]
+        range_counts = []
+        range_labels = []
+        range_colors = ['green', 'yellow', 'orange', 'red']
+
+        for min_val, max_val, label in ranges:
+            count = sum(1 for p in attack_percent if min_val <= p < max_val or (min_val == 0 and p == 0))
+            range_counts.append(count)
+            range_labels.append(label)
+
+        if sum(range_counts) > 0:
+            wedges, texts, autotexts = ax3.pie(range_counts, labels=range_labels, colors=range_colors,
+                                                autopct='%1.1f%%', shadow=True, startangle=90)
+            for autotext in autotexts:
+                autotext.set_color('white')
+                autotext.set_fontweight('bold')
+                autotext.set_fontsize(10)
+
+        ax3.set_title('Attack Intensity Distribution', fontsize=14, fontweight='bold')
+
+        # 4. Phase breakdown
+        ax4 = axes[1, 1]
+
+        # Phase durations
+        baseline_duration = metrics.get('baseline_duration', 0)
+        attack_duration = metrics.get('attack_duration', 0)
+
+        phase_labels = ['Baseline\nPhase', 'Attack\nPhase']
+        phase_durations = [baseline_duration, attack_duration]
+        phase_colors = ['green', 'red']
+
+        if max(phase_durations) > 0:
+            bars = ax4.barh(phase_labels, phase_durations, color=phase_colors, alpha=0.7, edgecolor='black', linewidth=2)
+
+            ax4.set_xlabel('Duration (seconds)', fontsize=12)
+            ax4.set_title('Experiment Phase Breakdown', fontsize=14, fontweight='bold')
+            ax4.grid(True, alpha=0.3, axis='x')
+
+            # Add value labels
+            for i, (bar, duration) in enumerate(zip(bars, phase_durations)):
+                if duration > 0:
+                    width = bar.get_width()
+                    total_duration = metrics.get('total_duration', 1)
+                    ax4.text(width + 5, bar.get_y() + bar.get_height()/2,
+                            f'{duration}s\n({duration/total_duration*100:.1f}%)',
+                            ha='left', va='center', fontsize=11, fontweight='bold')
 
         plt.tight_layout()
         output_path = os.path.join(self.output_dir, '03_baseline_vs_attack.png')
@@ -535,9 +803,139 @@ class QUICOptimisticACKAnalyzer:
         if not self.snapshots:
             return
 
-        # Similar to HTTP flood analyzer
         fig, axes = plt.subplots(2, 2, figsize=(16, 12))
         fig.suptitle(f'Link Utilization Analysis ({self.link_capacity_gbps}G Link)', fontsize=16, fontweight='bold')
+
+        # Extract data
+        times = [s['timestamp'] for s in self.snapshots]
+        baseline_throughput = [s['baseline_throughput_gbps'] for s in self.snapshots]
+        attack_throughput = [s['attack_throughput_gbps'] for s in self.snapshots]
+        total_throughput = [s['total_throughput_gbps'] for s in self.snapshots]
+        link_utilization = [(t / self.link_capacity_gbps) * 100 for t in total_throughput]
+
+        # Calculate phase statistics
+        baseline_phase = [s for s in self.snapshots if s['timestamp'] < self.attack_start_time]
+        attack_phase = [s for s in self.snapshots if s['timestamp'] >= self.attack_start_time]
+
+        # 1. Throughput over time
+        ax1 = axes[0, 0]
+        ax1.fill_between(times, 0, baseline_throughput, alpha=0.6, color='green', label='Baseline Traffic')
+        ax1.fill_between(times, baseline_throughput, total_throughput, alpha=0.6, color='red', label='Attack Traffic')
+        ax1.plot(times, total_throughput, 'b-', linewidth=2, label='Total Throughput')
+        ax1.axhline(y=self.link_capacity_gbps, color='gray', linestyle='--', linewidth=2, label=f'{self.link_capacity_gbps}G Link Capacity')
+        ax1.axvline(x=self.attack_start_time, color='orange', linestyle=':', linewidth=2, label='Attack Start')
+        ax1.set_xlabel('Time (seconds)', fontweight='bold')
+        ax1.set_ylabel('Throughput (Gbps)', fontweight='bold')
+        ax1.set_title('Throughput Over Time (Stacked)', fontweight='bold', fontsize=12)
+        ax1.legend(loc='upper left')
+        ax1.grid(True, alpha=0.3)
+
+        # 2. Link utilization percentage
+        ax2 = axes[0, 1]
+
+        # Calculate average utilization for each phase
+        baseline_util = sum([s['total_throughput_gbps'] for s in baseline_phase]) / len(baseline_phase) / self.link_capacity_gbps * 100 if baseline_phase else 0
+        attack_util = sum([s['total_throughput_gbps'] for s in attack_phase]) / len(attack_phase) / self.link_capacity_gbps * 100 if attack_phase else 0
+
+        phases = [f'Baseline Only\n(0-{self.attack_start_time}s)', f'Baseline + Attack\n({self.attack_start_time}-500s)']
+        utilizations = [baseline_util, attack_util]
+        colors = ['green', 'red']
+
+        bars = ax2.bar(phases, utilizations, color=colors, alpha=0.7, edgecolor='black', linewidth=2)
+        ax2.axhline(y=100, color='gray', linestyle='--', linewidth=2, label='100% Capacity')
+        ax2.set_ylabel('Link Utilization (%)', fontweight='bold')
+        ax2.set_title('Average Link Utilization by Phase', fontweight='bold', fontsize=12)
+        ax2.set_ylim(0, 110)
+        ax2.legend()
+        ax2.grid(True, alpha=0.3, axis='y')
+
+        # Add percentage labels on bars
+        for bar in bars:
+            height = bar.get_height()
+            ax2.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{height:.1f}%',
+                    ha='center', va='bottom', fontweight='bold', fontsize=11)
+
+        # 3. Throughput breakdown comparison
+        ax3 = axes[1, 0]
+
+        # Calculate averages for each phase
+        baseline_avg_baseline = sum([s['baseline_throughput_gbps'] for s in baseline_phase]) / len(baseline_phase) if baseline_phase else 0
+        baseline_avg_attack = 0  # No attack during baseline phase
+        attack_avg_baseline = sum([s['baseline_throughput_gbps'] for s in attack_phase]) / len(attack_phase) if attack_phase else 0
+        attack_avg_attack = sum([s['attack_throughput_gbps'] for s in attack_phase]) / len(attack_phase) if attack_phase else 0
+
+        x_pos = np.arange(len(phases))
+        width = 0.35
+
+        baseline_bars = ax3.bar(x_pos - width/2, [baseline_avg_baseline, attack_avg_baseline],
+                               width, label='Baseline Traffic', color='green', alpha=0.7, edgecolor='black')
+        attack_bars = ax3.bar(x_pos + width/2, [baseline_avg_attack, attack_avg_attack],
+                             width, label='Attack Traffic', color='red', alpha=0.7, edgecolor='black')
+
+        ax3.set_ylabel('Throughput (Gbps)', fontweight='bold')
+        ax3.set_title('Throughput Breakdown by Phase', fontweight='bold', fontsize=12)
+        ax3.set_xticks(x_pos)
+        ax3.set_xticklabels(phases)
+        ax3.legend()
+        ax3.grid(True, alpha=0.3, axis='y')
+
+        # Add value labels
+        for bars_group in [baseline_bars, attack_bars]:
+            for bar in bars_group:
+                height = bar.get_height()
+                if height > 0:
+                    ax3.text(bar.get_x() + bar.get_width()/2., height,
+                            f'{height:.2f}',
+                            ha='center', va='bottom', fontsize=9)
+
+        # 4. Summary statistics
+        ax4 = axes[1, 1]
+        ax4.axis('off')
+
+        # Calculate detailed statistics
+        baseline_total_avg = baseline_avg_baseline + baseline_avg_attack
+        attack_total_avg = attack_avg_baseline + attack_avg_attack
+
+        peak_throughput = max(total_throughput)
+        peak_utilization = max(link_utilization)
+        avg_throughput = sum(total_throughput) / len(total_throughput)
+        avg_utilization = (avg_throughput / self.link_capacity_gbps) * 100
+
+        # Calculate traffic increase
+        traffic_increase = ((attack_total_avg - baseline_total_avg) / baseline_total_avg * 100) if baseline_total_avg > 0 else 0
+
+        summary_text = f"""
+LINK UTILIZATION SUMMARY
+{'='*50}
+
+Link Capacity: {self.link_capacity_gbps} Gbps
+
+BASELINE PHASE (0-{self.attack_start_time}s):
+  • Baseline Traffic:     {baseline_avg_baseline:>8.2f} Gbps
+  • Total Throughput:     {baseline_total_avg:>8.2f} Gbps
+  • Link Utilization:     {baseline_util:>8.1f}%
+
+ATTACK PHASE ({self.attack_start_time}-500s):
+  • Baseline Traffic:     {attack_avg_baseline:>8.2f} Gbps
+  • Attack Traffic:       {attack_avg_attack:>8.2f} Gbps
+  • Total Throughput:     {attack_total_avg:>8.2f} Gbps
+  • Link Utilization:     {attack_util:>8.1f}%
+
+OVERALL STATISTICS:
+  • Average Throughput:   {avg_throughput:>8.2f} Gbps
+  • Average Utilization:  {avg_utilization:>8.1f}%
+  • Peak Throughput:      {peak_throughput:>8.2f} Gbps
+  • Peak Utilization:     {peak_utilization:>8.1f}%
+
+TRAFFIC IMPACT:
+  • Traffic Increase:     {traffic_increase:>8.1f}%
+  • Attack/Total Ratio:   {(attack_avg_attack/attack_total_avg*100) if attack_total_avg > 0 else 0:>8.1f}%
+"""
+
+        ax4.text(0.05, 0.95, summary_text, transform=ax4.transAxes,
+                fontfamily='monospace', fontsize=10, verticalalignment='top',
+                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.3))
 
         plt.tight_layout()
         output_path = os.path.join(self.output_dir, '04_link_utilization.png')
@@ -547,7 +945,7 @@ class QUICOptimisticACKAnalyzer:
 
 
 def main():
-    log_file = r'/local/dpdk_100g/quic/results/results_quic_optimistic_ack.log'
+    log_file = r'C:\Users\claud\Comi_archi\MD\codigo\dpdk_100g\quic\results\results_quic_optimistic_ack.log'
     output_dir = os.path.dirname(__file__)
 
     print("\n" + "="*80)

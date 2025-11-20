@@ -54,7 +54,8 @@ sudo apt-get update
 sudo apt-get install -y python3-pip
 pip3 install scapy
 
-# Generate 1M packets of Optimistic ACK attack
+# Generate 5M packets of Optimistic ACK attack WITH amplification (45x like Chromium)
+# IMPORTANT: With amplification=45x, 5M total packets = ~108K client ACKs + ~4.89M server responses
 sudo python3 generate_optimistic_ack_attack.py \
     --output ../attack_quic_optimistic_ack_5M.pcap \
     --packets 5000000 \
@@ -62,8 +63,9 @@ sudo python3 generate_optimistic_ack_attack.py \
     --attack-range 203.0.113.0/24 \
     --server-ip 10.0.0.1 \
     --attackers 500 \
-    --jump-factor 100 \
-    --acks-per-packet 3
+    --jump-factor 500 \
+    --acks-per-packet 5 \
+    --amplification-factor 45
 
 # Or generate mixed intensity attack
 python3 generate_optimistic_ack_attack.py \
@@ -144,8 +146,8 @@ mkdir -p /local/dpdk_100g/quic/results
 ```bash
 cd /local/dpdk_100g/quic/detector_system
 
-# Run detector for 510 seconds
-sudo timeout 530 ./quic_optimistic_ack_detector \
+# Run detector for 460 seconds (+ 10s buffer)
+sudo timeout 470 ./quic_optimistic_ack_detector \
     -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0 \
     2>&1 | tee ../results/results_quic_optimistic_ack.log
 ```
@@ -155,7 +157,12 @@ sudo timeout 530 ./quic_optimistic_ack_detector \
 - `-n 4`: 4 memory channels
 - `-w 0000:41:00.0`: PCI address of NIC (adjust for your system)
 - `-- -p 0`: Port 0
-- `timeout 510`: Run for 510 seconds
+- `timeout 470`: Run for 470 seconds (460s + 10s buffer)
+
+**Detection thresholds (updated):**
+- ACK Rate: >1000 ACKs/s per IP (was 5000)
+- Bytes Ratio: OUT/IN > 1.5 (was 8.0) - detects amplification
+- Heavy Hitter: >5000 ACKs per IP (was 10000)
 
 ---
 
@@ -194,12 +201,18 @@ Time     Monitor            Controller           TG
 ────────────────────────────────────────────────────────────────
 0s       Start detector     -                    -
 5s       -                  Start baseline       -
-5-200s   Monitoring         Baseline running     -
-205s     -                  -                    Start attack
-205-500s Detecting          Baseline continues   Attack running
-500s     -                  Traffic stops        Traffic stops
-510s     Detector stops     -                    -
+5-130s   Monitoring         Baseline running     -
+130s     -                  -                    Start attack
+130-450s Detecting          Baseline continues   Attack running
+450s     -                  Traffic stops        Traffic stops
+460s     Detector stops     -                    -
 ```
+
+**Key changes from HTTP flood experiment:**
+- Attack starts at **130s** (not 205s) to get longer attack observation period
+- Total experiment duration: **460s** (not 510s)
+- Baseline alone period: **125s** (130s - 5s)
+- Attack period: **320s** (450s - 130s)
 
 ### Step 1: Start Detector (Monitor)
 
@@ -211,8 +224,9 @@ Wait until the detector shows "Press Ctrl+C to exit..." before starting traffic.
 cd /local/dpdk_100g/quic
 
 # 25 instances x 50,000 pps = 1.25M pps (~7 Gbps, ~28% of 25G)
+# Duration: 445s (to stop at t=450s)
 for i in {1..25}; do
-    sudo timeout 500 tcpreplay --intf1=ens1f0 --pps=50000 --loop=0 baseline_quic_5M.pcap &
+    sudo timeout 445 tcpreplay --intf1=ens1f0 --pps=50000 --loop=0 baseline_quic_5M.pcap &
 done
 
 # Verify processes started
@@ -220,18 +234,24 @@ ps aux | grep tcpreplay | wc -l
 # Should show ~25 processes
 ```
 
-### Step 3: Start Attack Traffic (TG, wait 200s after baseline)
+### Step 3: Start Attack Traffic (TG, wait 125s after baseline starts)
 
-**IMPORTANT**: Wait 200 seconds after starting baseline traffic.
+**IMPORTANT**: Wait 125 seconds after starting baseline traffic (attack starts at t=130s).
 
 ```bash
 cd /local/dpdk_100g/quic
 
-# 50 instances x 37,500 pps = 1.875M pps (~10.5 Gbps)
-# Total with baseline: ~3.125M pps (~17.5 Gbps, ~70% of 25G)
-sleep 100
+# Wait until t=130s (5s detector start + 125s baseline alone)
+sleep 125
+
+# 50 instances x 37,500 pps = 1.875M pps (~10.5 Gbps from attack PCAP)
+# BUT: With 45x amplification, actual traffic will be MUCH higher
+# - Client ACKs: ~108K packets/file × 50 instances = 5.4M ACKs total
+# - Server responses: ~4.89M packets/file × 50 instances = 244M responses
+# This creates realistic Optimistic ACK amplification attack
+# Duration: 320s (to stop at t=450s)
 for i in {1..50}; do
-    sudo timeout 250 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 attack_quic_optimistic_ack_5M.pcap &
+    sudo timeout 320 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 attack_quic_optimistic_ack_5M.pcap &
 done
 
 # Verify processes
@@ -314,16 +334,19 @@ This generates:
 
 | Metric | Expected Value |
 |--------|----------------|
-| Baseline duration | 200 seconds |
-| Attack duration | 300 seconds |
+| Baseline duration | 125 seconds (5-130s) |
+| Attack duration | 320 seconds (130-450s) |
 | Baseline throughput | ~7 Gbps (1.25M pps) |
-| Attack throughput | ~10.5 Gbps (1.875M pps) |
-| Total during attack | ~17.5 Gbps (3.125M pps) |
+| Attack throughput (with amplification) | ~15-20 Gbps |
+| Total during attack | ~22-27 Gbps |
 | Link utilization (baseline) | ~28% of 25G |
-| Link utilization (attack) | ~70% of 25G |
-| Baseline/Attack ratio | 40%/60% |
+| Link utilization (attack) | ~80-90% of 25G |
+| Baseline/Attack ratio | ~25%/75% during attack |
 | Detection delay | < 5 seconds |
-| Bytes OUT/IN ratio during attack | > 10 |
+| **Bytes OUT/IN ratio during attack** | **> 40x** (Optimistic ACK amplification) |
+| ACK rate from attack IPs | > 100K ACKs/s |
+| True positive rate | > 95% |
+| False positive rate | < 5% |
 
 ---
 
@@ -378,14 +401,21 @@ sudo tcpreplay --intf1=ens1f0 --pps=1000 --loop=1 baseline_quic_5M.pcap
 
 ### Detector not detecting attack
 
-Possible issues:
-1. ACK threshold too high - try reducing `ACK_RATE_THRESHOLD` to 3000
-2. Bytes ratio threshold too high - try reducing `BYTES_RATIO_THRESHOLD` to 5.0
-3. PCAP not generating proper attack pattern
+**Updated detection thresholds (already applied):**
+1. `ACK_RATE_THRESHOLD = 1000` (reduced from 5000)
+2. `BYTES_RATIO_THRESHOLD = 1.5` (reduced from 8.0)
+3. `HEAVY_HITTER_THRESHOLD = 5000` (reduced from 10000)
 
+If still not detecting:
 ```bash
-# Verify attack PCAP has optimistic ACKs
-tcpdump -r attack_quic_optimistic_ack_1M.pcap -X | head -100
+# Verify attack PCAP has amplification
+tcpdump -r attack_quic_optimistic_ack_5M.pcap -c 100 | grep -E '(203.0.113|10.0.0.1)'
+# Should see both client->server (203.0.113) and server->client (10.0.0.1) packets
+# Server responses should be ~45x more than client ACKs
+
+# Check bytes ratio in real-time
+tail -f ../results/results_quic_optimistic_ack.log | grep "Ratio OUT/IN"
+# Should show ratio > 40 during attack
 ```
 
 ---
@@ -409,7 +439,7 @@ make clean && make
 mkdir -p /local/dpdk_100g/quic/results
 
 # Run
-sudo timeout 510 ./quic_optimistic_ack_detector -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0 2>&1 | tee ../results/results_quic_optimistic_ack.log
+sudo timeout 470 ./quic_optimistic_ack_detector -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0 2>&1 | tee ../results/results_quic_optimistic_ack.log
 ```
 
 ### Controller (Baseline)
@@ -421,9 +451,9 @@ cd /local/dpdk_100g/quic
 cd benign_generator
 python3 generate_baseline_quic.py --output ../baseline_quic_5M.pcap --packets 5000000 --dst-mac 0c:42:a1:dd:5b:28
 
-# Send traffic (after detector starts)
+# Send traffic (after detector starts, wait 5s)
 cd /local/dpdk_100g/quic
-for i in {1..25}; do sudo timeout 500 tcpreplay --intf1=ens1f0 --pps=50000 --loop=0 baseline_quic_5M.pcap & done
+for i in {1..25}; do sudo timeout 445 tcpreplay --intf1=ens1f0 --pps=50000 --loop=0 baseline_quic_5M.pcap & done
 ```
 
 ### TG (Attack)
@@ -431,13 +461,21 @@ for i in {1..25}; do sudo timeout 500 tcpreplay --intf1=ens1f0 --pps=50000 --loo
 ```bash
 cd /local/dpdk_100g/quic
 
-# Generate PCAP (one time)
+# Generate PCAP with 45x amplification (one time)
 cd attack_generator
-python3 generate_optimistic_ack_attack.py --output ../attack_quic_optimistic_ack_1M.pcap --packets 1000000 --dst-mac 0c:42:a1:dd:5b:28
+python3 generate_optimistic_ack_attack.py \
+    --output ../attack_quic_optimistic_ack_5M.pcap \
+    --packets 5000000 \
+    --dst-mac 0c:42:a1:dd:5b:28 \
+    --attackers 500 \
+    --jump-factor 500 \
+    --acks-per-packet 5 \
+    --amplification-factor 45
 
-# Send traffic (200 seconds after baseline)
+# Send traffic (125 seconds after baseline, attack starts at t=130s)
 cd /local/dpdk_100g/quic
-for i in {1..50}; do sudo timeout 300 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 attack_quic_optimistic_ack_1M.pcap & done
+sleep 125
+for i in {1..50}; do sudo timeout 320 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 attack_quic_optimistic_ack_5M.pcap & done
 ```
 
 ---
