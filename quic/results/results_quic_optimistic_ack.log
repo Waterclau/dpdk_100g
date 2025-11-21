@@ -1,5 +1,9 @@
 QUIC Optimistic ACK Detector Log
+<<<<<<< Updated upstream
 Start time: Nov 21 2025 09:26:18
+=======
+Start time: Nov 21 2025 15:19:38
+>>>>>>> Stashed changes
 ================================================================================
 
 
@@ -62,6 +66,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      6116749
   QUIC packets:       6116749
   Baseline (192.168): 3668800 (60.0%)
@@ -79,6 +84,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         39
+=======
+  Total packets:      6096736
+  QUIC packets:       6096736
+  Baseline (192.168): 3656289 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      5903659 (data)
+  Total ACKs:         2308299
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  372328219
+  Bytes OUT (server): 289095671
+  Ratio OUT/IN:       0.78
+
+[IP ANALYSIS]
+  Unique IPs:         50
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -86,8 +110,13 @@ Press Ctrl+C to exit...
   High ACK rate:      0 detections
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
+<<<<<<< Updated upstream
   Max bytes ratio:    0.77
   Max ACK rate/IP:    172033
+=======
+  Max bytes ratio:    0.78
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -98,6 +127,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      12357609
   QUIC packets:       12357609
   Baseline (192.168): 7421953 (60.1%)
@@ -115,6 +145,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         50
+=======
+  Total packets:      12337611
+  QUIC packets:       12337611
+  Baseline (192.168): 7409385 (60.1%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      12144534 (data)
+  Total ACKs:         4635810
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  688993595
+  Bytes OUT (server): 544681380
+  Ratio OUT/IN:       0.79
+
+[IP ANALYSIS]
+  Unique IPs:         61
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -123,7 +172,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.79
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -134,6 +187,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      18598455
   QUIC packets:       18598455
   Baseline (192.168): 11164115 (60.0%)
@@ -151,6 +205,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         49
+=======
+  Total packets:      18578474
+  QUIC packets:       18578473
+  Baseline (192.168): 11151806 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      18385396 (data)
+  Total ACKs:         6975889
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  1008255212
+  Bytes OUT (server): 803758394
+  Ratio OUT/IN:       0.80
+
+[IP ANALYSIS]
+  Unique IPs:         63
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -159,7 +232,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.80
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -170,6 +247,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      24839311
   QUIC packets:       24839310
   Baseline (192.168): 14910632 (60.0%)
@@ -187,6 +265,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         45
+=======
+  Total packets:      24819347
+  QUIC packets:       24819346
+  Baseline (192.168): 14898262 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      24626269 (data)
+  Total ACKs:         9316073
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  1328748461
+  Bytes OUT (server): 1063079906
+  Ratio OUT/IN:       0.80
+
+[IP ANALYSIS]
+  Unique IPs:         62
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -195,7 +292,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.80
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -206,6 +307,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      31080167
   QUIC packets:       31080166
   Baseline (192.168): 18652259 (60.0%)
@@ -223,6 +325,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         41
+=======
+  Total packets:      31060216
+  QUIC packets:       31060215
+  Baseline (192.168): 18639499 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      30867138 (data)
+  Total ACKs:         11638371
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  1649076117
+  Bytes OUT (server): 1323201325
+  Ratio OUT/IN:       0.80
+
+[IP ANALYSIS]
+  Unique IPs:         58
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -231,7 +352,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.80
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -242,6 +367,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      37321016
   QUIC packets:       37321015
   Baseline (192.168): 22390857 (60.0%)
@@ -259,6 +385,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         44
+=======
+  Total packets:      37301086
+  QUIC packets:       37301085
+  Baseline (192.168): 22378356 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      37108008 (data)
+  Total ACKs:         13967834
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  1969124195
+  Bytes OUT (server): 1583199938
+  Ratio OUT/IN:       0.80
+
+[IP ANALYSIS]
+  Unique IPs:         67
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -267,7 +412,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.80
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -278,6 +427,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      43561867
   QUIC packets:       43561866
   Baseline (192.168): 26133107 (60.0%)
@@ -292,6 +442,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  2291574006
   Bytes OUT (server): 1844037550
   Ratio OUT/IN:       0.80
+=======
+  Total packets:      43541953
+  QUIC packets:       43541952
+  Baseline (192.168): 26120877 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      43348875 (data)
+  Total ACKs:         16299594
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  2289377163
+  Bytes OUT (server): 1843009725
+  Ratio OUT/IN:       0.81
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         44
@@ -302,8 +468,13 @@ Press Ctrl+C to exit...
   High ACK rate:      0 detections
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
+<<<<<<< Updated upstream
   Max bytes ratio:    0.80
   Max ACK rate/IP:    172033
+=======
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -314,6 +485,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      49802720
   QUIC packets:       49802719
   Baseline (192.168): 29882844 (60.0%)
@@ -331,6 +503,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         44
+=======
+  Total packets:      49782821
+  QUIC packets:       49782820
+  Baseline (192.168): 29870539 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      49589743 (data)
+  Total ACKs:         18622990
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  2610339530
+  Bytes OUT (server): 2102469769
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         56
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -339,7 +530,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -350,6 +545,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      56043573
   QUIC packets:       56043572
   Baseline (192.168): 33622812 (60.0%)
@@ -367,6 +563,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         45
+=======
+  Total packets:      56023689
+  QUIC packets:       56023687
+  Baseline (192.168): 33610434 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      55830610 (data)
+  Total ACKs:         20944491
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  2930663183
+  Bytes OUT (server): 2362890035
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         64
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -375,7 +590,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -386,6 +605,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      62284429
   QUIC packets:       62284427
   Baseline (192.168): 37375751 (60.0%)
@@ -403,6 +623,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         44
+=======
+  Total packets:      62264558
+  QUIC packets:       62264556
+  Baseline (192.168): 37363412 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      62071479 (data)
+  Total ACKs:         23274263
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  3252218925
+  Bytes OUT (server): 2621249835
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         43
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -411,7 +650,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -422,6 +665,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      68525273
   QUIC packets:       68525271
   Baseline (192.168): 41115969 (60.0%)
@@ -439,6 +683,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         40
+=======
+  Total packets:      68505420
+  QUIC packets:       68505418
+  Baseline (192.168): 41103692 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      68312341 (data)
+  Total ACKs:         25598951
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  3572242327
+  Bytes OUT (server): 2881772138
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         64
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -447,7 +710,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -458,6 +725,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      74766129
   QUIC packets:       74766127
   Baseline (192.168): 44857336 (60.0%)
@@ -475,6 +743,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         39
+=======
+  Total packets:      74746286
+  QUIC packets:       74746284
+  Baseline (192.168): 44845259 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      74553207 (data)
+  Total ACKs:         27931220
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  3892498478
+  Bytes OUT (server): 3141562746
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         54
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -483,7 +770,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -494,6 +785,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      81006985
   QUIC packets:       81006983
   Baseline (192.168): 48600787 (60.0%)
@@ -511,6 +803,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         41
+=======
+  Total packets:      80987152
+  QUIC packets:       80987150
+  Baseline (192.168): 48588695 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      80794073 (data)
+  Total ACKs:         30264776
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  4212898199
+  Bytes OUT (server): 3401026018
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         55
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -519,7 +830,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -530,6 +845,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      87247840
   QUIC packets:       87247838
   Baseline (192.168): 52343588 (60.0%)
@@ -543,6 +859,21 @@ Press Ctrl+C to exit...
 [BYTES ANALYSIS]
   Bytes IN (client):  4535489389
   Bytes OUT (server): 3661675079
+=======
+  Total packets:      87228016
+  QUIC packets:       87228014
+  Baseline (192.168): 52331203 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      87034937 (data)
+  Total ACKs:         32597384
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  4533274891
+  Bytes OUT (server): 3660666843
+>>>>>>> Stashed changes
   Ratio OUT/IN:       0.81
 
 [IP ANALYSIS]
@@ -555,7 +886,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -566,6 +901,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      93488696
   QUIC packets:       93488694
   Baseline (192.168): 56087409 (60.0%)
@@ -583,6 +919,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         32
+=======
+  Total packets:      93468883
+  QUIC packets:       93468880
+  Baseline (192.168): 56075288 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      93275803 (data)
+  Total ACKs:         34931624
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  4853514941
+  Bytes OUT (server): 3920391918
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         45
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -591,7 +946,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -602,6 +961,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      99729537
   QUIC packets:       99729534
   Baseline (192.168): 59828227 (60.0%)
@@ -619,6 +979,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         44
+=======
+  Total packets:      99709742
+  QUIC packets:       99709739
+  Baseline (192.168): 59815986 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      99516662 (data)
+  Total ACKs:         37259979
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  5173682577
+  Bytes OUT (server): 4180619785
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         53
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -627,7 +1006,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -638,6 +1021,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      105970390
   QUIC packets:       105970387
   Baseline (192.168): 63575570 (60.0%)
@@ -655,6 +1039,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         34
+=======
+  Total packets:      105950611
+  QUIC packets:       105950608
+  Baseline (192.168): 63563212 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      105757531 (data)
+  Total ACKs:         39596845
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  5494154367
+  Bytes OUT (server): 4439826755
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         53
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -663,7 +1066,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169815
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -674,6 +1081,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      112211241
   QUIC packets:       112211238
   Baseline (192.168): 67322437 (60.0%)
@@ -691,6 +1099,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         35
+=======
+  Total packets:      112191472
+  QUIC packets:       112191469
+  Baseline (192.168): 67309794 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      111998392 (data)
+  Total ACKs:         41927040
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  5814842016
+  Bytes OUT (server): 4699309498
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         47
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -699,7 +1126,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169828
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -710,6 +1141,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      118452099
   QUIC packets:       118452096
   Baseline (192.168): 71063350 (60.0%)
@@ -727,6 +1159,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         33
+=======
+  Total packets:      118432339
+  QUIC packets:       118432336
+  Baseline (192.168): 71050950 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      118239259 (data)
+  Total ACKs:         44252596
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  6135159032
+  Bytes OUT (server): 4959212694
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         44
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -735,7 +1186,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169828
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -746,6 +1201,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      124692958
   QUIC packets:       124692955
   Baseline (192.168): 74808924 (60.0%)
@@ -763,6 +1219,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         45
+=======
+  Total packets:      124673202
+  QUIC packets:       124673199
+  Baseline (192.168): 74796627 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       193077 (handshakes)
+  Short headers:      124480122 (data)
+  Total ACKs:         46584569
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  6455784465
+  Bytes OUT (server): 5218611932
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         53
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -771,7 +1246,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    172033
+=======
+  Max ACK rate/IP:    169828
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -782,6 +1261,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      130877437
   QUIC packets:       130877434
   Baseline (192.168): 78517459 (60.0%)
@@ -799,6 +1279,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         43
+=======
+  Total packets:      130853497
+  QUIC packets:       130853493
+  Baseline (192.168): 78502117 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       384773 (handshakes)
+  Short headers:      130468720 (data)
+  Total ACKs:         48922519
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  6831686704
+  Bytes OUT (server): 5510900740
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         48
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -807,7 +1306,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    180439
+=======
+  Max ACK rate/IP:    179855
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -818,6 +1321,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      137118299
   QUIC packets:       137118295
   Baseline (192.168): 82271193 (60.0%)
@@ -835,6 +1339,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         34
+=======
+  Total packets:      137094362
+  QUIC packets:       137094358
+  Baseline (192.168): 82255847 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       384773 (handshakes)
+  Short headers:      136709585 (data)
+  Total ACKs:         51250722
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  7148375339
+  Bytes OUT (server): 5766423485
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         48
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -843,7 +1366,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    180439
+=======
+  Max ACK rate/IP:    179855
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -854,6 +1381,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      143359148
   QUIC packets:       143359144
   Baseline (192.168): 86014416 (60.0%)
@@ -871,6 +1399,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         34
+=======
+  Total packets:      143335226
+  QUIC packets:       143335222
+  Baseline (192.168): 85999435 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       384773 (handshakes)
+  Short headers:      142950449 (data)
+  Total ACKs:         53590351
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  7467665254
+  Bytes OUT (server): 6025240522
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         41
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -879,7 +1426,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    180439
+=======
+  Max ACK rate/IP:    179855
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -890,6 +1441,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      149600005
   QUIC packets:       149600001
   Baseline (192.168): 89761241 (60.0%)
@@ -907,6 +1459,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         38
+=======
+  Total packets:      149576087
+  QUIC packets:       149576083
+  Baseline (192.168): 89746019 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       384773 (handshakes)
+  Short headers:      149191310 (data)
+  Total ACKs:         55931797
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  7788077218
+  Bytes OUT (server): 6284578251
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         42
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -915,7 +1486,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    180439
+=======
+  Max ACK rate/IP:    179855
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -926,6 +1501,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      155840863
   QUIC packets:       155840859
   Baseline (192.168): 93501326 (60.0%)
@@ -943,6 +1519,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         27
+=======
+  Total packets:      155816949
+  QUIC packets:       155816945
+  Baseline (192.168): 93486186 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       384773 (handshakes)
+  Short headers:      155432172 (data)
+  Total ACKs:         58253437
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  8108403113
+  Bytes OUT (server): 6544733898
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         37
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -951,7 +1546,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    180439
+=======
+  Max ACK rate/IP:    179855
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -962,6 +1561,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      162081722
   QUIC packets:       162081718
   Baseline (192.168): 97241803 (60.0%)
@@ -979,6 +1579,25 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         28
+=======
+  Total packets:      162057808
+  QUIC packets:       162057804
+  Baseline (192.168): 97226668 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       384773 (handshakes)
+  Short headers:      161673031 (data)
+  Total ACKs:         60583484
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  8428512063
+  Bytes OUT (server): 6804628664
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         44
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
@@ -987,7 +1606,11 @@ Press Ctrl+C to exit...
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
+<<<<<<< Updated upstream
   Max ACK rate/IP:    180439
+=======
+  Max ACK rate/IP:    179855
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -998,6 +1621,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      168322578
   QUIC packets:       168322574
   Baseline (192.168): 100983731 (60.0%)
@@ -1017,16 +1641,47 @@ Press Ctrl+C to exit...
   Unique IPs:         41
   Heavy ACKers:       0
   Suspicious IPs:     0
+=======
+  Total packets:      168592495
+  QUIC packets:       168592491
+  Baseline (192.168): 100938974 (59.9%)
+  Attack (203.0.113): 343029 (0.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436700 (handshakes)
+  Short headers:      168155791 (data)
+  Total ACKs:         63343886
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  8841267314
+  Bytes OUT (server): 7062425451
+  Ratio OUT/IN:       0.80
+
+[IP ANALYSIS]
+  Unique IPs:         220
+  Heavy ACKers:       0
+  Suspicious IPs:     305
+>>>>>>> Stashed changes
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
   Bytes anomalies:    0 detections
+<<<<<<< Updated upstream
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
   Max ACK rate/IP:    180439
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
+=======
+  Pkt num jumps:      1 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    179855
+
+[ALERT STATUS]
+  Alert level:        [93mMEDIUM[0m
+  Reason:              | PKT_NUM JUMPS: 234504 IPs with abnormal ACK patterns
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1034,6 +1689,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      174563428
   QUIC packets:       174563423
   Baseline (192.168): 104733741 (60.0%)
@@ -1051,18 +1707,47 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         32
+=======
+  Total packets:      182148772
+  QUIC packets:       182148767
+  Baseline (192.168): 104483079 (57.4%)
+  Attack (203.0.113): 5358886 (2.9%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      181712005 (data)
+  Total ACKs:         72845049
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  9671361576
+  Bytes OUT (server): 10113555100
+  Ratio OUT/IN:       1.05
+
+[IP ANALYSIS]
+  Unique IPs:         26
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
   Bytes anomalies:    0 detections
+<<<<<<< Updated upstream
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
   Max ACK rate/IP:    180439
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
+=======
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    1.05
+  Max ACK rate/IP:    1164967
+
+[ALERT STATUS]
+  Alert level:        [93mMEDIUM[0m
+  Reason:              | PKT_NUM JUMPS: 46 IPs with abnormal ACK patterns
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1070,6 +1755,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      180804286
   QUIC packets:       180804281
   Baseline (192.168): 108474116 (60.0%)
@@ -1087,15 +1773,40 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         27
+=======
+  Total packets:      193844794
+  QUIC packets:       193844789
+  Baseline (192.168): 107519885 (55.5%)
+  Attack (203.0.113): 5358886 (2.8%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      193408027 (data)
+  Total ACKs:         79894728
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  9931464296
+  Bytes OUT (server): 17367335829
+  Ratio OUT/IN:       1.75
+
+[IP ANALYSIS]
+  Unique IPs:         0
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
   Bytes anomalies:    0 detections
+<<<<<<< Updated upstream
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
   Max ACK rate/IP:    180439
+=======
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    1.75
+  Max ACK rate/IP:    1172572
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -1106,6 +1817,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      187045144
   QUIC packets:       187045139
   Baseline (192.168): 112226744 (60.0%)
@@ -1123,15 +1835,40 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         34
+=======
+  Total packets:      205516956
+  QUIC packets:       205516951
+  Baseline (192.168): 110546226 (53.8%)
+  Attack (203.0.113): 5358886 (2.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      205080189 (data)
+  Total ACKs:         86928700
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  10190755467
+  Bytes OUT (server): 24627200036
+  Ratio OUT/IN:       2.42
+
+[IP ANALYSIS]
+  Unique IPs:         0
+>>>>>>> Stashed changes
   Heavy ACKers:       0
   Suspicious IPs:     0
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
   Bytes anomalies:    0 detections
+<<<<<<< Updated upstream
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
   Max ACK rate/IP:    180439
+=======
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    2.42
+  Max ACK rate/IP:    1172572
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -1142,6 +1879,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      193286001
   QUIC packets:       193285996
   Baseline (192.168): 115965815 (60.0%)
@@ -1160,14 +1898,40 @@ Press Ctrl+C to exit...
 [IP ANALYSIS]
   Unique IPs:         36
   Heavy ACKers:       0
+=======
+  Total packets:      217171854
+  QUIC packets:       217171849
+  Baseline (192.168): 113552492 (52.3%)
+  Attack (203.0.113): 5358886 (2.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      216735087 (data)
+  Total ACKs:         93967371
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  10448003088
+  Bytes OUT (server): 31888759108
+  Ratio OUT/IN:       3.05
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+>>>>>>> Stashed changes
   Suspicious IPs:     0
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
   Bytes anomalies:    0 detections
+<<<<<<< Updated upstream
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
   Max ACK rate/IP:    180439
+=======
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    2.93
+  Max ACK rate/IP:    1173273
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
@@ -1178,6 +1942,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      199526856
   QUIC packets:       199526851
   Baseline (192.168): 119707406 (60.0%)
@@ -1196,10 +1961,31 @@ Press Ctrl+C to exit...
 [IP ANALYSIS]
   Unique IPs:         26
   Heavy ACKers:       0
+=======
+  Total packets:      228828325
+  QUIC packets:       228828320
+  Baseline (192.168): 116566824 (50.9%)
+  Attack (203.0.113): 5358886 (2.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      228391558 (data)
+  Total ACKs:         101011470
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  10705964422
+  Bytes OUT (server): 39144443134
+  Ratio OUT/IN:       3.66
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+>>>>>>> Stashed changes
   Suspicious IPs:     0
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    0 detections
   Pkt num jumps:      0 detections
   Max bytes ratio:    0.81
@@ -1207,6 +1993,38 @@ Press Ctrl+C to exit...
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
+=======
+  Bytes anomalies:    5 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    3.54
+  Max ACK rate/IP:    1173273
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 3.5 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        700 cycles
+  Throughput/core:      386.73 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m5.1% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1214,6 +2032,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      207658124
   QUIC packets:       207658119
   Baseline (192.168): 123416922 (59.4%)
@@ -1244,6 +2063,60 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [93mMEDIUM[0m
   Reason:              | HEAVY ACKers: 245 IPs with excessive ACK rate | PKT_NUM JUMPS: 1549912 IPs with abnormal ACK patterns
+=======
+  Total packets:      240469636
+  QUIC packets:       240469631
+  Baseline (192.168): 119570594 (49.7%)
+  Attack (203.0.113): 5358886 (2.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      240032869 (data)
+  Total ACKs:         108064694
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  10963023010
+  Bytes OUT (server): 46403417665
+  Ratio OUT/IN:       4.23
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    10 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    4.12
+  Max ACK rate/IP:    1173273
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 4.1 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        727 cycles
+  Throughput/core:      446.84 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m9.7% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1251,6 +2124,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      220670410
   QUIC packets:       220670404
   Baseline (192.168): 126796087 (57.5%)
@@ -1269,10 +2143,31 @@ Press Ctrl+C to exit...
 [IP ANALYSIS]
   Unique IPs:         0
   Heavy ACKers:       0
+=======
+  Total packets:      252115426
+  QUIC packets:       252115421
+  Baseline (192.168): 122575617 (48.6%)
+  Attack (203.0.113): 5358886 (2.1%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      251678659 (data)
+  Total ACKs:         115106699
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  11220257128
+  Bytes OUT (server): 53664154197
+  Ratio OUT/IN:       4.78
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+>>>>>>> Stashed changes
   Suspicious IPs:     0
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    0 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    1.13
@@ -1280,6 +2175,38 @@ Press Ctrl+C to exit...
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
+=======
+  Bytes anomalies:    15 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    4.67
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 4.7 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        752 cycles
+  Throughput/core:      506.98 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m13.9% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1287,6 +2214,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      232344628
   QUIC packets:       232344622
   Baseline (192.168): 129824335 (55.9%)
@@ -1301,6 +2229,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  11839673070
   Bytes OUT (server): 20318671615
   Ratio OUT/IN:       1.72
+=======
+  Total packets:      263763112
+  QUIC packets:       263763107
+  Baseline (192.168): 125585553 (47.6%)
+  Attack (203.0.113): 5358886 (2.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      263326345 (data)
+  Total ACKs:         122148051
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  11477735466
+  Bytes OUT (server): 60922293867
+  Ratio OUT/IN:       5.31
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1309,6 +2253,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    0 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    1.60
@@ -1316,6 +2261,38 @@ Press Ctrl+C to exit...
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
+=======
+  Bytes anomalies:    20 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    5.21
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 5.2 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        774 cycles
+  Throughput/core:      567.12 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m17.7% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1323,6 +2300,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      244015741
   QUIC packets:       244015735
   Baseline (192.168): 132841495 (54.4%)
@@ -1337,6 +2315,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  12097849798
   Bytes OUT (server): 27577161204
   Ratio OUT/IN:       2.28
+=======
+  Total packets:      275405158
+  QUIC packets:       275405153
+  Baseline (192.168): 128585184 (46.7%)
+  Attack (203.0.113): 5358886 (1.9%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      274968391 (data)
+  Total ACKs:         129181996
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  11734445676
+  Bytes OUT (server): 68184573542
+  Ratio OUT/IN:       5.81
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1345,6 +2339,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    0 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    2.17
@@ -1352,6 +2347,38 @@ Press Ctrl+C to exit...
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
+=======
+  Bytes anomalies:    25 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    5.71
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 5.7 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        795 cycles
+  Throughput/core:      627.31 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m21.1% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1359,6 +2386,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      255681384
   QUIC packets:       255681378
   Baseline (192.168): 135864488 (53.1%)
@@ -1373,6 +2401,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  12356349088
   Bytes OUT (server): 34834642970
   Ratio OUT/IN:       2.82
+=======
+  Total packets:      287043472
+  QUIC packets:       287043467
+  Baseline (192.168): 131588351 (45.8%)
+  Attack (203.0.113): 5358886 (1.9%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      286606705 (data)
+  Total ACKs:         136224348
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  11991201924
+  Bytes OUT (server): 75446925867
+  Ratio OUT/IN:       6.29
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1381,6 +2425,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    0 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    2.71
@@ -1388,6 +2433,38 @@ Press Ctrl+C to exit...
 
 [ALERT STATUS]
   Alert level:        [0mNONE[0m
+=======
+  Bytes anomalies:    30 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    6.20
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 6.2 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        814 cycles
+  Throughput/core:      687.44 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m24.3% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1395,6 +2472,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      267342843
   QUIC packets:       267342837
   Baseline (192.168): 138881361 (51.9%)
@@ -1409,6 +2487,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  12614618886
   Bytes OUT (server): 42093765247
   Ratio OUT/IN:       3.34
+=======
+  Total packets:      298690468
+  QUIC packets:       298690463
+  Baseline (192.168): 134593476 (45.1%)
+  Attack (203.0.113): 5358886 (1.8%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      298253701 (data)
+  Total ACKs:         143255307
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  12248501263
+  Bytes OUT (server): 82711194732
+  Ratio OUT/IN:       6.75
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1417,6 +2511,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    3 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    3.24
@@ -1425,6 +2520,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 3.2 (threshold: 3.0)
+=======
+  Bytes anomalies:    35 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    6.66
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 6.7 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        831 cycles
+  Throughput/core:      747.65 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m27.3% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1432,6 +2559,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      279000487
   QUIC packets:       279000481
   Baseline (192.168): 141891161 (50.9%)
@@ -1446,6 +2574,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  12872196594
   Bytes OUT (server): 49357085367
   Ratio OUT/IN:       3.83
+=======
+  Total packets:      310336475
+  QUIC packets:       310336470
+  Baseline (192.168): 137593931 (44.3%)
+  Attack (203.0.113): 5358886 (1.7%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      309899708 (data)
+  Total ACKs:         150282482
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  12505381006
+  Bytes OUT (server): 89973689661
+  Ratio OUT/IN:       7.19
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1454,6 +2598,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    8 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    3.74
@@ -1462,6 +2607,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 3.7 (threshold: 3.0)
+=======
+  Bytes anomalies:    40 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    7.11
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 7.1 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        847 cycles
+  Throughput/core:      807.77 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m30.0% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1469,6 +2646,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      290662717
   QUIC packets:       290662710
   Baseline (192.168): 144909456 (49.9%)
@@ -1483,6 +2661,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  13130548829
   Bytes OUT (server): 56620402334
   Ratio OUT/IN:       4.31
+=======
+  Total packets:      321975482
+  QUIC packets:       321975476
+  Baseline (192.168): 140598908 (43.7%)
+  Attack (203.0.113): 5358886 (1.7%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436762 (handshakes)
+  Short headers:      321538714 (data)
+  Total ACKs:         157315418
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  12762601412
+  Bytes OUT (server): 97232980133
+  Ratio OUT/IN:       7.62
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1491,6 +2685,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    13 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    4.22
@@ -1499,6 +2694,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 4.2 (threshold: 3.0)
+=======
+  Bytes anomalies:    45 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    7.54
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 7.5 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        862 cycles
+  Throughput/core:      867.98 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m32.5% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1506,6 +2733,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      302105404
   QUIC packets:       302105397
   Baseline (192.168): 147867085 (48.9%)
@@ -1520,6 +2748,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  13420932100
   Bytes OUT (server): 63762842404
   Ratio OUT/IN:       4.75
+=======
+  Total packets:      333387083
+  QUIC packets:       333387077
+  Baseline (192.168): 143538881 (43.1%)
+  Attack (203.0.113): 5358886 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      332825247 (data)
+  Total ACKs:         164240188
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  13050890366
+  Bytes OUT (server): 104377283981
+  Ratio OUT/IN:       8.00
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1528,6 +2772,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    18 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    4.66
@@ -1536,6 +2781,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 4.7 (threshold: 3.0)
+=======
+  Bytes anomalies:    50 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    7.92
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 7.9 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        877 cycles
+  Throughput/core:      927.45 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m34.9% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1543,6 +2820,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      313771765
   QUIC packets:       313771758
   Baseline (192.168): 150894553 (48.1%)
@@ -1557,6 +2835,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  13676272501
   Bytes OUT (server): 71019407404
   Ratio OUT/IN:       5.19
+=======
+  Total packets:      345019656
+  QUIC packets:       345019650
+  Baseline (192.168): 146542767 (42.5%)
+  Attack (203.0.113): 5358886 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      344457820 (data)
+  Total ACKs:         171274846
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  13304290580
+  Bytes OUT (server): 111638512193
+  Ratio OUT/IN:       8.39
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1565,6 +2859,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    23 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    5.11
@@ -1573,6 +2868,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 5.1 (threshold: 3.0)
+=======
+  Bytes anomalies:    55 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    8.31
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 8.3 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        890 cycles
+  Throughput/core:      987.48 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m37.1% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1580,6 +2907,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      325434763
   QUIC packets:       325434756
   Baseline (192.168): 153909421 (47.3%)
@@ -1594,6 +2922,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  13933299914
   Bytes OUT (server): 78279219669
   Ratio OUT/IN:       5.62
+=======
+  Total packets:      356649079
+  QUIC packets:       356649073
+  Baseline (192.168): 149535176 (41.9%)
+  Attack (203.0.113): 5358886 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      356087243 (data)
+  Total ACKs:         178324700
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  13559388681
+  Bytes OUT (server): 118905345311
+  Ratio OUT/IN:       8.77
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1602,6 +2946,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    28 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    5.53
@@ -1610,6 +2955,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 5.5 (threshold: 3.0)
+=======
+  Bytes anomalies:    60 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    8.70
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 8.7 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        902 cycles
+  Throughput/core:      1047.62 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m39.1% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1617,6 +2994,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      337096287
   QUIC packets:       337096280
   Baseline (192.168): 156927564 (46.6%)
@@ -1631,6 +3009,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  14191347349
   Bytes OUT (server): 85534323044
   Ratio OUT/IN:       6.03
+=======
+  Total packets:      368274702
+  QUIC packets:       368274696
+  Baseline (192.168): 152525003 (41.4%)
+  Attack (203.0.113): 5358886 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      367712866 (data)
+  Total ACKs:         185371088
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  13815048986
+  Bytes OUT (server): 126172870984
+  Ratio OUT/IN:       9.13
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1639,6 +3033,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    33 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    5.95
@@ -1647,6 +3042,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 5.9 (threshold: 3.0)
+=======
+  Bytes anomalies:    65 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    9.06
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 9.1 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        913 cycles
+  Throughput/core:      1107.71 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m41.0% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1654,6 +3081,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      348763904
   QUIC packets:       348763897
   Baseline (192.168): 159946121 (45.9%)
@@ -1668,6 +3096,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  14449829915
   Bytes OUT (server): 92792253287
   Ratio OUT/IN:       6.42
+=======
+  Total packets:      379904324
+  QUIC packets:       379904318
+  Baseline (192.168): 155514565 (40.9%)
+  Attack (203.0.113): 5358886 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      379342488 (data)
+  Total ACKs:         192397003
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  14071107349
+  Bytes OUT (server): 133440011497
+  Ratio OUT/IN:       9.48
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1676,6 +3120,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    38 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    6.34
@@ -1684,6 +3129,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 6.3 (threshold: 3.0)
+=======
+  Bytes anomalies:    70 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    9.41
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 9.4 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        924 cycles
+  Throughput/core:      1167.90 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m42.8% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1691,6 +3168,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      360438661
   QUIC packets:       360438653
   Baseline (192.168): 162968868 (45.2%)
@@ -1705,6 +3183,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  14708577911
   Bytes OUT (server): 100048398280
   Ratio OUT/IN:       6.80
+=======
+  Total packets:      391543514
+  QUIC packets:       391543508
+  Baseline (192.168): 158511292 (40.5%)
+  Attack (203.0.113): 5358886 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      390981678 (data)
+  Total ACKs:         199433674
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  14327572027
+  Bytes OUT (server): 140701610527
+  Ratio OUT/IN:       9.82
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1713,6 +3207,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    43 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    6.73
@@ -1721,6 +3216,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 6.7 (threshold: 3.0)
+=======
+  Bytes anomalies:    75 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    9.75
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 9.8 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        934 cycles
+  Throughput/core:      1228.23 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m44.5% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1728,6 +3255,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      372109778
   QUIC packets:       372109770
   Baseline (192.168): 165988540 (44.6%)
@@ -1742,6 +3270,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  14967008772
   Bytes OUT (server): 107308661831
   Ratio OUT/IN:       7.17
+=======
+  Total packets:      403188097
+  QUIC packets:       403188091
+  Baseline (192.168): 161511967 (40.1%)
+  Attack (203.0.113): 5358886 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      402626261 (data)
+  Total ACKs:         206463906
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  14584391349
+  Bytes OUT (server): 147961759945
+  Ratio OUT/IN:       10.15
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1750,6 +3294,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    48 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    7.10
@@ -1758,6 +3303,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 7.1 (threshold: 3.0)
+=======
+  Bytes anomalies:    80 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    10.08
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 10.1 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        943 cycles
+  Throughput/core:      1288.28 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m46.1% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1765,6 +3342,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      383778544
   QUIC packets:       383778536
   Baseline (192.168): 169015017 (44.0%)
@@ -1779,6 +3357,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  15226103977
   Bytes OUT (server): 114566471782
   Ratio OUT/IN:       7.52
+=======
+  Total packets:      414827860
+  QUIC packets:       414827854
+  Baseline (192.168): 164512530 (39.7%)
+  Attack (203.0.113): 5358886 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      414266024 (data)
+  Total ACKs:         213486435
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  14841228152
+  Bytes OUT (server): 155227971687
+  Ratio OUT/IN:       10.46
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1787,6 +3381,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    53 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    7.45
@@ -1795,6 +3390,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 7.5 (threshold: 3.0)
+=======
+  Bytes anomalies:    85 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    10.40
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 10.4 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        952 cycles
+  Throughput/core:      1348.56 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m47.6% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1802,6 +3429,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      395449358
   QUIC packets:       395449350
   Baseline (192.168): 172034341 (43.5%)
@@ -1816,6 +3444,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  15484611764
   Bytes OUT (server): 121826063424
   Ratio OUT/IN:       7.87
+=======
+  Total packets:      426468966
+  QUIC packets:       426468960
+  Baseline (192.168): 167511370 (39.3%)
+  Attack (203.0.113): 5358886 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      425907130 (data)
+  Total ACKs:         220510066
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  15098056694
+  Bytes OUT (server): 162489237468
+  Ratio OUT/IN:       10.76
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1824,6 +3468,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    58 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    7.80
@@ -1832,6 +3477,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 7.8 (threshold: 3.0)
+=======
+  Bytes anomalies:    90 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    10.70
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 10.7 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        960 cycles
+  Throughput/core:      1408.57 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m49.1% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1839,6 +3516,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      407110057
   QUIC packets:       407110049
   Baseline (192.168): 175058173 (43.0%)
@@ -1853,6 +3531,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  15743720120
   Bytes OUT (server): 129088671486
   Ratio OUT/IN:       8.20
+=======
+  Total packets:      438108444
+  QUIC packets:       438108438
+  Baseline (192.168): 170520320 (38.9%)
+  Attack (203.0.113): 5358886 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      437546608 (data)
+  Total ACKs:         227530963
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  15355886239
+  Bytes OUT (server): 169746949657
+  Ratio OUT/IN:       11.05
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1861,6 +3555,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    63 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    8.13
@@ -1869,6 +3564,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 8.1 (threshold: 3.0)
+=======
+  Bytes anomalies:    95 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    11.00
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.0 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        968 cycles
+  Throughput/core:      1468.87 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m50.4% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1876,6 +3603,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      418766896
   QUIC packets:       418766888
   Baseline (192.168): 178068720 (42.5%)
@@ -1890,6 +3618,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  16001357786
   Bytes OUT (server): 136350258601
   Ratio OUT/IN:       8.52
+=======
+  Total packets:      449742473
+  QUIC packets:       449742467
+  Baseline (192.168): 173514600 (38.6%)
+  Attack (203.0.113): 5358886 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      449180637 (data)
+  Total ACKs:         234555110
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  15612114238
+  Bytes OUT (server): 177012519676
+  Ratio OUT/IN:       11.34
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1898,6 +3642,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    68 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    8.46
@@ -1906,6 +3651,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 8.5 (threshold: 3.0)
+=======
+  Bytes anomalies:    100 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    11.28
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.3 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        976 cycles
+  Throughput/core:      1528.84 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m51.7% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1913,6 +3690,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      430429207
   QUIC packets:       430429198
   Baseline (192.168): 181081133 (42.1%)
@@ -1927,6 +3705,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  16259111533
   Bytes OUT (server): 143612092123
   Ratio OUT/IN:       8.83
+=======
+  Total packets:      461372814
+  QUIC packets:       461372807
+  Baseline (192.168): 176506384 (38.3%)
+  Attack (203.0.113): 5358886 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      460810977 (data)
+  Total ACKs:         241594915
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  15868128112
+  Bytes OUT (server): 184278054881
+  Ratio OUT/IN:       11.61
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1935,6 +3729,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    73 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    8.77
@@ -1943,6 +3738,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 8.8 (threshold: 3.0)
+=======
+  Bytes anomalies:    105 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    11.56
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.6 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        983 cycles
+  Throughput/core:      1589.07 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m52.9% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1950,6 +3777,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      442091815
   QUIC packets:       442091806
   Baseline (192.168): 184092685 (41.6%)
@@ -1964,6 +3792,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  16516784469
   Bytes OUT (server): 150873083864
   Ratio OUT/IN:       9.13
+=======
+  Total packets:      473012493
+  QUIC packets:       473012486
+  Baseline (192.168): 179506437 (37.9%)
+  Attack (203.0.113): 5358886 (1.1%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      472450656 (data)
+  Total ACKs:         248638730
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  16124841842
+  Bytes OUT (server): 191540604100
+  Ratio OUT/IN:       11.88
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -1972,6 +3816,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    78 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    9.08
@@ -1980,6 +3825,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 9.1 (threshold: 3.0)
+=======
+  Bytes anomalies:    110 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    11.83
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.8 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        989 cycles
+  Throughput/core:      1649.09 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m54.1% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1987,6 +3864,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      453760730
   QUIC packets:       453760721
   Baseline (192.168): 187109417 (41.2%)
@@ -2001,6 +3879,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  16775091463
   Bytes OUT (server): 158135212229
   Ratio OUT/IN:       9.43
+=======
+  Total packets:      484657803
+  QUIC packets:       484657796
+  Baseline (192.168): 182509243 (37.7%)
+  Attack (203.0.113): 5358886 (1.1%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      484095966 (data)
+  Total ACKs:         255675140
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  16381966922
+  Bytes OUT (server): 198803865040
+  Ratio OUT/IN:       12.14
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2009,6 +3903,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    83 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    9.37
@@ -2017,6 +3912,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 9.4 (threshold: 3.0)
+=======
+  Bytes anomalies:    115 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    12.09
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.1 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        996 cycles
+  Throughput/core:      1709.23 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m55.2% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2024,6 +3951,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      465422865
   QUIC packets:       465422856
   Baseline (192.168): 190126724 (40.9%)
@@ -2038,6 +3966,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  17033121481
   Bytes OUT (server): 165396752650
   Ratio OUT/IN:       9.71
+=======
+  Total packets:      496303732
+  QUIC packets:       496303725
+  Baseline (192.168): 185514749 (37.4%)
+  Attack (203.0.113): 5358886 (1.1%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       561830 (handshakes)
+  Short headers:      495741895 (data)
+  Total ACKs:         262719305
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  16638982863
+  Bytes OUT (server): 206065108789
+  Ratio OUT/IN:       12.38
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2046,6 +3990,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    88 detections
   Pkt num jumps:      6 detections
   Max bytes ratio:    9.65
@@ -2054,6 +3999,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 9.7 (threshold: 3.0)
+=======
+  Bytes anomalies:    120 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    12.34
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.3 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1002 cycles
+  Throughput/core:      1769.64 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m56.2% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2061,6 +4038,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      477081976
   QUIC packets:       477081967
   Baseline (192.168): 193133444 (40.5%)
@@ -2091,6 +4069,60 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 9.9 (threshold: 3.0)
+=======
+  Total packets:      508301062
+  QUIC packets:       508301055
+  Baseline (192.168): 188602725 (37.1%)
+  Attack (203.0.113): 5875597 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       571199 (handshakes)
+  Short headers:      507729856 (data)
+  Total ACKs:         270132938
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  16968139899
+  Bytes OUT (server): 213002595933
+  Ratio OUT/IN:       12.55
+
+[IP ANALYSIS]
+  Unique IPs:         513
+  Heavy ACKers:       1
+  Suspicious IPs:     119117
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    125 detections
+  Pkt num jumps:      10 detections
+  Max bytes ratio:    12.52
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.5 (threshold: 3.0) | PKT_NUM JUMPS: 110883 IPs with abnormal ACK patterns
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1007 cycles
+  Throughput/core:      1828.07 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m57.3% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2098,6 +4130,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      488738595
   QUIC packets:       488738586
   Baseline (192.168): 196148377 (40.1%)
@@ -2128,6 +4161,60 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 10.2 (threshold: 3.0)
+=======
+  Total packets:      520654991
+  QUIC packets:       520654984
+  Baseline (192.168): 191784646 (36.8%)
+  Attack (203.0.113): 6919918 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       590034 (handshakes)
+  Short headers:      520064950 (data)
+  Total ACKs:         277928666
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  17371306302
+  Bytes OUT (server): 219608408545
+  Ratio OUT/IN:       12.64
+
+[IP ANALYSIS]
+  Unique IPs:         513
+  Heavy ACKers:       1
+  Suspicious IPs:     309045
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    130 detections
+  Pkt num jumps:      15 detections
+  Max bytes ratio:    12.64
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.6 (threshold: 3.0) | PKT_NUM JUMPS: 231449 IPs with abnormal ACK patterns
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1012 cycles
+  Throughput/core:      1885.15 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m58.3% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2135,6 +4222,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      500393884
   QUIC packets:       500393874
   Baseline (192.168): 199160660 (39.8%)
@@ -2165,6 +4253,60 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 10.5 (threshold: 3.0)
+=======
+  Total packets:      533315860
+  QUIC packets:       533315852
+  Baseline (192.168): 195047274 (36.6%)
+  Attack (203.0.113): 8328126 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       605600 (handshakes)
+  Short headers:      532710252 (data)
+  Total ACKs:         285974696
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  17816230797
+  Bytes OUT (server): 226015718856
+  Ratio OUT/IN:       12.69
+
+[IP ANALYSIS]
+  Unique IPs:         513
+  Heavy ACKers:       1
+  Suspicious IPs:     158616
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    135 detections
+  Pkt num jumps:      20 detections
+  Max bytes ratio:    12.67
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.7 (threshold: 3.0) | PKT_NUM JUMPS: 129918 IPs with abnormal ACK patterns
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1015 cycles
+  Throughput/core:      1939.47 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m59.3% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2172,6 +4314,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      512063078
   QUIC packets:       512063068
   Baseline (192.168): 202174959 (39.5%)
@@ -2202,6 +4345,60 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 10.7 (threshold: 3.0)
+=======
+  Total packets:      545872402
+  QUIC packets:       545872394
+  Baseline (192.168): 198288180 (36.3%)
+  Attack (203.0.113): 9566768 (1.8%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       618003 (handshakes)
+  Short headers:      545254391 (data)
+  Total ACKs:         293899733
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  18237781484
+  Bytes OUT (server): 232519822978
+  Ratio OUT/IN:       12.75
+
+[IP ANALYSIS]
+  Unique IPs:         513
+  Heavy ACKers:       1
+  Suspicious IPs:     113926
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    140 detections
+  Pkt num jumps:      25 detections
+  Max bytes ratio:    12.72
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.7 (threshold: 3.0) | PKT_NUM JUMPS: 234804 IPs with abnormal ACK patterns
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1018 cycles
+  Throughput/core:      1994.50 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m60.2% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2209,6 +4406,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      523737030
   QUIC packets:       523737020
   Baseline (192.168): 205201408 (39.2%)
@@ -2239,6 +4437,60 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.0 (threshold: 3.0)
+=======
+  Total packets:      557806050
+  QUIC packets:       557806042
+  Baseline (192.168): 201372291 (36.1%)
+  Attack (203.0.113): 9949605 (1.8%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       621554 (handshakes)
+  Short headers:      557184488 (data)
+  Total ACKs:         301213630
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  18545971428
+  Bytes OUT (server): 239549577042
+  Ratio OUT/IN:       12.92
+
+[IP ANALYSIS]
+  Unique IPs:         513
+  Heavy ACKers:       1
+  Suspicious IPs:     32426
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    145 detections
+  Pkt num jumps:      30 detections
+  Max bytes ratio:    12.88
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.9 (threshold: 3.0) | PKT_NUM JUMPS: 80841 IPs with abnormal ACK patterns
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1023 cycles
+  Throughput/core:      2052.59 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m61.1% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2246,6 +4498,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      535182577
   QUIC packets:       535182567
   Baseline (192.168): 208164894 (38.9%)
@@ -2334,10 +4587,27 @@ Press Ctrl+C to exit...
   Bytes IN (client):  19341988557
   Bytes OUT (server): 222416725240
   Ratio OUT/IN:       11.50
+=======
+  Total packets:      569283809
+  QUIC packets:       569283801
+  Baseline (192.168): 204329470 (35.9%)
+  Attack (203.0.113): 10034025 (1.8%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      568536374 (data)
+  Total ACKs:         308194815
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  18845861895
+  Bytes OUT (server): 246644649895
+  Ratio OUT/IN:       13.09
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         513
   Heavy ACKers:       1
+<<<<<<< Updated upstream
   Suspicious IPs:     440945
 
 [ATTACK INDICATORS]
@@ -2350,6 +4620,42 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.5 (threshold: 3.0) | PKT_NUM JUMPS: 355133 IPs with abnormal ACK patterns
+=======
+  Suspicious IPs:     20597
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    150 detections
+  Pkt num jumps:      35 detections
+  Max bytes ratio:    13.05
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.0 (threshold: 3.0) | PKT_NUM JUMPS: 23245 IPs with abnormal ACK patterns
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1028 cycles
+  Throughput/core:      2111.97 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m61.9% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2357,6 +4663,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      572835016
   QUIC packets:       572835005
   Baseline (192.168): 217898444 (38.0%)
@@ -2424,6 +4731,60 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.6 (threshold: 3.0) | PKT_NUM JUMPS: 124340 IPs with abnormal ACK patterns
+=======
+  Total packets:      580940868
+  QUIC packets:       580940860
+  Baseline (192.168): 207337794 (35.7%)
+  Attack (203.0.113): 10051445 (1.7%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      580193433 (data)
+  Total ACKs:         315250734
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  19101413723
+  Bytes OUT (server): 253902390245
+  Ratio OUT/IN:       13.29
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    155 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    13.25
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.3 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1032 cycles
+  Throughput/core:      2171.83 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m62.6% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2431,6 +4792,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      596978959
   QUIC packets:       596978948
   Baseline (192.168): 224146610 (37.5%)
@@ -2461,6 +4823,60 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.8 (threshold: 3.0) | PKT_NUM JUMPS: 30524 IPs with abnormal ACK patterns
+=======
+  Total packets:      592569390
+  QUIC packets:       592569382
+  Baseline (192.168): 210330844 (35.5%)
+  Attack (203.0.113): 10051445 (1.7%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      591821955 (data)
+  Total ACKs:         322300571
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  19356493211
+  Bytes OUT (server): 261167969750
+  Ratio OUT/IN:       13.49
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    160 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    13.45
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.5 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1037 cycles
+  Throughput/core:      2231.93 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m63.4% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2468,6 +4884,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      608704115
   QUIC packets:       608704104
   Baseline (192.168): 227177308 (37.3%)
@@ -2482,6 +4899,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  20816229846
   Bytes OUT (server): 249471003783
   Ratio OUT/IN:       11.98
+=======
+  Total packets:      604201840
+  QUIC packets:       604201831
+  Baseline (192.168): 213324854 (35.3%)
+  Attack (203.0.113): 10051445 (1.7%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      603454404 (data)
+  Total ACKs:         329345939
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  19612545824
+  Bytes OUT (server): 268431957089
+  Ratio OUT/IN:       13.69
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2490,6 +4923,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    148 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    11.94
@@ -2498,6 +4932,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.9 (threshold: 3.0)
+=======
+  Bytes anomalies:    165 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    13.65
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.6 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1041 cycles
+  Throughput/core:      2292.48 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m64.1% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2505,6 +4971,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      620364106
   QUIC packets:       620364095
   Baseline (192.168): 230198128 (37.1%)
@@ -2519,6 +4986,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  21074858573
   Bytes OUT (server): 256732250276
   Ratio OUT/IN:       12.18
+=======
+  Total packets:      615852491
+  QUIC packets:       615852482
+  Baseline (192.168): 216331530 (35.1%)
+  Attack (203.0.113): 10051445 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      615105055 (data)
+  Total ACKs:         336382106
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  19870061052
+  Bytes OUT (server): 275697152661
+  Ratio OUT/IN:       13.88
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2527,6 +5010,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    153 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    12.14
@@ -2535,6 +5019,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.1 (threshold: 3.0)
+=======
+  Bytes anomalies:    170 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    13.84
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.8 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1045 cycles
+  Throughput/core:      2352.48 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m64.7% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2542,6 +5058,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      632027209
   QUIC packets:       632027198
   Baseline (192.168): 233211514 (36.9%)
@@ -2556,6 +5073,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  21332858141
   Bytes OUT (server): 263996573209
   Ratio OUT/IN:       12.38
+=======
+  Total packets:      627494988
+  QUIC packets:       627494979
+  Baseline (192.168): 219329616 (35.0%)
+  Attack (203.0.113): 10051445 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      626747552 (data)
+  Total ACKs:         343421938
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  20126615968
+  Bytes OUT (server): 282963930525
+  Ratio OUT/IN:       14.06
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2564,6 +5097,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    158 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    12.34
@@ -2572,6 +5106,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.3 (threshold: 3.0)
+=======
+  Bytes anomalies:    175 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.02
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.0 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1049 cycles
+  Throughput/core:      2412.80 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m65.4% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2579,6 +5145,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      643690236
   QUIC packets:       643690225
   Baseline (192.168): 236231656 (36.7%)
@@ -2593,6 +5160,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  21591685319
   Bytes OUT (server): 271260483990
   Ratio OUT/IN:       12.56
+=======
+  Total packets:      639150253
+  QUIC packets:       639150244
+  Baseline (192.168): 222337413 (34.8%)
+  Attack (203.0.113): 10051445 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      638402817 (data)
+  Total ACKs:         350462256
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  20384020858
+  Bytes OUT (server): 290224608628
+  Ratio OUT/IN:       14.24
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2601,6 +5184,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    163 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    12.53
@@ -2609,6 +5193,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.5 (threshold: 3.0)
+=======
+  Bytes anomalies:    180 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.20
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.2 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1053 cycles
+  Throughput/core:      2472.86 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m66.0% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2616,6 +5232,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      655346740
   QUIC packets:       655346729
   Baseline (192.168): 239242867 (36.5%)
@@ -2630,6 +5247,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  21849332206
   Bytes OUT (server): 278525201749
   Ratio OUT/IN:       12.75
+=======
+  Total packets:      650804681
+  QUIC packets:       650804672
+  Baseline (192.168): 225353108 (34.6%)
+  Attack (203.0.113): 10051445 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      650057245 (data)
+  Total ACKs:         357493686
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  20642201619
+  Bytes OUT (server): 297484856090
+  Ratio OUT/IN:       14.41
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2638,6 +5271,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    168 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    12.71
@@ -2646,6 +5280,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.7 (threshold: 3.0)
+=======
+  Bytes anomalies:    185 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.38
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.4 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1056 cycles
+  Throughput/core:      2532.99 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m66.6% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2653,6 +5319,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      667011247
   QUIC packets:       667011236
   Baseline (192.168): 242257464 (36.3%)
@@ -2667,6 +5334,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  22107271452
   Bytes OUT (server): 285785247588
   Ratio OUT/IN:       12.93
+=======
+  Total packets:      662446997
+  QUIC packets:       662446988
+  Baseline (192.168): 228352124 (34.5%)
+  Attack (203.0.113): 10051445 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      661699561 (data)
+  Total ACKs:         364520584
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  20898962464
+  Bytes OUT (server): 304751046193
+  Ratio OUT/IN:       14.58
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2675,6 +5358,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    173 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    12.89
@@ -2683,6 +5367,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.9 (threshold: 3.0)
+=======
+  Bytes anomalies:    190 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.55
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.5 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1060 cycles
+  Throughput/core:      2593.22 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m67.2% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2690,6 +5406,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      678676608
   QUIC packets:       678676597
   Baseline (192.168): 245274791 (36.1%)
@@ -2704,6 +5421,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  22365478047
   Bytes OUT (server): 293046233447
   Ratio OUT/IN:       13.10
+=======
+  Total packets:      674083966
+  QUIC packets:       674083956
+  Baseline (192.168): 231354082 (34.3%)
+  Attack (203.0.113): 10051445 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      673336529 (data)
+  Total ACKs:         371548138
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  21156266195
+  Bytes OUT (server): 312016972788
+  Ratio OUT/IN:       14.75
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2712,6 +5445,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    178 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    13.07
@@ -2720,6 +5454,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.1 (threshold: 3.0)
+=======
+  Bytes anomalies:    195 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.72
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.7 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1063 cycles
+  Throughput/core:      2653.48 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m67.8% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2727,6 +5493,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      690337889
   QUIC packets:       690337878
   Baseline (192.168): 248289098 (36.0%)
@@ -2741,6 +5508,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  22623633139
   Bytes OUT (server): 300306745487
   Ratio OUT/IN:       13.27
+=======
+  Total packets:      685609873
+  QUIC packets:       685609863
+  Baseline (192.168): 234369570 (34.2%)
+  Attack (203.0.113): 10051445 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      684862436 (data)
+  Total ACKs:         378487677
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  21414292920
+  Bytes OUT (server): 319134158618
+  Ratio OUT/IN:       14.90
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2749,6 +5532,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    183 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    13.24
@@ -2757,6 +5541,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.2 (threshold: 3.0)
+=======
+  Bytes anomalies:    200 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.88
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.9 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1067 cycles
+  Throughput/core:      2713.69 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m68.3% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2764,6 +5580,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      702007471
   QUIC packets:       702007460
   Baseline (192.168): 251309056 (35.8%)
@@ -2778,6 +5595,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  22881882760
   Bytes OUT (server): 307566795993
   Ratio OUT/IN:       13.44
+=======
+  Total packets:      691850740
+  QUIC packets:       691850730
+  Baseline (192.168): 238110130 (34.4%)
+  Attack (203.0.113): 10051445 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      691103303 (data)
+  Total ACKs:         380824053
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  21734350171
+  Bytes OUT (server): 319393969928
+  Ratio OUT/IN:       14.70
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2786,6 +5619,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    188 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    13.41
@@ -2794,6 +5628,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.4 (threshold: 3.0)
+=======
+  Bytes anomalies:    205 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.7 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1063 cycles
+  Throughput/core:      2728.11 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m68.6% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2801,6 +5667,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      713667755
   QUIC packets:       713667743
   Baseline (192.168): 254320406 (35.6%)
@@ -2815,6 +5682,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  23139568630
   Bytes OUT (server): 314828677773
   Ratio OUT/IN:       13.61
+=======
+  Total packets:      698091597
+  QUIC packets:       698091587
+  Baseline (192.168): 241852623 (34.6%)
+  Attack (203.0.113): 10051445 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      697344160 (data)
+  Total ACKs:         383160316
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  22054665391
+  Bytes OUT (server): 319653370974
+  Ratio OUT/IN:       14.49
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2823,6 +5706,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    193 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    13.57
@@ -2831,6 +5715,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.6 (threshold: 3.0)
+=======
+  Bytes anomalies:    210 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.5 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1058 cycles
+  Throughput/core:      2732.75 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m68.9% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2838,6 +5754,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      725333615
   QUIC packets:       725333603
   Baseline (192.168): 257339193 (35.5%)
@@ -2852,6 +5769,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  23397742105
   Bytes OUT (server): 322089512147
   Ratio OUT/IN:       13.77
+=======
+  Total packets:      704332455
+  QUIC packets:       704332445
+  Baseline (192.168): 245596357 (34.9%)
+  Attack (203.0.113): 10051445 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      703585018 (data)
+  Total ACKs:         385489144
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  22375279762
+  Bytes OUT (server): 319912891217
+  Ratio OUT/IN:       14.30
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2860,6 +5793,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    198 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    13.73
@@ -2868,6 +5802,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.7 (threshold: 3.0)
+=======
+  Bytes anomalies:    215 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.3 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1054 cycles
+  Throughput/core:      2737.39 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m69.2% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2875,6 +5841,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      737000087
   QUIC packets:       737000075
   Baseline (192.168): 260363450 (35.3%)
@@ -2889,6 +5856,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  23656623785
   Bytes OUT (server): 329346587278
   Ratio OUT/IN:       13.92
+=======
+  Total packets:      710573312
+  QUIC packets:       710573302
+  Baseline (192.168): 249338996 (35.1%)
+  Attack (203.0.113): 10051445 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      709825875 (data)
+  Total ACKs:         387823245
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  22695360471
+  Bytes OUT (server): 320172867624
+  Ratio OUT/IN:       14.11
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2897,6 +5880,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    203 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    13.89
@@ -2905,6 +5889,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.9 (threshold: 3.0)
+=======
+  Bytes anomalies:    220 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.1 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1049 cycles
+  Throughput/core:      2742.03 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m69.4% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2912,6 +5928,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      748669439
   QUIC packets:       748669427
   Baseline (192.168): 263377688 (35.2%)
@@ -2926,6 +5943,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  23914758555
   Bytes OUT (server): 336607147451
   Ratio OUT/IN:       14.08
+=======
+  Total packets:      716814166
+  QUIC packets:       716814155
+  Baseline (192.168): 253079654 (35.3%)
+  Attack (203.0.113): 10051445 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      716066728 (data)
+  Total ACKs:         390153530
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  23015425381
+  Bytes OUT (server): 320433129898
+  Ratio OUT/IN:       13.92
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2934,14 +5967,46 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    208 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    14.05
   Max ACK rate/IP:    1173813
+=======
+  Bytes anomalies:    225 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+>>>>>>> Stashed changes
 
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.0 (threshold: 3.0)
+<<<<<<< Updated upstream
+=======
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1045 cycles
+  Throughput/core:      2746.68 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m69.7% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2949,6 +6014,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      760329619
   QUIC packets:       760329607
   Baseline (192.168): 266395820 (35.0%)
@@ -2963,6 +6029,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  24173087768
   Bytes OUT (server): 343869067507
   Ratio OUT/IN:       14.23
+=======
+  Total packets:      723055025
+  QUIC packets:       723055014
+  Baseline (192.168): 256825921 (35.5%)
+  Attack (203.0.113): 10051445 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      722307587 (data)
+  Total ACKs:         392490814
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  23335841132
+  Bytes OUT (server): 320692394492
+  Ratio OUT/IN:       13.74
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -2971,6 +6053,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    213 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    14.20
@@ -2979,6 +6062,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.2 (threshold: 3.0)
+=======
+  Bytes anomalies:    230 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.8 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1040 cycles
+  Throughput/core:      2751.30 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m70.0% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2986,6 +6101,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      771769863
   QUIC packets:       771769851
   Baseline (192.168): 269350765 (34.9%)
@@ -3000,6 +6116,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  24463197056
   Bytes OUT (server): 351013506505
   Ratio OUT/IN:       14.35
+=======
+  Total packets:      729295890
+  QUIC packets:       729295879
+  Baseline (192.168): 260572796 (35.7%)
+  Attack (203.0.113): 10051445 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      728548452 (data)
+  Total ACKs:         394815601
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  23656660470
+  Bytes OUT (server): 320951911411
+  Ratio OUT/IN:       13.57
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -3008,6 +6140,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    218 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    14.32
@@ -3016,6 +6149,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.3 (threshold: 3.0)
+=======
+  Bytes anomalies:    235 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.6 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1036 cycles
+  Throughput/core:      2755.96 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m70.2% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -3023,6 +6188,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      783434054
   QUIC packets:       783434041
   Baseline (192.168): 272377078 (34.8%)
@@ -3037,6 +6203,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  24718429747
   Bytes OUT (server): 358269761991
   Ratio OUT/IN:       14.49
+=======
+  Total packets:      735536740
+  QUIC packets:       735536729
+  Baseline (192.168): 264310003 (35.9%)
+  Attack (203.0.113): 10051445 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      734789302 (data)
+  Total ACKs:         397143027
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  23976608226
+  Bytes OUT (server): 321212209126
+  Ratio OUT/IN:       13.40
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -3045,6 +6227,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    223 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    14.47
@@ -3053,6 +6236,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.5 (threshold: 3.0)
+=======
+  Bytes anomalies:    240 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.4 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1032 cycles
+  Throughput/core:      2760.59 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m70.5% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -3060,6 +6275,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      795093748
   QUIC packets:       795093735
   Baseline (192.168): 275389925 (34.6%)
@@ -3074,6 +6290,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  24975034429
   Bytes OUT (server): 365529825888
   Ratio OUT/IN:       14.64
+=======
+  Total packets:      741777603
+  QUIC packets:       741777592
+  Baseline (192.168): 268059599 (36.1%)
+  Attack (203.0.113): 10051445 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       747427 (handshakes)
+  Short headers:      741030165 (data)
+  Total ACKs:         399474367
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  24297538605
+  Bytes OUT (server): 321471246143
+  Ratio OUT/IN:       13.23
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -3082,6 +6314,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    228 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    14.61
@@ -3090,6 +6323,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.6 (threshold: 3.0)
+=======
+  Bytes anomalies:    245 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.3 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1028 cycles
+  Throughput/core:      2765.24 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m70.7% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -3097,6 +6362,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      806760900
   QUIC packets:       806760887
   Baseline (192.168): 278406752 (34.5%)
@@ -3111,6 +6377,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  25233106958
   Bytes OUT (server): 372786160246
   Ratio OUT/IN:       14.77
+=======
+  Total packets:      747957785
+  QUIC packets:       747957774
+  Baseline (192.168): 271764602 (36.3%)
+  Attack (203.0.113): 10051445 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       939023 (handshakes)
+  Short headers:      747018751 (data)
+  Total ACKs:         401811822
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  24673969046
+  Bytes OUT (server): 321763668362
+  Ratio OUT/IN:       13.04
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -3119,6 +6401,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    233 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    14.75
@@ -3127,6 +6410,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.7 (threshold: 3.0)
+=======
+  Bytes anomalies:    250 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.1 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1024 cycles
+  Throughput/core:      2770.60 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m71.0% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -3134,6 +6449,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      818426048
   QUIC packets:       818426035
   Baseline (192.168): 281425115 (34.4%)
@@ -3148,6 +6464,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  25491575066
   Bytes OUT (server): 380043945119
   Ratio OUT/IN:       14.91
+=======
+  Total packets:      754198639
+  QUIC packets:       754198627
+  Baseline (192.168): 275520821 (36.5%)
+  Attack (203.0.113): 10051445 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       939023 (handshakes)
+  Short headers:      753259604 (data)
+  Total ACKs:         404142986
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  24990779513
+  Bytes OUT (server): 322018834342
+  Ratio OUT/IN:       12.89
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -3156,6 +6488,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    238 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    14.88
@@ -3164,6 +6497,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.9 (threshold: 3.0)
+=======
+  Bytes anomalies:    255 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.9 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1020 cycles
+  Throughput/core:      2775.17 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m71.2% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -3171,6 +6536,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      830087336
   QUIC packets:       830087323
   Baseline (192.168): 284436700 (34.3%)
@@ -3185,6 +6551,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  25749349276
   Bytes OUT (server): 387306271807
   Ratio OUT/IN:       15.04
+=======
+  Total packets:      760439495
+  QUIC packets:       760439483
+  Baseline (192.168): 279266063 (36.7%)
+  Attack (203.0.113): 10051445 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       939023 (handshakes)
+  Short headers:      759500460 (data)
+  Total ACKs:         406485649
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  25309773359
+  Bytes OUT (server): 322277112474
+  Ratio OUT/IN:       12.73
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -3193,6 +6575,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    243 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    15.02
@@ -3201,6 +6584,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 15.0 (threshold: 3.0)
+=======
+  Bytes anomalies:    260 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.8 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1016 cycles
+  Throughput/core:      2779.78 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m71.4% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -3208,6 +6623,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      841746881
   QUIC packets:       841746868
   Baseline (192.168): 287445648 (34.1%)
@@ -3222,6 +6638,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  26006837907
   Bytes OUT (server): 394567973085
   Ratio OUT/IN:       15.17
+=======
+  Total packets:      766680353
+  QUIC packets:       766680341
+  Baseline (192.168): 283006796 (36.9%)
+  Attack (203.0.113): 10051445 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       939023 (handshakes)
+  Short headers:      765741318 (data)
+  Total ACKs:         408824263
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  25629751906
+  Bytes OUT (server): 322537113954
+  Ratio OUT/IN:       12.58
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -3230,6 +6662,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    248 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    15.15
@@ -3238,6 +6671,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 15.1 (threshold: 3.0)
+=======
+  Bytes anomalies:    265 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.6 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1012 cycles
+  Throughput/core:      2784.42 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m71.7% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -3245,6 +6710,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      853404533
   QUIC packets:       853404519
   Baseline (192.168): 290462349 (34.0%)
@@ -3259,6 +6725,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  26265059575
   Bytes OUT (server): 401830995465
   Ratio OUT/IN:       15.30
+=======
+  Total packets:      772921215
+  QUIC packets:       772921203
+  Baseline (192.168): 286751560 (37.1%)
+  Attack (203.0.113): 10051445 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       939023 (handshakes)
+  Short headers:      771982180 (data)
+  Total ACKs:         411145840
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  25950403605
+  Bytes OUT (server): 322796860992
+  Ratio OUT/IN:       12.44
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -3267,6 +6749,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    253 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    15.27
@@ -3275,6 +6758,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 15.3 (threshold: 3.0)
+=======
+  Bytes anomalies:    270 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.5 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1009 cycles
+  Throughput/core:      2789.06 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m71.9% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -3282,6 +6797,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      865062630
   QUIC packets:       865062616
   Baseline (192.168): 293468556 (33.9%)
@@ -3296,6 +6812,22 @@ Press Ctrl+C to exit...
   Bytes IN (client):  26522438118
   Bytes OUT (server): 409097572211
   Ratio OUT/IN:       15.42
+=======
+  Total packets:      779162056
+  QUIC packets:       779162044
+  Baseline (192.168): 290493612 (37.3%)
+  Attack (203.0.113): 10051445 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       939023 (handshakes)
+  Short headers:      778223021 (data)
+  Total ACKs:         413476580
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  26270705167
+  Bytes OUT (server): 323056532677
+  Ratio OUT/IN:       12.30
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
@@ -3304,6 +6836,7 @@ Press Ctrl+C to exit...
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    258 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    15.40
@@ -3312,6 +6845,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 15.4 (threshold: 3.0)
+=======
+  Bytes anomalies:    275 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.3 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1005 cycles
+  Throughput/core:      2793.71 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m72.1% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -3319,6 +6884,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      873691511
   QUIC packets:       873691497
   Baseline (192.168): 293807072 (33.6%)
@@ -3336,11 +6902,31 @@ Press Ctrl+C to exit...
 
 [IP ANALYSIS]
   Unique IPs:         1
+=======
+  Total packets:      785402930
+  QUIC packets:       785402918
+  Baseline (192.168): 294230819 (37.5%)
+  Attack (203.0.113): 10051445 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       939023 (handshakes)
+  Short headers:      784463895 (data)
+  Total ACKs:         415808376
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  26590557762
+  Bytes OUT (server): 323316755038
+  Ratio OUT/IN:       12.16
+
+[IP ANALYSIS]
+  Unique IPs:         257
+>>>>>>> Stashed changes
   Heavy ACKers:       1
   Suspicious IPs:     0
 
 [ATTACK INDICATORS]
   High ACK rate:      0 detections
+<<<<<<< Updated upstream
   Bytes anomalies:    263 detections
   Pkt num jumps:      31 detections
   Max bytes ratio:    15.67
@@ -3349,6 +6935,38 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 15.7 (threshold: 3.0)
+=======
+  Bytes anomalies:    280 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.2 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        1001 cycles
+  Throughput/core:      2798.35 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m72.3% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -3356,6 +6974,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      881911715
   QUIC packets:       881911701
   Baseline (192.168): 293807072 (33.3%)
@@ -3370,10 +6989,27 @@ Press Ctrl+C to exit...
   Bytes IN (client):  26564619966
   Bytes OUT (server): 426310569242
   Ratio OUT/IN:       16.05
+=======
+  Total packets:      791643792
+  QUIC packets:       791643779
+  Baseline (192.168): 297981150 (37.6%)
+  Attack (203.0.113): 10051445 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       939023 (handshakes)
+  Short headers:      790704756 (data)
+  Total ACKs:         418128917
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  26911572254
+  Bytes OUT (server): 323576406931
+  Ratio OUT/IN:       12.02
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
   Heavy ACKers:       1
+<<<<<<< Updated upstream
   Suspicious IPs:     12096
 
 [ATTACK INDICATORS]
@@ -3386,6 +7022,42 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 16.0 (threshold: 3.0) | PKT_NUM JUMPS: 38337 IPs with abnormal ACK patterns
+=======
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    285 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.1 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        997 cycles
+  Throughput/core:      2802.98 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m72.6% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -3393,6 +7065,7 @@ Press Ctrl+C to exit...
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS]
+<<<<<<< Updated upstream
   Total packets:      890151666
   QUIC packets:       890151652
   Baseline (192.168): 293807072 (33.0%)
@@ -3407,10 +7080,27 @@ Press Ctrl+C to exit...
   Bytes IN (client):  26599998066
   Bytes OUT (server): 434794623288
   Ratio OUT/IN:       16.35
+=======
+  Total packets:      797884645
+  QUIC packets:       797884632
+  Baseline (192.168): 301722082 (37.8%)
+  Attack (203.0.113): 10051445 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       939023 (handshakes)
+  Short headers:      796945609 (data)
+  Total ACKs:         420455104
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  27231878763
+  Bytes OUT (server): 323836564625
+  Ratio OUT/IN:       11.89
+>>>>>>> Stashed changes
 
 [IP ANALYSIS]
   Unique IPs:         257
   Heavy ACKers:       1
+<<<<<<< Updated upstream
   Suspicious IPs:     136429
 
 [ATTACK INDICATORS]
@@ -3423,6 +7113,42 @@ Press Ctrl+C to exit...
 [ALERT STATUS]
   Alert level:        [91mHIGH[0m
   Reason:              | AMPLIFICATION: bytes_out/bytes_in = 16.3 (threshold: 3.0) | PKT_NUM JUMPS: 87221 IPs with abnormal ACK patterns
+=======
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    290 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    14.90
+  Max ACK rate/IP:    1173422
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.9 (threshold: 3.0)
+
+[TMA 2025 PAPER COMPARISON]
+=== Detection Performance Metrics ===
+  Detection Latency:  20340.49 ms
+    vs Protocol-based: 1-2 RTT (~50-100 ms for 25-50ms RTT)
+    Improvement:       [92m0.0x faster[0m
+  Amplification@Detect: 3.05x
+    vs RFC 9000 limit:  3.0x
+    Detection margin:   [92m-0.1x below RFC limit[0m
+  Packets until detect: 217172878
+  Bytes until detect:   42337418208 (40376.11 MB)
+  Cycles/packet:        994 cycles
+  Throughput/core:      2807.63 Gbps
+
+=== Comparison vs TMA 2025 Protocol Defense ===
+  DPDK Detection Time:   20340.49 ms (THIS WORK)
+  Protocol Detection:    50-100 ms (TMA 2025 paper)
+  Speed Improvement:     [1;92m0.0x faster[0m
+  DPDK Alert Threshold:  3.05x amplification
+  RFC 9000 Limit:        3.0x amplification
+  Early Detection:       [1;92mYES - detects before RFC limit[0m
+  Traffic Savings:       [92m72.8% fewer packets processed[0m
+>>>>>>> Stashed changes
 
 
 ================================================================================
