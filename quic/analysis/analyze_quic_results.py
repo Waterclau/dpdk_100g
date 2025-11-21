@@ -154,6 +154,31 @@ class QUICOptimisticACKAnalyzer:
         else:
             snapshot['alert_reason'] = 'None'
 
+        # TMA 2025 Metrics (only present after first detection)
+        match = re.search(r'Detection Latency:\s+([\d.]+)\s+ms', section)
+        if match:
+            snapshot['detection_latency_ms'] = float(match.group(1))
+
+        match = re.search(r'Amplification@Detect:\s+([\d.]+)x', section)
+        if match:
+            snapshot['amplification_at_detection'] = float(match.group(1))
+
+        match = re.search(r'Packets until detect:\s+(\d+)', section)
+        if match:
+            snapshot['packets_until_detection'] = int(match.group(1))
+
+        match = re.search(r'Bytes until detect:\s+(\d+)', section)
+        if match:
+            snapshot['bytes_until_detection'] = int(match.group(1))
+
+        match = re.search(r'Cycles/packet:\s+([\d.]+)\s+cycles', section)
+        if match:
+            snapshot['cycles_per_packet'] = float(match.group(1))
+
+        match = re.search(r'Throughput/core:\s+([\d.]+)\s+Gbps', section)
+        if match:
+            snapshot['throughput_per_core_gbps'] = float(match.group(1))
+
         return snapshot if snapshot.get('total_packets') else None
 
     def calculate_throughput(self):
@@ -943,9 +968,166 @@ TRAFFIC IMPACT:
         plt.close()
         print(f"\n[FIGURE 4: Link Utilization] - Saved to {output_path}")
 
+    def plot_tma_2025_comparison(self):
+        """Generate TMA 2025 Paper Comparison visualization"""
+        # Extract TMA 2025 metrics (only available after first detection)
+        snapshots_with_metrics = [s for s in self.snapshots if 'detection_latency_ms' in s]
+
+        if not snapshots_with_metrics:
+            print("\n[FIGURE 6: TMA 2025 Comparison] - SKIPPED (no detection metrics found)")
+            return
+
+        # Use first snapshot with metrics (first detection)
+        first_detection = snapshots_with_metrics[0]
+
+        fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+        fig.suptitle('TMA 2025 Paper Comparison - DPDK vs Protocol-based Detection',
+                     fontsize=16, fontweight='bold')
+
+        # Plot 1: Detection Latency Comparison
+        ax1 = axes[0, 0]
+        methods = ['DPDK\n(This Work)', 'Protocol-based\n(TMA 2025)']
+        latencies = [first_detection['detection_latency_ms'], 75.0]  # 75ms avg for protocol
+        colors = ['#2ecc71', '#e74c3c']
+
+        bars = ax1.bar(methods, latencies, color=colors, alpha=0.7, edgecolor='black', linewidth=1.5)
+        ax1.set_ylabel('Detection Latency (ms)', fontsize=12, fontweight='bold')
+        ax1.set_title('Detection Speed Comparison', fontsize=13, fontweight='bold')
+        ax1.grid(True, alpha=0.3, axis='y')
+
+        # Add value labels on bars
+        for bar, latency in zip(bars, latencies):
+            height = bar.get_height()
+            ax1.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{latency:.1f} ms',
+                    ha='center', va='bottom', fontsize=11, fontweight='bold')
+
+        # Add improvement factor
+        improvement = latencies[1] / latencies[0]
+        ax1.text(0.5, 0.95, f'{improvement:.1f}× FASTER',
+                transform=ax1.transAxes, ha='center', va='top',
+                fontsize=14, fontweight='bold', color='green',
+                bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.5))
+
+        # Plot 2: Amplification at Detection
+        ax2 = axes[0, 1]
+        methods = ['DPDK Alert\nThreshold', 'RFC 9000\nLimit']
+        amplifications = [first_detection.get('amplification_at_detection', 3.0), 3.0]
+        colors = ['#3498db', '#95a5a6']
+
+        bars = ax2.bar(methods, amplifications, color=colors, alpha=0.7, edgecolor='black', linewidth=1.5)
+        ax2.set_ylabel('Amplification Factor (×)', fontsize=12, fontweight='bold')
+        ax2.set_title('Early Detection - Amplification Comparison', fontsize=13, fontweight='bold')
+        ax2.grid(True, alpha=0.3, axis='y')
+        ax2.axhline(y=3.0, color='red', linestyle='--', linewidth=2, label='RFC 9000 Limit (3.0×)')
+        ax2.legend(loc='upper right')
+
+        # Add value labels
+        for bar, amp in zip(bars, amplifications):
+            height = bar.get_height()
+            ax2.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{amp:.2f}×',
+                    ha='center', va='bottom', fontsize=11, fontweight='bold')
+
+        # Add early detection indicator
+        margin = 3.0 - amplifications[0]
+        ax2.text(0.5, 0.95, f'Detects {margin:.2f}× BEFORE RFC limit',
+                transform=ax2.transAxes, ha='center', va='top',
+                fontsize=12, fontweight='bold', color='blue',
+                bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.5))
+
+        # Plot 3: CPU Efficiency
+        ax3 = axes[1, 0]
+
+        # Extract CPU metrics over time
+        intervals = [s['interval'] for s in self.snapshots if 'cycles_per_packet' in s]
+        cycles = [s['cycles_per_packet'] for s in self.snapshots if 'cycles_per_packet' in s]
+        throughput = [s.get('throughput_per_core_gbps', 0) for s in self.snapshots if 'cycles_per_packet' in s]
+
+        if intervals:
+            ax3_twin = ax3.twinx()
+
+            line1 = ax3.plot(intervals, cycles, 'o-', color='#9b59b6', linewidth=2,
+                           markersize=6, label='Cycles/Packet')
+            ax3.set_xlabel('Time (seconds)', fontsize=12, fontweight='bold')
+            ax3.set_ylabel('Cycles per Packet', fontsize=12, fontweight='bold', color='#9b59b6')
+            ax3.tick_params(axis='y', labelcolor='#9b59b6')
+
+            line2 = ax3_twin.plot(intervals, throughput, 's-', color='#e67e22', linewidth=2,
+                                markersize=6, label='Throughput/Core')
+            ax3_twin.set_ylabel('Throughput per Core (Gbps)', fontsize=12, fontweight='bold', color='#e67e22')
+            ax3_twin.tick_params(axis='y', labelcolor='#e67e22')
+
+            # Add attack start line
+            ax3.axvline(x=self.attack_start_time, color='red', linestyle='--',
+                       linewidth=2, alpha=0.7, label='Attack Start')
+
+            ax3.set_title('CPU Efficiency Metrics', fontsize=13, fontweight='bold')
+            ax3.grid(True, alpha=0.3)
+
+            # Combine legends
+            lines = line1 + line2
+            labels = [l.get_label() for l in lines]
+            ax3.legend(lines, labels, loc='upper left')
+
+        # Plot 4: Summary Statistics
+        ax4 = axes[1, 1]
+        ax4.axis('off')
+
+        # Calculate additional metrics
+        total_snapshots = len(self.snapshots)
+        attack_phase = [s for s in self.snapshots if s['interval'] >= self.attack_start_time]
+        high_alerts = len([s for s in attack_phase if s.get('alert_level') == 'HIGH'])
+        detection_rate = (high_alerts / len(attack_phase) * 100) if attack_phase else 0
+
+        avg_cycles = np.mean(cycles) if cycles else 0
+        avg_throughput = np.mean(throughput) if throughput else 0
+
+        summary_text = f"""
+╔══════════════════════════════════════════════╗
+║   TMA 2025 COMPARISON - SUMMARY RESULTS      ║
+╚══════════════════════════════════════════════╝
+
+DETECTION PERFORMANCE:
+  • Detection Latency:     {first_detection['detection_latency_ms']:>8.2f} ms
+  • Protocol-based (TMA):  {75.0:>8.2f} ms
+  • Speed Improvement:     {latencies[1]/latencies[0]:>8.1f}× faster
+
+EARLY DETECTION:
+  • Alert Threshold:       {first_detection.get('amplification_at_detection', 3.0):>8.2f}×
+  • RFC 9000 Limit:        {3.0:>8.2f}×
+  • Detection Margin:      {3.0 - first_detection.get('amplification_at_detection', 3.0):>8.2f}× below limit
+
+TRAFFIC COST:
+  • Packets until detect:  {first_detection.get('packets_until_detection', 0):>8,}
+  • Bytes until detect:    {first_detection.get('bytes_until_detection', 0)/1e6:>8.2f} MB
+  • Detection rate:        {detection_rate:>8.1f}%
+
+CPU EFFICIENCY:
+  • Avg Cycles/Packet:     {avg_cycles:>8.0f} cycles
+  • Avg Throughput/Core:   {avg_throughput:>8.2f} Gbps
+  • Processing efficiency: Line-rate
+
+═══════════════════════════════════════════════
+CONCLUSION: DPDK-based detection achieves
+{latencies[1]/latencies[0]:.1f}× faster detection than protocol-based
+defenses while processing at line-rate.
+═══════════════════════════════════════════════
+"""
+
+        ax4.text(0.05, 0.95, summary_text, transform=ax4.transAxes,
+                fontfamily='monospace', fontsize=10, verticalalignment='top',
+                bbox=dict(boxstyle='round', facecolor='lightcyan', alpha=0.5))
+
+        plt.tight_layout()
+        output_path = os.path.join(self.output_dir, '06_tma_2025_comparison.png')
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"\n[FIGURE 6: TMA 2025 Comparison] - Saved to {output_path}")
+
 
 def main():
-    log_file = r'C:\Users\claud\Comi_archi\MD\codigo\dpdk_100g\quic\results\results_quic_optimistic_ack.log'
+    log_file = r'C:\Users\claud\Comi_archi\MD\codigo\dpdk_100g\quic\results\results_quic_optimistic_ack (1).log'
     output_dir = os.path.dirname(__file__)
 
     print("\n" + "="*80)
@@ -964,6 +1146,7 @@ def main():
     analyzer.plot_detection_efficacy()
     analyzer.plot_baseline_vs_attack()
     analyzer.plot_link_utilization()
+    analyzer.plot_tma_2025_comparison()
 
     print("\n" + "="*80)
     print("ANALYSIS COMPLETED")
@@ -974,7 +1157,8 @@ def main():
     print("  - 02_detection_efficacy.png")
     print("  - 03_baseline_vs_attack.png")
     print("  - 04_link_utilization.png")
-    print("  - 05_ack_analysis.png\n")
+    print("  - 05_ack_analysis.png")
+    print("  - 06_tma_2025_comparison.png\n")
 
 
 if __name__ == "__main__":

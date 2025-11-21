@@ -1,0 +1,3429 @@
+QUIC Optimistic ACK Detector Log
+Start time: Nov 21 2025 09:26:18
+================================================================================
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║      QUIC OPTIMISTIC ACK DETECTOR - DPDK + OctoSketch                ║
+╠═══════════════════════════════════════════════════════════════════════╣
+║  Port:              0                                                ║
+║  Detection window:  1 second                                         ║
+║  Stats interval:    5 seconds                                        ║
+║                                                                       ║
+║  Detection Rules (QUIC Optimistic ACK Attack):                        ║
+║    1. ACK Rate Anomaly (>10000 ACKs per IP in 5s window)               ║
+║    2. Bytes Amplification (OUT/IN > 3.0, baseline ~1.0)             ║
+║    3. Attack Network Detection (203.0.113.x traffic > 5%)          ║
+║    4. Heavy Hitter ACKers (>5000 ACKs per IP)                         ║
+║    5. Packet Number Jumps (ACKing future packets)                     ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+Press Ctrl+C to exit...
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      2
+  QUIC packets:       2
+  Baseline (192.168): 1 (50.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       2 (handshakes)
+  Short headers:      0 (data)
+  Total ACKs:         2
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  1242
+  Bytes OUT (server): 1242
+  Ratio OUT/IN:       1.00
+
+[IP ANALYSIS]
+  Unique IPs:         0
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.00
+  Max ACK rate/IP:    1
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      6116749
+  QUIC packets:       6116749
+  Baseline (192.168): 3668800 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      5922209 (data)
+  Total ACKs:         2316029
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  374544264
+  Bytes OUT (server): 290103911
+  Ratio OUT/IN:       0.77
+
+[IP ANALYSIS]
+  Unique IPs:         39
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.77
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      12357609
+  QUIC packets:       12357609
+  Baseline (192.168): 7421953 (60.1%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      12163069 (data)
+  Total ACKs:         4643806
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  691212464
+  Bytes OUT (server): 545672960
+  Ratio OUT/IN:       0.79
+
+[IP ANALYSIS]
+  Unique IPs:         50
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.79
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      18598455
+  QUIC packets:       18598455
+  Baseline (192.168): 11164115 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      18403915 (data)
+  Total ACKs:         6983963
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  1010453922
+  Bytes OUT (server): 804794476
+  Ratio OUT/IN:       0.80
+
+[IP ANALYSIS]
+  Unique IPs:         49
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.80
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      24839311
+  QUIC packets:       24839310
+  Baseline (192.168): 14910632 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      24644770 (data)
+  Total ACKs:         9324047
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  1330963438
+  Bytes OUT (server): 1064096079
+  Ratio OUT/IN:       0.80
+
+[IP ANALYSIS]
+  Unique IPs:         45
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.80
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      31080167
+  QUIC packets:       31080166
+  Baseline (192.168): 18652259 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      30885626 (data)
+  Total ACKs:         11646282
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  1651324437
+  Bytes OUT (server): 1324183862
+  Ratio OUT/IN:       0.80
+
+[IP ANALYSIS]
+  Unique IPs:         41
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.80
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      37321016
+  QUIC packets:       37321015
+  Baseline (192.168): 22390857 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      37126475 (data)
+  Total ACKs:         13976015
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  1971342448
+  Bytes OUT (server): 1584204626
+  Ratio OUT/IN:       0.80
+
+[IP ANALYSIS]
+  Unique IPs:         44
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.80
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      43561867
+  QUIC packets:       43561866
+  Baseline (192.168): 26133107 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      43367326 (data)
+  Total ACKs:         16307620
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  2291574006
+  Bytes OUT (server): 1844037550
+  Ratio OUT/IN:       0.80
+
+[IP ANALYSIS]
+  Unique IPs:         44
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.80
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      49802720
+  QUIC packets:       49802719
+  Baseline (192.168): 29882844 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      49608179 (data)
+  Total ACKs:         18630870
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  2612549845
+  Bytes OUT (server): 2103490826
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         44
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      56043573
+  QUIC packets:       56043572
+  Baseline (192.168): 33622812 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      55849032 (data)
+  Total ACKs:         20952420
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  2932874999
+  Bytes OUT (server): 2363905754
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         45
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      62284429
+  QUIC packets:       62284427
+  Baseline (192.168): 37375751 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      62089887 (data)
+  Total ACKs:         23282493
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  3254420326
+  Bytes OUT (server): 2622262243
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         44
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      68525273
+  QUIC packets:       68525271
+  Baseline (192.168): 41115969 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      68330731 (data)
+  Total ACKs:         25606889
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  3574444415
+  Bytes OUT (server): 2882793000
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         40
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      74766129
+  QUIC packets:       74766127
+  Baseline (192.168): 44857336 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      74571587 (data)
+  Total ACKs:         27939097
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  3894686521
+  Bytes OUT (server): 3142604772
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         39
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      81006985
+  QUIC packets:       81006983
+  Baseline (192.168): 48600787 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      80812443 (data)
+  Total ACKs:         30272672
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  4215085435
+  Bytes OUT (server): 3402067463
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         41
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      87247840
+  QUIC packets:       87247838
+  Baseline (192.168): 52343588 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      87053298 (data)
+  Total ACKs:         32605266
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  4535489389
+  Bytes OUT (server): 3661675079
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         42
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      93488696
+  QUIC packets:       93488694
+  Baseline (192.168): 56087409 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      93294154 (data)
+  Total ACKs:         34939527
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  4855702388
+  Bytes OUT (server): 3921437846
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         32
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      99729537
+  QUIC packets:       99729534
+  Baseline (192.168): 59828227 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      99534994 (data)
+  Total ACKs:         37267672
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  5175886487
+  Bytes OUT (server): 4181641222
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         44
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      105970390
+  QUIC packets:       105970387
+  Baseline (192.168): 63575570 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      105775847 (data)
+  Total ACKs:         39604244
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  5496377427
+  Bytes OUT (server): 4440842334
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         34
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      112211241
+  QUIC packets:       112211238
+  Baseline (192.168): 67322437 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      112016698 (data)
+  Total ACKs:         41934920
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  5817075819
+  Bytes OUT (server): 4700287014
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         35
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      118452099
+  QUIC packets:       118452096
+  Baseline (192.168): 71063350 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      118257556 (data)
+  Total ACKs:         44260149
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  6137382440
+  Bytes OUT (server): 4960218145
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         33
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      124692958
+  QUIC packets:       124692955
+  Baseline (192.168): 74808924 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       194540 (handshakes)
+  Short headers:      124498415 (data)
+  Total ACKs:         46592184
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  6457996014
+  Bytes OUT (server): 5219631107
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         45
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    172033
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      130877437
+  QUIC packets:       130877434
+  Baseline (192.168): 78517459 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       387566 (handshakes)
+  Short headers:      130489868 (data)
+  Total ACKs:         48932286
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  6835200379
+  Bytes OUT (server): 5512237255
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         43
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      137118299
+  QUIC packets:       137118295
+  Baseline (192.168): 82271193 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       387566 (handshakes)
+  Short headers:      136730729 (data)
+  Total ACKs:         51260680
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  7151889084
+  Bytes OUT (server): 5767745529
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         34
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      143359148
+  QUIC packets:       143359144
+  Baseline (192.168): 86014416 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       387566 (handshakes)
+  Short headers:      142971578 (data)
+  Total ACKs:         53600013
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  7471161113
+  Bytes OUT (server): 6026626315
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         34
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      149600005
+  QUIC packets:       149600001
+  Baseline (192.168): 89761241 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       387566 (handshakes)
+  Short headers:      149212435 (data)
+  Total ACKs:         55941539
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  7791595158
+  Bytes OUT (server): 6285930163
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         38
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      155840863
+  QUIC packets:       155840859
+  Baseline (192.168): 93501326 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       387566 (handshakes)
+  Short headers:      155453293 (data)
+  Total ACKs:         58263114
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  8111913878
+  Bytes OUT (server): 6546097726
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         27
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162081722
+  QUIC packets:       162081718
+  Baseline (192.168): 97241803 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       387566 (handshakes)
+  Short headers:      161694152 (data)
+  Total ACKs:         60592969
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  8432031666
+  Bytes OUT (server): 6805998073
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         28
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      168322578
+  QUIC packets:       168322574
+  Baseline (192.168): 100983731 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       387566 (handshakes)
+  Short headers:      167935008 (data)
+  Total ACKs:         62924678
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  8752258588
+  Bytes OUT (server): 7065842843
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         41
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      174563428
+  QUIC packets:       174563423
+  Baseline (192.168): 104733741 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       387566 (handshakes)
+  Short headers:      174175857 (data)
+  Total ACKs:         65247524
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  9073256369
+  Bytes OUT (server): 7325282882
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         32
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      180804286
+  QUIC packets:       180804281
+  Baseline (192.168): 108474116 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       387566 (handshakes)
+  Short headers:      180416715 (data)
+  Total ACKs:         67570020
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  9393595731
+  Bytes OUT (server): 7585613886
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         27
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      187045144
+  QUIC packets:       187045139
+  Baseline (192.168): 112226744 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       387566 (handshakes)
+  Short headers:      186657573 (data)
+  Total ACKs:         69897558
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  9715145170
+  Bytes OUT (server): 7844119181
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         34
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      193286001
+  QUIC packets:       193285996
+  Baseline (192.168): 115965815 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       387566 (handshakes)
+  Short headers:      192898430 (data)
+  Total ACKs:         72222362
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  10035097652
+  Bytes OUT (server): 8104712797
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         36
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      199526856
+  QUIC packets:       199526851
+  Baseline (192.168): 119707406 (60.0%)
+  Attack (203.0.113): 0 (0.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       387566 (handshakes)
+  Short headers:      199139285 (data)
+  Total ACKs:         74555951
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  10355314390
+  Bytes OUT (server): 8364500213
+  Ratio OUT/IN:       0.81
+
+[IP ANALYSIS]
+  Unique IPs:         26
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      0 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      207658124
+  QUIC packets:       207658119
+  Baseline (192.168): 123416922 (59.4%)
+  Attack (203.0.113): 1945596 (0.9%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436669 (handshakes)
+  Short headers:      207221450 (data)
+  Total ACKs:         79088919
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  10932941821
+  Bytes OUT (server): 8621685349
+  Ratio OUT/IN:       0.79
+
+[IP ANALYSIS]
+  Unique IPs:         244
+  Heavy ACKers:       0
+  Suspicious IPs:     386
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      2 detections
+  Max bytes ratio:    0.81
+  Max ACK rate/IP:    180439
+
+[ALERT STATUS]
+  Alert level:        [93mMEDIUM[0m
+  Reason:              | HEAVY ACKers: 245 IPs with excessive ACK rate | PKT_NUM JUMPS: 1549912 IPs with abnormal ACK patterns
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      220670410
+  QUIC packets:       220670404
+  Baseline (192.168): 126796087 (57.5%)
+  Attack (203.0.113): 5359379 (2.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436669 (handshakes)
+  Short headers:      220233735 (data)
+  Total ACKs:         87753319
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  11580635351
+  Bytes OUT (server): 13065216509
+  Ratio OUT/IN:       1.13
+
+[IP ANALYSIS]
+  Unique IPs:         0
+  Heavy ACKers:       0
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    1.13
+  Max ACK rate/IP:    1167029
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      232344628
+  QUIC packets:       232344622
+  Baseline (192.168): 129824335 (55.9%)
+  Attack (203.0.113): 5359379 (2.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436669 (handshakes)
+  Short headers:      231907953 (data)
+  Total ACKs:         94812334
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  11839673070
+  Bytes OUT (server): 20318671615
+  Ratio OUT/IN:       1.72
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    1.60
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      244015741
+  QUIC packets:       244015735
+  Baseline (192.168): 132841495 (54.4%)
+  Attack (203.0.113): 5359379 (2.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436669 (handshakes)
+  Short headers:      243579066 (data)
+  Total ACKs:         101842563
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  12097849798
+  Bytes OUT (server): 27577161204
+  Ratio OUT/IN:       2.28
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    2.17
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      255681384
+  QUIC packets:       255681378
+  Baseline (192.168): 135864488 (53.1%)
+  Attack (203.0.113): 5359379 (2.1%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436669 (handshakes)
+  Short headers:      255244709 (data)
+  Total ACKs:         108890015
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  12356349088
+  Bytes OUT (server): 34834642970
+  Ratio OUT/IN:       2.82
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    0 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    2.71
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      267342843
+  QUIC packets:       267342837
+  Baseline (192.168): 138881361 (51.9%)
+  Attack (203.0.113): 5359379 (2.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436669 (handshakes)
+  Short headers:      266906168 (data)
+  Total ACKs:         115939399
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  12614618886
+  Bytes OUT (server): 42093765247
+  Ratio OUT/IN:       3.34
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    3 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    3.24
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 3.2 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      279000487
+  QUIC packets:       279000481
+  Baseline (192.168): 141891161 (50.9%)
+  Attack (203.0.113): 5359379 (1.9%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436669 (handshakes)
+  Short headers:      278563812 (data)
+  Total ACKs:         122995743
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  12872196594
+  Bytes OUT (server): 49357085367
+  Ratio OUT/IN:       3.83
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    8 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    3.74
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 3.7 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      290662717
+  QUIC packets:       290662710
+  Baseline (192.168): 144909456 (49.9%)
+  Attack (203.0.113): 5359379 (1.8%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       436669 (handshakes)
+  Short headers:      290226041 (data)
+  Total ACKs:         130044528
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  13130548829
+  Bytes OUT (server): 56620402334
+  Ratio OUT/IN:       4.31
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    13 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    4.22
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 4.2 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      302105404
+  QUIC packets:       302105397
+  Baseline (192.168): 147867085 (48.9%)
+  Attack (203.0.113): 5359379 (1.8%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      301543111 (data)
+  Total ACKs:         136974349
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  13420932100
+  Bytes OUT (server): 63762842404
+  Ratio OUT/IN:       4.75
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    18 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    4.66
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 4.7 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      313771765
+  QUIC packets:       313771758
+  Baseline (192.168): 150894553 (48.1%)
+  Attack (203.0.113): 5359379 (1.7%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      313209472 (data)
+  Total ACKs:         144017234
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  13676272501
+  Bytes OUT (server): 71019407404
+  Ratio OUT/IN:       5.19
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    23 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    5.11
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 5.1 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      325434763
+  QUIC packets:       325434756
+  Baseline (192.168): 153909421 (47.3%)
+  Attack (203.0.113): 5359379 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      324872470 (data)
+  Total ACKs:         151066245
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  13933299914
+  Bytes OUT (server): 78279219669
+  Ratio OUT/IN:       5.62
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    28 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    5.53
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 5.5 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      337096287
+  QUIC packets:       337096280
+  Baseline (192.168): 156927564 (46.6%)
+  Attack (203.0.113): 5359379 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      336533994 (data)
+  Total ACKs:         158117269
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  14191347349
+  Bytes OUT (server): 85534323044
+  Ratio OUT/IN:       6.03
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    33 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    5.95
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 5.9 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      348763904
+  QUIC packets:       348763897
+  Baseline (192.168): 159946121 (45.9%)
+  Attack (203.0.113): 5359379 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      348201611 (data)
+  Total ACKs:         165147271
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  14449829915
+  Bytes OUT (server): 92792253287
+  Ratio OUT/IN:       6.42
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    38 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    6.34
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 6.3 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      360438661
+  QUIC packets:       360438653
+  Baseline (192.168): 162968868 (45.2%)
+  Attack (203.0.113): 5359379 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      359876367 (data)
+  Total ACKs:         172188550
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  14708577911
+  Bytes OUT (server): 100048398280
+  Ratio OUT/IN:       6.80
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    43 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    6.73
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 6.7 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      372109778
+  QUIC packets:       372109770
+  Baseline (192.168): 165988540 (44.6%)
+  Attack (203.0.113): 5359379 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      371547484 (data)
+  Total ACKs:         179240732
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  14967008772
+  Bytes OUT (server): 107308661831
+  Ratio OUT/IN:       7.17
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    48 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    7.10
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 7.1 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      383778544
+  QUIC packets:       383778536
+  Baseline (192.168): 169015017 (44.0%)
+  Attack (203.0.113): 5359379 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      383216250 (data)
+  Total ACKs:         186277002
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  15226103977
+  Bytes OUT (server): 114566471782
+  Ratio OUT/IN:       7.52
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    53 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    7.45
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 7.5 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      395449358
+  QUIC packets:       395449350
+  Baseline (192.168): 172034341 (43.5%)
+  Attack (203.0.113): 5359379 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      394887064 (data)
+  Total ACKs:         193327644
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  15484611764
+  Bytes OUT (server): 121826063424
+  Ratio OUT/IN:       7.87
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    58 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    7.80
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 7.8 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      407110057
+  QUIC packets:       407110049
+  Baseline (192.168): 175058173 (43.0%)
+  Attack (203.0.113): 5359379 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      406547763 (data)
+  Total ACKs:         200371277
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  15743720120
+  Bytes OUT (server): 129088671486
+  Ratio OUT/IN:       8.20
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    63 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    8.13
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 8.1 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      418766896
+  QUIC packets:       418766888
+  Baseline (192.168): 178068720 (42.5%)
+  Attack (203.0.113): 5359379 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      418204602 (data)
+  Total ACKs:         207408335
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  16001357786
+  Bytes OUT (server): 136350258601
+  Ratio OUT/IN:       8.52
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    68 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    8.46
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 8.5 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      430429207
+  QUIC packets:       430429198
+  Baseline (192.168): 181081133 (42.1%)
+  Attack (203.0.113): 5359379 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      429866912 (data)
+  Total ACKs:         214457488
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  16259111533
+  Bytes OUT (server): 143612092123
+  Ratio OUT/IN:       8.83
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    73 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    8.77
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 8.8 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      442091815
+  QUIC packets:       442091806
+  Baseline (192.168): 184092685 (41.6%)
+  Attack (203.0.113): 5359379 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      441529520 (data)
+  Total ACKs:         221500489
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  16516784469
+  Bytes OUT (server): 150873083864
+  Ratio OUT/IN:       9.13
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    78 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    9.08
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 9.1 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      453760730
+  QUIC packets:       453760721
+  Baseline (192.168): 187109417 (41.2%)
+  Attack (203.0.113): 5359379 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      453198435 (data)
+  Total ACKs:         228532328
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  16775091463
+  Bytes OUT (server): 158135212229
+  Ratio OUT/IN:       9.43
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    83 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    9.37
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 9.4 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      465422865
+  QUIC packets:       465422856
+  Baseline (192.168): 190126724 (40.9%)
+  Attack (203.0.113): 5359379 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      464860570 (data)
+  Total ACKs:         235574172
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  17033121481
+  Bytes OUT (server): 165396752650
+  Ratio OUT/IN:       9.71
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    88 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    9.65
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 9.7 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      477081976
+  QUIC packets:       477081967
+  Baseline (192.168): 193133444 (40.5%)
+  Attack (203.0.113): 5359379 (1.1%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      476519681 (data)
+  Total ACKs:         242608063
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  17290461289
+  Bytes OUT (server): 172662160823
+  Ratio OUT/IN:       9.99
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    93 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    9.93
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 9.9 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      488738595
+  QUIC packets:       488738586
+  Baseline (192.168): 196148377 (40.1%)
+  Attack (203.0.113): 5359379 (1.1%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      488176300 (data)
+  Total ACKs:         249644629
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  17548196761
+  Bytes OUT (server): 179923939326
+  Ratio OUT/IN:       10.25
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    98 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    10.20
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 10.2 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      500393884
+  QUIC packets:       500393874
+  Baseline (192.168): 199160660 (39.8%)
+  Attack (203.0.113): 5359379 (1.1%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      499831588 (data)
+  Total ACKs:         256689474
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  17806195876
+  Bytes OUT (server): 187185480727
+  Ratio OUT/IN:       10.51
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    103 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    10.46
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 10.5 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      512063078
+  QUIC packets:       512063068
+  Baseline (192.168): 202174959 (39.5%)
+  Attack (203.0.113): 5359379 (1.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      511500782 (data)
+  Total ACKs:         263736267
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  18064180330
+  Bytes OUT (server): 194449234399
+  Ratio OUT/IN:       10.76
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    108 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    10.72
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 10.7 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      523737030
+  QUIC packets:       523737020
+  Baseline (192.168): 205201408 (39.2%)
+  Attack (203.0.113): 5359379 (1.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       562286 (handshakes)
+  Short headers:      523174734 (data)
+  Total ACKs:         270788312
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  18323201011
+  Bytes OUT (server): 201708040834
+  Ratio OUT/IN:       11.01
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    113 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    10.96
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.0 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      535182577
+  QUIC packets:       535182567
+  Baseline (192.168): 208164894 (38.9%)
+  Attack (203.0.113): 5359379 (1.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       688933 (handshakes)
+  Short headers:      534493634 (data)
+  Total ACKs:         277713267
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  18614180284
+  Bytes OUT (server): 208849804484
+  Ratio OUT/IN:       11.22
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    118 detections
+  Pkt num jumps:      6 detections
+  Max bytes ratio:    11.17
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.2 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      546916964
+  QUIC packets:       546916954
+  Baseline (192.168): 211205495 (38.6%)
+  Attack (203.0.113): 5474622 (1.0%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       693671 (handshakes)
+  Short headers:      546223283 (data)
+  Total ACKs:         284853682
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  18888079664
+  Bytes OUT (server): 216028102047
+  Ratio OUT/IN:       11.44
+
+[IP ANALYSIS]
+  Unique IPs:         513
+  Heavy ACKers:       1
+  Suspicious IPs:     79932
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    123 detections
+  Pkt num jumps:      7 detections
+  Max bytes ratio:    11.40
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.4 (threshold: 3.0) | PKT_NUM JUMPS: 24459 IPs with abnormal ACK patterns
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      559574687
+  QUIC packets:       559574677
+  Baseline (192.168): 214475456 (38.3%)
+  Attack (203.0.113): 6883281 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       717659 (handshakes)
+  Short headers:      558857018 (data)
+  Total ACKs:         292935141
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  19341988557
+  Bytes OUT (server): 222416725240
+  Ratio OUT/IN:       11.50
+
+[IP ANALYSIS]
+  Unique IPs:         513
+  Heavy ACKers:       1
+  Suspicious IPs:     440945
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    128 detections
+  Pkt num jumps:      12 detections
+  Max bytes ratio:    11.51
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.5 (threshold: 3.0) | PKT_NUM JUMPS: 355133 IPs with abnormal ACK patterns
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      572835016
+  QUIC packets:       572835005
+  Baseline (192.168): 217898444 (38.0%)
+  Attack (203.0.113): 9058836 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       742313 (handshakes)
+  Short headers:      572092692 (data)
+  Total ACKs:         301567943
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  19891186142
+  Bytes OUT (server): 228366814612
+  Ratio OUT/IN:       11.48
+
+[IP ANALYSIS]
+  Unique IPs:         513
+  Heavy ACKers:       1
+  Suspicious IPs:     302509
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    133 detections
+  Pkt num jumps:      17 detections
+  Max bytes ratio:    11.51
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.5 (threshold: 3.0) | PKT_NUM JUMPS: 415095 IPs with abnormal ACK patterns
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      585151108
+  QUIC packets:       585151097
+  Baseline (192.168): 221084537 (37.8%)
+  Attack (203.0.113): 9918930 (1.7%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       749690 (handshakes)
+  Short headers:      584401407 (data)
+  Total ACKs:         309229523
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  20262760584
+  Bytes OUT (server): 235117073053
+  Ratio OUT/IN:       11.60
+
+[IP ANALYSIS]
+  Unique IPs:         513
+  Heavy ACKers:       1
+  Suspicious IPs:     116965
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    138 detections
+  Pkt num jumps:      22 detections
+  Max bytes ratio:    11.57
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.6 (threshold: 3.0) | PKT_NUM JUMPS: 124340 IPs with abnormal ACK patterns
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      596978959
+  QUIC packets:       596978948
+  Baseline (192.168): 224146610 (37.5%)
+  Attack (203.0.113): 10124127 (1.7%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      596226902 (data)
+  Total ACKs:         316421120
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  20549076727
+  Bytes OUT (server): 242253353067
+  Ratio OUT/IN:       11.79
+
+[IP ANALYSIS]
+  Unique IPs:         513
+  Heavy ACKers:       1
+  Suspicious IPs:     42125
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    143 detections
+  Pkt num jumps:      27 detections
+  Max bytes ratio:    11.75
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.8 (threshold: 3.0) | PKT_NUM JUMPS: 30524 IPs with abnormal ACK patterns
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      608704115
+  QUIC packets:       608704104
+  Baseline (192.168): 227177308 (37.3%)
+  Attack (203.0.113): 10198156 (1.7%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      607952058 (data)
+  Total ACKs:         323518003
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  20816229846
+  Bytes OUT (server): 249471003783
+  Ratio OUT/IN:       11.98
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    148 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    11.94
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 11.9 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      620364106
+  QUIC packets:       620364095
+  Baseline (192.168): 230198128 (37.1%)
+  Attack (203.0.113): 10198156 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      619612049 (data)
+  Total ACKs:         330559727
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  21074858573
+  Bytes OUT (server): 256732250276
+  Ratio OUT/IN:       12.18
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    153 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    12.14
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.1 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      632027209
+  QUIC packets:       632027198
+  Baseline (192.168): 233211514 (36.9%)
+  Attack (203.0.113): 10198156 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      631275152 (data)
+  Total ACKs:         337611186
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  21332858141
+  Bytes OUT (server): 263996573209
+  Ratio OUT/IN:       12.38
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    158 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    12.34
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.3 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      643690236
+  QUIC packets:       643690225
+  Baseline (192.168): 236231656 (36.7%)
+  Attack (203.0.113): 10198156 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      642938179 (data)
+  Total ACKs:         344655942
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  21591685319
+  Bytes OUT (server): 271260483990
+  Ratio OUT/IN:       12.56
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    163 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    12.53
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.5 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      655346740
+  QUIC packets:       655346729
+  Baseline (192.168): 239242867 (36.5%)
+  Attack (203.0.113): 10198156 (1.6%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      654594683 (data)
+  Total ACKs:         351698615
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  21849332206
+  Bytes OUT (server): 278525201749
+  Ratio OUT/IN:       12.75
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    168 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    12.71
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.7 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      667011247
+  QUIC packets:       667011236
+  Baseline (192.168): 242257464 (36.3%)
+  Attack (203.0.113): 10198156 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      666259190 (data)
+  Total ACKs:         358746146
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  22107271452
+  Bytes OUT (server): 285785247588
+  Ratio OUT/IN:       12.93
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    173 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    12.89
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 12.9 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      678676608
+  QUIC packets:       678676597
+  Baseline (192.168): 245274791 (36.1%)
+  Attack (203.0.113): 10198156 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      677924551 (data)
+  Total ACKs:         365795266
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  22365478047
+  Bytes OUT (server): 293046233447
+  Ratio OUT/IN:       13.10
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    178 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    13.07
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.1 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      690337889
+  QUIC packets:       690337878
+  Baseline (192.168): 248289098 (36.0%)
+  Attack (203.0.113): 10198156 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      689585832 (data)
+  Total ACKs:         372835125
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  22623633139
+  Bytes OUT (server): 300306745487
+  Ratio OUT/IN:       13.27
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    183 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    13.24
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.2 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      702007471
+  QUIC packets:       702007460
+  Baseline (192.168): 251309056 (35.8%)
+  Attack (203.0.113): 10198156 (1.5%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      701255414 (data)
+  Total ACKs:         379877943
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  22881882760
+  Bytes OUT (server): 307566795993
+  Ratio OUT/IN:       13.44
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    188 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    13.41
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.4 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      713667755
+  QUIC packets:       713667743
+  Baseline (192.168): 254320406 (35.6%)
+  Attack (203.0.113): 10198156 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      712915697 (data)
+  Total ACKs:         386921839
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  23139568630
+  Bytes OUT (server): 314828677773
+  Ratio OUT/IN:       13.61
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    193 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    13.57
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.6 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      725333615
+  QUIC packets:       725333603
+  Baseline (192.168): 257339193 (35.5%)
+  Attack (203.0.113): 10198156 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      724581557 (data)
+  Total ACKs:         393973807
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  23397742105
+  Bytes OUT (server): 322089512147
+  Ratio OUT/IN:       13.77
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    198 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    13.73
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.7 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      737000087
+  QUIC packets:       737000075
+  Baseline (192.168): 260363450 (35.3%)
+  Attack (203.0.113): 10198156 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      736248029 (data)
+  Total ACKs:         401016250
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  23656623785
+  Bytes OUT (server): 329346587278
+  Ratio OUT/IN:       13.92
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    203 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    13.89
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 13.9 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      748669439
+  QUIC packets:       748669427
+  Baseline (192.168): 263377688 (35.2%)
+  Attack (203.0.113): 10198156 (1.4%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      747917381 (data)
+  Total ACKs:         408062386
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  23914758555
+  Bytes OUT (server): 336607147451
+  Ratio OUT/IN:       14.08
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    208 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    14.05
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.0 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      760329619
+  QUIC packets:       760329607
+  Baseline (192.168): 266395820 (35.0%)
+  Attack (203.0.113): 10198156 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       752046 (handshakes)
+  Short headers:      759577561 (data)
+  Total ACKs:         415109384
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  24173087768
+  Bytes OUT (server): 343869067507
+  Ratio OUT/IN:       14.23
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    213 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    14.20
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.2 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      771769863
+  QUIC packets:       771769851
+  Baseline (192.168): 269350765 (34.9%)
+  Attack (203.0.113): 10198156 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       878042 (handshakes)
+  Short headers:      770891809 (data)
+  Total ACKs:         422037606
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  24463197056
+  Bytes OUT (server): 351013506505
+  Ratio OUT/IN:       14.35
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    218 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    14.32
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.3 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      783434054
+  QUIC packets:       783434041
+  Baseline (192.168): 272377078 (34.8%)
+  Attack (203.0.113): 10198156 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       878042 (handshakes)
+  Short headers:      782555999 (data)
+  Total ACKs:         429078497
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  24718429747
+  Bytes OUT (server): 358269761991
+  Ratio OUT/IN:       14.49
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    223 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    14.47
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.5 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      795093748
+  QUIC packets:       795093735
+  Baseline (192.168): 275389925 (34.6%)
+  Attack (203.0.113): 10198156 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       878042 (handshakes)
+  Short headers:      794215693 (data)
+  Total ACKs:         436128837
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  24975034429
+  Bytes OUT (server): 365529825888
+  Ratio OUT/IN:       14.64
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    228 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    14.61
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.6 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      806760900
+  QUIC packets:       806760887
+  Baseline (192.168): 278406752 (34.5%)
+  Attack (203.0.113): 10198156 (1.3%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       878042 (handshakes)
+  Short headers:      805882845 (data)
+  Total ACKs:         443170034
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  25233106958
+  Bytes OUT (server): 372786160246
+  Ratio OUT/IN:       14.77
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    233 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    14.75
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.7 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      818426048
+  QUIC packets:       818426035
+  Baseline (192.168): 281425115 (34.4%)
+  Attack (203.0.113): 10198156 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       878042 (handshakes)
+  Short headers:      817547993 (data)
+  Total ACKs:         450199137
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  25491575066
+  Bytes OUT (server): 380043945119
+  Ratio OUT/IN:       14.91
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    238 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    14.88
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 14.9 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      830087336
+  QUIC packets:       830087323
+  Baseline (192.168): 284436700 (34.3%)
+  Attack (203.0.113): 10198156 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       878042 (handshakes)
+  Short headers:      829209281 (data)
+  Total ACKs:         457235561
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  25749349276
+  Bytes OUT (server): 387306271807
+  Ratio OUT/IN:       15.04
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    243 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    15.02
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 15.0 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      841746881
+  QUIC packets:       841746868
+  Baseline (192.168): 287445648 (34.1%)
+  Attack (203.0.113): 10198156 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       878042 (handshakes)
+  Short headers:      840868826 (data)
+  Total ACKs:         464274000
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  26006837907
+  Bytes OUT (server): 394567973085
+  Ratio OUT/IN:       15.17
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    248 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    15.15
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 15.1 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      853404533
+  QUIC packets:       853404519
+  Baseline (192.168): 290462349 (34.0%)
+  Attack (203.0.113): 10198156 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       878042 (handshakes)
+  Short headers:      852526477 (data)
+  Total ACKs:         471311225
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  26265059575
+  Bytes OUT (server): 401830995465
+  Ratio OUT/IN:       15.30
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    253 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    15.27
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 15.3 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      865062630
+  QUIC packets:       865062616
+  Baseline (192.168): 293468556 (33.9%)
+  Attack (203.0.113): 10198156 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       878042 (handshakes)
+  Short headers:      864184574 (data)
+  Total ACKs:         478356019
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  26522438118
+  Bytes OUT (server): 409097572211
+  Ratio OUT/IN:       15.42
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    258 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    15.40
+  Max ACK rate/IP:    1173813
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 15.4 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      873691511
+  QUIC packets:       873691497
+  Baseline (192.168): 293807072 (33.6%)
+  Attack (203.0.113): 10198156 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       878042 (handshakes)
+  Short headers:      872813455 (data)
+  Total ACKs:         484844900
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  26551501491
+  Bytes OUT (server): 417691810250
+  Ratio OUT/IN:       15.73
+
+[IP ANALYSIS]
+  Unique IPs:         1
+  Heavy ACKers:       1
+  Suspicious IPs:     0
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    263 detections
+  Pkt num jumps:      31 detections
+  Max bytes ratio:    15.67
+  Max ACK rate/IP:    1286245
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 15.7 (threshold: 3.0)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      881911715
+  QUIC packets:       881911701
+  Baseline (192.168): 293807072 (33.3%)
+  Attack (203.0.113): 10306851 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       879542 (handshakes)
+  Short headers:      881032159 (data)
+  Total ACKs:         491277508
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  26564619966
+  Bytes OUT (server): 426310569242
+  Ratio OUT/IN:       16.05
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     12096
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    268 detections
+  Pkt num jumps:      34 detections
+  Max bytes ratio:    15.99
+  Max ACK rate/IP:    1286245
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 16.0 (threshold: 3.0) | PKT_NUM JUMPS: 38337 IPs with abnormal ACK patterns
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          QUIC OPTIMISTIC ACK DETECTOR - STATISTICS                   ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      890151666
+  QUIC packets:       890151652
+  Baseline (192.168): 293807072 (33.0%)
+  Attack (203.0.113): 10562571 (1.2%)
+
+[QUIC TRAFFIC ANALYSIS]
+  Long headers:       887042 (handshakes)
+  Short headers:      889264610 (data)
+  Total ACKs:         497782257
+
+[BYTES ANALYSIS]
+  Bytes IN (client):  26599998066
+  Bytes OUT (server): 434794623288
+  Ratio OUT/IN:       16.35
+
+[IP ANALYSIS]
+  Unique IPs:         257
+  Heavy ACKers:       1
+  Suspicious IPs:     136429
+
+[ATTACK INDICATORS]
+  High ACK rate:      0 detections
+  Bytes anomalies:    273 detections
+  Pkt num jumps:      37 detections
+  Max bytes ratio:    16.30
+  Max ACK rate/IP:    1286245
+
+[ALERT STATUS]
+  Alert level:        [91mHIGH[0m
+  Reason:              | AMPLIFICATION: bytes_out/bytes_in = 16.3 (threshold: 3.0) | PKT_NUM JUMPS: 87221 IPs with abnormal ACK patterns
+
+
+================================================================================
+Detector stopped by signal 15
