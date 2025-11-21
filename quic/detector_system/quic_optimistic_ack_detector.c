@@ -76,12 +76,13 @@
 #define SKETCH_DEPTH 4        // 4 hash functions
 #define HEAVY_HITTER_THRESHOLD 5000   // ACKs para ser heavy hitter (por ventana) - was 10000
 
-/* Detection thresholds - ADJUSTED for real attack patterns */
-#define ACK_RATE_THRESHOLD 1000       // >1000 ACKs/s por IP = sospechoso (was 5000)
-#define BYTES_RATIO_THRESHOLD 1.5     // bytes_out/bytes_in > 1.5 = ataque (was 8.0)
+/* Detection thresholds - ADJUSTED for real Optimistic ACK attack patterns */
+#define ACK_RATE_THRESHOLD 10000      // >10K ACKs per IP in 5s window = suspicious
+#define BYTES_RATIO_THRESHOLD 3.0     // bytes_out/bytes_in > 3.0 = attack (baseline ~1.0)
 #define PKT_NUM_JUMP_THRESHOLD 1000   // Salto >1000 en pkt number = sospechoso
 #define BURST_THRESHOLD 100           // >100 ACKs en 100ms = burst
 #define MIN_PACKETS_FOR_DETECTION 500 // Minimo de paquetes para analisis
+#define ATTACK_RATIO_THRESHOLD 0.05   // >5% traffic from attack network = suspicious
 
 /* Time window */
 #define DETECTION_WINDOW_SEC 1        // Ventana de 1 segundo
@@ -457,15 +458,18 @@ static void detect_optimistic_ack(void)
     double acks_per_sec = g_stats.total_acks / elapsed_sec;
     double attack_ratio = (double)g_stats.attack_packets / g_stats.quic_packets;
 
-    /* Rule 1: High ACK rate from attack network (203.0.113.x) */
-    if (g_stats.attack_packets > 0 && attack_ratio > 0.3) {
-        double attack_ack_rate = (g_stats.total_acks * attack_ratio) / elapsed_sec;
-        if (attack_ack_rate > ACK_RATE_THRESHOLD) {
+    /* Rule 1: High ACK rate from attack network (203.0.113.x)
+     * OPTIMISTIC ACK ATTACK: Attack IPs send massive amounts of ACKs
+     * Even small percentage of attack traffic with high ACK rate = attack
+     */
+    if (g_stats.attack_packets > 0 && attack_ratio > ATTACK_RATIO_THRESHOLD) {
+        /* Check if max ACK rate per IP is suspicious */
+        if (g_stats.max_ack_rate > ACK_RATE_THRESHOLD) {
             g_stats.alert_level = ALERT_HIGH;
             g_stats.high_ack_rate_detections++;
             snprintf(g_stats.alert_reason, sizeof(g_stats.alert_reason),
-                    "HIGH ACK RATE: %.0f ACKs/s from attack network (%.1f%% of traffic)",
-                    attack_ack_rate, attack_ratio * 100);
+                    "OPTIMISTIC ACK ATTACK: IP from 203.0.113.x sent %lu ACKs (threshold: %d) | Attack traffic: %.1f%%",
+                    g_stats.max_ack_rate, ACK_RATE_THRESHOLD, attack_ratio * 100);
         }
     }
 
@@ -862,12 +866,12 @@ int main(int argc, char **argv)
     dual_printf("║  Detection window:  %u second                                         ║\n", DETECTION_WINDOW_SEC);
     dual_printf("║  Stats interval:    %u seconds                                        ║\n", STATS_INTERVAL_SEC);
     dual_printf("║                                                                       ║\n");
-    dual_printf("║  Detection Rules:                                                     ║\n");
-    dual_printf("║    1. ACK Rate Anomaly (>%u ACKs/s per IP)                          ║\n", ACK_RATE_THRESHOLD);
-    dual_printf("║    2. Bytes Ratio (OUT/IN > %.1f = amplification)                    ║\n", BYTES_RATIO_THRESHOLD);
-    dual_printf("║    3. Packet Number Jumps (ACKing future packets)                     ║\n");
+    dual_printf("║  Detection Rules (QUIC Optimistic ACK Attack):                        ║\n");
+    dual_printf("║    1. ACK Rate Anomaly (>%u ACKs per IP in 5s window)               ║\n", ACK_RATE_THRESHOLD);
+    dual_printf("║    2. Bytes Amplification (OUT/IN > %.1f, baseline ~1.0)             ║\n", BYTES_RATIO_THRESHOLD);
+    dual_printf("║    3. Attack Network Detection (203.0.113.x traffic > %.0f%%)          ║\n", ATTACK_RATIO_THRESHOLD * 100);
     dual_printf("║    4. Heavy Hitter ACKers (>%u ACKs per IP)                         ║\n", HEAVY_HITTER_THRESHOLD);
-    dual_printf("║    5. Burst Detection (rapid ACK sequences)                           ║\n");
+    dual_printf("║    5. Packet Number Jumps (ACKing future packets)                     ║\n");
     dual_printf("╚═══════════════════════════════════════════════════════════════════════╝\n");
     dual_printf("\nPress Ctrl+C to exit...\n\n");
 

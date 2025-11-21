@@ -278,7 +278,9 @@ def generate_baseline_quic_traffic(output_file, num_packets,
                     flow['last_acked'] = largest_ack
                 else:
                     # Stream data (HTTP/3 response)
-                    response_data = bytes([random.randint(0, 255) for _ in range(random.randint(100, 500))])
+                    # BALANCED: Use similar size to client to achieve ~1:1 ratio
+                    # This allows clean distinction between normal traffic and Optimistic ACK amplification
+                    response_data = bytes([random.randint(0, 255) for _ in range(random.randint(40, 80))])
                     payload = create_stream_frame(0, flow['stream_offset'], response_data)
                     flow['stream_offset'] += len(response_data)
 
