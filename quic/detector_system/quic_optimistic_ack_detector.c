@@ -544,6 +544,13 @@ static void detect_optimistic_ack(void)
                     sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
                     " | AMPLIFICATION: bytes_out/bytes_in = %.1f (threshold: %.1f)",
                     bytes_ratio, BYTES_RATIO_THRESHOLD);
+
+            /* TMA 2025: Capture detection moment (FIRST time HIGH alert is raised) */
+            if (!g_stats.detection_triggered) {
+                g_stats.amplification_at_detection = bytes_ratio;
+                g_stats.total_bytes_at_detection = g_stats.total_bytes_in + g_stats.total_bytes_out;
+                g_stats.detection_triggered = true;
+            }
         }
     }
 
