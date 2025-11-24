@@ -242,14 +242,17 @@ def generate_mirai_attack(output_file, num_packets, attack_type,
 
     packets = []
     packets_per_attacker = num_packets // num_attackers
-    packets_per_update = num_packets // 10
+    packets_per_update = num_packets // 100  # Update every 1%
 
     print(f"Generating attack packets...")
+    print("")  # Empty line for visibility
 
     for idx, attacker_ip in enumerate(attacker_ips):
-        if idx > 0 and (idx * packets_per_attacker) % packets_per_update == 0:
-            progress = (idx * packets_per_attacker * 100) // num_packets
-            print(f"  Progress: {idx * packets_per_attacker:,}/{num_packets:,} ({progress}%)")
+        # Print progress every 1% or every attacker, whichever is more frequent
+        if idx % max(1, num_attackers // 100) == 0 and idx > 0:
+            current_packets = len(packets)
+            progress = (current_packets * 100) // num_packets if num_packets > 0 else 0
+            print(f"  Progress: {current_packets:,}/{num_packets:,} ({progress}%) - Attacker {idx}/{num_attackers}", flush=True)
 
         # Generate packets from this attacker
         if attack_type == 'udp':

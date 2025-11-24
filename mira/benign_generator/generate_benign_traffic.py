@@ -245,16 +245,23 @@ def generate_benign_traffic(output_file, num_packets, src_mac, dst_mac,
         client_ips.append(client_ip)
 
     packets = []
-    packets_per_update = num_packets // 10
+    packets_per_update = num_packets // 100  # Update every 1% instead of 10%
     current_count = 0
+    last_print = 0
+
+    print("")  # Empty line for better visibility
+    print("Starting packet generation...")
 
     # Traffic distribution (similar to benign patterns):
     # 50% HTTP, 20% DNS, 15% SSH, 10% ICMP, 5% Background UDP
     traffic_types = ['http'] * 50 + ['dns'] * 20 + ['ssh'] * 15 + ['icmp'] * 10 + ['udp'] * 5
 
     while current_count < num_packets:
-        if current_count > 0 and current_count % packets_per_update == 0:
-            print(f"  Progress: {current_count:,}/{num_packets:,} ({current_count*100//num_packets}%)")
+        # Print progress more frequently (every 1% or every 50K packets, whichever is smaller)
+        if current_count - last_print >= min(packets_per_update, 50000):
+            percent = current_count * 100 // num_packets
+            print(f"  Progress: {current_count:,}/{num_packets:,} ({percent}%)", flush=True)
+            last_print = current_count
 
         # Select random client
         client_ip = random.choice(client_ips)
