@@ -183,8 +183,8 @@ sudo apt-get update
 sudo apt-get install -y dpdk dpdk-dev libdpdk-dev
 
 # Clean and build
-make clean
-make
+sudo make clean
+sudo make
 
 # Verify build
 ls -la mira_ddos_detector
@@ -251,7 +251,7 @@ cd /local/dpdk_100g/mira
 # 25 instances x 50,000 pps = 1.25M pps (~7 Gbps, ~28% of 25G)
 # Duration: 445s (to stop at t=450s)
 for i in {1..25}; do
-    sudo timeout 445 tcpreplay --intf1=ens1f0 --pps=50000 --loop=0 benign_5M.pcap &
+    sudo timeout 400 tcpreplay --intf1=ens1f0 --pps=50000 --loop=0 benign_5M.pcap &
 done
 
 # Verify processes started
@@ -273,7 +273,7 @@ sleep 125
 # Duration: 320s (to stop at t=450s)
 # Using UDP flood attack
 for i in {1..50}; do
-    sudo timeout 320 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 attack_udp_5M.pcap &
+    sudo timeout 220 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 attack_mixed_5M.pcap &
 done
 
 # Verify processes

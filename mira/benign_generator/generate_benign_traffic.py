@@ -66,7 +66,8 @@ def generate_http_traffic(src_ip, dst_ip, src_mac, dst_mac, flow_id):
     packets.append(req)
 
     # HTTP response (server)
-    response_size = random.randint(200, 1500)
+    # Max payload: 1500 (MTU) - 14 (Eth) - 20 (IP) - 20 (TCP) - 50 (HTTP headers) = ~1396 bytes
+    response_size = random.randint(200, 1200)  # Safe payload size
     http_resp = b"HTTP/1.1 200 OK\\r\\nContent-Length: " + str(response_size).encode() + b"\\r\\n\\r\\n" + \
                 bytes([random.randint(0, 255) for _ in range(response_size)])
     resp = Ether(src=dst_mac, dst=src_mac) / \

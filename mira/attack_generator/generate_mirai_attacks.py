@@ -39,7 +39,8 @@ def generate_udp_flood(src_ip, dst_ip, src_mac, dst_mac, num_packets):
 
     for i in range(num_packets):
         target_port = random.choice(target_ports)
-        payload_size = random.randint(64, 1024)
+        # Max payload: 1500 (MTU) - 14 (Eth) - 20 (IP) - 8 (UDP) = 1458 bytes
+        payload_size = random.randint(64, 1400)  # Safe payload size
         payload = bytes([random.randint(0, 255) for _ in range(payload_size)])
 
         pkt = Ether(src=src_mac, dst=dst_mac) / \
@@ -184,7 +185,8 @@ def generate_icmp_flood(src_ip, dst_ip, src_mac, dst_mac, num_packets):
     packets = []
 
     for i in range(num_packets):
-        payload_size = random.randint(32, 512)
+        # Max payload: 1500 (MTU) - 14 (Eth) - 20 (IP) - 8 (ICMP) = 1458 bytes
+        payload_size = random.randint(32, 512)  # Already safe, but adding comment
         payload = bytes([random.randint(0, 255) for _ in range(payload_size)])
 
         pkt = Ether(src=src_mac, dst=dst_mac) / \
