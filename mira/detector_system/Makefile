@@ -27,18 +27,18 @@ CFLAGS += -DVERBOSE_DEBUG
 endif
 
 # Build rules
-build/$(APP): $(SRCS-y) Makefile $(PC_FILE) | build
-	$(CC) $(CFLAGS) $(SRCS-y) -o $@ $(LDFLAGS) $(LDFLAGS_STATIC)
+.PHONY: all clean
 
-build:
-	@mkdir -p $@
+all: $(APP)
 
-.PHONY: clean
+$(APP): $(SRCS-y) Makefile $(PC_FILE)
+	$(CC) $(CFLAGS) $(SRCS-y) -o $(APP) $(LDFLAGS) $(LDFLAGS_STATIC)
+	@echo ""
+	@echo "Build successful! Binary: ./$(APP)"
+	@echo ""
+
 clean:
-	rm -f build/$(APP)
-	rmdir build 2>/dev/null || true
-
-.PHONY: all
-all: build/$(APP)
+	rm -f $(APP)
+	@echo "Clean complete"
 
 .DEFAULT_GOAL := all
