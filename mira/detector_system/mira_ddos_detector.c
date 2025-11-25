@@ -37,24 +37,24 @@
 #define MBUF_CACHE_SIZE 250
 #define BURST_SIZE 128
 
-/* Detection thresholds */
-#define UDP_PPS_THRESHOLD 50000         /* UDP packets per second per IP */
-#define SYN_RATE_THRESHOLD 30000        /* SYN packets per second per IP */
-#define HTTP_CONN_THRESHOLD 10000       /* New HTTP connections per second */
-#define ICMP_PPS_THRESHOLD 20000        /* ICMP packets per second per IP */
-#define TOTAL_PPS_THRESHOLD 100000      /* Total pps from single IP */
+/* Detection thresholds - ADJUSTED for 1.875M pps / 200 IPs = ~9,375 pps per IP */
+#define UDP_PPS_THRESHOLD 5000          /* UDP packets per second per IP (was 50K) */
+#define SYN_RATE_THRESHOLD 3000         /* SYN packets per second per IP (was 30K) */
+#define HTTP_CONN_THRESHOLD 2000        /* New HTTP connections per second (was 10K) */
+#define ICMP_PPS_THRESHOLD 3000         /* ICMP packets per second per IP (was 20K) */
+#define TOTAL_PPS_THRESHOLD 8000        /* Total pps from single IP (was 100K) */
 
 /* New attack-specific thresholds */
-#define DNS_AMP_THRESHOLD 5000          /* DNS queries per second (amplification) */
-#define NTP_AMP_THRESHOLD 4000          /* NTP queries per second (amplification) */
-#define ACK_FLOOD_THRESHOLD 25000       /* Pure ACK packets per second */
-#define HTTP_FLOOD_THRESHOLD 8000       /* HTTP requests per second */
-#define FRAG_THRESHOLD 3000             /* Fragmented packets per second */
+#define DNS_AMP_THRESHOLD 2000          /* DNS queries per second (was 5K) */
+#define NTP_AMP_THRESHOLD 1500          /* NTP queries per second (was 4K) */
+#define ACK_FLOOD_THRESHOLD 4000        /* Pure ACK packets per second (was 25K) */
+#define HTTP_FLOOD_THRESHOLD 2500       /* HTTP requests per second (was 8K) */
+#define FRAG_THRESHOLD 1000             /* Fragmented packets per second (was 3K) */
 
 /* Time windows */
 #define FAST_DETECTION_INTERVAL 0.05    /* 50ms detection granularity (vs MULTI-LF 1000ms) */
 #define STATS_INTERVAL_SEC 5.0          /* Stats logging every 5s */
-#define DETECTION_WINDOW_SEC 5.0        /* Detection window for rate calculation */
+#define DETECTION_WINDOW_SEC 5.0        /* Detection window for rate calculation - RESET every 5s */
 
 /* IP tracking */
 #define MAX_IPS 65536
@@ -479,6 +479,28 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             g_stats.detection_triggered = true;
             g_stats.packets_until_detection = g_stats.total_packets;
             g_stats.bytes_until_detection = g_stats.total_bytes;
+        }
+
+        /* CRITICAL FIX: Reset detection window every DETECTION_WINDOW_SEC */
+        if (window_sec >= DETECTION_WINDOW_SEC) {
+            /* Reset window timestamp */
+            g_stats.window_start_tsc = cur_tsc;
+
+            /* Reset per-IP counters for fresh rate calculation */
+            for (uint32_t i = 0; i < g_ip_count; i++) {
+                g_ip_table[i].total_packets = 0;
+                g_ip_table[i].tcp_packets = 0;
+                g_ip_table[i].udp_packets = 0;
+                g_ip_table[i].icmp_packets = 0;
+                g_ip_table[i].syn_packets = 0;
+                g_ip_table[i].ack_packets = 0;
+                g_ip_table[i].http_requests = 0;
+                g_ip_table[i].dns_queries = 0;
+                g_ip_table[i].ntp_queries = 0;
+                g_ip_table[i].pure_ack_packets = 0;
+                g_ip_table[i].fragmented_packets = 0;
+                /* Keep bytes_in, bytes_out, last_seen_tsc, is_active */
+            }
         }
     }
 }

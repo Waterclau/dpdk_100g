@@ -56,19 +56,19 @@ sudo apt-get update
 sudo apt-get install -y python3-pip
 pip3 install scapy
 
-# Generate 5M packets of benign traffic
+# Generate 10M packets of benign traffic (optimized for 17-18 Gbps target)
 # Simulates CICDDoS2019 benign patterns: HTTP, DNS, SSH, ICMP
 sudo python3 generate_benign_traffic.py \
-    --output ../benign_5M.pcap \
-    --packets 5000000 \
+    --output ../benign_10M.pcap \
+    --packets 10000000 \
     --dst-mac 0c:42:a1:dd:5b:28 \
     --client-range 192.168.1.0/24 \
     --server-ip 10.0.0.1 \
     --clients 500
 
 # Verify PCAP
-ls -lh ../benign_5M.pcap
-tcpdump -r ../benign_5M.pcap -c 10
+ls -lh ../benign_10M.pcap
+tcpdump -r ../benign_10M.pcap -c 10
 ```
 
 **Traffic composition:**
@@ -119,9 +119,10 @@ sudo python3 generate_mirai_attacks.py \
     --attackers 200
 
 # Option 4: Mixed Attack (RECOMMENDED for comprehensive test)
+# Generate 10M packets for better throughput (17-18 Gbps target)
 sudo python3 generate_mirai_attacks.py \
-    --output ../attack_mixed_5M.pcap \
-    --packets 5000000 \
+    --output ../attack_mixed_10M.pcap \
+    --packets 10000000 \
     --attack-type mixed \
     --dst-mac 0c:42:a1:dd:5b:28 \
     --attacker-range 203.0.113.0/24 \
@@ -130,8 +131,8 @@ sudo python3 generate_mirai_attacks.py \
 
 # Verify PCAP
 ls -lh ../attack_*.pcap
-tcpdump -r ../attack_udp_5M.pcap -c 10
-tcpdump -r ../attack_mixed_5M.pcap -c 10
+tcpdump -r ../attack_mixed_10M.pcap -c 10
+tcpdump -r ../attack_mixed_10M.pcap -n -c 100 | grep "203.0.113" | head -20
 
 ```
 
@@ -250,13 +251,19 @@ Wait until the detector shows "Ready to receive packets..." before starting traf
 ```bash
 cd /local/dpdk_100g/mira
 
-# 25 instances x 50,000 pps = 1.25M pps (~7 Gbps, ~28% of 25G)
+# OPTIMIZED: 12 instances x 90,000 pps = 1.08M pps (~6.9 Gbps)
 # Duration: 445s (to stop at t=450s)
-
+for i in {1..12}; do
+    sudo timeout 445 tcpreplay --intf1=ens1f0 --pps=90000 --loop=0 benign_10M.pcap &
+done
 
 # Verify processes started
 ps aux | grep tcpreplay | wc -l
-# Should show ~25 processes
+# Should show ~12 processes
+
+# Monitor throughput in real-time (optional)
+watch -n 1 'ifstat -i ens1f0 1 1'
+# Should show ~6-7 Gbps
 ```
 
 ### Step 3: Start Attack Traffic (TG, wait 125s after baseline starts)
@@ -269,16 +276,20 @@ cd /local/dpdk_100g/mira
 # Wait until t=130s
 sleep 125
 
-# 50 instances x 37,500 pps = 1.875M pps (~10.5 Gbps)
+# OPTIMIZED: 16 instances x 100,000 pps = 1.6M pps (~10.2 Gbps)
 # Duration: 320s (to stop at t=450s)
-# Using UDP flood attack
-for i in {1..50}; do
-    sudo timeout 220 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 attack_mixed_5M.pcap &
+# Total peak: 6.9 + 10.2 = 17.1 Gbps ✅
+for i in {1..16}; do
+    sudo timeout 320 tcpreplay --intf1=ens1f0 --pps=100000 --loop=0 attack_mixed_10M.pcap &
 done
 
 # Verify processes
 ps aux | grep tcpreplay | wc -l
-# Should show ~50 processes
+# Should show ~16 processes
+
+# Monitor throughput in real-time (optional)
+watch -n 1 'ifstat -i ens1f0 1 1'
+# Should show ~10-11 Gbps attack + ~7 Gbps benign = ~17-18 Gbps total
 ```
 
 ---
@@ -427,11 +438,12 @@ Our System:  ██ 50 ms (17× faster)
 |--------|----------------|
 | Baseline duration | 125 seconds (5-130s) |
 | Attack duration | 320 seconds (130-450s) |
-| Baseline throughput | ~5-7 Gbps (1.25M pps) |
-| Attack throughput | ~10-15 Gbps (1.875M pps) |
-| Total during attack | ~15-22 Gbps |
+| Baseline throughput | ~6.9 Gbps (1.08M pps - 12 processes × 90K pps) |
+| Attack throughput | ~10.2 Gbps (1.6M pps - 16 processes × 100K pps) |
+| **Total during attack** | **~17-18 Gbps peak** (68-72% of 25G link) |
 | **Detection latency** | **< 50 ms** (vs MULTI-LF 866 ms) |
 | **Detection delay from attack start** | **< 100 ms** |
+| **Improvement factor** | **17× faster detection** |
 | True positive rate | > 95% |
 | False positive rate | < 5% |
 
@@ -542,13 +554,13 @@ sudo timeout 470 ./mira_ddos_detector -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0 2>&1 |
 ```bash
 cd /local/dpdk_100g/mira
 
-# Generate PCAP (one time)
+# Generate PCAP (one time) - 10M packets for 17-18 Gbps target
 cd benign_generator
-sudo python3 generate_benign_traffic.py --output ../benign_5M.pcap --packets 5000000 --dst-mac 0c:42:a1:dd:5b:28
+sudo python3 generate_benign_traffic.py --output ../benign_10M.pcap --packets 10000000 --dst-mac 0c:42:a1:dd:5b:28
 
 # Send traffic (after detector starts, wait 5s)
 cd /local/dpdk_100g/mira
-for i in {1..25}; do sudo timeout 445 tcpreplay --intf1=ens1f0 --pps=50000 --loop=0 benign_5M.pcap & done
+for i in {1..12}; do sudo timeout 445 tcpreplay --intf1=ens1f0 --pps=90000 --loop=0 benign_10M.pcap & done
 ```
 
 ### TG (Attack)
@@ -556,19 +568,21 @@ for i in {1..25}; do sudo timeout 445 tcpreplay --intf1=ens1f0 --pps=50000 --loo
 ```bash
 cd /local/dpdk_100g/mira
 
-# Generate PCAP (one time)
+# Generate PCAP (one time) - 10M packets for 17-18 Gbps target
 cd attack_generator
 sudo python3 generate_mirai_attacks.py \
-    --output ../attack_udp_5M.pcap \
-    --packets 5000000 \
-    --attack-type udp \
+    --output ../attack_mixed_10M.pcap \
+    --packets 10000000 \
+    --attack-type mixed \
     --dst-mac 0c:42:a1:dd:5b:28 \
+    --attacker-range 203.0.113.0/24 \
+    --target-ip 10.0.0.1 \
     --attackers 200
 
 # Send traffic (125 seconds after benign starts)
 cd /local/dpdk_100g/mira
 sleep 125
-for i in {1..50}; do sudo timeout 320 tcpreplay --intf1=ens1f0 --pps=37500 --loop=0 attack_udp_5M.pcap & done
+for i in {1..16}; do sudo timeout 320 tcpreplay --intf1=ens1f0 --pps=100000 --loop=0 attack_mixed_10M.pcap & done
 ```
 
 ---
