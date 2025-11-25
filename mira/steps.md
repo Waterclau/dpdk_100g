@@ -131,6 +131,8 @@ sudo python3 generate_mirai_attacks.py \
 # Verify PCAP
 ls -lh ../attack_*.pcap
 tcpdump -r ../attack_udp_5M.pcap -c 10
+tcpdump -r ../attack_mixed_5M.pcap -c 10
+
 ```
 
 **Attack composition (mixed):**

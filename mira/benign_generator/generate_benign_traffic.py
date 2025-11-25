@@ -43,7 +43,7 @@ def generate_http_traffic(src_ip, dst_ip, src_mac, dst_mac, flow_id):
     packets.append(syn)
 
     # TCP SYN-ACK (server response)
-    synack = Ether(src=dst_mac, dst=src_mac) / \
+    synack = Ether(src=src_mac, dst=dst_mac) / \
              IP(src=dst_ip, dst=src_ip) / \
              TCP(sport=80, dport=syn[TCP].sport, flags='SA',
                  seq=random.randint(1000, 4000000000), ack=syn[TCP].seq + 1)
@@ -70,7 +70,7 @@ def generate_http_traffic(src_ip, dst_ip, src_mac, dst_mac, flow_id):
     response_size = random.randint(200, 1200)  # Safe payload size
     http_resp = b"HTTP/1.1 200 OK\\r\\nContent-Length: " + str(response_size).encode() + b"\\r\\n\\r\\n" + \
                 bytes([random.randint(0, 255) for _ in range(response_size)])
-    resp = Ether(src=dst_mac, dst=src_mac) / \
+    resp = Ether(src=src_mac, dst=dst_mac) / \
            IP(src=dst_ip, dst=src_ip) / \
            TCP(sport=80, dport=syn[TCP].sport, flags='PA',
                seq=synack[TCP].seq + 1, ack=req[TCP].seq + len(http_req)) / \
@@ -92,7 +92,7 @@ def generate_http_traffic(src_ip, dst_ip, src_mac, dst_mac, flow_id):
     packets.append(fin)
 
     # TCP FIN-ACK (server closes)
-    finack = Ether(src=dst_mac, dst=src_mac) / \
+    finack = Ether(src=src_mac, dst=dst_mac) / \
              IP(src=dst_ip, dst=src_ip) / \
              TCP(sport=80, dport=syn[TCP].sport, flags='FA',
                  seq=resp[TCP].seq + len(http_resp), ack=fin[TCP].seq + 1)
@@ -123,7 +123,7 @@ def generate_dns_query(src_ip, dst_ip, src_mac, dst_mac):
     packets.append(query)
 
     # DNS response
-    response = Ether(src=dst_mac, dst=src_mac) / \
+    response = Ether(src=src_mac, dst=dst_mac) / \
                IP(src=dst_ip, dst=src_ip) / \
                UDP(sport=53, dport=query[UDP].sport) / \
                DNS(id=query[DNS].id, qr=1, aa=1, qd=query[DNS].qd,
@@ -143,7 +143,7 @@ def generate_ssh_traffic(src_ip, dst_ip, src_mac, dst_mac):
               seq=random.randint(1000, 4000000000))
     packets.append(syn)
 
-    synack = Ether(src=dst_mac, dst=src_mac) / \
+    synack = Ether(src=src_mac, dst=dst_mac) / \
              IP(src=dst_ip, dst=src_ip) / \
              TCP(sport=22, dport=syn[TCP].sport, flags='SA',
                  seq=random.randint(1000, 4000000000), ack=syn[TCP].seq + 1)
@@ -160,8 +160,7 @@ def generate_ssh_traffic(src_ip, dst_ip, src_mac, dst_mac):
         data_size = random.randint(50, 500)
         data = bytes([random.randint(0, 255) for _ in range(data_size)])
 
-        pkt = Ether(src=random.choice([src_mac, dst_mac]),
-                    dst=random.choice([src_mac, dst_mac])) / \
+        pkt = Ether(src=src_mac, dst=dst_mac) / \
               IP(src=random.choice([src_ip, dst_ip]),
                  dst=random.choice([src_ip, dst_ip])) / \
               TCP(sport=random.choice([syn[TCP].sport, 22]),
@@ -183,7 +182,7 @@ def generate_icmp_ping(src_ip, dst_ip, src_mac, dst_mac):
     packets.append(req)
 
     # Echo reply
-    reply = Ether(src=dst_mac, dst=src_mac) / \
+    reply = Ether(src=src_mac, dst=dst_mac) / \
             IP(src=dst_ip, dst=src_ip) / \
             ICMP(type=0, code=0, id=req[ICMP].id, seq=1) / \
             Raw(load=req[Raw].load)
