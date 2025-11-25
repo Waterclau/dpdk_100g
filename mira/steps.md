@@ -252,9 +252,7 @@ cd /local/dpdk_100g/mira
 
 # 25 instances x 50,000 pps = 1.25M pps (~7 Gbps, ~28% of 25G)
 # Duration: 445s (to stop at t=450s)
-for i in {1..25}; do
-    sudo timeout 400 tcpreplay --intf1=ens1f0 --pps=50000 --loop=0 benign_5M.pcap &
-done
+
 
 # Verify processes started
 ps aux | grep tcpreplay | wc -l

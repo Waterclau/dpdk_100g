@@ -44,6 +44,13 @@
 #define ICMP_PPS_THRESHOLD 20000        /* ICMP packets per second per IP */
 #define TOTAL_PPS_THRESHOLD 100000      /* Total pps from single IP */
 
+/* New attack-specific thresholds */
+#define DNS_AMP_THRESHOLD 5000          /* DNS queries per second (amplification) */
+#define NTP_AMP_THRESHOLD 4000          /* NTP queries per second (amplification) */
+#define ACK_FLOOD_THRESHOLD 25000       /* Pure ACK packets per second */
+#define HTTP_FLOOD_THRESHOLD 8000       /* HTTP requests per second */
+#define FRAG_THRESHOLD 3000             /* Fragmented packets per second */
+
 /* Time windows */
 #define FAST_DETECTION_INTERVAL 0.05    /* 50ms detection granularity (vs MULTI-LF 1000ms) */
 #define STATS_INTERVAL_SEC 5.0          /* Stats logging every 5s */
@@ -77,6 +84,12 @@ struct ip_stats {
     uint64_t bytes_out;
     uint64_t last_seen_tsc;
     bool is_active;
+
+    /* New attack-specific counters */
+    uint64_t dns_queries;       /* DNS port 53 packets */
+    uint64_t ntp_queries;       /* NTP port 123 packets */
+    uint64_t pure_ack_packets;  /* TCP packets with ONLY ACK flag */
+    uint64_t fragmented_packets;/* IP fragmented packets */
 };
 
 /* Global statistics */
@@ -108,6 +121,12 @@ struct detection_stats {
     uint64_t icmp_flood_detections;
     uint64_t total_flood_detections;
 
+    /* New attack detection counters */
+    uint64_t dns_amp_detections;
+    uint64_t ntp_amp_detections;
+    uint64_t ack_flood_detections;
+    uint64_t frag_attack_detections;
+
     /* Timestamps */
     uint64_t window_start_tsc;
     uint64_t last_stats_tsc;
@@ -131,12 +150,34 @@ struct detection_stats {
     char alert_reason[512];
 };
 
+/* ANSI color codes */
+#define COLOR_RESET   "\033[0m"
+#define COLOR_WHITE   "\033[1;37m"
+#define COLOR_YELLOW  "\033[1;33m"
+#define COLOR_RED     "\033[1;31m"
+
+/* Detection latency tracking */
+#define MAX_LATENCIES 1000
+static double detection_latencies[MAX_LATENCIES];
+static int latency_count = 0;
+
+/* Instantaneous metrics (5 second window) */
+static uint64_t window_baseline_pkts = 0;
+static uint64_t window_attack_pkts = 0;
+static uint64_t window_baseline_bytes = 0;
+static uint64_t window_attack_bytes = 0;
+static uint64_t last_window_reset_tsc = 0;
+#define WINDOW_SIZE_SEC 5
+
 /* Global variables */
 static volatile bool force_quit = false;
 static struct ip_stats g_ip_table[MAX_IPS];
 static uint32_t g_ip_count = 0;
 static struct detection_stats g_stats;
 static FILE *g_log_file = NULL;
+
+/* Server IP to filter false positives */
+#define SERVER_IP 0x0A000001  /* 10.0.0.1 */
 
 /* Function declarations */
 static int lcore_main(void *arg);
@@ -201,6 +242,9 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             struct ip_stats *ip = &g_ip_table[i];
             if (!ip->is_active) continue;
 
+            /* FILTER FALSE POSITIVES: Skip server IP (10.0.0.1) */
+            if (ip->ip_addr == SERVER_IP) continue;
+
             /* Calculate rates */
             double udp_pps = (double)ip->udp_packets / window_sec;
             double tcp_pps = (double)ip->tcp_packets / window_sec;
@@ -221,6 +265,14 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                         ip->ip_addr & 0xFF,
                         udp_pps, UDP_PPS_THRESHOLD);
                 attack_detected = true;
+
+                /* Calculate and store detection latency for THIS attack */
+                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
+                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
+                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
+                    detection_latencies[latency_count++] = latency_ms;
+                    g_stats.detection_latency_ms = latency_ms;
+                }
             }
 
             /* Rule 2: SYN Flood detection */
@@ -237,6 +289,14 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                         ip->ip_addr & 0xFF,
                         syn_pps, SYN_RATE_THRESHOLD);
                 attack_detected = true;
+
+                /* Calculate and store detection latency for THIS attack */
+                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
+                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
+                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
+                    detection_latencies[latency_count++] = latency_ms;
+                    g_stats.detection_latency_ms = latency_ms;
+                }
             }
 
             /* Rule 3: ICMP Flood detection */
@@ -253,9 +313,142 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                         ip->ip_addr & 0xFF,
                         icmp_pps, ICMP_PPS_THRESHOLD);
                 attack_detected = true;
+
+                /* Calculate and store detection latency for THIS attack */
+                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
+                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
+                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
+                    detection_latencies[latency_count++] = latency_ms;
+                    g_stats.detection_latency_ms = latency_ms;
+                }
             }
 
-            /* Rule 4: General packet flood */
+            /* Rule 4: DNS Amplification detection */
+            double dns_pps = (double)ip->dns_queries / window_sec;
+            if (dns_pps > DNS_AMP_THRESHOLD) {
+                g_stats.dns_amp_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "DNS AMPLIFICATION from %u.%u.%u.%u: %.0f qps (threshold: %d) | ",
+                        (ip->ip_addr >> 24) & 0xFF,
+                        (ip->ip_addr >> 16) & 0xFF,
+                        (ip->ip_addr >> 8) & 0xFF,
+                        ip->ip_addr & 0xFF,
+                        dns_pps, DNS_AMP_THRESHOLD);
+                attack_detected = true;
+
+                /* Calculate and store detection latency for THIS attack */
+                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
+                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
+                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
+                    detection_latencies[latency_count++] = latency_ms;
+                    g_stats.detection_latency_ms = latency_ms;
+                }
+            }
+
+            /* Rule 5: NTP Amplification detection */
+            double ntp_pps = (double)ip->ntp_queries / window_sec;
+            if (ntp_pps > NTP_AMP_THRESHOLD) {
+                g_stats.ntp_amp_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "NTP AMPLIFICATION from %u.%u.%u.%u: %.0f qps (threshold: %d) | ",
+                        (ip->ip_addr >> 24) & 0xFF,
+                        (ip->ip_addr >> 16) & 0xFF,
+                        (ip->ip_addr >> 8) & 0xFF,
+                        ip->ip_addr & 0xFF,
+                        ntp_pps, NTP_AMP_THRESHOLD);
+                attack_detected = true;
+
+                /* Calculate and store detection latency for THIS attack */
+                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
+                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
+                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
+                    detection_latencies[latency_count++] = latency_ms;
+                    g_stats.detection_latency_ms = latency_ms;
+                }
+            }
+
+            /* Rule 6: ACK Flood detection */
+            double ack_pps = (double)ip->pure_ack_packets / window_sec;
+            if (ack_pps > ACK_FLOOD_THRESHOLD) {
+                g_stats.ack_flood_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "ACK FLOOD from %u.%u.%u.%u: %.0f pps (threshold: %d) | ",
+                        (ip->ip_addr >> 24) & 0xFF,
+                        (ip->ip_addr >> 16) & 0xFF,
+                        (ip->ip_addr >> 8) & 0xFF,
+                        ip->ip_addr & 0xFF,
+                        ack_pps, ACK_FLOOD_THRESHOLD);
+                attack_detected = true;
+
+                /* Calculate and store detection latency for THIS attack */
+                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
+                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
+                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
+                    detection_latencies[latency_count++] = latency_ms;
+                    g_stats.detection_latency_ms = latency_ms;
+                }
+            }
+
+            /* Rule 7: HTTP Flood detection (specific threshold) */
+            double http_pps = (double)ip->http_requests / window_sec;
+            if (http_pps > HTTP_FLOOD_THRESHOLD) {
+                g_stats.http_flood_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "HTTP FLOOD from %u.%u.%u.%u: %.0f rps (threshold: %d) | ",
+                        (ip->ip_addr >> 24) & 0xFF,
+                        (ip->ip_addr >> 16) & 0xFF,
+                        (ip->ip_addr >> 8) & 0xFF,
+                        ip->ip_addr & 0xFF,
+                        http_pps, HTTP_FLOOD_THRESHOLD);
+                attack_detected = true;
+
+                /* Calculate and store detection latency for THIS attack */
+                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
+                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
+                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
+                    detection_latencies[latency_count++] = latency_ms;
+                    g_stats.detection_latency_ms = latency_ms;
+                }
+            }
+
+            /* Rule 8: Fragmentation Attack detection */
+            double frag_pps = (double)ip->fragmented_packets / window_sec;
+            if (frag_pps > FRAG_THRESHOLD) {
+                g_stats.frag_attack_detections++;
+                if (g_stats.alert_level < ALERT_MEDIUM)
+                    g_stats.alert_level = ALERT_MEDIUM;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "FRAGMENTATION ATTACK from %u.%u.%u.%u: %.0f frag/s (threshold: %d) | ",
+                        (ip->ip_addr >> 24) & 0xFF,
+                        (ip->ip_addr >> 16) & 0xFF,
+                        (ip->ip_addr >> 8) & 0xFF,
+                        ip->ip_addr & 0xFF,
+                        frag_pps, FRAG_THRESHOLD);
+                attack_detected = true;
+
+                /* Calculate and store detection latency for THIS attack */
+                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
+                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
+                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
+                    detection_latencies[latency_count++] = latency_ms;
+                    g_stats.detection_latency_ms = latency_ms;
+                }
+            }
+
+            /* Rule 9: General packet flood */
             if (total_pps > TOTAL_PPS_THRESHOLD) {
                 g_stats.total_flood_detections++;
                 if (g_stats.alert_level < ALERT_MEDIUM)
@@ -269,6 +462,14 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                         ip->ip_addr & 0xFF,
                         total_pps, TOTAL_PPS_THRESHOLD);
                 attack_detected = true;
+
+                /* Calculate and store detection latency for THIS attack */
+                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
+                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
+                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
+                    detection_latencies[latency_count++] = latency_ms;
+                    g_stats.detection_latency_ms = latency_ms;
+                }
             }
         }
 
@@ -278,12 +479,6 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             g_stats.detection_triggered = true;
             g_stats.packets_until_detection = g_stats.total_packets;
             g_stats.bytes_until_detection = g_stats.total_bytes;
-
-            /* Calculate detection latency from first attack packet */
-            if (g_stats.first_attack_packet_tsc > 0) {
-                uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
-                g_stats.detection_latency_ms = (double)latency_cycles * 1000.0 / hz;
-            }
         }
     }
 }
@@ -298,9 +493,17 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
 
     g_stats.last_stats_tsc = cur_tsc;
 
-    /* Calculate throughput */
-    double window_duration = (double)(cur_tsc - g_stats.window_start_tsc) / hz;
-    g_stats.throughput_gbps = (g_stats.total_bytes * 8.0) / (window_duration * 1e9);
+    /* Calculate INSTANTANEOUS throughput (last 5 seconds) */
+    double window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
+    double instantaneous_throughput_gbps = 0.0;
+    if (window_duration > 0) {
+        uint64_t window_total_bytes = window_baseline_bytes + window_attack_bytes;
+        instantaneous_throughput_gbps = (window_total_bytes * 8.0) / (window_duration * 1e9);
+    }
+
+    /* Calculate global throughput */
+    double global_window_duration = (double)(cur_tsc - g_stats.window_start_tsc) / hz;
+    g_stats.throughput_gbps = (g_stats.total_bytes * 8.0) / (global_window_duration * 1e9);
 
     if (g_stats.total_packets > 0) {
         g_stats.cycles_per_packet = (double)g_stats.total_processing_cycles / g_stats.total_packets;
@@ -315,8 +518,13 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
         "║          MIRA DDoS DETECTOR - STATISTICS                              ║\n"
         "╚═══════════════════════════════════════════════════════════════════════╝\n\n");
 
+    /* Calculate INSTANTANEOUS percentages (last 5 seconds) */
+    uint64_t window_total_pkts = window_baseline_pkts + window_attack_pkts;
+    double inst_baseline_pct = window_total_pkts > 0 ? (double)window_baseline_pkts * 100.0 / window_total_pkts : 0.0;
+    double inst_attack_pct = window_total_pkts > 0 ? (double)window_attack_pkts * 100.0 / window_total_pkts : 0.0;
+
     len += snprintf(buffer + len, sizeof(buffer) - len,
-        "[PACKET COUNTERS]\n"
+        "[PACKET COUNTERS - GLOBAL]\n"
         "  Total packets:      %" PRIu64 "\n"
         "  Baseline (192.168): %" PRIu64 " (%.1f%%)\n"
         "  Attack (203.0.113): %" PRIu64 " (%.1f%%)\n"
@@ -331,6 +539,18 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
         g_stats.tcp_packets,
         g_stats.udp_packets,
         g_stats.icmp_packets);
+
+    len += snprintf(buffer + len, sizeof(buffer) - len,
+        "[INSTANTANEOUS TRAFFIC - Last %.1f seconds]\n"
+        "  Baseline (192.168): %" PRIu64 " pkts (%.1f%%)  %.2f Gbps\n"
+        "  Attack (203.0.113): %" PRIu64 " pkts (%.1f%%)  %.2f Gbps\n"
+        "  Total throughput:   %.2f Gbps\n\n",
+        window_duration,
+        window_baseline_pkts, inst_baseline_pct,
+        window_duration > 0 ? (window_baseline_bytes * 8.0) / (window_duration * 1e9) : 0.0,
+        window_attack_pkts, inst_attack_pct,
+        window_duration > 0 ? (window_attack_bytes * 8.0) / (window_duration * 1e9) : 0.0,
+        instantaneous_throughput_gbps);
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[ATTACK-SPECIFIC COUNTERS]\n"
@@ -351,41 +571,90 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
         "  SYN floods:         %" PRIu64 "\n"
         "  HTTP floods:        %" PRIu64 "\n"
         "  ICMP floods:        %" PRIu64 "\n"
+        "  DNS amplification:  %" PRIu64 "\n"
+        "  NTP amplification:  %" PRIu64 "\n"
+        "  ACK floods:         %" PRIu64 "\n"
+        "  Fragmentation:      %" PRIu64 "\n"
         "  Total detections:   %" PRIu64 "\n\n",
         g_stats.udp_flood_detections,
         g_stats.syn_flood_detections,
         g_stats.http_flood_detections,
         g_stats.icmp_flood_detections,
+        g_stats.dns_amp_detections,
+        g_stats.ntp_amp_detections,
+        g_stats.ack_flood_detections,
+        g_stats.frag_attack_detections,
         g_stats.total_flood_detections);
+
+    /* Alert status with COLORS */
+    const char *alert_color = COLOR_RESET;
+    const char *alert_text = "NONE";
+
+    if (g_stats.alert_level == ALERT_HIGH) {
+        alert_color = COLOR_RED;
+        alert_text = "HIGH";
+    } else if (g_stats.alert_level == ALERT_MEDIUM) {
+        alert_color = COLOR_YELLOW;
+        alert_text = "MEDIUM";
+    } else if (g_stats.alert_level == ALERT_LOW) {
+        alert_color = COLOR_WHITE;
+        alert_text = "LOW";
+    }
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[ALERT STATUS]\n"
-        "  Alert level:        %s\n"
-        "  Reason:             %s\n\n",
-        g_stats.alert_level == ALERT_HIGH ? "HIGH" :
-        g_stats.alert_level == ALERT_MEDIUM ? "MEDIUM" :
-        g_stats.alert_level == ALERT_LOW ? "LOW" : "NONE",
-        strlen(g_stats.alert_reason) > 0 ? g_stats.alert_reason : "None");
+        "  Alert level:        %s%s%s\n"
+        "  Reason:             %s%s%s\n\n",
+        alert_color, alert_text, COLOR_RESET,
+        strlen(g_stats.alert_reason) > 0 ? alert_color : "",
+        strlen(g_stats.alert_reason) > 0 ? g_stats.alert_reason : "None",
+        strlen(g_stats.alert_reason) > 0 ? COLOR_RESET : "");
 
     /* MULTI-LF Comparison Section */
     if (g_stats.detection_triggered) {
+        /* Calculate average latency */
+        double avg_latency = 0.0;
+        if (latency_count > 0) {
+            for (int i = 0; i < latency_count; i++) {
+                avg_latency += detection_latencies[i];
+            }
+            avg_latency /= latency_count;
+        }
+
         len += snprintf(buffer + len, sizeof(buffer) - len,
             "[MULTI-LF (2025) COMPARISON]\n"
             "=== Detection Performance vs ML-Based System ===\n\n"
-            "  Detection Latency:  %.2f ms (vs MULTI-LF: 866 ms)\n"
-            "    Improvement:      %.1f× faster\n\n"
-            "  Packets until detect: %" PRIu64 "\n"
-            "  Bytes until detect:   %" PRIu64 " (%.2f MB)\n\n"
+            "  Latest Detection Latency:  %.2f ms (vs MULTI-LF: 866 ms)\n"
+            "    Improvement:             %.1f× faster\n\n"
+            "  Total detections:          %d\n"
+            "  Average latency:           %.2f ms\n\n"
+            "  Packets until first detect: %" PRIu64 "\n"
+            "  Bytes until first detect:   %" PRIu64 " (%.2f MB)\n\n",
+            g_stats.detection_latency_ms,
+            866.0 / (g_stats.detection_latency_ms > 0 ? g_stats.detection_latency_ms : 1.0),
+            latency_count,
+            avg_latency,
+            g_stats.packets_until_detection,
+            g_stats.bytes_until_detection,
+            g_stats.bytes_until_detection / (1024.0 * 1024.0));
+
+        /* Show last 10 detection latencies */
+        if (latency_count > 0) {
+            len += snprintf(buffer + len, sizeof(buffer) - len, "  Last detection latencies:\n");
+            int start = latency_count > 10 ? latency_count - 10 : 0;
+            for (int i = start; i < latency_count; i++) {
+                len += snprintf(buffer + len, sizeof(buffer) - len,
+                    "    [%d] %.2f ms\n", i + 1, detection_latencies[i]);
+            }
+            len += snprintf(buffer + len, sizeof(buffer) - len, "\n");
+        }
+
+        len += snprintf(buffer + len, sizeof(buffer) - len,
             "  DPDK Advantages:\n"
             "    ✓ Real-time detection (50ms granularity)\n"
             "    ✓ No training required\n"
             "    ✓ Line-rate processing\n"
-            "    ✓ Constant memory usage\n\n",
-            g_stats.detection_latency_ms,
-            866.0 / (g_stats.detection_latency_ms > 0 ? g_stats.detection_latency_ms : 1.0),
-            g_stats.packets_until_detection,
-            g_stats.bytes_until_detection,
-            g_stats.bytes_until_detection / (1024.0 * 1024.0));
+            "    ✓ Constant memory usage\n\n");
     }
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
@@ -405,6 +674,13 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
         fprintf(g_log_file, "%s", buffer);
         fflush(g_log_file);
     }
+
+    /* Reset instantaneous window counters */
+    window_baseline_pkts = 0;
+    window_attack_pkts = 0;
+    window_baseline_bytes = 0;
+    window_attack_bytes = 0;
+    last_window_reset_tsc = cur_tsc;
 }
 
 /* Main packet processing loop */
@@ -422,6 +698,7 @@ static int lcore_main(__rte_unused void *arg)
     g_stats.window_start_tsc = rte_rdtsc();
     g_stats.last_stats_tsc = g_stats.window_start_tsc;
     g_stats.last_fast_detection_tsc = g_stats.window_start_tsc;
+    last_window_reset_tsc = g_stats.window_start_tsc;
 
     while (!force_quit) {
         struct rte_mbuf *bufs[BURST_SIZE];
@@ -453,13 +730,25 @@ static int lcore_main(__rte_unused void *arg)
             uint32_t dst_ip = rte_be_to_cpu_32(ip_hdr->dst_addr);
             uint8_t proto = ip_hdr->next_proto_id;
 
+            /* Detect IP fragmentation */
+            uint16_t frag_off = rte_be_to_cpu_16(ip_hdr->fragment_offset);
+            bool is_fragmented = ((frag_off & RTE_IPV4_HDR_MF_FLAG) != 0) || ((frag_off & RTE_IPV4_HDR_OFFSET_MASK) != 0);
+
             /* Classify traffic by source network */
             if ((src_ip & NETWORK_MASK) == BASELINE_NETWORK) {
                 g_stats.baseline_packets++;
                 g_stats.bytes_in += rte_pktmbuf_pkt_len(m);
+
+                /* Instantaneous window counters */
+                window_baseline_pkts++;
+                window_baseline_bytes += rte_pktmbuf_pkt_len(m);
             } else if ((src_ip & NETWORK_MASK) == ATTACK_NETWORK) {
                 g_stats.attack_packets++;
                 g_stats.bytes_in += rte_pktmbuf_pkt_len(m);
+
+                /* Instantaneous window counters */
+                window_attack_pkts++;
+                window_attack_bytes += rte_pktmbuf_pkt_len(m);
 
                 /* Record first attack packet timestamp */
                 if (g_stats.first_attack_packet_tsc == 0) {
@@ -473,6 +762,11 @@ static int lcore_main(__rte_unused void *arg)
                 src_stats->total_packets++;
                 src_stats->bytes_in += rte_pktmbuf_pkt_len(m);
                 src_stats->last_seen_tsc = start_tsc;
+
+                /* Track fragmented packets */
+                if (is_fragmented) {
+                    src_stats->fragmented_packets++;
+                }
             }
 
             /* Parse transport layer */
@@ -495,6 +789,12 @@ static int lcore_main(__rte_unused void *arg)
                         g_stats.syn_ack_packets++;
                     if (src_stats)
                         src_stats->ack_packets++;
+
+                    /* Detect PURE ACK (only ACK flag, no SYN/PSH/FIN/RST) */
+                    if (tcp_flags == RTE_TCP_ACK_FLAG) {
+                        if (src_stats)
+                            src_stats->pure_ack_packets++;
+                    }
                 }
 
                 /* Detect HTTP (port 80) */
@@ -510,11 +810,22 @@ static int lcore_main(__rte_unused void *arg)
                 if (src_stats)
                     src_stats->udp_packets++;
 
-                /* Detect DNS (port 53) */
+                /* Detect DNS (port 53) and NTP (port 123) */
                 struct rte_udp_hdr *udp_hdr = (struct rte_udp_hdr *)((uint8_t *)ip_hdr + sizeof(struct rte_ipv4_hdr));
                 uint16_t dst_port = rte_be_to_cpu_16(udp_hdr->dst_port);
-                if (dst_port == 53) {
+                uint16_t src_port = rte_be_to_cpu_16(udp_hdr->src_port);
+
+                /* DNS detection (port 53 on either src or dst) */
+                if (dst_port == 53 || src_port == 53) {
                     g_stats.dns_queries++;
+                    if (src_stats)
+                        src_stats->dns_queries++;
+                }
+
+                /* NTP detection (port 123 on either src or dst) */
+                if (dst_port == 123 || src_port == 123) {
+                    if (src_stats)
+                        src_stats->ntp_queries++;
                 }
             }
             else if (proto == IPPROTO_ICMP) {
