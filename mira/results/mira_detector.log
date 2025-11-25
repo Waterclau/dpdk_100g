@@ -1,0 +1,4065 @@
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      2
+  Baseline (192.168): 1 (50.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        1
+  UDP packets:        0
+  ICMP packets:       0
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        1
+  SYN-ACK packets:    0
+  SYN/ACK ratio:      0.00
+  HTTP requests:      1
+  DNS queries:        0
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        NONE
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      1140 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         1
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      6175646
+  Baseline (192.168): 3949266 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        5423484
+  UDP packets:        558395
+  ICMP packets:       193766
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        1220348
+  SYN-ACK packets:    610174
+  SYN/ACK ratio:      2.00
+  HTTP requests:      2815417
+  DNS queries:        194679
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         53
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   58
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 50511 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 184347 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         0.67 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      12416508
+  Baseline (192.168): 7941935 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        10917177
+  UDP packets:        1117467
+  ICMP packets:       381863
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        2456904
+  SYN-ACK packets:    1228451
+  SYN/ACK ratio:      2.00
+  HTTP requests:      5683882
+  DNS queries:        388969
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         153
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   158
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 72084 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 262590 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         0.95 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      18657376
+  Baseline (192.168): 11932537 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        16412680
+  UDP packets:        1668709
+  ICMP packets:       575986
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        3693868
+  SYN-ACK packets:    1846933
+  SYN/ACK ratio:      2.00
+  HTTP requests:      8549036
+  DNS queries:        582500
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         253
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   258
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 83840 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 305266 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.11 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      24898242
+  Baseline (192.168): 15925026 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        21914318
+  UDP packets:        2220129
+  ICMP packets:       763794
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        4932330
+  SYN-ACK packets:    2466164
+  SYN/ACK ratio:      2.00
+  HTTP requests:      11389111
+  DNS queries:        776332
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         353
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   358
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 91257 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 332056 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.20 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      31139107
+  Baseline (192.168): 19914807 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        27412658
+  UDP packets:        2776959
+  ICMP packets:       949489
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        6171778
+  SYN-ACK packets:    3085886
+  SYN/ACK ratio:      2.00
+  HTTP requests:      14232390
+  DNS queries:        970647
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         453
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   458
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 96376 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 350549 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.27 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      37379980
+  Baseline (192.168): 23907411 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        32920174
+  UDP packets:        3324131
+  ICMP packets:       1135673
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        7411236
+  SYN-ACK packets:    3705618
+  SYN/ACK ratio:      2.00
+  HTTP requests:      17090883
+  DNS queries:        1162934
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         553
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   558
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 100103 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 363947 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.32 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      43620835
+  Baseline (192.168): 27895749 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        38421258
+  UDP packets:        3873191
+  ICMP packets:       1326384
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        8648690
+  SYN-ACK packets:    4324344
+  SYN/ACK ratio:      2.00
+  HTTP requests:      19951234
+  DNS queries:        1355224
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         653
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   658
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 102921 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 374264 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.35 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      49861712
+  Baseline (192.168): 31891370 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        43914828
+  UDP packets:        4430716
+  ICMP packets:       1516166
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        9885261
+  SYN-ACK packets:    4942628
+  SYN/ACK ratio:      2.00
+  HTTP requests:      22805349
+  DNS queries:        1547592
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         753
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   758
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 105128 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 382232 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.38 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      56102587
+  Baseline (192.168): 35885499 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        49420884
+  UDP packets:        4976715
+  ICMP packets:       1704986
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        11125643
+  SYN-ACK packets:    5562820
+  SYN/ACK ratio:      2.00
+  HTTP requests:      25668720
+  DNS queries:        1737540
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         853
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   858
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 106949 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 388681 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.41 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      62343447
+  Baseline (192.168): 39873777 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        54920917
+  UDP packets:        5526855
+  ICMP packets:       1895673
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        12362810
+  SYN-ACK packets:    6181404
+  SYN/ACK ratio:      2.00
+  HTTP requests:      28523240
+  DNS queries:        1928663
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         953
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   958
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 108422 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 394117 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.43 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      68584313
+  Baseline (192.168): 43860214 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        60432131
+  UDP packets:        6064034
+  ICMP packets:       2088146
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        13602656
+  SYN-ACK packets:    6801326
+  SYN/ACK ratio:      2.00
+  HTTP requests:      31365509
+  DNS queries:        2116890
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         1053
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   1058
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 109677 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 398693 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.44 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      74825178
+  Baseline (192.168): 47851843 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        65938750
+  UDP packets:        6609667
+  ICMP packets:       2276758
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        14841065
+  SYN-ACK packets:    7420531
+  SYN/ACK ratio:      2.00
+  HTTP requests:      34227904
+  DNS queries:        2309769
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         1153
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   1158
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 110734 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 402517 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.46 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      81066048
+  Baseline (192.168): 51843640 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        71436084
+  UDP packets:        7157221
+  ICMP packets:       2472740
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        16079611
+  SYN-ACK packets:    8039805
+  SYN/ACK ratio:      2.00
+  HTTP requests:      37084337
+  DNS queries:        2500407
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         1253
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   1258
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 111647 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 405805 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.47 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      87306912
+  Baseline (192.168): 55832016 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        76936446
+  UDP packets:        7707179
+  ICMP packets:       2663284
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        17317539
+  SYN-ACK packets:    8658769
+  SYN/ACK ratio:      2.00
+  HTTP requests:      39938797
+  DNS queries:        2691680
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         1353
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   1358
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 112435 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 408706 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.48 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      93547774
+  Baseline (192.168): 59821538 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        82436044
+  UDP packets:        8253817
+  ICMP packets:       2857910
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        18557191
+  SYN-ACK packets:    9278594
+  SYN/ACK ratio:      2.00
+  HTTP requests:      42793576
+  DNS queries:        2881969
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         1453
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   1458
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 113140 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 411242 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.49 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      99788639
+  Baseline (192.168): 63810161 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        87935221
+  UDP packets:        8801376
+  ICMP packets:       3052039
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        19795293
+  SYN-ACK packets:    9897646
+  SYN/ACK ratio:      2.00
+  HTTP requests:      45663395
+  DNS queries:        3071292
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         1553
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   1558
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 113753 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 413500 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.50 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      106029504
+  Baseline (192.168): 67790629 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        93442063
+  UDP packets:        9344661
+  ICMP packets:       3242776
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21034986
+  SYN-ACK packets:    10517492
+  SYN/ACK ratio:      2.00
+  HTTP requests:      48513818
+  DNS queries:        3261692
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         1653
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   1658
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 114307 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 415593 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.50 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      112270374
+  Baseline (192.168): 71774814 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        98942323
+  UDP packets:        9890470
+  ICMP packets:       3437576
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        22273096
+  SYN-ACK packets:    11136548
+  SYN/ACK ratio:      2.00
+  HTTP requests:      51362004
+  DNS queries:        3451770
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         1753
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   1758
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 114798 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 417437 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.51 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      118511237
+  Baseline (192.168): 75764921 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        104438940
+  UDP packets:        10443670
+  ICMP packets:       3628622
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        23510631
+  SYN-ACK packets:    11755314
+  SYN/ACK ratio:      2.00
+  HTTP requests:      54217733
+  DNS queries:        3644031
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         1853
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   1858
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 115238 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 419037 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.52 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      124752103
+  Baseline (192.168): 79751086 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        109941721
+  UDP packets:        10989841
+  ICMP packets:       3820536
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24749428
+  SYN-ACK packets:    12374713
+  SYN/ACK ratio:      2.00
+  HTTP requests:      57062845
+  DNS queries:        3834972
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         1953
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   1958
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 115642 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 420536 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.52 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      130992967
+  Baseline (192.168): 83742140 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        115422799
+  UDP packets:        11555371
+  ICMP packets:       4014792
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        25982582
+  SYN-ACK packets:    12991289
+  SYN/ACK ratio:      2.00
+  HTTP requests:      59907043
+  DNS queries:        4032452
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2053
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2058
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 115985 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 421851 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.53 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      137233829
+  Baseline (192.168): 87734421 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        120918680
+  UDP packets:        12111794
+  ICMP packets:       4203350
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        27219707
+  SYN-ACK packets:    13609852
+  SYN/ACK ratio:      2.00
+  HTTP requests:      62775719
+  DNS queries:        4225729
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2153
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2158
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 116315 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 423041 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.53 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      143474688
+  Baseline (192.168): 91725249 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        126412904
+  UDP packets:        12664144
+  ICMP packets:       4397635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        28456249
+  SYN-ACK packets:    14228123
+  SYN/ACK ratio:      2.00
+  HTTP requests:      65639294
+  DNS queries:        4419670
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2253
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2258
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 116616 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 424147 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.53 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      149715553
+  Baseline (192.168): 95717846 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        131913994
+  UDP packets:        13216850
+  ICMP packets:       4584703
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        29694810
+  SYN-ACK packets:    14847404
+  SYN/ACK ratio:      2.00
+  HTTP requests:      68481481
+  DNS queries:        4613863
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2353
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2358
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 116901 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 425152 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      436 cycles
+  Throughput:         1.54 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      159831901
+  Baseline (192.168): 99707777 (62.4%)
+  Attack (203.0.113): 3875479 (2.4%)
+  TCP packets:        138978249
+  UDP packets:        16082530
+  ICMP packets:       4771116
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        32499772
+  SYN-ACK packets:    15467114
+  SYN/ACK ratio:      2.10
+  HTTP requests:      71547676
+  DNS queries:        5100090
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2453
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2458
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 117167 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 426099 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      440 cycles
+  Throughput:         1.66 Gbps
+  Active IPs:         261
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162581996
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2475
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2480
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 112657 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 409685 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.63 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162581997
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2476
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2481
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 107931 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 392499 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.56 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582000
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2479
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2484
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 103586 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 376697 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.50 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582003
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2482
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2487
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 99577 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 362118 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.44 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582006
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2485
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2490
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 95864 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 348617 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.39 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582008
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2487
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2492
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 92423 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 336102 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.34 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582011
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2490
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2495
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 89216 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 324440 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.29 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582013
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2492
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2497
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 86228 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 313574 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.25 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582017
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2496
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2501
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 83432 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 303406 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.21 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582019
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2498
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2503
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 80811 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 293876 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.17 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582022
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2501
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2506
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 78351 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 284927 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.13 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582024
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2503
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2508
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 76034 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 276502 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.10 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582027
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2506
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2511
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 73853 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 268570 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.07 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582030
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2509
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2514
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 71792 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 261076 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.04 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582033
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2512
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2517
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 69843 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 253989 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         1.01 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582035
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2514
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2519
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 67997 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 247277 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.98 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582038
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2517
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2522
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 66246 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 240910 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.96 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582040
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2519
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2524
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 64584 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 234863 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.93 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582044
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2522
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2527
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 63002 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 229112 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.91 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582046
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2524
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2529
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 61496 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 223636 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.89 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582049
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2527
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2532
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 60061 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 218415 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.87 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582051
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2529
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2534
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 58690 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 213430 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.85 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582054
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2532
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2537
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 57382 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 208673 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.83 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582057
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2535
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2540
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 56129 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 204118 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.81 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582060
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2538
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2543
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 54932 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 199763 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.79 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582062
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2540
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2545
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 53783 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 195587 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.78 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582065
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2543
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2548
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 52682 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 191582 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.76 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582067
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2545
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2550
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 51624 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 187736 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.75 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582071
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2549
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2554
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 50609 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 184043 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.73 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582073
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2551
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2556
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 49633 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 180495 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.72 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582076
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2554
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2559
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 48694 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 177079 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.70 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582078
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2556
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2561
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 47789 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 173788 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.69 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582081
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2559
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2564
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 46918 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 170621 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.68 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582084
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2562
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2567
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 46078 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 167565 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.67 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582087
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2565
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2570
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 45267 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 164615 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.65 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582089
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2567
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2572
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 44484 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 161769 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.64 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582092
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2570
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2575
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 43728 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 159022 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.63 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582094
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2572
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2577
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 42998 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 156364 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.62 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582098
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2576
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2581
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 42291 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 153794 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.61 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582100
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2578
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2583
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 41607 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 151307 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.60 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582103
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2581
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2586
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 40945 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 148899 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.59 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582105
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2583
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2588
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 40304 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 146567 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.58 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582108
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2586
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2591
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 39682 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 144306 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.57 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582111
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2589
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2594
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 39079 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 142114 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.57 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582114
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2592
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2597
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 38495 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 139988 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.56 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582116
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2594
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2599
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 37927 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 137925 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.55 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582119
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2597
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2602
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 37376 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 135921 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.54 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582121
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2599
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2604
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 36841 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 133975 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.53 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582125
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2603
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2608
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 36321 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 132084 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.53 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582127
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2605
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2610
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 35815 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 130244 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.52 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582130
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2608
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2613
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 35324 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 128457 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.51 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582132
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2610
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2615
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 34845 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 126717 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.50 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582135
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2613
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2618
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 34380 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 125024 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.50 Gbps
+  Active IPs:         263
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS]
+  Total packets:      162582137
+  Baseline (192.168): 100463263 (61.8%)
+  Attack (203.0.113): 5446435 (3.3%)
+  TCP packets:        140801695
+  UDP packets:        16974657
+  ICMP packets:       4805635
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        33517529
+  SYN-ACK packets:    15583985
+  SYN/ACK ratio:      2.15
+  HTTP requests:      72201247
+  DNS queries:        5234129
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         2615
+  HTTP floods:        0
+  ICMP floods:        0
+  Total detections:   2620
+
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             SYN FLOOD from 10.0.0.1: 34193 SYN/s (threshold: 30000) | PACKET FLOOD from 10.0.0.1: 124345 pps (threshold: 100000) | 
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  Detection Latency:  0.00 ms (vs MULTI-LF: 866 ms)
+    Improvement:      866.0× faster
+
+  Packets until detect: 2555999
+  Bytes until detect:   414761946 (395.55 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      441 cycles
+  Throughput:         0.48 Gbps
+  Active IPs:         263
+
