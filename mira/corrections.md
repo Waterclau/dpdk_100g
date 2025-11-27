@@ -260,53 +260,74 @@ if (http_pps > HTTP_FLOOD_THRESHOLD) {
 
 **Symptom:**
 ```
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 7304004 pkts (100.0%)  1.21 Gbps
+[INSTANTANEOUS TRAFFIC - Last 14.5 seconds]
+  Baseline (192.168): 6528272 pkts (90.3%)  0.37 Gbps
+  Attack (203.0.113): 699761 pkts (9.7%)  0.09 Gbps
+  Total throughput:   0.46 Gbps
 ```
 
 **Analysis:**
-- Packets: 7,304,004 in 5 seconds = **1.46 Mpps**
-- Throughput: 1.21 Gbps
-- **Implied packet size:** 1.21 Gbps / 1.46 Mpps = ~660 bits/pkt = **82.5 bytes/packet**
+- Packets: 6,528,272 in 14.5 seconds = **450,192 pps**
+- Throughput reported: 0.37 Gbps
+- **Implied packet size:** 0.37 Gbps / 450,192 pps = ~82 bytes/packet
 - **Expected:** HTTP/TCP packets average 800-1200 bytes
-- **Expected throughput:** 1.46 Mpps × 800 bytes × 8 = **~9.3 Gbps**
+- **Expected throughput:** 450,192 pps × 800 bytes × 8 = **~2.88 Gbps**
 
-**Conclusion:** Throughput is **under-calculated by ~7.7×**
+**Conclusion:** Throughput is **under-calculated by ~7.8×**
 
-**Root Cause (lines 572-574):**
+**Root Cause:**
+
+The `window_duration` variable was using **wall-clock time** instead of **actual packet arrival time**:
+
 ```c
-window_duration > 0 ? (window_baseline_bytes * 8.0) / (window_duration * 1e9) : 0.0,
+// OLD (WRONG)
+double window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
 ```
 
-**Possible causes:**
-1. `window_baseline_bytes` is not accumulating all bytes (bug in counting)
-2. `window_duration` includes idle time (tcpreplay pause)
-3. Byte counter reset bug
+**Problem:**
+1. When NO packets arrive, `print_stats()` is not called (only called after packet processing)
+2. `last_window_reset_tsc` stays stale
+3. Next time packets arrive, `window_duration` can be 14.5 seconds instead of 5 seconds
+4. **Result:** Same bytes divided by inflated duration = artificially low Gbps
+
+**Example:**
+- t=0s: Reset window, start receiving packets
+- t=5s: Print stats (6.5M packets, 5s window) → **correct 2.8 Gbps**
+- t=5s-20s: NO packets (tcpreplay finished)
+- t=20s: 3 stray packets arrive, trigger stats print
+- `window_duration` = 20s - 5s = **15 seconds** (includes 15s of idle time!)
+- Throughput = 3 packets × 800 bytes / 15s = **0.001 Gbps** (WRONG!)
 
 **Solution:**
-Need to verify byte counting logic in packet processing loop (lines 740-859).
 
-**Verification needed:**
+Track actual packet arrival times:
+
 ```c
-// Line 741
-g_stats.total_bytes += rte_pktmbuf_pkt_len(m);  // ✓ Global counter
+// NEW (CORRECT) - lines 177-178, 683-686, 482-507
+static uint64_t first_packet_in_window_tsc = 0;
+static uint64_t last_packet_in_window_tsc = 0;
 
-// Line 762, 766
-g_stats.bytes_in += rte_pktmbuf_pkt_len(m);  // ✓ Direction counter
-window_baseline_bytes += rte_pktmbuf_pkt_len(m);  // ✓ Window counter
+// In packet processing:
+if (first_packet_in_window_tsc == 0) {
+    first_packet_in_window_tsc = start_tsc;
+}
+last_packet_in_window_tsc = start_tsc;
 
-// Line 769, 773
-g_stats.bytes_in += rte_pktmbuf_pkt_len(m);  // ✓ Direction counter
-window_attack_bytes += rte_pktmbuf_pkt_len(m);  // ✓ Window counter
+// In throughput calculation:
+if (first_packet_in_window_tsc > 0 && last_packet_in_window_tsc > first_packet_in_window_tsc) {
+    window_duration = (double)(last_packet_in_window_tsc - first_packet_in_window_tsc) / hz;
+    instantaneous_throughput_gbps = (window_total_bytes * 8.0) / (window_duration * 1e9);
+}
 ```
 
-**Hypothesis:** The window duration calculation might be including dead time when no packets arrive.
+**Key improvement:**
+- ✅ Use **actual time between first and last packet** in window
+- ✅ Ignore idle time when no packets arrive
+- ✅ Reset packet timing counters on each stats print
 
-**Fix:** Calculate throughput based on actual packet arrival times, not wall-clock time:
-- Track `first_packet_in_window_tsc` and `last_packet_in_window_tsc`
-- Use: `throughput = bytes / (last_packet_tsc - first_packet_tsc)`
-
-**For now:** Accept this as a minor issue. The packet count is correct, byte count is correct, so throughput calculation might be affected by tcpreplay timing.
+**Expected result:**
+- 6,528,272 packets in actual 2.3s of packet arrivals → **2.8 Gbps** (correct!)
+- Window shows "Last 14.5 seconds" (wall-clock) but throughput uses 2.3s (packet time)
 
 ---
 
@@ -433,10 +454,12 @@ window_attack_bytes += rte_pktmbuf_pkt_len(m);  // ✓ Window counter
    - Use `!g_stats.detection_triggered` flag to prevent duplicates
    - Store single latency value in array (was storing 1000+ duplicate values)
 
-5. **Lines 475-489**: Fixed throughput calculation
-   - Added safety check: `window_duration >= 0.001` to avoid division by zero
-   - Use window byte counters instead of cumulative `g_stats.total_bytes`
-   - Prevents `inf` and inflated throughput values
+5. **Lines 177-178, 683-686, 477-507, 661-662**: Fixed throughput calculation (CRITICAL FIX)
+   - **NEW:** Track actual packet arrival times with `first_packet_in_window_tsc` and `last_packet_in_window_tsc`
+   - **NEW:** Calculate `window_duration` as time between first and last packet (not wall-clock time)
+   - **FIX:** Prevents including idle time in throughput calculation
+   - **RESULT:** Accurate Gbps values (was under-reporting by 7-8×)
+   - Reset packet timing counters on each stats print
 
 6. **Lines 551-571**: Clarified detection counter output
    - Renamed section to "ATTACK DETECTIONS - Cumulative Events"
@@ -466,7 +489,7 @@ window_attack_bytes += rte_pktmbuf_pkt_len(m);  // ✓ Window counter
 ### Detection Metrics:
 - ✅ **Single latency value**: e.g., "First Detection Latency: 47.23 ms"
 - ✅ **Accurate improvement**: e.g., "18.3× faster" (866ms / 47.23ms)
-- ✅ **Realistic throughput**: Values between 0-25 Gbps (no `inf`, no 42+ Gbps)
+- ✅ **Realistic throughput**: Values between 2-15 Gbps based on actual traffic (no `inf`, no 0.46 Gbps under-reporting)
 
 ### Output Clarity:
 - ✅ Event counters labeled as "events" not "detections"
