@@ -61,6 +61,7 @@ pip3 install scapy
 sudo python3 generate_benign_traffic.py \
     --output ../benign_10M.pcap \
     --packets 10000000 \
+    --src-mac 00:00:00:00:00:01 \
     --dst-mac 0c:42:a1:dd:5b:28 \
     --client-range 192.168.1.0/24 \
     --server-ip 10.0.0.1 \
@@ -251,19 +252,20 @@ Wait until the detector shows "Ready to receive packets..." before starting traf
 ```bash
 cd /local/dpdk_100g/mira
 
-# OPTIMIZED: 12 instances x 90,000 pps = 1.08M pps (~6.9 Gbps)
+# OPTIMIZED: 8 instances x 875 Mbps = 7000 Mbps (7 Gbps)
+# Using --mbps for stable throughput + --loop=0 for continuous replay
 # Duration: 445s (to stop at t=450s)
-for i in {1..12}; do
-    sudo timeout 445 tcpreplay --intf1=ens1f0 --pps=90000 --loop=0 benign_10M.pcap &
+for i in {1..8}; do
+    sudo timeout 445 tcpreplay --intf1=ens1f0 --mbps=875 --loop=0 benign_10M.pcap &
 done
 
 # Verify processes started
 ps aux | grep tcpreplay | wc -l
-# Should show ~12 processes
+# Should show 8 processes
 
 # Monitor throughput in real-time (optional)
 watch -n 1 'ifstat -i ens1f0 1 1'
-# Should show ~6-7 Gbps
+# Should show ~7 Gbps sustained
 ```
 
 ### Step 3: Start Attack Traffic (TG, wait 125s after baseline starts)
@@ -276,20 +278,21 @@ cd /local/dpdk_100g/mira
 # Wait until t=130s
 sleep 125
 
-# OPTIMIZED: 16 instances x 100,000 pps = 1.6M pps (~10.2 Gbps)
+# OPTIMIZED: 10 instances x 1000 Mbps = 10000 Mbps (10 Gbps)
+# Using --mbps for stable throughput + --loop=0 for continuous replay
 # Duration: 320s (to stop at t=450s)
-# Total peak: 6.9 + 10.2 = 17.1 Gbps ✅
-for i in {1..16}; do
-    sudo timeout 320 tcpreplay --intf1=ens1f0 --pps=100000 --loop=0 attack_mixed_10M.pcap &
+# Total peak: 7 + 10 = 17 Gbps ✅
+for i in {1..10}; do
+    sudo timeout 320 tcpreplay --intf1=ens1f0 --mbps=1000 --loop=0 attack_mixed_10M.pcap &
 done
 
 # Verify processes
 ps aux | grep tcpreplay | wc -l
-# Should show ~16 processes
+# Should show 10 processes
 
 # Monitor throughput in real-time (optional)
 watch -n 1 'ifstat -i ens1f0 1 1'
-# Should show ~10-11 Gbps attack + ~7 Gbps benign = ~17-18 Gbps total
+# Should show ~10 Gbps attack + ~7 Gbps benign = ~17 Gbps total sustained
 ```
 
 ---
@@ -438,9 +441,9 @@ Our System:  ██ 50 ms (17× faster)
 |--------|----------------|
 | Baseline duration | 125 seconds (5-130s) |
 | Attack duration | 320 seconds (130-450s) |
-| Baseline throughput | ~6.9 Gbps (1.08M pps - 12 processes × 90K pps) |
-| Attack throughput | ~10.2 Gbps (1.6M pps - 16 processes × 100K pps) |
-| **Total during attack** | **~17-18 Gbps peak** (68-72% of 25G link) |
+| Baseline throughput | **~7 Gbps sustained** (8 processes × 875 Mbps, --loop=0) |
+| Attack throughput | **~10 Gbps sustained** (10 processes × 1000 Mbps, --loop=0) |
+| **Total during attack** | **~17 Gbps sustained** (68% of 25G link) |
 | **Detection latency** | **< 50 ms** (vs MULTI-LF 866 ms) |
 | **Detection delay from attack start** | **< 100 ms** |
 | **Improvement factor** | **17× faster detection** |
@@ -556,11 +559,18 @@ cd /local/dpdk_100g/mira
 
 # Generate PCAP (one time) - 10M packets for 17-18 Gbps target
 cd benign_generator
-sudo python3 generate_benign_traffic.py --output ../benign_10M.pcap --packets 10000000 --dst-mac 0c:42:a1:dd:5b:28
+sudo python3 generate_benign_traffic.py \
+    --output ../benign_10M.pcap \
+    --packets 10000000 \
+    --src-mac 00:00:00:00:00:01 \
+    --dst-mac 0c:42:a1:dd:5b:28 \
+    --client-range 192.168.1.0/24 \
+    --server-ip 10.0.0.1 \
+    --clients 500
 
 # Send traffic (after detector starts, wait 5s)
 cd /local/dpdk_100g/mira
-for i in {1..12}; do sudo timeout 445 tcpreplay --intf1=ens1f0 --pps=90000 --loop=0 benign_10M.pcap & done
+for i in {1..8}; do sudo timeout 445 tcpreplay --intf1=ens1f0 --mbps=875 --loop=0 benign_10M.pcap & done
 ```
 
 ### TG (Attack)
@@ -582,7 +592,7 @@ sudo python3 generate_mirai_attacks.py \
 # Send traffic (125 seconds after benign starts)
 cd /local/dpdk_100g/mira
 sleep 125
-for i in {1..16}; do sudo timeout 320 tcpreplay --intf1=ens1f0 --pps=100000 --loop=0 attack_mixed_10M.pcap & done
+for i in {1..10}; do sudo timeout 320 tcpreplay --intf1=ens1f0 --mbps=1000 --loop=0 attack_mixed_10M.pcap & done
 ```
 
 ---

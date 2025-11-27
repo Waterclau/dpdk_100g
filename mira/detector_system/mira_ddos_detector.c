@@ -37,19 +37,26 @@
 #define MBUF_CACHE_SIZE 250
 #define BURST_SIZE 128
 
-/* Detection thresholds - ADJUSTED for 1.875M pps / 200 IPs = ~9,375 pps per IP */
-#define UDP_PPS_THRESHOLD 5000          /* UDP packets per second per IP (was 50K) */
-#define SYN_RATE_THRESHOLD 3000         /* SYN packets per second per IP (was 30K) */
-#define HTTP_CONN_THRESHOLD 2000        /* New HTTP connections per second (was 10K) */
-#define ICMP_PPS_THRESHOLD 3000         /* ICMP packets per second per IP (was 20K) */
-#define TOTAL_PPS_THRESHOLD 8000        /* Total pps from single IP (was 100K) */
+/* Detection thresholds - SEPARATED for baseline vs attack traffic */
+/* Baseline thresholds (192.168.1.x) - Higher tolerance for legitimate traffic */
+#define BASELINE_UDP_THRESHOLD 10000    /* Baseline: benign UDP traffic */
+#define BASELINE_SYN_THRESHOLD 8000     /* Baseline: benign SYN connections */
+#define BASELINE_HTTP_THRESHOLD 10000   /* Baseline: benign HTTP requests */
+#define BASELINE_ICMP_THRESHOLD 5000    /* Baseline: benign ICMP (ping) */
+#define BASELINE_TOTAL_PPS_THRESHOLD 20000  /* Baseline: total packet rate */
 
-/* New attack-specific thresholds */
-#define DNS_AMP_THRESHOLD 2000          /* DNS queries per second (was 5K) */
-#define NTP_AMP_THRESHOLD 1500          /* NTP queries per second (was 4K) */
-#define ACK_FLOOD_THRESHOLD 4000        /* Pure ACK packets per second (was 25K) */
-#define HTTP_FLOOD_THRESHOLD 2500       /* HTTP requests per second (was 8K) */
-#define FRAG_THRESHOLD 1000             /* Fragmented packets per second (was 3K) */
+/* Attack thresholds (203.0.113.x) - Strict detection for attack traffic */
+#define ATTACK_UDP_THRESHOLD 5000       /* Attack: UDP flood detection */
+#define ATTACK_SYN_THRESHOLD 3000       /* Attack: SYN flood detection */
+#define ATTACK_HTTP_THRESHOLD 2500      /* Attack: HTTP flood detection */
+#define ATTACK_ICMP_THRESHOLD 3000      /* Attack: ICMP flood detection */
+#define ATTACK_TOTAL_PPS_THRESHOLD 8000 /* Attack: packet flood detection */
+
+/* Protocol-specific thresholds (apply to attack traffic only) */
+#define DNS_AMP_THRESHOLD 2000          /* DNS amplification detection */
+#define NTP_AMP_THRESHOLD 1500          /* NTP amplification detection */
+#define ACK_FLOOD_THRESHOLD 4000        /* Pure ACK flood detection */
+#define FRAG_THRESHOLD 1000             /* Fragmentation attack detection */
 
 /* Time windows */
 #define FAST_DETECTION_INTERVAL 0.05    /* 50ms detection granularity (vs MULTI-LF 1000ms) */
@@ -245,6 +252,10 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             /* FILTER FALSE POSITIVES: Skip server IP (10.0.0.1) */
             if (ip->ip_addr == SERVER_IP) continue;
 
+            /* Determine if this IP is from baseline or attack network */
+            bool is_baseline = ((ip->ip_addr & NETWORK_MASK) == BASELINE_NETWORK);
+            bool is_attack = ((ip->ip_addr & NETWORK_MASK) == ATTACK_NETWORK);
+
             /* Calculate rates */
             double udp_pps = (double)ip->udp_packets / window_sec;
             double tcp_pps = (double)ip->tcp_packets / window_sec;
@@ -252,80 +263,63 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             double syn_pps = (double)ip->syn_packets / window_sec;
             double total_pps = (double)ip->total_packets / window_sec;
 
+            /* Select appropriate thresholds based on source network */
+            uint32_t udp_threshold = is_attack ? ATTACK_UDP_THRESHOLD : BASELINE_UDP_THRESHOLD;
+            uint32_t syn_threshold = is_attack ? ATTACK_SYN_THRESHOLD : BASELINE_SYN_THRESHOLD;
+            uint32_t http_threshold = is_attack ? ATTACK_HTTP_THRESHOLD : BASELINE_HTTP_THRESHOLD;
+            uint32_t icmp_threshold = is_attack ? ATTACK_ICMP_THRESHOLD : BASELINE_ICMP_THRESHOLD;
+            uint32_t total_threshold = is_attack ? ATTACK_TOTAL_PPS_THRESHOLD : BASELINE_TOTAL_PPS_THRESHOLD;
+
             /* Rule 1: UDP Flood detection */
-            if (udp_pps > UDP_PPS_THRESHOLD) {
+            if (udp_pps > udp_threshold) {
                 g_stats.udp_flood_detections++;
                 g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "UDP FLOOD from %u.%u.%u.%u: %.0f pps (threshold: %d) | ",
+                        "UDP FLOOD from %u.%u.%u.%u: %.0f pps (threshold: %u) | ",
                         (ip->ip_addr >> 24) & 0xFF,
                         (ip->ip_addr >> 16) & 0xFF,
                         (ip->ip_addr >> 8) & 0xFF,
                         ip->ip_addr & 0xFF,
-                        udp_pps, UDP_PPS_THRESHOLD);
+                        udp_pps, udp_threshold);
                 attack_detected = true;
-
-                /* Calculate and store detection latency for THIS attack */
-                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
-                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
-                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
-                    detection_latencies[latency_count++] = latency_ms;
-                    g_stats.detection_latency_ms = latency_ms;
-                }
             }
 
             /* Rule 2: SYN Flood detection */
-            if (syn_pps > SYN_RATE_THRESHOLD) {
+            if (syn_pps > syn_threshold) {
                 g_stats.syn_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "SYN FLOOD from %u.%u.%u.%u: %.0f SYN/s (threshold: %d) | ",
+                        "SYN FLOOD from %u.%u.%u.%u: %.0f SYN/s (threshold: %u) | ",
                         (ip->ip_addr >> 24) & 0xFF,
                         (ip->ip_addr >> 16) & 0xFF,
                         (ip->ip_addr >> 8) & 0xFF,
                         ip->ip_addr & 0xFF,
-                        syn_pps, SYN_RATE_THRESHOLD);
+                        syn_pps, syn_threshold);
                 attack_detected = true;
-
-                /* Calculate and store detection latency for THIS attack */
-                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
-                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
-                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
-                    detection_latencies[latency_count++] = latency_ms;
-                    g_stats.detection_latency_ms = latency_ms;
-                }
             }
 
             /* Rule 3: ICMP Flood detection */
-            if (icmp_pps > ICMP_PPS_THRESHOLD) {
+            if (icmp_pps > icmp_threshold) {
                 g_stats.icmp_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "ICMP FLOOD from %u.%u.%u.%u: %.0f pps (threshold: %d) | ",
+                        "ICMP FLOOD from %u.%u.%u.%u: %.0f pps (threshold: %u) | ",
                         (ip->ip_addr >> 24) & 0xFF,
                         (ip->ip_addr >> 16) & 0xFF,
                         (ip->ip_addr >> 8) & 0xFF,
                         ip->ip_addr & 0xFF,
-                        icmp_pps, ICMP_PPS_THRESHOLD);
+                        icmp_pps, icmp_threshold);
                 attack_detected = true;
-
-                /* Calculate and store detection latency for THIS attack */
-                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
-                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
-                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
-                    detection_latencies[latency_count++] = latency_ms;
-                    g_stats.detection_latency_ms = latency_ms;
-                }
             }
 
-            /* Rule 4: DNS Amplification detection */
+            /* Rule 4: DNS Amplification detection (attack network only) */
             double dns_pps = (double)ip->dns_queries / window_sec;
-            if (dns_pps > DNS_AMP_THRESHOLD) {
+            if (is_attack && dns_pps > DNS_AMP_THRESHOLD) {
                 g_stats.dns_amp_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
@@ -338,19 +332,11 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                         ip->ip_addr & 0xFF,
                         dns_pps, DNS_AMP_THRESHOLD);
                 attack_detected = true;
-
-                /* Calculate and store detection latency for THIS attack */
-                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
-                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
-                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
-                    detection_latencies[latency_count++] = latency_ms;
-                    g_stats.detection_latency_ms = latency_ms;
-                }
             }
 
-            /* Rule 5: NTP Amplification detection */
+            /* Rule 5: NTP Amplification detection (attack network only) */
             double ntp_pps = (double)ip->ntp_queries / window_sec;
-            if (ntp_pps > NTP_AMP_THRESHOLD) {
+            if (is_attack && ntp_pps > NTP_AMP_THRESHOLD) {
                 g_stats.ntp_amp_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
@@ -363,19 +349,11 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                         ip->ip_addr & 0xFF,
                         ntp_pps, NTP_AMP_THRESHOLD);
                 attack_detected = true;
-
-                /* Calculate and store detection latency for THIS attack */
-                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
-                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
-                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
-                    detection_latencies[latency_count++] = latency_ms;
-                    g_stats.detection_latency_ms = latency_ms;
-                }
             }
 
-            /* Rule 6: ACK Flood detection */
+            /* Rule 6: ACK Flood detection (attack network only) */
             double ack_pps = (double)ip->pure_ack_packets / window_sec;
-            if (ack_pps > ACK_FLOOD_THRESHOLD) {
+            if (is_attack && ack_pps > ACK_FLOOD_THRESHOLD) {
                 g_stats.ack_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
@@ -388,44 +366,28 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                         ip->ip_addr & 0xFF,
                         ack_pps, ACK_FLOOD_THRESHOLD);
                 attack_detected = true;
-
-                /* Calculate and store detection latency for THIS attack */
-                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
-                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
-                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
-                    detection_latencies[latency_count++] = latency_ms;
-                    g_stats.detection_latency_ms = latency_ms;
-                }
             }
 
-            /* Rule 7: HTTP Flood detection (specific threshold) */
+            /* Rule 7: HTTP Flood detection */
             double http_pps = (double)ip->http_requests / window_sec;
-            if (http_pps > HTTP_FLOOD_THRESHOLD) {
+            if (http_pps > http_threshold) {
                 g_stats.http_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "HTTP FLOOD from %u.%u.%u.%u: %.0f rps (threshold: %d) | ",
+                        "HTTP FLOOD from %u.%u.%u.%u: %.0f rps (threshold: %u) | ",
                         (ip->ip_addr >> 24) & 0xFF,
                         (ip->ip_addr >> 16) & 0xFF,
                         (ip->ip_addr >> 8) & 0xFF,
                         ip->ip_addr & 0xFF,
-                        http_pps, HTTP_FLOOD_THRESHOLD);
+                        http_pps, http_threshold);
                 attack_detected = true;
-
-                /* Calculate and store detection latency for THIS attack */
-                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
-                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
-                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
-                    detection_latencies[latency_count++] = latency_ms;
-                    g_stats.detection_latency_ms = latency_ms;
-                }
             }
 
-            /* Rule 8: Fragmentation Attack detection */
+            /* Rule 8: Fragmentation Attack detection (attack network only) */
             double frag_pps = (double)ip->fragmented_packets / window_sec;
-            if (frag_pps > FRAG_THRESHOLD) {
+            if (is_attack && frag_pps > FRAG_THRESHOLD) {
                 g_stats.frag_attack_detections++;
                 if (g_stats.alert_level < ALERT_MEDIUM)
                     g_stats.alert_level = ALERT_MEDIUM;
@@ -438,47 +400,42 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                         ip->ip_addr & 0xFF,
                         frag_pps, FRAG_THRESHOLD);
                 attack_detected = true;
-
-                /* Calculate and store detection latency for THIS attack */
-                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
-                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
-                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
-                    detection_latencies[latency_count++] = latency_ms;
-                    g_stats.detection_latency_ms = latency_ms;
-                }
             }
 
             /* Rule 9: General packet flood */
-            if (total_pps > TOTAL_PPS_THRESHOLD) {
+            if (total_pps > total_threshold) {
                 g_stats.total_flood_detections++;
                 if (g_stats.alert_level < ALERT_MEDIUM)
                     g_stats.alert_level = ALERT_MEDIUM;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "PACKET FLOOD from %u.%u.%u.%u: %.0f pps (threshold: %d) | ",
+                        "PACKET FLOOD from %u.%u.%u.%u: %.0f pps (threshold: %u) | ",
                         (ip->ip_addr >> 24) & 0xFF,
                         (ip->ip_addr >> 16) & 0xFF,
                         (ip->ip_addr >> 8) & 0xFF,
                         ip->ip_addr & 0xFF,
-                        total_pps, TOTAL_PPS_THRESHOLD);
+                        total_pps, total_threshold);
                 attack_detected = true;
-
-                /* Calculate and store detection latency for THIS attack */
-                if (g_stats.first_attack_packet_tsc > 0 && latency_count < MAX_LATENCIES) {
-                    uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
-                    double latency_ms = (double)latency_cycles * 1000.0 / hz;
-                    detection_latencies[latency_count++] = latency_ms;
-                    g_stats.detection_latency_ms = latency_ms;
-                }
             }
         }
 
-        /* Capture FIRST detection time (MULTI-LF comparison) */
+        /* Capture FIRST detection time (MULTI-LF comparison) - ONLY ONCE */
         if (attack_detected && !g_stats.detection_triggered) {
             g_stats.first_detection_tsc = cur_tsc;
             g_stats.detection_triggered = true;
             g_stats.packets_until_detection = g_stats.total_packets;
             g_stats.bytes_until_detection = g_stats.total_bytes;
+
+            /* Calculate detection latency: time from first attack packet to first detection */
+            if (g_stats.first_attack_packet_tsc > 0) {
+                uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
+                g_stats.detection_latency_ms = (double)latency_cycles * 1000.0 / hz;
+
+                /* Store in latencies array (only once) */
+                if (latency_count < MAX_LATENCIES) {
+                    detection_latencies[latency_count++] = g_stats.detection_latency_ms;
+                }
+            }
         }
 
         /* CRITICAL FIX: Reset detection window every DETECTION_WINDOW_SEC */
@@ -518,14 +475,18 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
     /* Calculate INSTANTANEOUS throughput (last 5 seconds) */
     double window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
     double instantaneous_throughput_gbps = 0.0;
-    if (window_duration > 0) {
+    if (window_duration >= 0.001) {  /* Avoid division by zero */
         uint64_t window_total_bytes = window_baseline_bytes + window_attack_bytes;
         instantaneous_throughput_gbps = (window_total_bytes * 8.0) / (window_duration * 1e9);
     }
 
-    /* Calculate global throughput */
-    double global_window_duration = (double)(cur_tsc - g_stats.window_start_tsc) / hz;
-    g_stats.throughput_gbps = (g_stats.total_bytes * 8.0) / (global_window_duration * 1e9);
+    /* Calculate global throughput using WINDOW bytes, not cumulative total */
+    if (window_duration >= 0.001) {  /* Avoid division by zero */
+        uint64_t window_total_bytes = window_baseline_bytes + window_attack_bytes;
+        g_stats.throughput_gbps = (window_total_bytes * 8.0) / (window_duration * 1e9);
+    } else {
+        g_stats.throughput_gbps = 0.0;
+    }
 
     if (g_stats.total_packets > 0) {
         g_stats.cycles_per_packet = (double)g_stats.total_processing_cycles / g_stats.total_packets;
@@ -588,16 +549,17 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
         g_stats.dns_queries);
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
-        "[ATTACK DETECTIONS]\n"
-        "  UDP floods:         %" PRIu64 "\n"
-        "  SYN floods:         %" PRIu64 "\n"
-        "  HTTP floods:        %" PRIu64 "\n"
-        "  ICMP floods:        %" PRIu64 "\n"
-        "  DNS amplification:  %" PRIu64 "\n"
-        "  NTP amplification:  %" PRIu64 "\n"
-        "  ACK floods:         %" PRIu64 "\n"
-        "  Fragmentation:      %" PRIu64 "\n"
-        "  Total detections:   %" PRIu64 "\n\n",
+        "[ATTACK DETECTIONS - Cumulative Events]\n"
+        "  UDP flood events:   %" PRIu64 "\n"
+        "  SYN flood events:   %" PRIu64 "\n"
+        "  HTTP flood events:  %" PRIu64 "\n"
+        "  ICMP flood events:  %" PRIu64 "\n"
+        "  DNS amp events:     %" PRIu64 "\n"
+        "  NTP amp events:     %" PRIu64 "\n"
+        "  ACK flood events:   %" PRIu64 "\n"
+        "  Frag attack events: %" PRIu64 "\n"
+        "  Packet flood events:%" PRIu64 "\n"
+        "  (Note: Events count IPs exceeding thresholds per 50ms window)\n\n",
         g_stats.udp_flood_detections,
         g_stats.syn_flood_detections,
         g_stats.http_flood_detections,
@@ -634,42 +596,18 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
 
     /* MULTI-LF Comparison Section */
     if (g_stats.detection_triggered) {
-        /* Calculate average latency */
-        double avg_latency = 0.0;
-        if (latency_count > 0) {
-            for (int i = 0; i < latency_count; i++) {
-                avg_latency += detection_latencies[i];
-            }
-            avg_latency /= latency_count;
-        }
-
         len += snprintf(buffer + len, sizeof(buffer) - len,
             "[MULTI-LF (2025) COMPARISON]\n"
             "=== Detection Performance vs ML-Based System ===\n\n"
-            "  Latest Detection Latency:  %.2f ms (vs MULTI-LF: 866 ms)\n"
+            "  First Detection Latency:   %.2f ms (vs MULTI-LF: 866 ms)\n"
             "    Improvement:             %.1f× faster\n\n"
-            "  Total detections:          %d\n"
-            "  Average latency:           %.2f ms\n\n"
-            "  Packets until first detect: %" PRIu64 "\n"
-            "  Bytes until first detect:   %" PRIu64 " (%.2f MB)\n\n",
+            "  Packets until detection:   %" PRIu64 "\n"
+            "  Bytes until detection:     %" PRIu64 " (%.2f MB)\n\n",
             g_stats.detection_latency_ms,
             866.0 / (g_stats.detection_latency_ms > 0 ? g_stats.detection_latency_ms : 1.0),
-            latency_count,
-            avg_latency,
             g_stats.packets_until_detection,
             g_stats.bytes_until_detection,
             g_stats.bytes_until_detection / (1024.0 * 1024.0));
-
-        /* Show last 10 detection latencies */
-        if (latency_count > 0) {
-            len += snprintf(buffer + len, sizeof(buffer) - len, "  Last detection latencies:\n");
-            int start = latency_count > 10 ? latency_count - 10 : 0;
-            for (int i = start; i < latency_count; i++) {
-                len += snprintf(buffer + len, sizeof(buffer) - len,
-                    "    [%d] %.2f ms\n", i + 1, detection_latencies[i]);
-            }
-            len += snprintf(buffer + len, sizeof(buffer) - len, "\n");
-        }
 
         len += snprintf(buffer + len, sizeof(buffer) - len,
             "  DPDK Advantages:\n"
