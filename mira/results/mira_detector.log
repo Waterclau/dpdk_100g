@@ -4,114 +4,24 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      1
-  Baseline (192.168): 0 (0.0%)
+  Total packets:      866879
+  Baseline (192.168): 554235 (63.9%)
   Attack (203.0.113): 0 (0.0%)
-  TCP packets:        0
-  UDP packets:        0
-  ICMP packets:       0
-
-[INSTANTANEOUS TRAFFIC - Last 11.8 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        0
-  SYN-ACK packets:    0
-  SYN/ACK ratio:      0.00
-  HTTP requests:      0
-  DNS queries:        0
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      570 cycles
-  Throughput:         0.00 Gbps
-  Active IPs:         0
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      2
-  Baseline (192.168): 0 (0.0%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        0
-  UDP packets:        0
-  ICMP packets:       0
-
-[INSTANTANEOUS TRAFFIC - Last 30.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        0
-  SYN-ACK packets:    0
-  SYN/ACK ratio:      0.00
-  HTTP requests:      0
-  DNS queries:        0
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      420 cycles
-  Throughput:         0.00 Gbps
-  Active IPs:         0
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      1989499
-  Baseline (192.168): 1270282 (63.8%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        1741910
-  UDP packets:        184905
-  ICMP packets:       62682
+  TCP packets:        764144
+  UDP packets:        77472
+  ICMP packets:       25262
 
 [INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 1270282 pkts (100.0%)  0.21 Gbps
+  Baseline (192.168): 554235 pkts (100.0%)  0.09 Gbps
   Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.21 Gbps
+  Total throughput:   0.09 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        391664
-  SYN-ACK packets:    195832
+  SYN packets:        172098
+  SYN-ACK packets:    86048
   SYN/ACK ratio:      2.00
-  HTTP requests:      907499
-  DNS queries:        129986
+  HTTP requests:      399600
+  DNS queries:        54304
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -129,8 +39,8 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      441 cycles
-  Throughput:         0.06 Gbps
+  Cycles/packet:      464 cycles
+  Throughput:         0.23 Gbps
   Active IPs:         257
 
 
@@ -139,24 +49,24 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      8230375
-  Baseline (192.168): 5264090 (64.0%)
+  Total packets:      6258988
+  Baseline (192.168): 4002325 (63.9%)
   Attack (203.0.113): 0 (0.0%)
-  TCP packets:        7231993
-  UDP packets:        742514
-  ICMP packets:       255866
+  TCP packets:        5521481
+  UDP packets:        547195
+  ICMP packets:       190311
 
 [INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3993808 pkts (100.0%)  0.67 Gbps
+  Baseline (192.168): 3448090 pkts (100.0%)  0.57 Gbps
   Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.67 Gbps
+  Total throughput:   0.57 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        1627165
-  SYN-ACK packets:    813582
+  SYN packets:        1242828
+  SYN-ACK packets:    621414
   SYN/ACK ratio:      2.00
-  HTTP requests:      3752108
-  DNS queries:        516056
+  HTTP requests:      2878111
+  DNS queries:        382734
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -174,8 +84,8 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         0.21 Gbps
+  Cycles/packet:      469 cycles
+  Throughput:         0.81 Gbps
   Active IPs:         257
 
 
@@ -184,24 +94,24 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      14471241
-  Baseline (192.168): 9254893 (64.0%)
+  Total packets:      11651095
+  Baseline (192.168): 7451716 (64.0%)
   Attack (203.0.113): 0 (0.0%)
-  TCP packets:        12723925
-  UDP packets:        1298888
-  ICMP packets:       448426
+  TCP packets:        10283633
+  UDP packets:        1017274
+  ICMP packets:       350187
 
 [INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3990803 pkts (100.0%)  0.66 Gbps
+  Baseline (192.168): 3449391 pkts (100.0%)  0.57 Gbps
   Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
+  Total throughput:   0.57 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        2863258
-  SYN-ACK packets:    1431628
+  SYN packets:        2315329
+  SYN-ACK packets:    1157664
   SYN/ACK ratio:      2.00
-  HTTP requests:      6629129
-  DNS queries:        907548
+  HTTP requests:      5351286
+  DNS queries:        711846
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -219,8 +129,8 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         0.33 Gbps
+  Cycles/packet:      470 cycles
+  Throughput:         1.01 Gbps
   Active IPs:         257
 
 
@@ -229,24 +139,24 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      20712110
-  Baseline (192.168): 13247401 (64.0%)
+  Total packets:      17043198
+  Baseline (192.168): 10900479 (64.0%)
   Attack (203.0.113): 0 (0.0%)
-  TCP packets:        18223598
-  UDP packets:        1851368
-  ICMP packets:       637142
+  TCP packets:        15031726
+  UDP packets:        1495949
+  ICMP packets:       515522
 
 [INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3992508 pkts (100.0%)  0.66 Gbps
+  Baseline (192.168): 3448763 pkts (100.0%)  0.57 Gbps
   Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
+  Total throughput:   0.57 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        4101126
-  SYN-ACK packets:    2050562
+  SYN packets:        3384498
+  SYN-ACK packets:    1692249
   SYN/ACK ratio:      2.00
-  HTTP requests:      9481230
-  DNS queries:        1293069
+  HTTP requests:      7816763
+  DNS queries:        1043384
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -264,727 +174,7 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         0.44 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      26952978
-  Baseline (192.168): 17237978 (64.0%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        23720186
-  UDP packets:        2405282
-  ICMP packets:       827508
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3990577 pkts (100.0%)  0.67 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.67 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        5339270
-  SYN-ACK packets:    2669633
-  SYN/ACK ratio:      2.00
-  HTTP requests:      12315085
-  DNS queries:        1679144
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      444 cycles
-  Throughput:         0.53 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      33193849
-  Baseline (192.168): 21230393 (64.0%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        29221795
-  UDP packets:        2961228
-  ICMP packets:       1010824
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3992415 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        6578982
-  SYN-ACK packets:    3289491
-  SYN/ACK ratio:      2.00
-  HTTP requests:      15175078
-  DNS queries:        2067892
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      444 cycles
-  Throughput:         0.60 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      39434722
-  Baseline (192.168): 25220402 (64.0%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        34734285
-  UDP packets:        3501646
-  ICMP packets:       1198788
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3990009 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        7819038
-  SYN-ACK packets:    3909517
-  SYN/ACK ratio:      2.00
-  HTTP requests:      18033566
-  DNS queries:        2449728
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      444 cycles
-  Throughput:         0.67 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      45675581
-  Baseline (192.168): 29210548 (64.0%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        40229165
-  UDP packets:        4055659
-  ICMP packets:       1390754
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3990146 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        9055587
-  SYN-ACK packets:    4527790
-  SYN/ACK ratio:      2.00
-  HTTP requests:      20884517
-  DNS queries:        2835312
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      444 cycles
-  Throughput:         0.73 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      51916455
-  Baseline (192.168): 33203568 (64.0%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        45730020
-  UDP packets:        4609074
-  ICMP packets:       1577358
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3993020 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        10294040
-  SYN-ACK packets:    5147019
-  SYN/ACK ratio:      2.00
-  HTTP requests:      23744687
-  DNS queries:        3221034
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         0.78 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      58157328
-  Baseline (192.168): 37199870 (64.0%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        51228120
-  UDP packets:        5158939
-  ICMP packets:       1770266
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3996302 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        11532864
-  SYN-ACK packets:    5766430
-  SYN/ACK ratio:      2.00
-  HTTP requests:      26607097
-  DNS queries:        3599083
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         0.83 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      64398185
-  Baseline (192.168): 41185278 (64.0%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        56734467
-  UDP packets:        5703789
-  ICMP packets:       1959926
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3985408 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        12770888
-  SYN-ACK packets:    6385444
-  SYN/ACK ratio:      2.00
-  HTTP requests:      29456952
-  DNS queries:        3982908
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         0.87 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      70639061
-  Baseline (192.168): 45174424 (64.0%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        62239622
-  UDP packets:        6248892
-  ICMP packets:       2150544
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3989146 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        14009196
-  SYN-ACK packets:    7004597
-  SYN/ACK ratio:      2.00
-  HTTP requests:      32305813
-  DNS queries:        4364527
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         0.91 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      76879921
-  Baseline (192.168): 49167854 (64.0%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        67751025
-  UDP packets:        6788862
-  ICMP packets:       2340030
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3993430 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        15249277
-  SYN-ACK packets:    7624638
-  SYN/ACK ratio:      2.00
-  HTTP requests:      35164778
-  DNS queries:        4742540
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         0.94 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      83120793
-  Baseline (192.168): 53155632 (63.9%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        73247572
-  UDP packets:        7336949
-  ICMP packets:       2536268
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3987778 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        16487057
-  SYN-ACK packets:    8243528
-  SYN/ACK ratio:      2.00
-  HTTP requests:      38018575
-  DNS queries:        5124731
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         0.97 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      89361664
-  Baseline (192.168): 57146973 (64.0%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        78753272
-  UDP packets:        7881442
-  ICMP packets:       2726946
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3991341 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        17726643
-  SYN-ACK packets:    8863321
-  SYN/ACK ratio:      2.00
-  HTTP requests:      40882634
-  DNS queries:        5503344
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         1.00 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      95602528
-  Baseline (192.168): 61134555 (63.9%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        84246831
-  UDP packets:        8434555
-  ICMP packets:       2921138
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3987582 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        18965464
-  SYN-ACK packets:    9482731
-  SYN/ACK ratio:      2.00
-  HTTP requests:      43736689
-  DNS queries:        5888496
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         1.02 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      101843383
-  Baseline (192.168): 65119497 (63.9%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        89756098
-  UDP packets:        8973511
-  ICMP packets:       3113770
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3984942 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        20204850
-  SYN-ACK packets:    10102425
-  SYN/ACK ratio:      2.00
-  HTTP requests:      46606345
-  DNS queries:        6264326
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         1.05 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      108084251
-  Baseline (192.168): 69106146 (63.9%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        95254639
-  UDP packets:        9522981
-  ICMP packets:       3306627
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3986649 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        21443266
-  SYN-ACK packets:    10721631
-  SYN/ACK ratio:      2.00
-  HTTP requests:      49460148
-  DNS queries:        6644968
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         1.07 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      114325118
-  Baseline (192.168): 73089851 (63.9%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        100756784
-  UDP packets:        10067203
-  ICMP packets:       3501126
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3983705 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        22682620
-  SYN-ACK packets:    11341308
-  SYN/ACK ratio:      2.00
-  HTTP requests:      52306919
-  DNS queries:        7026374
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         1.09 Gbps
-  Active IPs:         257
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      120565980
-  Baseline (192.168): 77076236 (63.9%)
-  Attack (203.0.113): 0 (0.0%)
-  TCP packets:        106248151
-  UDP packets:        10623246
-  ICMP packets:       3694578
-
-[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3986385 pkts (100.0%)  0.66 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        23917395
-  SYN-ACK packets:    11958697
-  SYN/ACK ratio:      2.00
-  HTTP requests:      55156402
-  DNS queries:        7415204
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
+  Cycles/packet:      471 cycles
   Throughput:         1.11 Gbps
   Active IPs:         257
 
@@ -994,24 +184,24 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      126806846
-  Baseline (192.168): 81064365 (63.9%)
+  Total packets:      22435304
+  Baseline (192.168): 14346901 (63.9%)
   Attack (203.0.113): 0 (0.0%)
-  TCP packets:        111743880
-  UDP packets:        11179031
-  ICMP packets:       3883930
+  TCP packets:        19783987
+  UDP packets:        1969334
+  ICMP packets:       681982
 
 [INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3988129 pkts (100.0%)  0.66 Gbps
+  Baseline (192.168): 3446422 pkts (100.0%)  0.57 Gbps
   Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
+  Total throughput:   0.57 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        25154438
-  SYN-ACK packets:    12577216
+  SYN packets:        4454893
+  SYN-ACK packets:    2227446
   SYN/ACK ratio:      2.00
-  HTTP requests:      58001759
-  DNS queries:        7802759
+  HTTP requests:      10291845
+  DNS queries:        1373516
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1029,8 +219,8 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         1.13 Gbps
+  Cycles/packet:      471 cycles
+  Throughput:         1.17 Gbps
   Active IPs:         257
 
 
@@ -1039,24 +229,24 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      133047712
-  Baseline (192.168): 85057062 (63.9%)
+  Total packets:      27827412
+  Baseline (192.168): 17795207 (63.9%)
   Attack (203.0.113): 0 (0.0%)
-  TCP packets:        117231537
-  UDP packets:        11739150
-  ICMP packets:       4077020
+  TCP packets:        24535351
+  UDP packets:        2445158
+  ICMP packets:       846902
 
 [INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3992697 pkts (100.0%)  0.67 Gbps
+  Baseline (192.168): 3448306 pkts (100.0%)  0.57 Gbps
   Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.67 Gbps
+  Total throughput:   0.57 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        26389502
-  SYN-ACK packets:    13194750
+  SYN packets:        5523554
+  SYN-ACK packets:    2761777
   SYN/ACK ratio:      2.00
-  HTTP requests:      60843585
-  DNS queries:        8190946
+  HTTP requests:      12771204
+  DNS queries:        1706232
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1074,8 +264,8 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         1.14 Gbps
+  Cycles/packet:      471 cycles
+  Throughput:         1.21 Gbps
   Active IPs:         257
 
 
@@ -1084,24 +274,24 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      139288576
-  Baseline (192.168): 89048500 (63.9%)
+  Total packets:      33219517
+  Baseline (192.168): 21243646 (63.9%)
   Attack (203.0.113): 0 (0.0%)
-  TCP packets:        122725068
-  UDP packets:        12293587
-  ICMP packets:       4269916
+  TCP packets:        29292871
+  UDP packets:        2915688
+  ICMP packets:       1010956
 
 [INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3991438 pkts (100.0%)  0.66 Gbps
+  Baseline (192.168): 3448439 pkts (100.0%)  0.57 Gbps
   Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.66 Gbps
+  Total throughput:   0.57 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        27625941
-  SYN-ACK packets:    13812970
+  SYN packets:        6594405
+  SYN-ACK packets:    3297202
   SYN/ACK ratio:      2.00
-  HTTP requests:      63721356
-  DNS queries:        8580891
+  HTTP requests:      15248998
+  DNS queries:        2032222
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1119,8 +309,8 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      443 cycles
-  Throughput:         1.16 Gbps
+  Cycles/packet:      471 cycles
+  Throughput:         1.24 Gbps
   Active IPs:         257
 
 
@@ -1129,24 +319,24 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      146136624
-  Baseline (192.168): 93041029 (63.7%)
-  Attack (203.0.113): 607191 (0.4%)
-  TCP packets:        128225187
-  UDP packets:        13453496
-  ICMP packets:       4457936
+  Total packets:      38611623
+  Baseline (192.168): 24692384 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        34037332
+  UDP packets:        3398273
+  ICMP packets:       1176016
 
 [INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
-  Baseline (192.168): 3992529 pkts (86.8%)  0.66 Gbps
-  Attack (203.0.113): 607191 pkts (13.2%)  0.75 Gbps
-  Total throughput:   1.41 Gbps
+  Baseline (192.168): 3448738 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        28863817
-  SYN-ACK packets:    14431908
+  SYN packets:        7662913
+  SYN-ACK packets:    3831456
   SYN/ACK ratio:      2.00
-  HTTP requests:      66574915
-  DNS queries:        9043335
+  HTTP requests:      17724217
+  DNS queries:        2368319
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1164,54 +354,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      444 cycles
-  Throughput:         1.20 Gbps
-  Active IPs:         258
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414810
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 7.6 seconds]
-  Baseline (192.168): 2327198 pkts (33.4%)  0.26 Gbps
-  Attack (203.0.113): 4638418 pkts (66.6%)  2.03 Gbps
-  Total throughput:   2.28 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      471 cycles
   Throughput:         1.26 Gbps
-  Active IPs:         263
+  Active IPs:         257
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1219,24 +364,24 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414813
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      44003727
+  Baseline (192.168): 28139337 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        38796095
+  UDP packets:        3864170
+  ICMP packets:       1343460
 
-[INSTANTANEOUS TRAFFIC - Last 10.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3446953 pkts (100.0%)  0.57 Gbps
   Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
+  Total throughput:   0.57 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        8734459
+  SYN-ACK packets:    4367229
+  SYN/ACK ratio:      2.00
+  HTTP requests:      20197966
+  DNS queries:        2694980
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1254,9 +399,774 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      471 cycles
+  Throughput:         1.27 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      49395833
+  Baseline (192.168): 31587987 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        43554323
+  UDP packets:        4334276
+  ICMP packets:       1507232
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3448650 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        9805599
+  SYN-ACK packets:    4902798
+  SYN/ACK ratio:      2.00
+  HTTP requests:      22685904
+  DNS queries:        3023056
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      472 cycles
+  Throughput:         1.29 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      54787943
+  Baseline (192.168): 35035263 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        48310755
+  UDP packets:        4807562
+  ICMP packets:       1669624
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3447276 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        10876624
+  SYN-ACK packets:    5438312
+  SYN/ACK ratio:      2.00
+  HTTP requests:      25156709
+  DNS queries:        3350392
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      472 cycles
+  Throughput:         1.30 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      60180050
+  Baseline (192.168): 38481712 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        53061723
+  UDP packets:        5281193
+  ICMP packets:       1837132
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3446449 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        11946646
+  SYN-ACK packets:    5973321
+  SYN/ACK ratio:      2.00
+  HTTP requests:      27622403
+  DNS queries:        3680798
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      471 cycles
+  Throughput:         1.31 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      65572156
+  Baseline (192.168): 41930528 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        57818778
+  UDP packets:        5754809
+  ICMP packets:       1998566
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3448816 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        13017270
+  SYN-ACK packets:    6508635
+  SYN/ACK ratio:      2.00
+  HTTP requests:      30097418
+  DNS queries:        4007574
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      471 cycles
+  Throughput:         1.32 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      70964261
+  Baseline (192.168): 45374368 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        62559016
+  UDP packets:        6236784
+  ICMP packets:       2168458
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3443840 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        14084110
+  SYN-ACK packets:    7042055
+  SYN/ACK ratio:      2.00
+  HTTP requests:      32556332
+  DNS queries:        4344006
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      471 cycles
+  Throughput:         1.32 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      76356364
+  Baseline (192.168): 48819565 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        67305074
+  UDP packets:        6717111
+  ICMP packets:       2334176
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3445197 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        15153184
+  SYN-ACK packets:    7576592
+  SYN/ACK ratio:      2.00
+  HTTP requests:      35018121
+  DNS queries:        4680775
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      471 cycles
+  Throughput:         1.33 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      81748462
+  Baseline (192.168): 52265806 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        72062075
+  UDP packets:        7187166
+  ICMP packets:       2499218
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3446241 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        16223530
+  SYN-ACK packets:    8111763
+  SYN/ACK ratio:      2.00
+  HTTP requests:      37492601
+  DNS queries:        5010896
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      471 cycles
+  Throughput:         1.33 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      87140572
+  Baseline (192.168): 55714939 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        76816296
+  UDP packets:        7659105
+  ICMP packets:       2665168
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3449133 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        17294328
+  SYN-ACK packets:    8647164
+  SYN/ACK ratio:      2.00
+  HTTP requests:      39966743
+  DNS queries:        5338864
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      471 cycles
+  Throughput:         1.34 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      92532678
+  Baseline (192.168): 59163306 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        81567399
+  UDP packets:        8135216
+  ICMP packets:       2830060
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3448367 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        18363552
+  SYN-ACK packets:    9181776
+  SYN/ACK ratio:      2.00
+  HTTP requests:      42430318
+  DNS queries:        5664371
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      471 cycles
+  Throughput:         1.34 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      97924785
+  Baseline (192.168): 62608688 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        86323938
+  UDP packets:        8603363
+  ICMP packets:       2997480
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3445382 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        19434504
+  SYN-ACK packets:    9717252
+  SYN/ACK ratio:      2.00
+  HTTP requests:      44894067
+  DNS queries:        5991678
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      471 cycles
+  Throughput:         1.34 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      103316891
+  Baseline (192.168): 66052822 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        91085794
+  UDP packets:        9071455
+  ICMP packets:       3159638
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3444134 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        20505994
+  SYN-ACK packets:    10252996
+  SYN/ACK ratio:      2.00
+  HTTP requests:      47358283
+  DNS queries:        6322778
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      471 cycles
+  Throughput:         1.35 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      108708995
+  Baseline (192.168): 69500155 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        95835334
+  UDP packets:        9549194
+  ICMP packets:       3324463
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3447333 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21574582
+  SYN-ACK packets:    10787291
+  SYN/ACK ratio:      2.00
+  HTTP requests:      49821588
+  DNS queries:        6653880
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      471 cycles
+  Throughput:         1.35 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      114101092
+  Baseline (192.168): 72950274 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        100585923
+  UDP packets:        10027777
+  ICMP packets:       3487388
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3450119 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        22643264
+  SYN-ACK packets:    11321631
+  SYN/ACK ratio:      2.00
+  HTTP requests:      52285319
+  DNS queries:        6984450
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      471 cycles
+  Throughput:         1.35 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      119493200
+  Baseline (192.168): 76400524 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        105340265
+  UDP packets:        10500779
+  ICMP packets:       3652152
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 3450250 pkts (100.0%)  0.57 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.57 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        23713754
+  SYN-ACK packets:    11856875
+  SYN/ACK ratio:      2.00
+  HTTP requests:      54753395
+  DNS queries:        7311952
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      471 cycles
+  Throughput:         1.36 Gbps
+  Active IPs:         257
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394288
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 9.9 seconds]
+  Baseline (192.168): 1486610 pkts (48.6%)  0.12 Gbps
+  Attack (203.0.113): 1573690 pkts (51.4%)  0.24 Gbps
+  Total throughput:   0.36 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         1.29 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394291
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         1.24 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394292
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
   Throughput:         1.19 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1264,12 +1174,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414816
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394295
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -1277,11 +1187,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1299,9 +1209,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         1.15 Gbps
-  Active IPs:         263
+  Cycles/packet:      473 cycles
+  Throughput:         1.14 Gbps
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1309,12 +1219,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414818
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394297
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -1322,11 +1232,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1344,9 +1254,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         1.12 Gbps
-  Active IPs:         263
+  Cycles/packet:      473 cycles
+  Throughput:         1.09 Gbps
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1354,12 +1264,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414822
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394300
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -1367,11 +1277,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1389,54 +1299,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         1.08 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414824
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
   Throughput:         1.05 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1444,12 +1309,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414827
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394303
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -1457,11 +1322,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1479,9 +1344,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         1.02 Gbps
-  Active IPs:         263
+  Cycles/packet:      473 cycles
+  Throughput:         1.01 Gbps
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1489,12 +1354,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414829
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394306
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -1502,11 +1367,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1524,9 +1389,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.99 Gbps
-  Active IPs:         263
+  Cycles/packet:      473 cycles
+  Throughput:         0.97 Gbps
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1534,12 +1399,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414832
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394308
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -1547,11 +1412,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1569,54 +1434,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.96 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414835
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
   Throughput:         0.94 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1624,12 +1444,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414838
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394311
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -1637,11 +1457,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1659,9 +1479,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.91 Gbps
-  Active IPs:         263
+  Cycles/packet:      473 cycles
+  Throughput:         0.90 Gbps
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1669,12 +1489,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414840
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394313
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -1682,11 +1502,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1704,54 +1524,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.89 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414843
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
   Throughput:         0.87 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1759,12 +1534,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414845
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394317
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -1772,11 +1547,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1794,9 +1569,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
   Throughput:         0.85 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1804,12 +1579,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414849
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394319
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -1817,11 +1592,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1839,9 +1614,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.83 Gbps
-  Active IPs:         263
+  Cycles/packet:      473 cycles
+  Throughput:         0.82 Gbps
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1849,12 +1624,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414851
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394322
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -1862,11 +1637,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1884,9 +1659,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.81 Gbps
-  Active IPs:         263
+  Cycles/packet:      473 cycles
+  Throughput:         0.80 Gbps
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1894,12 +1669,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414854
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394324
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -1907,11 +1682,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -1929,54 +1704,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.79 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414856
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
   Throughput:         0.77 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1984,102 +1714,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414859
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 5.8 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.76 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414862
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.3 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.74 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414865
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394327
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -2087,11 +1727,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -2109,9 +1749,54 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
+  Throughput:         0.75 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394330
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
   Throughput:         0.73 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2119,12 +1804,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414867
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394333
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -2132,11 +1817,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -2154,9 +1839,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
   Throughput:         0.71 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2164,12 +1849,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414870
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394335
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -2177,11 +1862,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -2199,9 +1884,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.70 Gbps
-  Active IPs:         263
+  Cycles/packet:      473 cycles
+  Throughput:         0.69 Gbps
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2209,24 +1894,24 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414872
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394338
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
-[INSTANTANEOUS TRAFFIC - Last 5.6 seconds]
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
   Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -2244,54 +1929,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.68 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414876
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.5 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
   Throughput:         0.67 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2299,12 +1939,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414878
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394340
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -2312,11 +1952,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -2334,9 +1974,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
   Throughput:         0.66 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2344,12 +1984,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414881
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394344
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -2357,11 +1997,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -2379,9 +2019,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.65 Gbps
-  Active IPs:         263
+  Cycles/packet:      473 cycles
+  Throughput:         0.64 Gbps
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2389,12 +2029,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414883
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394346
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -2402,11 +2042,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -2424,9 +2064,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
   Throughput:         0.63 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2434,24 +2074,24 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414886
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394349
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
-[INSTANTANEOUS TRAFFIC - Last 5.4 seconds]
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
   Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -2469,54 +2109,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.62 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414889
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.7 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
   Throughput:         0.61 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2524,12 +2119,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414892
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394351
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -2537,11 +2132,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -2559,9 +2154,9 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
   Throughput:         0.60 Gbps
-  Active IPs:         263
+  Active IPs:         260
 
 
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -2569,822 +2164,12 @@
 ╚═══════════════════════════════════════════════════════════════════════╝
 
 [PACKET COUNTERS - GLOBAL]
-  Total packets:      154414894
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.59 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414897
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.58 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414899
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 5.2 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.57 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414903
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 7.0 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.56 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414905
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.55 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414908
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.55 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414910
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.54 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414914
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.53 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414916
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.52 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414919
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.51 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414921
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.51 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414924
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.50 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414927
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.49 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414930
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.49 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414932
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.48 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414935
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.47 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414937
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.47 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414941
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
-
-[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
-  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
-  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
-  Total throughput:   0.00 Gbps
-
-[ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
-
-[ATTACK DETECTIONS]
-  UDP floods:         0
-  SYN floods:         0
-  HTTP floods:        0
-  ICMP floods:        0
-  DNS amplification:  0
-  NTP amplification:  0
-  ACK floods:         0
-  Fragmentation:      0
-  Total detections:   0
-
-[ALERT STATUS]
-  Alert level:        [0mNONE[0m
-  Reason:             None
-
-[PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
-  Throughput:         0.46 Gbps
-  Active IPs:         263
-
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║          MIRA DDoS DETECTOR - STATISTICS                              ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-[PACKET COUNTERS - GLOBAL]
-  Total packets:      154414942
-  Baseline (192.168): 95368227 (61.8%)
-  Attack (203.0.113): 5245609 (3.4%)
-  TCP packets:        133764652
-  UDP packets:        16082495
-  ICMP packets:       4567656
+  Total packets:      123394354
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
 
 [INSTANTANEOUS TRAFFIC - Last 6.0 seconds]
   Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
@@ -3392,11 +2177,11 @@
   Total throughput:   0.00 Gbps
 
 [ATTACK-SPECIFIC COUNTERS]
-  SYN packets:        31918733
-  SYN-ACK packets:    14793107
-  SYN/ACK ratio:      2.16
-  HTTP requests:      68565042
-  DNS queries:        9562321
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
 
 [ATTACK DETECTIONS]
   UDP floods:         0
@@ -3414,7 +2199,1357 @@
   Reason:             None
 
 [PERFORMANCE METRICS]
-  Cycles/packet:      451 cycles
+  Cycles/packet:      473 cycles
+  Throughput:         0.59 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394357
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.2 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.57 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394360
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.56 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394362
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.55 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394365
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.54 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394367
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 5.7 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.53 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394371
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.4 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.52 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394373
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.51 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394376
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.50 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394378
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.49 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394381
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 5.5 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.48 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394384
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.6 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.47 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394387
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.46 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394389
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.46 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394392
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
   Throughput:         0.45 Gbps
-  Active IPs:         263
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394394
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 5.2 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.44 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394398
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.9 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.43 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394400
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.43 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394403
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.42 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394405
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 7.6 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.41 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394409
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.41 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394411
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.40 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394414
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.39 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394416
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.39 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394419
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.38 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394422
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.38 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394425
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.37 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394427
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.37 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394430
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.36 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394432
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 9.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.35 Gbps
+  Active IPs:         260
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      123394432
+  Baseline (192.168): 77887134 (63.1%)
+  Attack (203.0.113): 1573690 (1.3%)
+  TCP packets:        108166099
+  UDP packets:        10705908
+  ICMP packets:       4522276
+
+[INSTANTANEOUS TRAFFIC - Last 14.7 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0.00 Gbps
+  Total throughput:   0.00 Gbps
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24949330
+  SYN-ACK packets:    12087820
+  SYN/ACK ratio:      2.06
+  HTTP requests:      55933245
+  DNS queries:        7456121
+
+[ATTACK DETECTIONS]
+  UDP floods:         0
+  SYN floods:         0
+  HTTP floods:        0
+  ICMP floods:        0
+  DNS amplification:  0
+  NTP amplification:  0
+  ACK floods:         0
+  Fragmentation:      0
+  Total detections:   0
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      473 cycles
+  Throughput:         0.34 Gbps
+  Active IPs:         260
 
