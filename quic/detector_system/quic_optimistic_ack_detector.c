@@ -169,6 +169,12 @@ struct detection_stats {
     uint64_t window_bytes_in_prev;       // Bytes IN at start of window
     uint64_t window_bytes_out_prev;      // Bytes OUT at start of window
 
+    /* Instantaneous traffic tracking (per window) */
+    uint64_t window_baseline_pkts_prev;  // Baseline packets at window start
+    uint64_t window_attack_pkts_prev;    // Attack packets at window start
+    uint64_t window_baseline_bytes_prev; // Baseline bytes at window start
+    uint64_t window_attack_bytes_prev;   // Attack bytes at window start
+
     /* DPDK Performance & Drop Statistics */
     uint64_t rx_packets_nic;          /* Packets received by NIC */
     uint64_t rx_dropped_nic;          /* Packets dropped by NIC */
@@ -913,6 +919,38 @@ static void print_stats(void)
            window_duration, g_stats.instantaneous_throughput_gbps);
     dual_printf("  Bytes IN (window):      %lu bytes\n", bytes_in_window / 2);
     dual_printf("  Bytes OUT (window):     %lu bytes\n", bytes_in_window / 2);
+
+    /* Calculate instantaneous traffic by type */
+    uint64_t window_baseline_pkts = g_stats.baseline_packets - g_stats.window_baseline_pkts_prev;
+    uint64_t window_attack_pkts = g_stats.attack_packets - g_stats.window_attack_pkts_prev;
+    uint64_t window_baseline_bytes = (g_stats.total_bytes_in + g_stats.total_bytes_out) / 2 - g_stats.window_baseline_bytes_prev;
+    uint64_t window_attack_bytes = (g_stats.total_bytes_in + g_stats.total_bytes_out) / 2 - g_stats.window_attack_bytes_prev;
+
+    uint64_t window_total_pkts = window_baseline_pkts + window_attack_pkts;
+    uint64_t window_total_bytes = window_baseline_bytes + window_attack_bytes;
+
+    double baseline_pct = window_total_pkts > 0 ? (double)window_baseline_pkts * 100.0 / window_total_pkts : 0.0;
+    double attack_pct = window_total_pkts > 0 ? (double)window_attack_pkts * 100.0 / window_total_pkts : 0.0;
+
+    double baseline_gbps = window_duration >= 0.001 ? (window_baseline_bytes * 8.0) / (window_duration * 1e9) : 0.0;
+    double attack_gbps = window_duration >= 0.001 ? (window_attack_bytes * 8.0) / (window_duration * 1e9) : 0.0;
+    double total_gbps = baseline_gbps + attack_gbps;
+
+    uint64_t avg_pkt_size = window_total_pkts > 0 ? window_total_bytes / window_total_pkts : 0;
+
+    dual_printf("\n[INSTANTANEOUS TRAFFIC - Last %.1f seconds]\n", window_duration);
+    dual_printf("  Baseline (192.168): %lu pkts (%.1f%%)  %lu bytes  %.2f Gbps\n",
+           window_baseline_pkts, baseline_pct, window_baseline_bytes, baseline_gbps);
+    dual_printf("  Attack (203.0.113): %lu pkts (%.1f%%)  %lu bytes  %.2f Gbps\n",
+           window_attack_pkts, attack_pct, window_attack_bytes, attack_gbps);
+    dual_printf("  Total throughput:   %.2f Gbps  (avg pkt: %lu bytes)\n",
+           total_gbps, avg_pkt_size);
+
+    /* Update window tracking for next interval */
+    g_stats.window_baseline_pkts_prev = g_stats.baseline_packets;
+    g_stats.window_attack_pkts_prev = g_stats.attack_packets;
+    g_stats.window_baseline_bytes_prev = (g_stats.total_bytes_in + g_stats.total_bytes_out) / 2;
+    g_stats.window_attack_bytes_prev = (g_stats.total_bytes_in + g_stats.total_bytes_out) / 2;
 
     dual_printf("\n[DPDK NIC STATISTICS]\n");
     dual_printf("  RX packets (NIC):   %lu\n", g_stats.rx_packets_nic);
