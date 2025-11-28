@@ -174,8 +174,6 @@ static uint64_t window_attack_pkts = 0;
 static uint64_t window_baseline_bytes = 0;
 static uint64_t window_attack_bytes = 0;
 static uint64_t last_window_reset_tsc = 0;
-static uint64_t first_packet_in_window_tsc = 0;  /* Track actual packet arrival time */
-static uint64_t last_packet_in_window_tsc = 0;   /* Track actual packet arrival time */
 #define WINDOW_SIZE_SEC 5
 
 /* Global variables */
@@ -474,35 +472,19 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
 
     g_stats.last_stats_tsc = cur_tsc;
 
-    /* Calculate INSTANTANEOUS throughput using ACTUAL packet arrival times */
-    double window_duration = 0.0;
+    /* Calculate INSTANTANEOUS throughput - use time since window reset */
+    double window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
     double instantaneous_throughput_gbps = 0.0;
 
-    /* Use actual time between first and last packet in window */
-    if (first_packet_in_window_tsc > 0 && last_packet_in_window_tsc > first_packet_in_window_tsc) {
-        window_duration = (double)(last_packet_in_window_tsc - first_packet_in_window_tsc) / hz;
+    /* Calculate throughput if we have packets and reasonable duration */
+    uint64_t window_total_pkts = window_baseline_pkts + window_attack_pkts;
+    uint64_t window_total_bytes = window_baseline_bytes + window_attack_bytes;
 
-        if (window_duration >= 0.001) {  /* At least 1ms of packet arrivals */
-            uint64_t window_total_bytes = window_baseline_bytes + window_attack_bytes;
-            instantaneous_throughput_gbps = (window_total_bytes * 8.0) / (window_duration * 1e9);
-            g_stats.throughput_gbps = instantaneous_throughput_gbps;
-        } else {
-            /* Very short window, use packet count to estimate */
-            uint64_t window_total_pkts = window_baseline_pkts + window_attack_pkts;
-            if (window_total_pkts > 0) {
-                window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
-                uint64_t window_total_bytes = window_baseline_bytes + window_attack_bytes;
-                instantaneous_throughput_gbps = (window_total_bytes * 8.0) / (window_duration * 1e9);
-                g_stats.throughput_gbps = instantaneous_throughput_gbps;
-            } else {
-                g_stats.throughput_gbps = 0.0;
-                window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
-            }
-        }
+    if (window_total_pkts > 0 && window_duration >= 0.001) {
+        /* Use total bytes in window divided by time since last reset */
+        instantaneous_throughput_gbps = (window_total_bytes * 8.0) / (window_duration * 1e9);
+        g_stats.throughput_gbps = instantaneous_throughput_gbps;
     } else {
-        /* No packets in window */
-        window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
-        instantaneous_throughput_gbps = 0.0;
         g_stats.throughput_gbps = 0.0;
     }
 
@@ -658,8 +640,6 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
     window_attack_pkts = 0;
     window_baseline_bytes = 0;
     window_attack_bytes = 0;
-    first_packet_in_window_tsc = 0;  /* Reset packet timing */
-    last_packet_in_window_tsc = 0;
     last_window_reset_tsc = cur_tsc;
 }
 
@@ -696,12 +676,6 @@ static int lcore_main(__rte_unused void *arg)
 
             g_stats.total_packets++;
             g_stats.total_bytes += rte_pktmbuf_pkt_len(m);
-
-            /* Track packet arrival times for accurate throughput calculation */
-            if (first_packet_in_window_tsc == 0) {
-                first_packet_in_window_tsc = start_tsc;
-            }
-            last_packet_in_window_tsc = start_tsc;
 
             /* Parse Ethernet header */
             if (unlikely(rte_be_to_cpu_16(eth_hdr->ether_type) != RTE_ETHER_TYPE_IPV4)) {

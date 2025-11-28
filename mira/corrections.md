@@ -298,36 +298,36 @@ double window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
 - `window_duration` = 20s - 5s = **15 seconds** (includes 15s of idle time!)
 - Throughput = 3 packets × 800 bytes / 15s = **0.001 Gbps** (WRONG!)
 
-**Solution:**
+**Solution (v2 - FINAL FIX):**
 
-Track actual packet arrival times:
+Use time since last window reset (simple and correct):
 
 ```c
-// NEW (CORRECT) - lines 177-178, 683-686, 482-507
-static uint64_t first_packet_in_window_tsc = 0;
-static uint64_t last_packet_in_window_tsc = 0;
+// FINAL (CORRECT) - lines 477-491
+double window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
+uint64_t window_total_bytes = window_baseline_bytes + window_attack_bytes;
 
-// In packet processing:
-if (first_packet_in_window_tsc == 0) {
-    first_packet_in_window_tsc = start_tsc;
-}
-last_packet_in_window_tsc = start_tsc;
-
-// In throughput calculation:
-if (first_packet_in_window_tsc > 0 && last_packet_in_window_tsc > first_packet_in_window_tsc) {
-    window_duration = (double)(last_packet_in_window_tsc - first_packet_in_window_tsc) / hz;
+if (window_total_pkts > 0 && window_duration >= 0.001) {
     instantaneous_throughput_gbps = (window_total_bytes * 8.0) / (window_duration * 1e9);
 }
 ```
 
-**Key improvement:**
-- ✅ Use **actual time between first and last packet** in window
-- ✅ Ignore idle time when no packets arrive
-- ✅ Reset packet timing counters on each stats print
+**Why this works:**
+- ✅ `print_stats()` is called **every 5 seconds** (STATS_INTERVAL_SEC)
+- ✅ `last_window_reset_tsc` is updated **after each print**
+- ✅ `window_duration` = current_time - last_reset ≈ 5 seconds (wall-clock time)
+- ✅ Bytes accumulated over this 5-second period
+- ✅ **Result:** Throughput = bytes_in_5s / 5s = correct Gbps
+
+**Why previous attempt failed:**
+- ❌ Used `first_packet_tsc` and `last_packet_tsc` from single BURST (128 packets)
+- ❌ Burst processing takes microseconds → tiny duration
+- ❌ Throughput = bytes / microseconds = inflated Gbps or division issues
 
 **Expected result:**
-- 6,528,272 packets in actual 2.3s of packet arrivals → **2.8 Gbps** (correct!)
-- Window shows "Last 14.5 seconds" (wall-clock) but throughput uses 2.3s (packet time)
+- 7,196,737 packets in 5.0s → **1.44 Mpps**
+- With avg 800 bytes/packet → **9.2 Gbps** (correct for 8×875 Mbps tcpreplay!)
+- Window shows "Last 5.0 seconds" and throughput is accurate
 
 ---
 

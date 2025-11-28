@@ -210,6 +210,8 @@ sudo timeout 470 ./mira_ddos_detector \
     -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0 \
     2>&1 | tee ../results/results_mira_udp.log
 ```
+sudo ./mira_ddos_detector \
+    -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0
 
 **Parameters:**
 - `-l 1-2`: Use CPU cores 1-2
@@ -592,7 +594,7 @@ sudo python3 generate_mirai_attacks.py \
 # Send traffic (125 seconds after benign starts)
 cd /local/dpdk_100g/mira
 sleep 125
-for i in {1..10}; do sudo timeout 320 tcpreplay --intf1=ens1f0 --mbps=1000 --loop=0 attack_mixed_10M.pcap & done
+for i in {1..10}; do sudo timeout 220 tcpreplay --intf1=ens1f0 --mbps=1000 --loop=0 attack_mixed_10M.pcap & done
 ```
 
 ---
