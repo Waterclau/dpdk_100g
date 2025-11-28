@@ -78,7 +78,8 @@ static int port_init(uint16_t port, struct rte_mempool *mbuf_pool)
     if (retval != 0)
         return retval;
 
-    retval = rte_eth_dev_adjust_nb_tx_desc(port, &nb_txd);
+    /* Adjust TX descriptor count - use newer API */
+    retval = rte_eth_dev_adjust_nb_rx_tx_desc(port, NULL, &nb_txd);
     if (retval != 0)
         return retval;
 

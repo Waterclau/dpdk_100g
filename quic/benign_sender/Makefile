@@ -7,9 +7,8 @@ PKGCONF ?= pkg-config
 PC_FILE := $(shell $(PKGCONF) --path libdpdk 2>/dev/null)
 
 CFLAGS += -O3 -g $(shell $(PKGCONF) --cflags libdpdk)
-LDFLAGS_SHARED = $(shell $(PKGCONF) --libs libdpdk)
-LDFLAGS_STATIC = $(shell $(PKGCONF) --static --libs libdpdk)
-LDFLAGS += -lpcap
+LDFLAGS_SHARED = $(shell $(PKGCONF) --libs libdpdk) -lpcap
+LDFLAGS_STATIC = $(shell $(PKGCONF) --static --libs libdpdk) -lpcap
 
 ifeq ($(MAKECMDGOALS),static)
 LDFLAGS = $(LDFLAGS_STATIC)
