@@ -914,12 +914,6 @@ static void print_stats(void)
     if (drop_rate > 10.0) drop_color = "\033[91m";      // RED
     else if (drop_rate > 1.0) drop_color = "\033[93m";  // YELLOW
 
-    dual_printf("\n[INSTANTANEOUS TRAFFIC]\n");
-    dual_printf("  Throughput (last %.1fs): %.2f Gbps\n",
-           window_duration, g_stats.instantaneous_throughput_gbps);
-    dual_printf("  Bytes IN (window):      %lu bytes\n", bytes_in_window / 2);
-    dual_printf("  Bytes OUT (window):     %lu bytes\n", bytes_in_window / 2);
-
     /* Calculate instantaneous traffic by type */
     uint64_t window_baseline_pkts = g_stats.baseline_packets - g_stats.window_baseline_pkts_prev;
     uint64_t window_attack_pkts = g_stats.attack_packets - g_stats.window_attack_pkts_prev;
