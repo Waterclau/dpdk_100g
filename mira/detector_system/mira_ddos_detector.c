@@ -7,8 +7,8 @@
  * Detects: UDP Flood, SYN Flood, HTTP Flood, ICMP Flood, DNS/NTP Amp, ACK Flood
  *
  * Architecture:
- * - 4 Worker threads (lcores 1-4): RX processing with RSS
- * - 1 Coordinator thread (lcore 5): Attack detection and stats
+ * - 8 Worker threads (lcores 1-8): RX processing with RSS
+ * - 1 Coordinator thread (lcore 9): Attack detection and stats
  * - Shared atomic counters for zero-lock aggregation
  *
  * Key Comparison Metric:
@@ -41,10 +41,10 @@
 
 #define RX_RING_SIZE 32768       /* Increased for 14+ Gbps - Phase 1 optimization */
 #define TX_RING_SIZE 4096
-#define NUM_MBUFS 1048576        /* Increased to 1M to prevent rx_nombuf - Phase 1 */
+#define NUM_MBUFS 524288         /* Keep at 524K to avoid soft lockup on cleanup */
 #define MBUF_CACHE_SIZE 512
 #define BURST_SIZE 512           /* Matched with sender burst size - Phase 1 */
-#define NUM_RX_QUEUES 4          /* 4 RX queues for 4 workers */
+#define NUM_RX_QUEUES 8          /* 8 workers for 14+ Gbps - CRITICAL */
 
 /* Detection thresholds */
 #define BASELINE_UDP_THRESHOLD 10000
@@ -649,7 +649,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         "  Cycles/packet:      %.0f cycles\n"
         "  Throughput:         %.2f Gbps\n"
         "  Active IPs:         %u\n"
-        "  Worker threads:     4 (lcores 1-4)\n\n",
+        "  Worker threads:     8 (lcores 1-8)\n\n",
         g_stats.cycles_per_packet,
         g_stats.throughput_gbps,
         rte_atomic32_read(&g_ip_count));
@@ -1013,16 +1013,16 @@ int main(int argc, char *argv[])
     rte_atomic64_init(&window_attack_bytes);
 
     printf("\n╔═══════════════════════════════════════════════════════════════════════╗\n");
-    printf("║       MIRA DDoS DETECTOR - MULTI-CORE (4 workers + 1 coordinator)    ║\n");
+    printf("║       MIRA DDoS DETECTOR - MULTI-CORE (8 workers + 1 coordinator)    ║\n");
     printf("╚═══════════════════════════════════════════════════════════════════════╝\n\n");
     printf("Comparing against MULTI-LF (2025):\n");
     printf("  - MULTI-LF detection latency: 866 ms\n");
     printf("  - MIRA detection latency:     <50 ms\n");
     printf("  - Expected improvement:       17-170× faster\n");
-    printf("  - Multi-core architecture:    4 RX workers + 1 coordinator\n\n");
+    printf("  - Multi-core architecture:    8 RX workers + 1 coordinator\n\n");
     printf("Press Ctrl+C to exit...\n\n");
 
-    /* Launch worker threads on lcores 1-4 and coordinator on lcore 5 */
+    /* Launch worker threads on lcores 1-8 and coordinator on lcore 9 */
     for (unsigned i = 0; i < NUM_RX_QUEUES; i++) {
         queue_ids[i] = i;
     }
