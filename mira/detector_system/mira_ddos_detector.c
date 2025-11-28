@@ -39,11 +39,11 @@
 #include <rte_hash.h>
 #include <rte_jhash.h>
 
-#define RX_RING_SIZE 16384       /* Doubled for high-rate traffic */
+#define RX_RING_SIZE 32768       /* Increased for 14+ Gbps - Phase 1 optimization */
 #define TX_RING_SIZE 4096
-#define NUM_MBUFS 524288         /* Doubled for 14+ Gbps */
+#define NUM_MBUFS 1048576        /* Increased to 1M to prevent rx_nombuf - Phase 1 */
 #define MBUF_CACHE_SIZE 512
-#define BURST_SIZE 256           /* Increased for better batching */
+#define BURST_SIZE 512           /* Matched with sender burst size - Phase 1 */
 #define NUM_RX_QUEUES 4          /* 4 RX queues for 4 workers */
 
 /* Detection thresholds */
