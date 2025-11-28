@@ -502,7 +502,6 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
         "╚═══════════════════════════════════════════════════════════════════════╝\n\n");
 
     /* Calculate INSTANTANEOUS percentages (last 5 seconds) */
-    uint64_t window_total_pkts = window_baseline_pkts + window_attack_pkts;
     double inst_baseline_pct = window_total_pkts > 0 ? (double)window_baseline_pkts * 100.0 / window_total_pkts : 0.0;
     double inst_attack_pct = window_total_pkts > 0 ? (double)window_attack_pkts * 100.0 / window_total_pkts : 0.0;
 
