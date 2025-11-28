@@ -276,13 +276,13 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             if (!ip->is_active) continue;
             if (ip->ip_addr == SERVER_IP) continue;
 
+            /* Determine if baseline or attack network */
             bool is_baseline = ((ip->ip_addr & NETWORK_MASK) == BASELINE_NETWORK);
             bool is_attack = ((ip->ip_addr & NETWORK_MASK) == ATTACK_NETWORK);
 
             /* Read atomic counters */
             uint64_t total_pkts = rte_atomic64_read(&ip->total_packets);
             uint64_t udp_pkts = rte_atomic64_read(&ip->udp_packets);
-            uint64_t tcp_pkts = rte_atomic64_read(&ip->tcp_packets);
             uint64_t icmp_pkts = rte_atomic64_read(&ip->icmp_packets);
             uint64_t syn_pkts = rte_atomic64_read(&ip->syn_packets);
             uint64_t http_reqs = rte_atomic64_read(&ip->http_requests);
@@ -301,11 +301,12 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             double ack_pps = (double)ack_pkts / window_sec;
             double frag_pps = (double)frag_pkts / window_sec;
 
-            uint32_t udp_threshold = is_attack ? ATTACK_UDP_THRESHOLD : BASELINE_UDP_THRESHOLD;
-            uint32_t syn_threshold = is_attack ? ATTACK_SYN_THRESHOLD : BASELINE_SYN_THRESHOLD;
-            uint32_t http_threshold = is_attack ? ATTACK_HTTP_THRESHOLD : BASELINE_HTTP_THRESHOLD;
-            uint32_t icmp_threshold = is_attack ? ATTACK_ICMP_THRESHOLD : BASELINE_ICMP_THRESHOLD;
-            uint32_t total_threshold = is_attack ? ATTACK_TOTAL_PPS_THRESHOLD : BASELINE_TOTAL_PPS_THRESHOLD;
+            /* Select thresholds based on source network */
+            uint32_t udp_threshold = is_baseline ? BASELINE_UDP_THRESHOLD : ATTACK_UDP_THRESHOLD;
+            uint32_t syn_threshold = is_baseline ? BASELINE_SYN_THRESHOLD : ATTACK_SYN_THRESHOLD;
+            uint32_t http_threshold = is_baseline ? BASELINE_HTTP_THRESHOLD : ATTACK_HTTP_THRESHOLD;
+            uint32_t icmp_threshold = is_baseline ? BASELINE_ICMP_THRESHOLD : ATTACK_ICMP_THRESHOLD;
+            uint32_t total_threshold = is_baseline ? BASELINE_TOTAL_PPS_THRESHOLD : ATTACK_TOTAL_PPS_THRESHOLD;
 
             /* UDP Flood */
             if (udp_pps > udp_threshold) {
@@ -876,13 +877,13 @@ static inline int port_init(uint16_t port, struct rte_mempool *mbuf_pool)
 {
     struct rte_eth_conf port_conf = {
         .rxmode = {
-            .mq_mode = RTE_ETH_MQ_RX_RSS,  /* Enable RSS */
+            .mq_mode = ETH_MQ_RX_RSS,  /* Enable RSS */
             .max_lro_pkt_size = RTE_ETHER_MAX_LEN,
         },
         .rx_adv_conf = {
             .rss_conf = {
                 .rss_key = NULL,  /* Use default key */
-                .rss_hf = RTE_ETH_RSS_IP | RTE_ETH_RSS_TCP | RTE_ETH_RSS_UDP,  /* Hash on IP + ports */
+                .rss_hf = ETH_RSS_IP | ETH_RSS_TCP | ETH_RSS_UDP,  /* Hash on IP + ports */
             },
         },
     };
@@ -1016,7 +1017,7 @@ int main(int argc, char *argv[])
     }
 
     unsigned worker_idx = 0;
-    RTE_LCORE_FOREACH_WORKER(lcore_id) {
+    RTE_LCORE_FOREACH_SLAVE(lcore_id) {
         if (worker_idx < NUM_RX_QUEUES) {
             /* Worker thread */
             rte_eal_remote_launch(worker_thread, &queue_ids[worker_idx], lcore_id);
