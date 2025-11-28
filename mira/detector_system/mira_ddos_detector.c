@@ -31,10 +31,10 @@
 #include <rte_udp.h>
 #include <rte_icmp.h>
 
-#define RX_RING_SIZE 4096
+#define RX_RING_SIZE 8192        /* Increased from 4096 to reduce drops */
 #define TX_RING_SIZE 4096
-#define NUM_MBUFS 8191
-#define MBUF_CACHE_SIZE 250
+#define NUM_MBUFS 65535          /* Increased from 8191 to handle bursts */
+#define MBUF_CACHE_SIZE 512      /* Increased from 250 for better performance */
 #define BURST_SIZE 128
 
 /* Detection thresholds - SEPARATED for baseline vs attack traffic */
@@ -147,6 +147,16 @@ struct detection_stats {
     uint64_t bytes_until_detection;
     bool detection_triggered;
 
+    /* DPDK Performance & Drop Statistics */
+    uint64_t rx_packets_nic;          /* Packets received by NIC */
+    uint64_t rx_dropped_nic;          /* Packets dropped by NIC */
+    uint64_t rx_errors_nic;           /* RX errors */
+    uint64_t rx_nombuf_nic;           /* Dropped due to no mbufs */
+    uint64_t tx_packets_nic;
+    uint64_t tx_dropped_nic;
+    uint64_t rx_bursts_empty;         /* Number of times rx_burst returned 0 */
+    uint64_t rx_bursts_total;         /* Total rx_burst calls */
+
     /* CPU efficiency */
     uint64_t total_processing_cycles;
     double cycles_per_packet;
@@ -189,7 +199,7 @@ static FILE *g_log_file = NULL;
 /* Function declarations */
 static int lcore_main(void *arg);
 static void signal_handler(int signum);
-static void print_stats(uint64_t cur_tsc, uint64_t hz);
+static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz);
 static void detect_attacks(uint64_t cur_tsc, uint64_t hz);
 static struct ip_stats* get_ip_stats(uint32_t ip_addr);
 
@@ -462,8 +472,23 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
     }
 }
 
+/* Update DPDK NIC statistics */
+static void update_dpdk_stats(uint16_t port)
+{
+    struct rte_eth_stats eth_stats;
+
+    if (rte_eth_stats_get(port, &eth_stats) == 0) {
+        g_stats.rx_packets_nic = eth_stats.ipackets;
+        g_stats.rx_dropped_nic = eth_stats.imissed;    /* Packets dropped by HW */
+        g_stats.rx_errors_nic = eth_stats.ierrors;
+        g_stats.rx_nombuf_nic = eth_stats.rx_nombuf;   /* Dropped due to no mbufs */
+        g_stats.tx_packets_nic = eth_stats.opackets;
+        g_stats.tx_dropped_nic = eth_stats.oerrors;
+    }
+}
+
 /* Print statistics */
-static void print_stats(uint64_t cur_tsc, uint64_t hz)
+static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
 {
     double elapsed = (double)(cur_tsc - g_stats.last_stats_tsc) / hz;
 
@@ -471,6 +496,9 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
         return;
 
     g_stats.last_stats_tsc = cur_tsc;
+
+    /* Update DPDK NIC statistics */
+    update_dpdk_stats(port);
 
     /* Calculate INSTANTANEOUS throughput - use time since window reset */
     double window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
@@ -628,6 +656,35 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
         g_stats.throughput_gbps,
         g_ip_count);
 
+    /* DPDK NIC Statistics - CRITICAL for diagnosing packet loss */
+    uint64_t total_nic_drops = g_stats.rx_dropped_nic + g_stats.rx_nombuf_nic;
+    double drop_rate = g_stats.rx_packets_nic > 0 ?
+        (double)total_nic_drops * 100.0 / (g_stats.rx_packets_nic + total_nic_drops) : 0.0;
+    double empty_burst_rate = g_stats.rx_bursts_total > 0 ?
+        (double)g_stats.rx_bursts_empty * 100.0 / g_stats.rx_bursts_total : 0.0;
+
+    const char *drop_color = COLOR_RESET;
+    if (drop_rate > 10.0) drop_color = COLOR_RED;
+    else if (drop_rate > 1.0) drop_color = COLOR_YELLOW;
+
+    len += snprintf(buffer + len, sizeof(buffer) - len,
+        "[DPDK NIC STATISTICS]\n"
+        "  RX packets (NIC):   %" PRIu64 "\n"
+        "  RX dropped (HW):    %s%" PRIu64 "%s (imissed)\n"
+        "  RX no mbufs:        %s%" PRIu64 "%s (buffer exhaustion)\n"
+        "  RX errors:          %" PRIu64 "\n"
+        "  Total drops:        %s%" PRIu64 " (%.2f%%)%s\n"
+        "  RX burst calls:     %" PRIu64 " (%.1f%% empty)\n"
+        "  Processed pkts:     %" PRIu64 " (%.1f%% of NIC RX)\n\n",
+        g_stats.rx_packets_nic,
+        drop_color, g_stats.rx_dropped_nic, COLOR_RESET,
+        drop_color, g_stats.rx_nombuf_nic, COLOR_RESET,
+        g_stats.rx_errors_nic,
+        drop_color, total_nic_drops, drop_rate, COLOR_RESET,
+        g_stats.rx_bursts_total, empty_burst_rate,
+        g_stats.total_packets,
+        g_stats.rx_packets_nic > 0 ? (double)g_stats.total_packets * 100.0 / g_stats.rx_packets_nic : 0.0);
+
     /* Print to console */
     printf("%s", buffer);
 
@@ -666,8 +723,12 @@ static int lcore_main(__rte_unused void *arg)
         struct rte_mbuf *bufs[BURST_SIZE];
         uint16_t nb_rx = rte_eth_rx_burst(port, 0, bufs, BURST_SIZE);
 
-        if (unlikely(nb_rx == 0))
+        /* Track RX burst statistics */
+        g_stats.rx_bursts_total++;
+        if (unlikely(nb_rx == 0)) {
+            g_stats.rx_bursts_empty++;
             continue;
+        }
 
         uint64_t start_tsc = rte_rdtsc();
 
@@ -806,11 +867,11 @@ static int lcore_main(__rte_unused void *arg)
         detect_attacks(end_tsc, hz);
 
         /* Print stats periodically */
-        print_stats(end_tsc, hz);
+        print_stats(port, end_tsc, hz);
     }
 
     /* Final stats */
-    print_stats(rte_rdtsc(), hz);
+    print_stats(port, rte_rdtsc(), hz);
 
     return 0;
 }
