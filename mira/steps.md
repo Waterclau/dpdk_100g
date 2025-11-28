@@ -206,7 +206,7 @@ mkdir -p /local/dpdk_100g/mira/results
 cd /local/dpdk_100g/mira/detector_system
 
 # Run detector for 460 seconds
-sudo timeout 470 ./mira_ddos_detector \
+sudo timeout 300 ./mira_ddos_detector \
     -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0 \
     2>&1 | tee ../results/results_mira_udp.log
 ```

@@ -40,7 +40,7 @@ sudo ./build/dpdk_pcap_sender -l 0-7 -n 4 -a 0000:41:00.0 -- /path/to/file.pcap
 cd /local/dpdk_100g/mira/benign_sender
 
 # Send baseline MIRA traffic at line-rate
-sudo ./build/dpdk_pcap_sender -l 0-7 -n 4 -a 0000:41:00.0 -- ../benign_10M.pcap
+sudo ./build/dpdk_pcap_sender -l 0-7 -n 4 -w 0000:41:00.0 -- ../benign_10M.pcap stats=1
 ```
 
 ### On node-monitor (detector):
@@ -48,7 +48,7 @@ sudo ./build/dpdk_pcap_sender -l 0-7 -n 4 -a 0000:41:00.0 -- ../benign_10M.pcap
 cd /local/dpdk_100g/mira/detector_system
 
 # Run detector
-sudo ./mira_detector -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0 --stats=1
+sudo ./mira_ddos_detector -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0
 ```
 
 ## Expected Performance

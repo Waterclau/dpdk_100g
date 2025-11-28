@@ -49,6 +49,7 @@ cd /local/dpdk_100g/quic/detector_system
 
 # Run detector
 sudo ./quic_optimistic_ack_detector -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0
+
 ```
 
 ## Expected Performance
