@@ -39,11 +39,11 @@
 #include <rte_hash.h>
 #include <rte_jhash.h>
 
-#define RX_RING_SIZE 8192
+#define RX_RING_SIZE 16384       /* Doubled for high-rate traffic */
 #define TX_RING_SIZE 4096
-#define NUM_MBUFS 262144         /* Increased for multi-core */
+#define NUM_MBUFS 524288         /* Doubled for 14+ Gbps */
 #define MBUF_CACHE_SIZE 512
-#define BURST_SIZE 128
+#define BURST_SIZE 256           /* Increased for better batching */
 #define NUM_RX_QUEUES 4          /* 4 RX queues for 4 workers */
 
 /* Detection thresholds */
@@ -725,8 +725,19 @@ static int worker_thread(void *arg)
 
         uint64_t start_tsc = rte_rdtsc();
 
+        /* Prefetch first 4 packets */
+        for (uint16_t i = 0; i < nb_rx && i < 4; i++) {
+            rte_prefetch0(rte_pktmbuf_mtod(bufs[i], void *));
+        }
+
         for (uint16_t i = 0; i < nb_rx; i++) {
             struct rte_mbuf *m = bufs[i];
+
+            /* Prefetch next packet */
+            if (i + 4 < nb_rx) {
+                rte_prefetch0(rte_pktmbuf_mtod(bufs[i + 4], void *));
+            }
+
             struct rte_ether_hdr *eth_hdr = rte_pktmbuf_mtod(m, struct rte_ether_hdr *);
 
             rte_atomic64_inc(&g_stats.total_packets);
