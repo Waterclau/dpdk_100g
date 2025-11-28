@@ -710,6 +710,19 @@ static int worker_thread(void *arg)
     uint16_t queue_id = *(uint16_t *)arg;
     uint16_t port = 0;
 
+    /* Local counters to reduce atomic contention */
+    uint64_t local_total_pkts = 0, local_total_bytes = 0;
+    uint64_t local_baseline_pkts = 0, local_attack_pkts = 0;
+    uint64_t local_tcp_pkts = 0, local_udp_pkts = 0, local_icmp_pkts = 0;
+    uint64_t local_syn_pkts = 0, local_syn_ack_pkts = 0;
+    uint64_t local_http_reqs = 0, local_dns_queries = 0;
+    uint64_t local_baseline_bytes = 0, local_attack_bytes = 0;
+    uint64_t local_bursts_total = 0, local_bursts_empty = 0;
+    uint64_t local_cycles = 0;
+
+    uint64_t last_update_tsc = rte_rdtsc();
+    const uint64_t UPDATE_INTERVAL = 100000000; /* ~33ms at 3GHz */
+
     printf("Worker thread %u processing queue %u on lcore %u\n",
            queue_id, queue_id, rte_lcore_id());
 
@@ -717,34 +730,34 @@ static int worker_thread(void *arg)
         struct rte_mbuf *bufs[BURST_SIZE];
         uint16_t nb_rx = rte_eth_rx_burst(port, queue_id, bufs, BURST_SIZE);
 
-        rte_atomic64_inc(&g_stats.rx_bursts_total);
+        local_bursts_total++;
         if (unlikely(nb_rx == 0)) {
-            rte_atomic64_inc(&g_stats.rx_bursts_empty);
+            local_bursts_empty++;
             continue;
         }
 
         uint64_t start_tsc = rte_rdtsc();
 
-        /* Prefetch first 4 packets */
-        for (uint16_t i = 0; i < nb_rx && i < 4; i++) {
+        /* Prefetch first 8 packets (increased from 4) */
+        for (uint16_t i = 0; i < nb_rx && i < 8; i++) {
             rte_prefetch0(rte_pktmbuf_mtod(bufs[i], void *));
         }
 
         for (uint16_t i = 0; i < nb_rx; i++) {
             struct rte_mbuf *m = bufs[i];
 
-            /* Prefetch next packet */
-            if (i + 4 < nb_rx) {
-                rte_prefetch0(rte_pktmbuf_mtod(bufs[i + 4], void *));
+            /* Prefetch next packet (8 ahead instead of 4) */
+            if (i + 8 < nb_rx) {
+                rte_prefetch0(rte_pktmbuf_mtod(bufs[i + 8], void *));
             }
 
             struct rte_ether_hdr *eth_hdr = rte_pktmbuf_mtod(m, struct rte_ether_hdr *);
+            uint16_t pkt_len = rte_pktmbuf_pkt_len(m);
 
-            rte_atomic64_inc(&g_stats.total_packets);
-            rte_atomic64_add(&g_stats.total_bytes, rte_pktmbuf_pkt_len(m));
+            local_total_pkts++;
+            local_total_bytes += pkt_len;
 
             if (unlikely(rte_be_to_cpu_16(eth_hdr->ether_type) != RTE_ETHER_TYPE_IPV4)) {
-                rte_atomic64_inc(&g_stats.other_packets);
                 rte_pktmbuf_free(m);
                 continue;
             }
@@ -753,104 +766,101 @@ static int worker_thread(void *arg)
             uint32_t src_ip = rte_be_to_cpu_32(ip_hdr->src_addr);
             uint8_t proto = ip_hdr->next_proto_id;
 
-            uint16_t frag_off = rte_be_to_cpu_16(ip_hdr->fragment_offset);
-            bool is_fragmented = ((frag_off & RTE_IPV4_HDR_MF_FLAG) != 0) ||
-                                ((frag_off & RTE_IPV4_HDR_OFFSET_MASK) != 0);
-
             /* Classify traffic */
             if ((src_ip & NETWORK_MASK) == BASELINE_NETWORK) {
-                rte_atomic64_inc(&g_stats.baseline_packets);
-                rte_atomic64_add(&g_stats.bytes_in, rte_pktmbuf_pkt_len(m));
-                rte_atomic64_inc(&window_baseline_pkts);
-                rte_atomic64_add(&window_baseline_bytes, rte_pktmbuf_pkt_len(m));
+                local_baseline_pkts++;
+                local_baseline_bytes += pkt_len;
             } else if ((src_ip & NETWORK_MASK) == ATTACK_NETWORK) {
-                rte_atomic64_inc(&g_stats.attack_packets);
-                rte_atomic64_add(&g_stats.bytes_in, rte_pktmbuf_pkt_len(m));
-                rte_atomic64_inc(&window_attack_pkts);
-                rte_atomic64_add(&window_attack_bytes, rte_pktmbuf_pkt_len(m));
-
+                local_attack_pkts++;
+                local_attack_bytes += pkt_len;
                 if (g_stats.first_attack_packet_tsc == 0) {
                     g_stats.first_attack_packet_tsc = start_tsc;
                 }
             }
 
-            /* Get IP stats */
-            struct ip_stats *src_stats = get_ip_stats(src_ip);
-            if (src_stats) {
-                rte_atomic64_inc(&src_stats->total_packets);
-                rte_atomic64_add(&src_stats->bytes_in, rte_pktmbuf_pkt_len(m));
-                src_stats->last_seen_tsc = start_tsc;
-
-                if (is_fragmented) {
-                    rte_atomic64_inc(&src_stats->fragmented_packets);
-                }
-            }
-
             /* Parse transport layer */
             if (proto == IPPROTO_TCP) {
-                rte_atomic64_inc(&g_stats.tcp_packets);
+                local_tcp_pkts++;
                 struct rte_tcp_hdr *tcp_hdr = (struct rte_tcp_hdr *)((uint8_t *)ip_hdr + sizeof(struct rte_ipv4_hdr));
-
-                if (src_stats)
-                    rte_atomic64_inc(&src_stats->tcp_packets);
-
                 uint8_t tcp_flags = tcp_hdr->tcp_flags;
-                if (tcp_flags & RTE_TCP_SYN_FLAG) {
-                    rte_atomic64_inc(&g_stats.syn_packets);
-                    if (src_stats)
-                        rte_atomic64_inc(&src_stats->syn_packets);
-                }
-                if (tcp_flags & RTE_TCP_ACK_FLAG) {
-                    if (tcp_flags & RTE_TCP_SYN_FLAG)
-                        rte_atomic64_inc(&g_stats.syn_ack_packets);
-                    if (src_stats)
-                        rte_atomic64_inc(&src_stats->ack_packets);
 
-                    if (tcp_flags == RTE_TCP_ACK_FLAG) {
-                        if (src_stats)
-                            rte_atomic64_inc(&src_stats->pure_ack_packets);
-                    }
+                if (tcp_flags & RTE_TCP_SYN_FLAG) {
+                    local_syn_pkts++;
+                    if (tcp_flags & RTE_TCP_ACK_FLAG)
+                        local_syn_ack_pkts++;
                 }
 
                 uint16_t dst_port = rte_be_to_cpu_16(tcp_hdr->dst_port);
                 if (dst_port == 80) {
-                    rte_atomic64_inc(&g_stats.http_requests);
-                    if (src_stats)
-                        rte_atomic64_inc(&src_stats->http_requests);
+                    local_http_reqs++;
                 }
             }
             else if (proto == IPPROTO_UDP) {
-                rte_atomic64_inc(&g_stats.udp_packets);
-                if (src_stats)
-                    rte_atomic64_inc(&src_stats->udp_packets);
-
+                local_udp_pkts++;
                 struct rte_udp_hdr *udp_hdr = (struct rte_udp_hdr *)((uint8_t *)ip_hdr + sizeof(struct rte_ipv4_hdr));
                 uint16_t dst_port = rte_be_to_cpu_16(udp_hdr->dst_port);
                 uint16_t src_port = rte_be_to_cpu_16(udp_hdr->src_port);
 
                 if (dst_port == 53 || src_port == 53) {
-                    rte_atomic64_inc(&g_stats.dns_queries);
-                    if (src_stats)
-                        rte_atomic64_inc(&src_stats->dns_queries);
-                }
-
-                if (dst_port == 123 || src_port == 123) {
-                    if (src_stats)
-                        rte_atomic64_inc(&src_stats->ntp_queries);
+                    local_dns_queries++;
                 }
             }
             else if (proto == IPPROTO_ICMP) {
-                rte_atomic64_inc(&g_stats.icmp_packets);
-                if (src_stats)
-                    rte_atomic64_inc(&src_stats->icmp_packets);
+                local_icmp_pkts++;
             }
 
             rte_pktmbuf_free(m);
         }
 
         uint64_t end_tsc = rte_rdtsc();
-        rte_atomic64_add(&g_stats.total_processing_cycles, end_tsc - start_tsc);
+        local_cycles += (end_tsc - start_tsc);
+
+        /* Bulk update global counters every ~33ms to reduce contention */
+        if (unlikely(end_tsc - last_update_tsc > UPDATE_INTERVAL)) {
+            rte_atomic64_add(&g_stats.total_packets, local_total_pkts);
+            rte_atomic64_add(&g_stats.total_bytes, local_total_bytes);
+            rte_atomic64_add(&g_stats.baseline_packets, local_baseline_pkts);
+            rte_atomic64_add(&g_stats.attack_packets, local_attack_pkts);
+            rte_atomic64_add(&g_stats.tcp_packets, local_tcp_pkts);
+            rte_atomic64_add(&g_stats.udp_packets, local_udp_pkts);
+            rte_atomic64_add(&g_stats.icmp_packets, local_icmp_pkts);
+            rte_atomic64_add(&g_stats.syn_packets, local_syn_pkts);
+            rte_atomic64_add(&g_stats.syn_ack_packets, local_syn_ack_pkts);
+            rte_atomic64_add(&g_stats.http_requests, local_http_reqs);
+            rte_atomic64_add(&g_stats.dns_queries, local_dns_queries);
+            rte_atomic64_add(&window_baseline_pkts, local_baseline_pkts);
+            rte_atomic64_add(&window_baseline_bytes, local_baseline_bytes);
+            rte_atomic64_add(&window_attack_pkts, local_attack_pkts);
+            rte_atomic64_add(&window_attack_bytes, local_attack_bytes);
+            rte_atomic64_add(&g_stats.rx_bursts_total, local_bursts_total);
+            rte_atomic64_add(&g_stats.rx_bursts_empty, local_bursts_empty);
+            rte_atomic64_add(&g_stats.total_processing_cycles, local_cycles);
+
+            /* Reset local counters */
+            local_total_pkts = local_total_bytes = 0;
+            local_baseline_pkts = local_attack_pkts = 0;
+            local_tcp_pkts = local_udp_pkts = local_icmp_pkts = 0;
+            local_syn_pkts = local_syn_ack_pkts = 0;
+            local_http_reqs = local_dns_queries = 0;
+            local_baseline_bytes = local_attack_bytes = 0;
+            local_bursts_total = local_bursts_empty = 0;
+            local_cycles = 0;
+            last_update_tsc = end_tsc;
+        }
     }
+
+    /* Final update before exit */
+    rte_atomic64_add(&g_stats.total_packets, local_total_pkts);
+    rte_atomic64_add(&g_stats.total_bytes, local_total_bytes);
+    rte_atomic64_add(&g_stats.baseline_packets, local_baseline_pkts);
+    rte_atomic64_add(&g_stats.attack_packets, local_attack_pkts);
+    rte_atomic64_add(&g_stats.tcp_packets, local_tcp_pkts);
+    rte_atomic64_add(&g_stats.udp_packets, local_udp_pkts);
+    rte_atomic64_add(&g_stats.icmp_packets, local_icmp_pkts);
+    rte_atomic64_add(&g_stats.syn_packets, local_syn_pkts);
+    rte_atomic64_add(&g_stats.syn_ack_packets, local_syn_ack_pkts);
+    rte_atomic64_add(&g_stats.http_requests, local_http_reqs);
+    rte_atomic64_add(&g_stats.dns_queries, local_dns_queries);
 
     return 0;
 }
