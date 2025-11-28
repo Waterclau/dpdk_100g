@@ -533,10 +533,82 @@ Before deploying corrected detector:
 
 ---
 
+## Debugging Throughput Issues
+
+### Added Debug Output (2025-01-27)
+
+To diagnose throughput calculation issues, added byte counters and average packet size to output:
+
+```c
+// Lines 525-538
+double avg_pkt_size = window_total_pkts > 0 ? (double)window_total_bytes / window_total_pkts : 0.0;
+
+len += snprintf(buffer + len, sizeof(buffer) - len,
+    "[INSTANTANEOUS TRAFFIC - Last %.1f seconds]\n"
+    "  Baseline (192.168): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
+    "  Attack (203.0.113): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
+    "  Total throughput:   %.2f Gbps  (avg pkt: %.0f bytes)\n\n",
+    ...);
+```
+
+**Purpose:**
+- Show actual byte counts to verify accumulation
+- Display average packet size to identify if packets are too small
+- Debug why throughput shows 1.00 Gbps instead of expected 7+ Gbps
+
+**Expected values:**
+- Average packet size: 800-1200 bytes (TCP/HTTP)
+- If avg_pkt_size < 200 bytes → problem with byte counting
+- If avg_pkt_size correct but Gbps low → problem with calculation
+
+---
+
+## Known Issues in CloudLab Environment
+
+### Issue 1: Disk Full on Traffic Generator Node
+
+**Symptom:**
+```
+[610975.525395] systemd-journald[756]: Failed to open system journal: No space left on device
+```
+
+**Impact:**
+- tcpreplay may fail silently
+- Attack traffic not sent properly (only 684K packets instead of millions)
+- System instability
+
+**Solution:**
+```bash
+# On node-tg
+df -h  # Check disk usage
+sudo journalctl --vacuum-time=1d  # Clean old logs
+sudo rm -rf /tmp/*
+sudo rm -rf /var/log/*.gz
+df -h  # Verify space freed
+```
+
+### Issue 2: Mellanox NIC Firmware Warnings
+
+**Symptom:**
+```
+mlx5_core 0000:41:00.0: mlx5_fw_tracer_handle_traces:711:(pid 153523): FWTracer: Events were lost
+```
+
+**Impact:**
+- Minor: Firmware tracing buffer overflow (non-critical)
+- Does not affect packet processing
+
+**Action:**
+- Informational only, can be ignored
+- If persistent, consider disabling FW tracing: `echo 0 > /sys/module/mlx5_core/parameters/enable_tracer`
+
+---
+
 ## Next Steps
 
-1. Compile corrected detector: `cd detector_system && make clean && make`
-2. Run baseline test (60s, benign traffic only)
-3. Run full experiment (baseline + attack)
-4. Analyze results and compare with MULTI-LF metrics
-5. Update thesis with accurate detection latency values
+1. **Compile with debug output**: `cd detector_system && make clean && make`
+2. **Clean TG disk space**: Free at least 10GB on node-tg
+3. **Kill all tcpreplay**: Ensure clean start
+4. **Run experiment**: Monitor byte counts and avg packet size
+5. **Analyze throughput**: Verify realistic Gbps values (7-15 Gbps range)
+6. **Update corrections.md**: Document root cause once identified

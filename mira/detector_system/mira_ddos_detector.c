@@ -522,17 +522,20 @@ static void print_stats(uint64_t cur_tsc, uint64_t hz)
         g_stats.udp_packets,
         g_stats.icmp_packets);
 
+    /* DEBUG: Calculate average packet size */
+    double avg_pkt_size = window_total_pkts > 0 ? (double)window_total_bytes / window_total_pkts : 0.0;
+
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[INSTANTANEOUS TRAFFIC - Last %.1f seconds]\n"
-        "  Baseline (192.168): %" PRIu64 " pkts (%.1f%%)  %.2f Gbps\n"
-        "  Attack (203.0.113): %" PRIu64 " pkts (%.1f%%)  %.2f Gbps\n"
-        "  Total throughput:   %.2f Gbps\n\n",
+        "  Baseline (192.168): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
+        "  Attack (203.0.113): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
+        "  Total throughput:   %.2f Gbps  (avg pkt: %.0f bytes)\n\n",
         window_duration,
-        window_baseline_pkts, inst_baseline_pct,
+        window_baseline_pkts, inst_baseline_pct, window_baseline_bytes,
         window_duration > 0 ? (window_baseline_bytes * 8.0) / (window_duration * 1e9) : 0.0,
-        window_attack_pkts, inst_attack_pct,
+        window_attack_pkts, inst_attack_pct, window_attack_bytes,
         window_duration > 0 ? (window_attack_bytes * 8.0) / (window_duration * 1e9) : 0.0,
-        instantaneous_throughput_gbps);
+        instantaneous_throughput_gbps, avg_pkt_size);
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[ATTACK-SPECIFIC COUNTERS]\n"
