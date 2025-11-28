@@ -1011,23 +1011,34 @@ int main(int argc, char *argv[])
     printf("  - Multi-core architecture:    4 RX workers + 1 coordinator\n\n");
     printf("Press Ctrl+C to exit...\n\n");
 
-    /* Launch worker threads on lcores 1-4 */
+    /* Launch worker threads on lcores 1-4 and coordinator on lcore 5 */
     for (unsigned i = 0; i < NUM_RX_QUEUES; i++) {
         queue_ids[i] = i;
     }
 
-    unsigned worker_idx = 0;
+    unsigned lcore_idx = 0;
+    unsigned coordinator_lcore = 0;
+
+    /* First pass: launch workers */
     RTE_LCORE_FOREACH_SLAVE(lcore_id) {
-        if (worker_idx < NUM_RX_QUEUES) {
+        if (lcore_idx < NUM_RX_QUEUES) {
             /* Worker thread */
-            rte_eal_remote_launch(worker_thread, &queue_ids[worker_idx], lcore_id);
-            worker_idx++;
-        } else if (worker_idx == NUM_RX_QUEUES) {
-            /* Coordinator thread */
-            rte_eal_remote_launch(coordinator_thread, NULL, lcore_id);
-            worker_idx++;
+            printf("Launching worker %u on lcore %u\n", lcore_idx, lcore_id);
+            rte_eal_remote_launch(worker_thread, &queue_ids[lcore_idx], lcore_id);
+            lcore_idx++;
+        } else {
+            /* Save coordinator lcore for next pass */
+            coordinator_lcore = lcore_id;
             break;
         }
+    }
+
+    /* Launch coordinator */
+    if (coordinator_lcore > 0) {
+        printf("Launching coordinator on lcore %u\n", coordinator_lcore);
+        rte_eal_remote_launch(coordinator_thread, NULL, coordinator_lcore);
+    } else {
+        printf("Warning: No lcore available for coordinator thread!\n");
     }
 
     /* Wait for all threads */
