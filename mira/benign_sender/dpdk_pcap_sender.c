@@ -18,8 +18,8 @@
 
 #define RX_RING_SIZE 1024
 #define TX_RING_SIZE 8192
-#define NUM_MBUFS 12000000      /* Enough for 10M PCAP packets + overhead */
-#define MBUF_CACHE_SIZE 512
+#define NUM_MBUFS 10500000      /* 10M PCAP packets + 500K overhead */
+#define MBUF_CACHE_SIZE 256     /* Reduced cache size */
 #define BURST_SIZE 512
 #define MAX_PCAP_PACKETS 10000000
 
