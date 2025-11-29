@@ -1,14 +1,14 @@
 /* SPDX-License-Identifier: BSD-3-Clause
  * Copyright(c) 2025 MIRA Project
  *
- * MIRA DDoS Detector - MULTI-CORE VERSION
+ * MIRA DDoS Detector - MULTI-CORE VERSION (OPTIMIZED for 17+ Gbps)
  *
  * Multi-attack DDoS detector with multi-core processing for line-rate detection
  * Detects: UDP Flood, SYN Flood, HTTP Flood, ICMP Flood, DNS/NTP Amp, ACK Flood
  *
  * Architecture:
- * - 8 Worker threads (lcores 1-8): RX processing with RSS
- * - 1 Coordinator thread (lcore 9): Attack detection and stats
+ * - 14 Worker threads (lcores 1-14): RX processing with RSS
+ * - 1 Coordinator thread (lcore 15): Attack detection and stats
  * - Shared atomic counters for zero-lock aggregation
  *
  * Key Comparison Metric:
@@ -39,12 +39,12 @@
 #include <rte_hash.h>
 #include <rte_jhash.h>
 
-#define RX_RING_SIZE 32768       /* Increased for 14+ Gbps - Phase 1 optimization */
+#define RX_RING_SIZE 65536       /* Increased for 17+ Gbps - Phase 2 optimization */
 #define TX_RING_SIZE 4096
 #define NUM_MBUFS 524288         /* Keep at 524K to avoid soft lockup on cleanup */
 #define MBUF_CACHE_SIZE 512
-#define BURST_SIZE 512           /* Matched with sender burst size - Phase 1 */
-#define NUM_RX_QUEUES 8          /* 8 workers for 14+ Gbps - CRITICAL */
+#define BURST_SIZE 1024          /* Larger bursts for 17+ Gbps - Phase 2 */
+#define NUM_RX_QUEUES 14         /* 14 workers for 17+ Gbps - CRITICAL */
 
 /* Detection thresholds */
 #define BASELINE_UDP_THRESHOLD 10000

