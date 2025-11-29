@@ -270,22 +270,24 @@ def generate_mirai_attack(output_file, num_packets, attack_type,
             attacker_packets = generate_icmp_flood(attacker_ip, target_ip, src_mac, dst_mac,
                                                    packets_per_attacker)
         elif attack_type == 'mixed':
-            # Mixed attack: 40% UDP, 30% SYN, 20% HTTP, 10% ICMP
-            types = ['udp'] * 40 + ['syn'] * 30 + ['http'] * 20 + ['icmp'] * 10
-            attack_choice = random.choice(types)
+            # Mixed attack: Each attacker generates a TRUE MIX of packets
+            # 40% UDP, 30% SYN, 20% HTTP, 10% ICMP
+            attacker_packets = []
 
-            if attack_choice == 'udp':
-                attacker_packets = generate_udp_flood(attacker_ip, target_ip, src_mac, dst_mac,
-                                                      packets_per_attacker)
-            elif attack_choice == 'syn':
-                attacker_packets = generate_syn_flood(attacker_ip, target_ip, src_mac, dst_mac,
-                                                      packets_per_attacker)
-            elif attack_choice == 'http':
-                attacker_packets = generate_http_flood(attacker_ip, target_ip, src_mac, dst_mac,
-                                                       packets_per_attacker)
-            else:
-                attacker_packets = generate_icmp_flood(attacker_ip, target_ip, src_mac, dst_mac,
-                                                       packets_per_attacker)
+            # Calculate packets per type for this attacker
+            udp_count = int(packets_per_attacker * 0.40)
+            syn_count = int(packets_per_attacker * 0.30)
+            http_count = int(packets_per_attacker * 0.20)
+            icmp_count = packets_per_attacker - udp_count - syn_count - http_count  # Remaining
+
+            # Generate each type
+            attacker_packets.extend(generate_udp_flood(attacker_ip, target_ip, src_mac, dst_mac, udp_count))
+            attacker_packets.extend(generate_syn_flood(attacker_ip, target_ip, src_mac, dst_mac, syn_count))
+            attacker_packets.extend(generate_http_flood(attacker_ip, target_ip, src_mac, dst_mac, http_count))
+            attacker_packets.extend(generate_icmp_flood(attacker_ip, target_ip, src_mac, dst_mac, icmp_count))
+
+            # Shuffle to mix packet types (important for realistic traffic pattern)
+            random.shuffle(attacker_packets)
         else:
             print(f"ERROR: Unknown attack type: {attack_type}")
             return 0
