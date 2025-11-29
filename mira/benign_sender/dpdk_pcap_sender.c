@@ -318,13 +318,23 @@ int main(int argc, char *argv[])
     rte_eth_dev_stop(port_id);
     rte_eth_dev_close(port_id);
 
-    /* Free pre-loaded mbufs */
+    /* Free pre-loaded mbufs in batches to avoid soft lockup */
     if (pcap_mbufs) {
-        for (uint32_t i = 0; i < num_pcap_packets; i++) {
-            if (pcap_mbufs[i])
-                rte_pktmbuf_free(pcap_mbufs[i]);
+        printf("Freeing %u pre-loaded mbufs (this may take a moment)...\n", num_pcap_packets);
+        const uint32_t BATCH_SIZE = 10000;
+        for (uint32_t i = 0; i < num_pcap_packets; i += BATCH_SIZE) {
+            uint32_t end = (i + BATCH_SIZE > num_pcap_packets) ? num_pcap_packets : i + BATCH_SIZE;
+            for (uint32_t j = i; j < end; j++) {
+                if (pcap_mbufs[j])
+                    rte_pktmbuf_free(pcap_mbufs[j]);
+            }
+            /* Yield CPU every batch to avoid soft lockup */
+            if (i % 100000 == 0 && i > 0)
+                printf("  Freed %u/%u mbufs...\n", i, num_pcap_packets);
+            rte_delay_us_block(10); /* 10us sleep between batches */
         }
         free(pcap_mbufs);
+        printf("All mbufs freed successfully.\n");
     }
 
     printf("Sender stopped.\n");
