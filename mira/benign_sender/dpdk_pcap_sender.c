@@ -44,8 +44,11 @@ static uint32_t current_packet_idx = 0;
 static void signal_handler(int signum)
 {
     if (signum == SIGINT || signum == SIGTERM) {
-        printf("\n\nSignal %d received, stopping...\n", signum);
+        printf("\n\n[SIGNAL] Received signal %d (Ctrl+C), initiating graceful shutdown...\n", signum);
         force_quit = 1;
+
+        /* Flush output to ensure user sees the message */
+        fflush(stdout);
     }
 }
 
@@ -194,21 +197,33 @@ static void send_loop(void)
     window_start_tsc = start_tsc;
 
     while (!force_quit) {
-        /* Fill burst with pre-loaded mbufs (NO MEMCPY!) */
+        /* Fill burst with cloned mbufs (safe reuse without refcount corruption) */
         for (i = 0; i < BURST_SIZE; i++) {
-            pkts[i] = pcap_mbufs[current_packet_idx];
+            /* Clone mbuf for safe reuse - TX will auto-free the clone */
+            struct rte_mbuf *pkt_clone = rte_pktmbuf_clone(
+                pcap_mbufs[current_packet_idx], mbuf_pool);
 
-            /* Increment refcnt so mbuf isn't freed after TX */
-            rte_mbuf_refcnt_update(pkts[i], 1);
+            if (pkt_clone == NULL) {
+                /* Clone failed (rare), fill remaining with NULLs */
+                pkts[i] = NULL;
+            } else {
+                pkts[i] = pkt_clone;
+            }
 
-            /* Move to next packet (loop) */
+            /* Move to next packet (loop through PCAP) */
             current_packet_idx++;
             if (current_packet_idx >= num_pcap_packets)
                 current_packet_idx = 0;
         }
 
-        /* Send burst */
-        nb_tx = rte_eth_tx_burst(port_id, 0, pkts, BURST_SIZE);
+        /* Send burst (only valid packets) */
+        uint16_t valid_pkts = 0;
+        for (i = 0; i < BURST_SIZE; i++) {
+            if (pkts[i] != NULL)
+                pkts[valid_pkts++] = pkts[i];
+        }
+
+        nb_tx = rte_eth_tx_burst(port_id, 0, pkts, valid_pkts);
         total_packets_sent += nb_tx;
 
         /* Track bytes sent for rate limiting */
@@ -217,9 +232,9 @@ static void send_loop(void)
             total_bytes_sent += pkts[i]->pkt_len;
         }
 
-        /* Decrement refcnt for unsent packets */
-        for (i = nb_tx; i < BURST_SIZE; i++) {
-            rte_mbuf_refcnt_update(pkts[i], -1);
+        /* Free unsent packets (TX didn't take ownership) */
+        for (i = nb_tx; i < valid_pkts; i++) {
+            rte_pktmbuf_free(pkts[i]);
         }
 
         /* Rate limiting */
@@ -318,23 +333,55 @@ int main(int argc, char *argv[])
     rte_eth_dev_stop(port_id);
     rte_eth_dev_close(port_id);
 
-    /* Free pre-loaded mbufs in batches to avoid soft lockup */
+    /* Free pre-loaded mbufs with timeout protection */
     if (pcap_mbufs) {
-        printf("Freeing %u pre-loaded mbufs (this may take a moment)...\n", num_pcap_packets);
-        const uint32_t BATCH_SIZE = 10000;
-        for (uint32_t i = 0; i < num_pcap_packets; i += BATCH_SIZE) {
-            uint32_t end = (i + BATCH_SIZE > num_pcap_packets) ? num_pcap_packets : i + BATCH_SIZE;
-            for (uint32_t j = i; j < end; j++) {
-                if (pcap_mbufs[j])
-                    rte_pktmbuf_free(pcap_mbufs[j]);
+        printf("Freeing %u pre-loaded mbufs...\n", num_pcap_packets);
+
+        uint64_t hz = rte_get_tsc_hz();
+        uint64_t cleanup_start = rte_rdtsc();
+        uint64_t cleanup_timeout = hz * 5;  /* 5 second timeout */
+        uint32_t freed_count = 0;
+        uint32_t skipped_count = 0;
+
+        for (uint32_t i = 0; i < num_pcap_packets; i++) {
+            if (pcap_mbufs[i]) {
+                /* Force free regardless of refcount */
+                uint16_t refcnt = rte_mbuf_refcnt_read(pcap_mbufs[i]);
+
+                if (refcnt == 1) {
+                    /* Normal case - single reference */
+                    rte_pktmbuf_free(pcap_mbufs[i]);
+                    freed_count++;
+                } else if (refcnt > 1) {
+                    /* Force free by decrementing all references */
+                    while (rte_mbuf_refcnt_read(pcap_mbufs[i]) > 1) {
+                        rte_mbuf_refcnt_update(pcap_mbufs[i], -1);
+                    }
+                    rte_pktmbuf_free(pcap_mbufs[i]);
+                    freed_count++;
+                } else {
+                    /* Already freed or corrupted */
+                    skipped_count++;
+                }
             }
-            /* Yield CPU every batch to avoid soft lockup */
-            if (i % 100000 == 0 && i > 0)
-                printf("  Freed %u/%u mbufs...\n", i, num_pcap_packets);
-            rte_delay_us_block(10); /* 10us sleep between batches */
+
+            /* Progress indicator every 500K packets */
+            if (i > 0 && i % 500000 == 0) {
+                printf("  Progress: %u/%u mbufs processed...\n", i, num_pcap_packets);
+            }
+
+            /* Timeout check every 100K packets to avoid hanging */
+            if (i % 100000 == 0) {
+                uint64_t elapsed = rte_rdtsc() - cleanup_start;
+                if (elapsed > cleanup_timeout) {
+                    printf("WARNING: Cleanup timeout after %u packets, forcing exit\n", i);
+                    break;
+                }
+            }
         }
+
         free(pcap_mbufs);
-        printf("All mbufs freed successfully.\n");
+        printf("Cleanup complete: %u freed, %u skipped\n", freed_count, skipped_count);
     }
 
     printf("Sender stopped.\n");
