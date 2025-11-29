@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-3-Clause
- * DPDK PCAP sender - SIMPLE VERSION (no pre-load mbufs)
- * Based on working old/dpdk_pcap_sender.c
- * Optimized for 7 Gbps with rate limiting
+ * DPDK PCAP sender - ATTACK TRAFFIC VERSION
+ * Based on benign_sender but configured for attack traffic
+ * Optimized for 10 Gbps target (to achieve ~4.1 Gbps real at detector)
  */
 
 #include <stdio.h>
@@ -25,8 +25,8 @@
 #define BURST_SIZE 512
 #define MAX_PCAP_PACKETS 10000000
 
-/* Target transmission rate: 17 Gbps (to achieve ~7 Gbps real at detector) */
-#define TARGET_GBPS 17.0
+/* Target transmission rate: 24 Gbps (to achieve ~10 Gbps real at detector) */
+#define TARGET_GBPS 24.0
 
 static volatile uint8_t force_quit = 0;
 static uint16_t port_id = 0;
@@ -172,9 +172,9 @@ static void send_loop(void)
     uint64_t window_start_tsc = 0;
 
     printf("\n╔═══════════════════════════════════════════════════════════╗\n");
-    printf("║      DPDK PCAP SENDER - %.1f Gbps baseline transmission     ║\n", TARGET_GBPS);
+    printf("║   DPDK PCAP SENDER - %.1f Gbps ATTACK transmission        ║\n", TARGET_GBPS);
     printf("╚═══════════════════════════════════════════════════════════╝\n\n");
-    printf("Starting packet transmission at %.1f Gbps...\n", TARGET_GBPS);
+    printf("Starting ATTACK packet transmission at %.1f Gbps...\n", TARGET_GBPS);
     printf("Press Ctrl+C to stop\n\n");
 
     start_tsc = rte_rdtsc();
