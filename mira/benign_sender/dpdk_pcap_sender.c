@@ -25,8 +25,8 @@
 #define BURST_SIZE 512
 #define MAX_PCAP_PACKETS 10000000
 
-/* Target transmission rate: 7 Gbps */
-#define TARGET_GBPS 7.0
+/* Target transmission rate: 14 Gbps (to achieve ~5.8 Gbps real at detector) */
+#define TARGET_GBPS 14.0
 
 static volatile uint8_t force_quit = 0;
 static uint16_t port_id = 0;
