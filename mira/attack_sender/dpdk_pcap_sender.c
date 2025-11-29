@@ -101,7 +101,20 @@ static int port_init(uint16_t port, struct rte_mempool *mbuf_pool)
     if (retval != 0)
         return retval;
 
-    printf("Port %u initialized successfully\n", port);
+    /* Print detailed port information */
+    struct rte_ether_addr mac_addr;
+    rte_eth_macaddr_get(port, &mac_addr);
+
+    printf("╔════════════════════════════════════════════════════════════════╗\n");
+    printf("║ Port %u initialized successfully                               ║\n", port);
+    printf("║ PCI: %s                                                   ║\n", dev_info.device->name);
+    printf("║ MAC: %02x:%02x:%02x:%02x:%02x:%02x                             ║\n",
+           mac_addr.addr_bytes[0], mac_addr.addr_bytes[1],
+           mac_addr.addr_bytes[2], mac_addr.addr_bytes[3],
+           mac_addr.addr_bytes[4], mac_addr.addr_bytes[5]);
+    printf("║ Driver: %s                                                ║\n", dev_info.driver_name);
+    printf("╚════════════════════════════════════════════════════════════════╝\n");
+
     return 0;
 }
 
