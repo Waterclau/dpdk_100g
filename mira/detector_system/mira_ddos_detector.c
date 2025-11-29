@@ -71,9 +71,9 @@
 
 /* IP tracking */
 #define MAX_IPS 65536
-#define BASELINE_NETWORK 0xC0A80100
-#define ATTACK_NETWORK 0xCB007100
-#define NETWORK_MASK 0xFFFFFF00
+#define BASELINE_NETWORK 0xC0A80100     /* 192.168.1.x - benign traffic */
+#define ATTACK_NETWORK   0xC0A80200     /* 192.168.2.x - attack traffic (changed from 203.0.113.x) */
+#define NETWORK_MASK     0xFFFFFF00
 
 #define SERVER_IP 0x0A000001
 
@@ -535,8 +535,8 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[PACKET COUNTERS - GLOBAL]\n"
         "  Total packets:      %" PRIu64 "\n"
-        "  Baseline (192.168): %" PRIu64 " (%.1f%%)\n"
-        "  Attack (203.0.113): %" PRIu64 " (%.1f%%)\n"
+        "  Baseline (192.168.1): %" PRIu64 " (%.1f%%)\n"
+        "  Attack (192.168.2): %" PRIu64 " (%.1f%%)\n"
         "  TCP packets:        %" PRIu64 "\n"
         "  UDP packets:        %" PRIu64 "\n"
         "  ICMP packets:       %" PRIu64 "\n\n",
@@ -551,8 +551,8 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[INSTANTANEOUS TRAFFIC - Last %.1f seconds]\n"
-        "  Baseline (192.168): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
-        "  Attack (203.0.113): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
+        "  Baseline (192.168.1): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
+        "  Attack (192.168.2): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
         "  Total throughput:   %.2f Gbps  (avg pkt: %.0f bytes)\n\n",
         window_duration,
         window_base_pkts, inst_baseline_pct, window_base_bytes,
