@@ -1,7 +1,5 @@
 /* SPDX-License-Identifier: BSD-3-Clause
- * DPDK PCAP sender - SIMPLE VERSION (no pre-load mbufs)
- * Based on working old/dpdk_pcap_sender.c
- * Optimized for 7 Gbps with rate limiting
+ * DPDK PCAP replayer with pre-loaded mbufs for 7 Gbps baseline transmission
  */
 
 #include <stdio.h>
@@ -20,10 +18,10 @@
 
 #define RX_RING_SIZE 1024
 #define TX_RING_SIZE 8192
-#define NUM_MBUFS 262144
-#define MBUF_CACHE_SIZE 512
+#define NUM_MBUFS 1572864       /* 1.5M mbufs for pre-loaded packets */
+#define MBUF_CACHE_SIZE 256
 #define BURST_SIZE 512
-#define MAX_PCAP_PACKETS 10000000
+#define MAX_PCAP_PACKETS 1500000  /* Pre-load 1.5M packets */
 
 /* Target transmission rate: 7 Gbps */
 #define TARGET_GBPS 7.0
@@ -37,13 +35,8 @@ static uint64_t total_packets_sent = 0;
 static uint64_t total_bytes_sent = 0;
 static uint64_t start_tsc = 0;
 
-/* PCAP packets storage - SIMPLE STRUCT (not mbufs) */
-struct packet_data {
-    uint8_t data[2048];
-    uint16_t len;
-};
-
-static struct packet_data *pcap_packets = NULL;
+/* Pre-loaded mbufs (zero-copy after initial load) */
+static struct rte_mbuf **pcap_mbufs = NULL;
 static uint32_t num_pcap_packets = 0;
 static uint32_t current_packet_idx = 0;
 
@@ -53,6 +46,8 @@ static void signal_handler(int signum)
     if (signum == SIGINT || signum == SIGTERM) {
         printf("\n\n[SIGNAL] Received signal %d (Ctrl+C), initiating graceful shutdown...\n", signum);
         force_quit = 1;
+
+        /* Flush output to ensure user sees the message */
         fflush(stdout);
     }
 }
@@ -88,15 +83,18 @@ static int port_init(uint16_t port, struct rte_mempool *mbuf_pool)
     if (retval != 0)
         return retval;
 
+    /* Allocate TX queue */
     retval = rte_eth_tx_queue_setup(port, 0, nb_txd,
             rte_eth_dev_socket_id(port), NULL);
     if (retval < 0)
         return retval;
 
+    /* Start the Ethernet port */
     retval = rte_eth_dev_start(port);
     if (retval < 0)
         return retval;
 
+    /* Enable promiscuous mode */
     retval = rte_eth_promiscuous_enable(port);
     if (retval != 0)
         return retval;
@@ -105,7 +103,7 @@ static int port_init(uint16_t port, struct rte_mempool *mbuf_pool)
     return 0;
 }
 
-/* Load PCAP file into simple struct array */
+/* Load PCAP file and pre-allocate mbufs */
 static int load_pcap(const char *filename)
 {
     pcap_t *pcap;
@@ -113,6 +111,8 @@ static int load_pcap(const char *filename)
     struct pcap_pkthdr *header;
     const u_char *data;
     int ret;
+    struct rte_mbuf *m;
+    char *pkt_buf;
 
     printf("Loading PCAP file: %s\n", filename);
 
@@ -122,30 +122,45 @@ static int load_pcap(const char *filename)
         return -1;
     }
 
-    pcap_packets = malloc(MAX_PCAP_PACKETS * sizeof(struct packet_data));
-    if (pcap_packets == NULL) {
-        printf("Failed to allocate memory for PCAP packets\n");
+    /* Allocate array of mbuf pointers */
+    pcap_mbufs = malloc(MAX_PCAP_PACKETS * sizeof(struct rte_mbuf *));
+    if (pcap_mbufs == NULL) {
+        printf("Failed to allocate memory for mbuf pointers\n");
         pcap_close(pcap);
         return -1;
     }
 
+    /* Read all packets and pre-load into mbufs */
     num_pcap_packets = 0;
     while ((ret = pcap_next_ex(pcap, &header, &data)) >= 0) {
-        if (ret == 0) continue;
+        if (ret == 0) continue; /* Timeout */
 
         if (num_pcap_packets >= MAX_PCAP_PACKETS) {
             printf("Warning: PCAP has more than %d packets, truncating\n", MAX_PCAP_PACKETS);
             break;
         }
 
-        if (header->caplen > sizeof(pcap_packets[0].data)) {
+        if (header->caplen > 2048) {
             printf("Warning: packet %u too large (%u bytes), skipping\n",
                    num_pcap_packets, header->caplen);
             continue;
         }
 
-        memcpy(pcap_packets[num_pcap_packets].data, data, header->caplen);
-        pcap_packets[num_pcap_packets].len = header->caplen;
+        /* Allocate mbuf */
+        m = rte_pktmbuf_alloc(mbuf_pool);
+        if (m == NULL) {
+            printf("Failed to allocate mbuf for packet %u\n", num_pcap_packets);
+            break;
+        }
+
+        /* Copy packet data to mbuf (ONE TIME ONLY) */
+        pkt_buf = rte_pktmbuf_mtod(m, char *);
+        rte_memcpy(pkt_buf, data, header->caplen);
+        m->data_len = header->caplen;
+        m->pkt_len = header->caplen;
+
+        /* Store mbuf pointer */
+        pcap_mbufs[num_pcap_packets] = m;
         num_pcap_packets++;
 
         if (num_pcap_packets % 1000000 == 0)
@@ -153,7 +168,7 @@ static int load_pcap(const char *filename)
     }
 
     pcap_close(pcap);
-    printf("Loaded %u packets from PCAP\n", num_pcap_packets);
+    printf("Loaded %u packets from PCAP (pre-loaded into mbufs)\n", num_pcap_packets);
     return 0;
 }
 
@@ -182,40 +197,44 @@ static void send_loop(void)
     window_start_tsc = start_tsc;
 
     while (!force_quit) {
-        /* Allocate fresh mbufs */
-        if (rte_pktmbuf_alloc_bulk(mbuf_pool, pkts, BURST_SIZE) != 0) {
-            rte_delay_us_block(100);
-            continue;
-        }
-
-        /* Fill mbufs with PCAP data */
+        /* Fill burst with cloned mbufs (safe reuse without refcount corruption) */
         for (i = 0; i < BURST_SIZE; i++) {
-            struct packet_data *pkt_data = &pcap_packets[current_packet_idx];
+            /* Clone mbuf for safe reuse - TX will auto-free the clone */
+            struct rte_mbuf *pkt_clone = rte_pktmbuf_clone(
+                pcap_mbufs[current_packet_idx], mbuf_pool);
 
-            char *pkt_buf = rte_pktmbuf_mtod(pkts[i], char *);
-            rte_memcpy(pkt_buf, pkt_data->data, pkt_data->len);
-            pkts[i]->data_len = pkt_data->len;
-            pkts[i]->pkt_len = pkt_data->len;
+            if (pkt_clone == NULL) {
+                /* Clone failed (rare), fill remaining with NULLs */
+                pkts[i] = NULL;
+            } else {
+                pkts[i] = pkt_clone;
+            }
 
+            /* Move to next packet (loop through PCAP) */
             current_packet_idx++;
             if (current_packet_idx >= num_pcap_packets)
                 current_packet_idx = 0;
         }
 
-        /* Send burst */
-        nb_tx = rte_eth_tx_burst(port_id, 0, pkts, BURST_SIZE);
+        /* Send burst (only valid packets) */
+        uint16_t valid_pkts = 0;
+        for (i = 0; i < BURST_SIZE; i++) {
+            if (pkts[i] != NULL)
+                pkts[valid_pkts++] = pkts[i];
+        }
+
+        nb_tx = rte_eth_tx_burst(port_id, 0, pkts, valid_pkts);
         total_packets_sent += nb_tx;
 
-        /* Track bytes for rate limiting */
+        /* Track bytes sent for rate limiting */
         for (i = 0; i < nb_tx; i++) {
             bytes_sent_in_window += pkts[i]->pkt_len;
             total_bytes_sent += pkts[i]->pkt_len;
         }
 
-        /* Free unsent packets */
-        if (unlikely(nb_tx < BURST_SIZE)) {
-            for (i = nb_tx; i < BURST_SIZE; i++)
-                rte_pktmbuf_free(pkts[i]);
+        /* Free unsent packets (TX didn't take ownership) */
+        for (i = nb_tx; i < valid_pkts; i++) {
+            rte_pktmbuf_free(pkts[i]);
         }
 
         /* Rate limiting */
@@ -227,12 +246,12 @@ static void send_loop(void)
             bytes_sent_in_window = 0;
             window_start_tsc = cur_tsc;
         } else if (bytes_sent_in_window > (uint64_t)(target_bytes_per_sec * elapsed_sec)) {
-            /* Too fast, calculate sleep time */
+            /* We're too fast, calculate how long to sleep */
             double bytes_expected = target_bytes_per_sec * elapsed_sec;
             double bytes_over = bytes_sent_in_window - bytes_expected;
             uint64_t sleep_ns = (uint64_t)((bytes_over * 8.0 * 1e9) / (TARGET_GBPS * 1e9));
 
-            if (sleep_ns > 0 && sleep_ns < 100000) {
+            if (sleep_ns > 0 && sleep_ns < 100000) { /* Max 100us sleep */
                 rte_delay_us_block(sleep_ns / 1000);
             }
         }
@@ -267,6 +286,7 @@ int main(int argc, char *argv[])
     int ret;
     char *pcap_file = NULL;
 
+    /* Initialize EAL */
     ret = rte_eal_init(argc, argv);
     if (ret < 0)
         rte_exit(EXIT_FAILURE, "Error with EAL initialization\n");
@@ -274,6 +294,7 @@ int main(int argc, char *argv[])
     argc -= ret;
     argv += ret;
 
+    /* Check for PCAP file argument */
     if (argc < 2) {
         printf("Usage: %s [EAL options] -- <pcap_file>\n", argv[0]);
         return -1;
@@ -281,35 +302,92 @@ int main(int argc, char *argv[])
 
     pcap_file = argv[1];
 
+    /* Install signal handler */
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
 
+    /* Check for available ports */
     if (rte_eth_dev_count_avail() == 0)
         rte_exit(EXIT_FAILURE, "No Ethernet ports available\n");
 
+    /* Create mbuf pool (1.5M mbufs for pre-loaded packets) */
     mbuf_pool = rte_pktmbuf_pool_create("MBUF_POOL", NUM_MBUFS,
         MBUF_CACHE_SIZE, 0, RTE_MBUF_DEFAULT_BUF_SIZE, rte_socket_id());
 
     if (mbuf_pool == NULL)
         rte_exit(EXIT_FAILURE, "Cannot create mbuf pool\n");
 
+    /* Initialize port */
     if (port_init(port_id, mbuf_pool) != 0)
         rte_exit(EXIT_FAILURE, "Cannot init port %u\n", port_id);
 
+    /* Load PCAP file and pre-load mbufs */
     if (load_pcap(pcap_file) != 0)
         rte_exit(EXIT_FAILURE, "Failed to load PCAP file\n");
 
+    /* Start sending */
     send_loop();
 
-    /* Cleanup - INSTANTANEOUS */
+    /* Cleanup */
     printf("Stopping port %u...\n", port_id);
     rte_eth_dev_stop(port_id);
     rte_eth_dev_close(port_id);
 
-    if (pcap_packets) {
-        printf("Freeing PCAP data...\n");
-        free(pcap_packets);  /* Single free - instant! */
-        printf("Cleanup complete.\n");
+    /* Free pre-loaded mbufs with CPU yield to prevent soft lockup */
+    if (pcap_mbufs) {
+        printf("Freeing %u pre-loaded mbufs...\n", num_pcap_packets);
+
+        uint64_t hz = rte_get_tsc_hz();
+        uint64_t cleanup_start = rte_rdtsc();
+        uint64_t cleanup_timeout = hz * 10;  /* 10 second timeout */
+        uint32_t freed_count = 0;
+        uint32_t skipped_count = 0;
+
+        /* Free in batches with CPU yields to prevent soft lockup */
+        const uint32_t BATCH_SIZE = 5000;  /* Small batches */
+
+        for (uint32_t i = 0; i < num_pcap_packets; i++) {
+            if (pcap_mbufs[i]) {
+                /* Force free regardless of refcount */
+                uint16_t refcnt = rte_mbuf_refcnt_read(pcap_mbufs[i]);
+
+                if (refcnt == 1) {
+                    /* Normal case - single reference */
+                    rte_pktmbuf_free(pcap_mbufs[i]);
+                    freed_count++;
+                } else if (refcnt > 1) {
+                    /* Force free by decrementing all references */
+                    while (rte_mbuf_refcnt_read(pcap_mbufs[i]) > 1) {
+                        rte_mbuf_refcnt_update(pcap_mbufs[i], -1);
+                    }
+                    rte_pktmbuf_free(pcap_mbufs[i]);
+                    freed_count++;
+                } else {
+                    /* Already freed or corrupted */
+                    skipped_count++;
+                }
+            }
+
+            /* Yield CPU every batch to prevent soft lockup */
+            if (i > 0 && i % BATCH_SIZE == 0) {
+                rte_delay_us_block(100);  /* 100us yield every 5K mbufs */
+
+                /* Progress indicator every 100K */
+                if (i % 100000 == 0) {
+                    printf("  Progress: %u/%u mbufs processed...\n", i, num_pcap_packets);
+                }
+
+                /* Timeout check */
+                uint64_t elapsed = rte_rdtsc() - cleanup_start;
+                if (elapsed > cleanup_timeout) {
+                    printf("WARNING: Cleanup timeout after %u packets, forcing exit\n", i);
+                    break;
+                }
+            }
+        }
+
+        free(pcap_mbufs);
+        printf("Cleanup complete: %u freed, %u skipped\n", freed_count, skipped_count);
     }
 
     printf("Sender stopped.\n");
