@@ -18,10 +18,10 @@
 
 #define RX_RING_SIZE 1024
 #define TX_RING_SIZE 8192
-#define NUM_MBUFS 10500000      /* 10M PCAP packets + 500K overhead */
-#define MBUF_CACHE_SIZE 256     /* Reduced cache size */
+#define NUM_MBUFS 1572864       /* 1.5M mbufs for pre-loaded packets */
+#define MBUF_CACHE_SIZE 256
 #define BURST_SIZE 512
-#define MAX_PCAP_PACKETS 10000000
+#define MAX_PCAP_PACKETS 1500000  /* Pre-load 1.5M packets */
 
 /* Target transmission rate: 7 Gbps */
 #define TARGET_GBPS 7.0
@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
     if (rte_eth_dev_count_avail() == 0)
         rte_exit(EXIT_FAILURE, "No Ethernet ports available\n");
 
-    /* Create mbuf pool (12M mbufs for 10M packets + overhead) */
+    /* Create mbuf pool (1.5M mbufs for pre-loaded packets) */
     mbuf_pool = rte_pktmbuf_pool_create("MBUF_POOL", NUM_MBUFS,
         MBUF_CACHE_SIZE, 0, RTE_MBUF_DEFAULT_BUF_SIZE, rte_socket_id());
 
