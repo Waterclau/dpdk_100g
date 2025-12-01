@@ -39,7 +39,7 @@
 #include <rte_hash.h>
 #include <rte_jhash.h>
 
-#define RX_RING_SIZE 65536       /* Increased for 17+ Gbps - Phase 2 optimization */
+#define RX_RING_SIZE 32768       /* Max for uint16_t compatibility (must be power of 2) */
 #define TX_RING_SIZE 4096
 #define NUM_MBUFS 524288         /* Keep at 524K to avoid soft lockup on cleanup */
 #define MBUF_CACHE_SIZE 512
@@ -758,8 +758,8 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         rx_errors,
         drop_color, total_nic_drops, drop_rate, COLOR_RESET,
         rx_bursts_total, empty_burst_rate,
-        total_pkts,
-        rx_pkts_nic > 0 ? (double)total_pkts * 100.0 / rx_pkts_nic : 0.0);
+        g_stats.total_packets,
+        rx_pkts_nic > 0 ? (double)g_stats.total_packets * 100.0 / rx_pkts_nic : 0.0);
 
     printf("%s", buffer);
 
@@ -769,10 +769,10 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     }
 
     /* Reset instantaneous counters */
-    rte_atomic64_clear(&window_baseline_pkts);
-    rte_atomic64_clear(&window_attack_pkts);
-    rte_atomic64_clear(&window_baseline_bytes);
-    rte_atomic64_clear(&window_attack_bytes);
+    memset(window_baseline_pkts, 0, sizeof(window_baseline_pkts));
+    memset(window_attack_pkts, 0, sizeof(window_attack_pkts));
+    memset(window_baseline_bytes, 0, sizeof(window_baseline_bytes));
+    memset(window_attack_bytes, 0, sizeof(window_attack_bytes));
     last_window_reset_tsc = cur_tsc;
 }
 
@@ -1085,10 +1085,10 @@ int main(int argc, char *argv[])
     memset(&g_stats, 0, sizeof(g_stats));
     memset(g_ip_table, 0, sizeof(g_ip_table));
     rte_atomic32_init(&g_ip_count);
-    rte_atomic64_init(&window_baseline_pkts);
-    rte_atomic64_init(&window_attack_pkts);
-    rte_atomic64_init(&window_baseline_bytes);
-    rte_atomic64_init(&window_attack_bytes);
+    memset(window_baseline_pkts, 0, sizeof(window_baseline_pkts));
+    memset(window_attack_pkts, 0, sizeof(window_attack_pkts));
+    memset(window_baseline_bytes, 0, sizeof(window_baseline_bytes));
+    memset(window_attack_bytes, 0, sizeof(window_attack_bytes));
 
     printf("\n╔═══════════════════════════════════════════════════════════════════════╗\n");
     printf("║       MIRA DDoS DETECTOR - MULTI-CORE (%d workers + 1 coordinator)    ║\n", NUM_RX_QUEUES);
