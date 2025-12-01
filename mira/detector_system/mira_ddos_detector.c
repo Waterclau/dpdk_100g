@@ -105,38 +105,63 @@ struct ip_stats {
     bool is_active;
 } __rte_cache_aligned;
 
-/* Global statistics - ATOMIC for multi-core */
+/* Per-worker statistics - NO ATOMICS (lock-free) */
+struct worker_stats {
+    /* Packet counters */
+    uint64_t total_packets;
+    uint64_t baseline_packets;
+    uint64_t attack_packets;
+    uint64_t tcp_packets;
+    uint64_t udp_packets;
+    uint64_t icmp_packets;
+
+    /* Attack-specific counters */
+    uint64_t syn_packets;
+    uint64_t syn_ack_packets;
+    uint64_t http_requests;
+    uint64_t dns_queries;
+
+    /* Bytes counters */
+    uint64_t total_bytes;
+    uint64_t baseline_bytes;
+    uint64_t attack_bytes;
+
+    /* DPDK Performance */
+    uint64_t rx_bursts_empty;
+    uint64_t rx_bursts_total;
+} __rte_cache_aligned;
+
+/* Global statistics - Aggregated by coordinator */
 struct detection_stats {
-    /* Packet counters - ATOMIC */
-    rte_atomic64_t total_packets;
-    rte_atomic64_t baseline_packets;
-    rte_atomic64_t attack_packets;
-    rte_atomic64_t tcp_packets;
-    rte_atomic64_t udp_packets;
-    rte_atomic64_t icmp_packets;
-    rte_atomic64_t other_packets;
+    /* Aggregated packet counters (updated by coordinator) */
+    uint64_t total_packets;
+    uint64_t baseline_packets;
+    uint64_t attack_packets;
+    uint64_t tcp_packets;
+    uint64_t udp_packets;
+    uint64_t icmp_packets;
 
-    /* Attack-specific counters - ATOMIC */
-    rte_atomic64_t syn_packets;
-    rte_atomic64_t syn_ack_packets;
-    rte_atomic64_t http_requests;
-    rte_atomic64_t dns_queries;
+    /* Aggregated attack-specific counters */
+    uint64_t syn_packets;
+    uint64_t syn_ack_packets;
+    uint64_t http_requests;
+    uint64_t dns_queries;
 
-    /* Bytes counters - ATOMIC */
-    rte_atomic64_t total_bytes;
-    rte_atomic64_t bytes_in;
-    rte_atomic64_t bytes_out;
+    /* Aggregated bytes counters */
+    uint64_t total_bytes;
+    uint64_t baseline_bytes;
+    uint64_t attack_bytes;
 
-    /* Detection metrics - ATOMIC */
-    rte_atomic64_t udp_flood_detections;
-    rte_atomic64_t syn_flood_detections;
-    rte_atomic64_t http_flood_detections;
-    rte_atomic64_t icmp_flood_detections;
-    rte_atomic64_t total_flood_detections;
-    rte_atomic64_t dns_amp_detections;
-    rte_atomic64_t ntp_amp_detections;
-    rte_atomic64_t ack_flood_detections;
-    rte_atomic64_t frag_attack_detections;
+    /* Detection metrics */
+    uint64_t udp_flood_detections;
+    uint64_t syn_flood_detections;
+    uint64_t http_flood_detections;
+    uint64_t icmp_flood_detections;
+    uint64_t total_flood_detections;
+    uint64_t dns_amp_detections;
+    uint64_t ntp_amp_detections;
+    uint64_t ack_flood_detections;
+    uint64_t frag_attack_detections;
 
     /* Timestamps */
     uint64_t window_start_tsc;
@@ -152,15 +177,14 @@ struct detection_stats {
     bool detection_triggered;
 
     /* DPDK Performance */
-    rte_atomic64_t rx_packets_nic;
-    rte_atomic64_t rx_dropped_nic;
-    rte_atomic64_t rx_errors_nic;
-    rte_atomic64_t rx_nombuf_nic;
-    rte_atomic64_t rx_bursts_empty;
-    rte_atomic64_t rx_bursts_total;
+    uint64_t rx_packets_nic;
+    uint64_t rx_dropped_nic;
+    uint64_t rx_errors_nic;
+    uint64_t rx_nombuf_nic;
+    uint64_t rx_bursts_empty;
+    uint64_t rx_bursts_total;
 
     /* CPU efficiency */
-    rte_atomic64_t total_processing_cycles;
     double cycles_per_packet;
     double throughput_gbps;
 
@@ -175,11 +199,11 @@ struct detection_stats {
 #define COLOR_YELLOW  "\033[1;33m"
 #define COLOR_RED     "\033[1;31m"
 
-/* Instantaneous metrics - ATOMIC for multi-core */
-static rte_atomic64_t window_baseline_pkts;
-static rte_atomic64_t window_attack_pkts;
-static rte_atomic64_t window_baseline_bytes;
-static rte_atomic64_t window_attack_bytes;
+/* Instantaneous metrics - per-worker (lock-free) */
+static uint64_t window_baseline_pkts[NUM_RX_QUEUES];
+static uint64_t window_attack_pkts[NUM_RX_QUEUES];
+static uint64_t window_baseline_bytes[NUM_RX_QUEUES];
+static uint64_t window_attack_bytes[NUM_RX_QUEUES];
 static uint64_t last_window_reset_tsc = 0;
 
 /* Global variables */
@@ -187,6 +211,7 @@ static volatile bool force_quit = false;
 static struct ip_stats g_ip_table[MAX_IPS];
 static rte_atomic32_t g_ip_count;
 static struct detection_stats g_stats;
+static struct worker_stats g_worker_stats[NUM_RX_QUEUES] __rte_cache_aligned;
 static FILE *g_log_file = NULL;
 static struct rte_hash *ip_hash = NULL;
 
@@ -310,7 +335,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
             /* UDP Flood */
             if (udp_pps > udp_threshold) {
-                rte_atomic64_inc(&g_stats.udp_flood_detections);
+                g_stats.udp_flood_detections++;
                 g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
@@ -323,7 +348,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
             /* SYN Flood */
             if (syn_pps > syn_threshold) {
-                rte_atomic64_inc(&g_stats.syn_flood_detections);
+                g_stats.syn_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
@@ -337,7 +362,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
             /* ICMP Flood */
             if (icmp_pps > icmp_threshold) {
-                rte_atomic64_inc(&g_stats.icmp_flood_detections);
+                g_stats.icmp_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
@@ -351,7 +376,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
             /* DNS Amplification */
             if (is_attack && dns_pps > DNS_AMP_THRESHOLD) {
-                rte_atomic64_inc(&g_stats.dns_amp_detections);
+                g_stats.dns_amp_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
@@ -365,7 +390,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
             /* NTP Amplification */
             if (is_attack && ntp_pps > NTP_AMP_THRESHOLD) {
-                rte_atomic64_inc(&g_stats.ntp_amp_detections);
+                g_stats.ntp_amp_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
@@ -379,7 +404,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
             /* ACK Flood */
             if (is_attack && ack_pps > ACK_FLOOD_THRESHOLD) {
-                rte_atomic64_inc(&g_stats.ack_flood_detections);
+                g_stats.ack_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
@@ -393,7 +418,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
             /* HTTP Flood */
             if (http_pps > http_threshold) {
-                rte_atomic64_inc(&g_stats.http_flood_detections);
+                g_stats.http_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
@@ -407,7 +432,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
             /* Fragmentation Attack */
             if (is_attack && frag_pps > FRAG_THRESHOLD) {
-                rte_atomic64_inc(&g_stats.frag_attack_detections);
+                g_stats.frag_attack_detections++;
                 if (g_stats.alert_level < ALERT_MEDIUM)
                     g_stats.alert_level = ALERT_MEDIUM;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
@@ -421,7 +446,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
             /* Packet Flood */
             if (total_pps > total_threshold) {
-                rte_atomic64_inc(&g_stats.total_flood_detections);
+                g_stats.total_flood_detections++;
                 if (g_stats.alert_level < ALERT_MEDIUM)
                     g_stats.alert_level = ALERT_MEDIUM;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
@@ -438,8 +463,8 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         if (attack_detected && !g_stats.detection_triggered) {
             g_stats.first_detection_tsc = cur_tsc;
             g_stats.detection_triggered = true;
-            g_stats.packets_until_detection = rte_atomic64_read(&g_stats.total_packets);
-            g_stats.bytes_until_detection = rte_atomic64_read(&g_stats.total_bytes);
+            g_stats.packets_until_detection = g_stats.total_packets;
+            g_stats.bytes_until_detection = g_stats.total_bytes;
 
             if (g_stats.first_attack_packet_tsc > 0) {
                 uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
@@ -474,10 +499,10 @@ static void update_dpdk_stats(uint16_t port)
     struct rte_eth_stats eth_stats;
 
     if (rte_eth_stats_get(port, &eth_stats) == 0) {
-        rte_atomic64_set(&g_stats.rx_packets_nic, eth_stats.ipackets);
-        rte_atomic64_set(&g_stats.rx_dropped_nic, eth_stats.imissed);
-        rte_atomic64_set(&g_stats.rx_errors_nic, eth_stats.ierrors);
-        rte_atomic64_set(&g_stats.rx_nombuf_nic, eth_stats.rx_nombuf);
+        g_stats.rx_packets_nic = eth_stats.ipackets;
+        g_stats.rx_dropped_nic = eth_stats.imissed;
+        g_stats.rx_errors_nic = eth_stats.ierrors;
+        g_stats.rx_nombuf_nic = eth_stats.rx_nombuf;
     }
 }
 
@@ -492,12 +517,52 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     g_stats.last_stats_tsc = cur_tsc;
     update_dpdk_stats(port);
 
+    /* Aggregate stats from all workers (lock-free read) */
+    g_stats.total_packets = 0;
+    g_stats.baseline_packets = 0;
+    g_stats.attack_packets = 0;
+    g_stats.tcp_packets = 0;
+    g_stats.udp_packets = 0;
+    g_stats.icmp_packets = 0;
+    g_stats.syn_packets = 0;
+    g_stats.syn_ack_packets = 0;
+    g_stats.http_requests = 0;
+    g_stats.dns_queries = 0;
+    g_stats.total_bytes = 0;
+    g_stats.baseline_bytes = 0;
+    g_stats.attack_bytes = 0;
+    g_stats.rx_bursts_total = 0;
+    g_stats.rx_bursts_empty = 0;
+
+    for (int i = 0; i < NUM_RX_QUEUES; i++) {
+        g_stats.total_packets += g_worker_stats[i].total_packets;
+        g_stats.baseline_packets += g_worker_stats[i].baseline_packets;
+        g_stats.attack_packets += g_worker_stats[i].attack_packets;
+        g_stats.tcp_packets += g_worker_stats[i].tcp_packets;
+        g_stats.udp_packets += g_worker_stats[i].udp_packets;
+        g_stats.icmp_packets += g_worker_stats[i].icmp_packets;
+        g_stats.syn_packets += g_worker_stats[i].syn_packets;
+        g_stats.syn_ack_packets += g_worker_stats[i].syn_ack_packets;
+        g_stats.http_requests += g_worker_stats[i].http_requests;
+        g_stats.dns_queries += g_worker_stats[i].dns_queries;
+        g_stats.total_bytes += g_worker_stats[i].total_bytes;
+        g_stats.baseline_bytes += g_worker_stats[i].baseline_bytes;
+        g_stats.attack_bytes += g_worker_stats[i].attack_bytes;
+        g_stats.rx_bursts_total += g_worker_stats[i].rx_bursts_total;
+        g_stats.rx_bursts_empty += g_worker_stats[i].rx_bursts_empty;
+    }
+
     double window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
 
-    uint64_t window_base_pkts = rte_atomic64_read(&window_baseline_pkts);
-    uint64_t window_att_pkts = rte_atomic64_read(&window_attack_pkts);
-    uint64_t window_base_bytes = rte_atomic64_read(&window_baseline_bytes);
-    uint64_t window_att_bytes = rte_atomic64_read(&window_attack_bytes);
+    /* Aggregate window stats */
+    uint64_t window_base_pkts = 0, window_att_pkts = 0;
+    uint64_t window_base_bytes = 0, window_att_bytes = 0;
+    for (int i = 0; i < NUM_RX_QUEUES; i++) {
+        window_base_pkts += window_baseline_pkts[i];
+        window_att_pkts += window_attack_pkts[i];
+        window_base_bytes += window_baseline_bytes[i];
+        window_att_bytes += window_attack_bytes[i];
+    }
 
     uint64_t window_total_pkts = window_base_pkts + window_att_pkts;
     uint64_t window_total_bytes = window_base_bytes + window_att_bytes;
@@ -511,7 +576,6 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     }
 
     /* Calculate cycles available per packet at current PPS (not actual usage) */
-    uint64_t total_pkts = rte_atomic64_read(&g_stats.total_packets);
     if (window_total_pkts > 0 && window_duration > 0.001) {
         double pps = (double)window_total_pkts / window_duration;
         if (pps > 0) {
@@ -534,12 +598,6 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     double inst_baseline_pct = window_total_pkts > 0 ? (double)window_base_pkts * 100.0 / window_total_pkts : 0.0;
     double inst_attack_pct = window_total_pkts > 0 ? (double)window_att_pkts * 100.0 / window_total_pkts : 0.0;
 
-    uint64_t baseline_pkts = rte_atomic64_read(&g_stats.baseline_packets);
-    uint64_t attack_pkts = rte_atomic64_read(&g_stats.attack_packets);
-    uint64_t tcp_pkts = rte_atomic64_read(&g_stats.tcp_packets);
-    uint64_t udp_pkts = rte_atomic64_read(&g_stats.udp_packets);
-    uint64_t icmp_pkts = rte_atomic64_read(&g_stats.icmp_packets);
-
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[PACKET COUNTERS - GLOBAL]\n"
         "  Total packets:      %" PRIu64 "\n"
@@ -548,12 +606,12 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         "  TCP packets:        %" PRIu64 "\n"
         "  UDP packets:        %" PRIu64 "\n"
         "  ICMP packets:       %" PRIu64 "\n\n",
-        total_pkts,
-        baseline_pkts,
-        total_pkts > 0 ? (double)baseline_pkts * 100.0 / total_pkts : 0.0,
-        attack_pkts,
-        total_pkts > 0 ? (double)attack_pkts * 100.0 / total_pkts : 0.0,
-        tcp_pkts, udp_pkts, icmp_pkts);
+        g_stats.total_packets,
+        g_stats.baseline_packets,
+        g_stats.total_packets > 0 ? (double)g_stats.baseline_packets * 100.0 / g_stats.total_packets : 0.0,
+        g_stats.attack_packets,
+        g_stats.total_packets > 0 ? (double)g_stats.attack_packets * 100.0 / g_stats.total_packets : 0.0,
+        g_stats.tcp_packets, g_stats.udp_packets, g_stats.icmp_packets);
 
     double avg_pkt_size = window_total_pkts > 0 ? (double)window_total_bytes / window_total_pkts : 0.0;
 
@@ -569,10 +627,10 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         window_duration > 0 ? (window_att_bytes * 8.0) / (window_duration * 1e9) : 0.0,
         instantaneous_throughput_gbps, avg_pkt_size);
 
-    uint64_t syn_pkts = rte_atomic64_read(&g_stats.syn_packets);
-    uint64_t syn_ack_pkts = rte_atomic64_read(&g_stats.syn_ack_packets);
-    uint64_t http_reqs = rte_atomic64_read(&g_stats.http_requests);
-    uint64_t dns_qs = rte_atomic64_read(&g_stats.dns_queries);
+    uint64_t syn_pkts = g_stats.syn_packets;
+    uint64_t syn_ack_pkts = g_stats.syn_ack_packets;
+    uint64_t http_reqs = g_stats.http_requests;
+    uint64_t dns_qs = g_stats.dns_queries;
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[ATTACK-SPECIFIC COUNTERS]\n"
@@ -597,15 +655,15 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         "  Frag attack events: %" PRIu64 "\n"
         "  Packet flood events:%" PRIu64 "\n"
         "  (Note: Events count IPs exceeding thresholds per 50ms window)\n\n",
-        rte_atomic64_read(&g_stats.udp_flood_detections),
-        rte_atomic64_read(&g_stats.syn_flood_detections),
-        rte_atomic64_read(&g_stats.http_flood_detections),
-        rte_atomic64_read(&g_stats.icmp_flood_detections),
-        rte_atomic64_read(&g_stats.dns_amp_detections),
-        rte_atomic64_read(&g_stats.ntp_amp_detections),
-        rte_atomic64_read(&g_stats.ack_flood_detections),
-        rte_atomic64_read(&g_stats.frag_attack_detections),
-        rte_atomic64_read(&g_stats.total_flood_detections));
+        g_stats.udp_flood_detections,
+        g_stats.syn_flood_detections,
+        g_stats.http_flood_detections,
+        g_stats.icmp_flood_detections,
+        g_stats.dns_amp_detections,
+        g_stats.ntp_amp_detections,
+        g_stats.ack_flood_detections,
+        g_stats.frag_attack_detections,
+        g_stats.total_flood_detections);
 
     const char *alert_color = COLOR_RESET;
     const char *alert_text = "NONE";
@@ -668,16 +726,16 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         NUM_RX_QUEUES,
         NUM_RX_QUEUES);
 
-    uint64_t rx_pkts_nic = rte_atomic64_read(&g_stats.rx_packets_nic);
-    uint64_t rx_dropped = rte_atomic64_read(&g_stats.rx_dropped_nic);
-    uint64_t rx_nombuf = rte_atomic64_read(&g_stats.rx_nombuf_nic);
-    uint64_t rx_errors = rte_atomic64_read(&g_stats.rx_errors_nic);
+    uint64_t rx_pkts_nic = g_stats.rx_packets_nic;
+    uint64_t rx_dropped = g_stats.rx_dropped_nic;
+    uint64_t rx_nombuf = g_stats.rx_nombuf_nic;
+    uint64_t rx_errors = g_stats.rx_errors_nic;
     uint64_t total_nic_drops = rx_dropped + rx_nombuf;
     double drop_rate = rx_pkts_nic > 0 ?
         (double)total_nic_drops * 100.0 / (rx_pkts_nic + total_nic_drops) : 0.0;
 
-    uint64_t rx_bursts_total = rte_atomic64_read(&g_stats.rx_bursts_total);
-    uint64_t rx_bursts_empty = rte_atomic64_read(&g_stats.rx_bursts_empty);
+    uint64_t rx_bursts_total = g_stats.rx_bursts_total;
+    uint64_t rx_bursts_empty = g_stats.rx_bursts_empty;
     double empty_burst_rate = rx_bursts_total > 0 ?
         (double)rx_bursts_empty * 100.0 / rx_bursts_total : 0.0;
 
@@ -733,9 +791,6 @@ static int worker_thread(void *arg)
     uint64_t local_baseline_bytes = 0, local_attack_bytes = 0;
     uint64_t local_bursts_total = 0, local_bursts_empty = 0;
     uint64_t local_cycles = 0;
-
-    uint64_t last_update_tsc = rte_rdtsc();
-    const uint64_t UPDATE_INTERVAL = 300000000; /* ~100ms at 3GHz - reduce atomic contention */
 
     printf("Worker thread %u processing queue %u on lcore %u\n",
            queue_id, queue_id, rte_lcore_id());
@@ -827,51 +882,53 @@ static int worker_thread(void *arg)
             rte_pktmbuf_free(m);
         }
 
-        /* Bulk update global counters every ~100ms to reduce contention */
-        uint64_t cur_tsc = rte_rdtsc();
-        if (unlikely(cur_tsc - last_update_tsc > UPDATE_INTERVAL)) {
-            rte_atomic64_add(&g_stats.total_packets, local_total_pkts);
-            rte_atomic64_add(&g_stats.total_bytes, local_total_bytes);
-            rte_atomic64_add(&g_stats.baseline_packets, local_baseline_pkts);
-            rte_atomic64_add(&g_stats.attack_packets, local_attack_pkts);
-            rte_atomic64_add(&g_stats.tcp_packets, local_tcp_pkts);
-            rte_atomic64_add(&g_stats.udp_packets, local_udp_pkts);
-            rte_atomic64_add(&g_stats.icmp_packets, local_icmp_pkts);
-            rte_atomic64_add(&g_stats.syn_packets, local_syn_pkts);
-            rte_atomic64_add(&g_stats.syn_ack_packets, local_syn_ack_pkts);
-            rte_atomic64_add(&g_stats.http_requests, local_http_reqs);
-            rte_atomic64_add(&g_stats.dns_queries, local_dns_queries);
-            rte_atomic64_add(&window_baseline_pkts, local_baseline_pkts);
-            rte_atomic64_add(&window_baseline_bytes, local_baseline_bytes);
-            rte_atomic64_add(&window_attack_pkts, local_attack_pkts);
-            rte_atomic64_add(&window_attack_bytes, local_attack_bytes);
-            rte_atomic64_add(&g_stats.rx_bursts_total, local_bursts_total);
-            rte_atomic64_add(&g_stats.rx_bursts_empty, local_bursts_empty);
+        /* Update per-worker stats (NO ATOMICS - lock-free!) */
+        struct worker_stats *ws = &g_worker_stats[queue_id];
+        ws->total_packets += local_total_pkts;
+        ws->total_bytes += local_total_bytes;
+        ws->baseline_packets += local_baseline_pkts;
+        ws->attack_packets += local_attack_pkts;
+        ws->tcp_packets += local_tcp_pkts;
+        ws->udp_packets += local_udp_pkts;
+        ws->icmp_packets += local_icmp_pkts;
+        ws->syn_packets += local_syn_pkts;
+        ws->syn_ack_packets += local_syn_ack_pkts;
+        ws->http_requests += local_http_reqs;
+        ws->dns_queries += local_dns_queries;
+        ws->baseline_bytes += local_baseline_bytes;
+        ws->attack_bytes += local_attack_bytes;
+        ws->rx_bursts_total += local_bursts_total;
+        ws->rx_bursts_empty += local_bursts_empty;
 
-            /* Reset local counters */
-            local_total_pkts = local_total_bytes = 0;
-            local_baseline_pkts = local_attack_pkts = 0;
-            local_tcp_pkts = local_udp_pkts = local_icmp_pkts = 0;
-            local_syn_pkts = local_syn_ack_pkts = 0;
-            local_http_reqs = local_dns_queries = 0;
-            local_baseline_bytes = local_attack_bytes = 0;
-            local_bursts_total = local_bursts_empty = 0;
-            last_update_tsc = cur_tsc;
-        }
+        /* Update window stats */
+        window_baseline_pkts[queue_id] += local_baseline_pkts;
+        window_baseline_bytes[queue_id] += local_baseline_bytes;
+        window_attack_pkts[queue_id] += local_attack_pkts;
+        window_attack_bytes[queue_id] += local_attack_bytes;
+
+        /* Reset local counters */
+        local_total_pkts = local_total_bytes = 0;
+        local_baseline_pkts = local_attack_pkts = 0;
+        local_tcp_pkts = local_udp_pkts = local_icmp_pkts = 0;
+        local_syn_pkts = local_syn_ack_pkts = 0;
+        local_http_reqs = local_dns_queries = 0;
+        local_baseline_bytes = local_attack_bytes = 0;
+        local_bursts_total = local_bursts_empty = 0;
     }
 
     /* Final update before exit */
-    rte_atomic64_add(&g_stats.total_packets, local_total_pkts);
-    rte_atomic64_add(&g_stats.total_bytes, local_total_bytes);
-    rte_atomic64_add(&g_stats.baseline_packets, local_baseline_pkts);
-    rte_atomic64_add(&g_stats.attack_packets, local_attack_pkts);
-    rte_atomic64_add(&g_stats.tcp_packets, local_tcp_pkts);
-    rte_atomic64_add(&g_stats.udp_packets, local_udp_pkts);
-    rte_atomic64_add(&g_stats.icmp_packets, local_icmp_pkts);
-    rte_atomic64_add(&g_stats.syn_packets, local_syn_pkts);
-    rte_atomic64_add(&g_stats.syn_ack_packets, local_syn_ack_pkts);
-    rte_atomic64_add(&g_stats.http_requests, local_http_reqs);
-    rte_atomic64_add(&g_stats.dns_queries, local_dns_queries);
+    struct worker_stats *ws = &g_worker_stats[queue_id];
+    ws->total_packets += local_total_pkts;
+    ws->total_bytes += local_total_bytes;
+    ws->baseline_packets += local_baseline_pkts;
+    ws->attack_packets += local_attack_pkts;
+    ws->tcp_packets += local_tcp_pkts;
+    ws->udp_packets += local_udp_pkts;
+    ws->icmp_packets += local_icmp_pkts;
+    ws->syn_packets += local_syn_pkts;
+    ws->syn_ack_packets += local_syn_ack_pkts;
+    ws->http_requests += local_http_reqs;
+    ws->dns_queries += local_dns_queries;
 
     return 0;
 }
