@@ -22,6 +22,13 @@ CFLAGS += -I.
 CFLAGS += -Wall -Wextra
 CFLAGS += -g
 
+# CPU-specific optimizations for high-performance packet processing
+CFLAGS += -march=native -mtune=native
+CFLAGS += -funroll-loops
+CFLAGS += -ffast-math
+CFLAGS += -flto
+LDFLAGS += -flto
+
 ifeq ($(V),1)
 CFLAGS += -DVERBOSE_DEBUG
 endif

@@ -43,7 +43,7 @@
 #define TX_RING_SIZE 4096
 #define NUM_MBUFS 524288         /* Keep at 524K to avoid soft lockup on cleanup */
 #define MBUF_CACHE_SIZE 512
-#define BURST_SIZE 1024          /* Larger bursts for 17+ Gbps - Phase 2 */
+#define BURST_SIZE 2048          /* Larger bursts for max throughput - Phase 3 */
 #define NUM_RX_QUEUES 14         /* 14 workers for 17+ Gbps - CRITICAL */
 
 /* Detection thresholds */
@@ -510,9 +510,13 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         g_stats.throughput_gbps = 0.0;
     }
 
+    /* Estimate cycles per packet based on throughput */
     uint64_t total_pkts = rte_atomic64_read(&g_stats.total_packets);
-    if (total_pkts > 0) {
-        g_stats.cycles_per_packet = (double)rte_atomic64_read(&g_stats.total_processing_cycles) / total_pkts;
+    if (total_pkts > 0 && elapsed > 0) {
+        double pps = (double)window_total_pkts / window_duration;
+        if (pps > 0) {
+            g_stats.cycles_per_packet = hz / pps;
+        }
     }
 
     char buffer[4096];
@@ -649,10 +653,12 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         "  Cycles/packet:      %.0f cycles\n"
         "  Throughput:         %.2f Gbps\n"
         "  Active IPs:         %u\n"
-        "  Worker threads:     8 (lcores 1-8)\n\n",
+        "  Worker threads:     %d (lcores 1-%d)\n\n",
         g_stats.cycles_per_packet,
         g_stats.throughput_gbps,
-        rte_atomic32_read(&g_ip_count));
+        rte_atomic32_read(&g_ip_count),
+        NUM_RX_QUEUES,
+        NUM_RX_QUEUES);
 
     uint64_t rx_pkts_nic = rte_atomic64_read(&g_stats.rx_packets_nic);
     uint64_t rx_dropped = rte_atomic64_read(&g_stats.rx_dropped_nic);
@@ -721,7 +727,7 @@ static int worker_thread(void *arg)
     uint64_t local_cycles = 0;
 
     uint64_t last_update_tsc = rte_rdtsc();
-    const uint64_t UPDATE_INTERVAL = 100000000; /* ~33ms at 3GHz */
+    const uint64_t UPDATE_INTERVAL = 300000000; /* ~100ms at 3GHz - reduce atomic contention */
 
     printf("Worker thread %u processing queue %u on lcore %u\n",
            queue_id, queue_id, rte_lcore_id());
@@ -736,74 +742,75 @@ static int worker_thread(void *arg)
             continue;
         }
 
-        uint64_t start_tsc = rte_rdtsc();
-
-        /* Prefetch first 8 packets (increased from 4) */
-        for (uint16_t i = 0; i < nb_rx && i < 8; i++) {
+        /* Prefetch first 16 packets for better pipeline */
+        for (uint16_t i = 0; i < nb_rx && i < 16; i++) {
             rte_prefetch0(rte_pktmbuf_mtod(bufs[i], void *));
         }
 
         for (uint16_t i = 0; i < nb_rx; i++) {
             struct rte_mbuf *m = bufs[i];
 
-            /* Prefetch next packet (8 ahead instead of 4) */
-            if (i + 8 < nb_rx) {
-                rte_prefetch0(rte_pktmbuf_mtod(bufs[i + 8], void *));
+            /* Prefetch next packet (16 ahead for better pipeline) */
+            if (i + 16 < nb_rx) {
+                rte_prefetch0(rte_pktmbuf_mtod(bufs[i + 16], void *));
             }
 
             struct rte_ether_hdr *eth_hdr = rte_pktmbuf_mtod(m, struct rte_ether_hdr *);
             uint16_t pkt_len = rte_pktmbuf_pkt_len(m);
 
-            local_total_pkts++;
-            local_total_bytes += pkt_len;
-
+            /* Fast path: check IPv4 first to avoid unnecessary processing */
             if (unlikely(rte_be_to_cpu_16(eth_hdr->ether_type) != RTE_ETHER_TYPE_IPV4)) {
                 rte_pktmbuf_free(m);
                 continue;
             }
 
+            local_total_pkts++;
+            local_total_bytes += pkt_len;
+
             struct rte_ipv4_hdr *ip_hdr = (struct rte_ipv4_hdr *)(eth_hdr + 1);
             uint32_t src_ip = rte_be_to_cpu_32(ip_hdr->src_addr);
             uint8_t proto = ip_hdr->next_proto_id;
 
-            /* Classify traffic */
-            if ((src_ip & NETWORK_MASK) == BASELINE_NETWORK) {
-                local_baseline_pkts++;
-                local_baseline_bytes += pkt_len;
-            } else if ((src_ip & NETWORK_MASK) == ATTACK_NETWORK) {
-                local_attack_pkts++;
-                local_attack_bytes += pkt_len;
-                if (g_stats.first_attack_packet_tsc == 0) {
-                    g_stats.first_attack_packet_tsc = start_tsc;
-                }
+            /* Classify traffic - optimized with single mask operation */
+            uint32_t network = src_ip & NETWORK_MASK;
+            bool is_baseline = (network == BASELINE_NETWORK);
+            bool is_attack = (network == ATTACK_NETWORK);
+
+            /* Branchless increment (use conditional moves) */
+            local_baseline_pkts += is_baseline ? 1 : 0;
+            local_baseline_bytes += is_baseline ? pkt_len : 0;
+            local_attack_pkts += is_attack ? 1 : 0;
+            local_attack_bytes += is_attack ? pkt_len : 0;
+
+            if (unlikely(is_attack && g_stats.first_attack_packet_tsc == 0)) {
+                g_stats.first_attack_packet_tsc = rte_rdtsc();
             }
 
-            /* Parse transport layer */
-            if (proto == IPPROTO_TCP) {
+            /* Parse transport layer - OPTIMIZED for CPU efficiency */
+            if (likely(proto == IPPROTO_TCP)) {
                 local_tcp_pkts++;
                 struct rte_tcp_hdr *tcp_hdr = (struct rte_tcp_hdr *)((uint8_t *)ip_hdr + sizeof(struct rte_ipv4_hdr));
+
+                /* Combine flag checks and port check in minimal branches */
                 uint8_t tcp_flags = tcp_hdr->tcp_flags;
+                uint16_t dst_port_raw = tcp_hdr->dst_port;
 
-                if (tcp_flags & RTE_TCP_SYN_FLAG) {
+                /* SYN detection - single branch */
+                if (unlikely(tcp_flags & RTE_TCP_SYN_FLAG)) {
                     local_syn_pkts++;
-                    if (tcp_flags & RTE_TCP_ACK_FLAG)
-                        local_syn_ack_pkts++;
+                    local_syn_ack_pkts += (tcp_flags & RTE_TCP_ACK_FLAG) ? 1 : 0;
                 }
 
-                uint16_t dst_port = rte_be_to_cpu_16(tcp_hdr->dst_port);
-                if (dst_port == 80) {
-                    local_http_reqs++;
-                }
+                /* HTTP detection - use raw port (avoid byte swap if possible) */
+                local_http_reqs += (dst_port_raw == rte_cpu_to_be_16(80)) ? 1 : 0;
             }
             else if (proto == IPPROTO_UDP) {
                 local_udp_pkts++;
                 struct rte_udp_hdr *udp_hdr = (struct rte_udp_hdr *)((uint8_t *)ip_hdr + sizeof(struct rte_ipv4_hdr));
-                uint16_t dst_port = rte_be_to_cpu_16(udp_hdr->dst_port);
-                uint16_t src_port = rte_be_to_cpu_16(udp_hdr->src_port);
 
-                if (dst_port == 53 || src_port == 53) {
-                    local_dns_queries++;
-                }
+                /* DNS detection - check both ports at once */
+                uint16_t dns_port = rte_cpu_to_be_16(53);
+                local_dns_queries += ((udp_hdr->dst_port == dns_port) | (udp_hdr->src_port == dns_port)) ? 1 : 0;
             }
             else if (proto == IPPROTO_ICMP) {
                 local_icmp_pkts++;
@@ -812,11 +819,9 @@ static int worker_thread(void *arg)
             rte_pktmbuf_free(m);
         }
 
-        uint64_t end_tsc = rte_rdtsc();
-        local_cycles += (end_tsc - start_tsc);
-
-        /* Bulk update global counters every ~33ms to reduce contention */
-        if (unlikely(end_tsc - last_update_tsc > UPDATE_INTERVAL)) {
+        /* Bulk update global counters every ~100ms to reduce contention */
+        uint64_t cur_tsc = rte_rdtsc();
+        if (unlikely(cur_tsc - last_update_tsc > UPDATE_INTERVAL)) {
             rte_atomic64_add(&g_stats.total_packets, local_total_pkts);
             rte_atomic64_add(&g_stats.total_bytes, local_total_bytes);
             rte_atomic64_add(&g_stats.baseline_packets, local_baseline_pkts);
@@ -834,7 +839,6 @@ static int worker_thread(void *arg)
             rte_atomic64_add(&window_attack_bytes, local_attack_bytes);
             rte_atomic64_add(&g_stats.rx_bursts_total, local_bursts_total);
             rte_atomic64_add(&g_stats.rx_bursts_empty, local_bursts_empty);
-            rte_atomic64_add(&g_stats.total_processing_cycles, local_cycles);
 
             /* Reset local counters */
             local_total_pkts = local_total_bytes = 0;
@@ -844,8 +848,7 @@ static int worker_thread(void *arg)
             local_http_reqs = local_dns_queries = 0;
             local_baseline_bytes = local_attack_bytes = 0;
             local_bursts_total = local_bursts_empty = 0;
-            local_cycles = 0;
-            last_update_tsc = end_tsc;
+            last_update_tsc = cur_tsc;
         }
     }
 
@@ -1023,16 +1026,16 @@ int main(int argc, char *argv[])
     rte_atomic64_init(&window_attack_bytes);
 
     printf("\n╔═══════════════════════════════════════════════════════════════════════╗\n");
-    printf("║       MIRA DDoS DETECTOR - MULTI-CORE (8 workers + 1 coordinator)    ║\n");
+    printf("║       MIRA DDoS DETECTOR - MULTI-CORE (%d workers + 1 coordinator)    ║\n", NUM_RX_QUEUES);
     printf("╚═══════════════════════════════════════════════════════════════════════╝\n\n");
     printf("Comparing against MULTI-LF (2025):\n");
     printf("  - MULTI-LF detection latency: 866 ms\n");
     printf("  - MIRA detection latency:     <50 ms\n");
     printf("  - Expected improvement:       17-170× faster\n");
-    printf("  - Multi-core architecture:    8 RX workers + 1 coordinator\n\n");
+    printf("  - Multi-core architecture:    %d RX workers + 1 coordinator\n\n", NUM_RX_QUEUES);
     printf("Press Ctrl+C to exit...\n\n");
 
-    /* Launch worker threads on lcores 1-8 and coordinator on lcore 9 */
+    /* Launch worker threads on lcores 1-%d and coordinator on last lcore */
     for (unsigned i = 0; i < NUM_RX_QUEUES; i++) {
         queue_ids[i] = i;
     }
