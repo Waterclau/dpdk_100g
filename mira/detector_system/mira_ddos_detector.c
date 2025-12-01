@@ -510,13 +510,17 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         g_stats.throughput_gbps = 0.0;
     }
 
-    /* Estimate cycles per packet based on throughput */
+    /* Calculate cycles available per packet at current PPS (not actual usage) */
     uint64_t total_pkts = rte_atomic64_read(&g_stats.total_packets);
-    if (total_pkts > 0 && elapsed > 0) {
+    if (window_total_pkts > 0 && window_duration > 0.001) {
         double pps = (double)window_total_pkts / window_duration;
         if (pps > 0) {
+            /* This shows cycles AVAILABLE per packet, not cycles USED */
+            /* Lower number = higher PPS = better throughput */
             g_stats.cycles_per_packet = hz / pps;
         }
+    } else {
+        g_stats.cycles_per_packet = 0;
     }
 
     char buffer[4096];
@@ -648,14 +652,18 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
             "    ✓ Constant memory usage\n\n");
     }
 
+    double pps_current = (window_total_pkts > 0 && window_duration > 0.001) ?
+                         (double)window_total_pkts / window_duration : 0.0;
+
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[PERFORMANCE METRICS]\n"
-        "  Cycles/packet:      %.0f cycles\n"
-        "  Throughput:         %.2f Gbps\n"
+        "  Throughput:         %.2f Gbps (%.2f Mpps)\n"
+        "  Cycles available:   %.0f cycles/pkt (lower = higher load)\n"
         "  Active IPs:         %u\n"
         "  Worker threads:     %d (lcores 1-%d)\n\n",
-        g_stats.cycles_per_packet,
         g_stats.throughput_gbps,
+        pps_current / 1e6,
+        g_stats.cycles_per_packet,
         rte_atomic32_read(&g_ip_count),
         NUM_RX_QUEUES,
         NUM_RX_QUEUES);
