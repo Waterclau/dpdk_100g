@@ -64,7 +64,7 @@ sudo python3 generate_benign_traffic.py \
     --src-mac 00:00:00:00:00:01 \
     --dst-mac 0c:42:a1:dd:5b:28 \
     --client-range 192.168.1.0/24 \
-    --server-ip 10.0.0.1 \
+    --server-ip 10.10.1.2 \
     --clients 500
 
 sudo python3 generate_benign_traffic.py \
@@ -73,7 +73,7 @@ sudo python3 generate_benign_traffic.py \
     --src-mac 00:00:00:00:00:01 \
     --dst-mac 0c:42:a1:dd:5b:28 \
     --client-range 192.168.1.0/24 \
-    --server-ip 10.0.0.1 \
+    --server-ip 10.10.1.2 \
     --clients 500
 
 # Verify PCAP
@@ -98,59 +98,58 @@ sudo apt-get update
 sudo apt-get install -y python3-pip
 pip3 install scapy
 
-# Option 1: UDP Flood (classic Mirai)
+# Option 1: UDP Flood (516-byte payloads, random ports - CICDDoS2019 style)
 sudo python3 generate_mirai_attacks.py \
     --output ../attack_udp_5M.pcap \
     --packets 5000000 \
     --attack-type udp \
     --dst-mac 0c:42:a1:dd:5b:28 \
-    --attacker-range 203.0.113.0/24 \
-    --target-ip 10.0.0.1 \
+    --attacker-range 192.168.2.0/24 \
+    --target-ip 10.10.1.2 \
     --attackers 200
 
-# Option 2: SYN Flood
+# Option 2: SYN Flood (ports 80/443/22 - simple Mirai style)
 sudo python3 generate_mirai_attacks.py \
     --output ../attack_syn_5M.pcap \
     --packets 5000000 \
     --attack-type syn \
     --dst-mac 0c:42:a1:dd:5b:28 \
-    --attacker-range 203.0.113.0/24 \
-    --target-ip 10.0.0.1 \
+    --attacker-range 192.168.2.0/24 \
+    --target-ip 10.10.1.2 \
     --attackers 200
 
-# Option 3: HTTP Flood
+# Option 3: ICMP Flood (standard 64-byte ping)
 sudo python3 generate_mirai_attacks.py \
-    --output ../attack_http_5M.pcap \
+    --output ../attack_icmp_5M.pcap \
     --packets 5000000 \
-    --attack-type http \
+    --attack-type icmp \
     --dst-mac 0c:42:a1:dd:5b:28 \
-    --attacker-range 203.0.113.0/24 \
-    --target-ip 10.0.0.1 \
+    --attacker-range 192.168.2.0/24 \
+    --target-ip 10.10.1.2 \
     --attackers 200
 
-# Option 4: Mixed Attack (RECOMMENDED for comprehensive test)
+# Option 4: Mixed Attack (RECOMMENDED - 50% SYN + 40% UDP + 10% ICMP)
 # Generate 10M packets for better throughput (17-18 Gbps target)
 sudo python3 generate_mirai_attacks.py \
     --output ../attack_mixed_10M.pcap \
     --packets 10000000 \
     --attack-type mixed \
     --dst-mac 0c:42:a1:dd:5b:28 \
-    --attacker-range 203.0.113.0/24 \
-    --target-ip 10.0.0.1 \
+    --attacker-range 192.168.2.0/24 \
+    --target-ip 10.10.1.2 \
     --attackers 200
 
 # Verify PCAP
 ls -lh ../attack_*.pcap
 tcpdump -r ../attack_mixed_10M.pcap -c 10
-tcpdump -r ../attack_mixed_10M.pcap -n -c 100 | grep "203.0.113" | head -20
+tcpdump -r ../attack_mixed_10M.pcap -n -c 100 | grep "192.168.2" | head -20
 
 ```
 
 **Attack composition (mixed):**
-- 40% UDP Flood (DNS, NTP amplification)
-- 30% SYN Flood (TCP exhaustion)
-- 20% HTTP Flood (application layer)
-- 10% ICMP Flood (ping)
+- 50% SYN Flood (TCP exhaustion - ports 80/443/22)
+- 40% UDP Flood (516-byte payloads, random ports - CICDDoS2019 style)
+- 10% ICMP Flood (standard 64-byte ping)
 
 ---
 
@@ -519,7 +518,7 @@ lspci | grep -i mellanox
 
 ```bash
 # Verify attack PCAP has malicious patterns
-tcpdump -r attack_udp_5M.pcap -c 100 | grep -E '(203.0.113|10.0.0.1)'
+tcpdump -r attack_udp_5M.pcap -c 100 | grep -E '(192.168.2|10.10.1.2)'
 
 # Check packet rates in real-time
 tail -f ../results/results_mira_udp.log | grep "pps"
@@ -576,7 +575,7 @@ sudo python3 generate_benign_traffic.py \
     --src-mac 00:00:00:00:00:01 \
     --dst-mac 0c:42:a1:dd:5b:28 \
     --client-range 192.168.1.0/24 \
-    --server-ip 10.0.0.1 \
+    --server-ip 10.10.1.2 \
     --clients 500
 
 # Send traffic (after detector starts, wait 5s)
@@ -596,8 +595,8 @@ sudo python3 generate_mirai_attacks.py \
     --packets 10000000 \
     --attack-type mixed \
     --dst-mac 0c:42:a1:dd:5b:28 \
-    --attacker-range 203.0.113.0/24 \
-    --target-ip 10.0.0.1 \
+    --attacker-range 192.168.2.0/24 \
+    --target-ip 10.10.1.2 \
     --attackers 200
 
 # Send traffic (125 seconds after benign starts)
