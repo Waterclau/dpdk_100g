@@ -24,31 +24,24 @@ from scapy.layers.l2 import Ether
 
 def generate_udp_flood(src_ip, dst_ip, src_mac, dst_mac, num_packets):
     """
-    Generate UDP flood attack (classic Mirai) - SWITCH-SAFE VERSION
+    Generate UDP flood attack (CICDDoS2019 style - MULTI-LF paper replication)
 
-    Characteristics:
-    - Random source ports
-    - Target DNS port (53) primarily - looks more legitimate
-    - SMALL fixed payloads (to avoid switch DoS protection)
-    - High packet rate
+    Characteristics (based on CICDDoS2019 dataset observation):
+    - Random source ports (1024-65535)
+    - Random destination ports (NOT fixed DNS port 53)
+    - Fixed payload: 516 bytes (as observed in CICDDoS2019 traces)
+    - High volume flood attack
     """
     packets = []
 
-    # DNS query payloads (realistic, small, won't trigger switch filters)
-    dns_queries = [
-        b'\x00\x01\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x07example\x03com\x00\x00\x01\x00\x01',
-        b'\x00\x02\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x06google\x03com\x00\x00\x01\x00\x01',
-        b'\x00\x03\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x09localhost\x00\x00\x01\x00\x01',
-        b'\x00\x04\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x04test\x03net\x00\x00\x01\x00\x01',
-    ]
+    # Generate fixed 516-byte payload (CICDDoS2019 characteristic)
+    payload = bytes([random.randint(0, 255) for _ in range(516)])
 
     for i in range(num_packets):
-        # Mostly DNS (port 53) with realistic queries
-        payload = random.choice(dns_queries)
-
         pkt = Ether(src=src_mac, dst=dst_mac) / \
               IP(src=src_ip, dst=dst_ip) / \
-              UDP(sport=random.randint(1024, 65535), dport=53) / \
+              UDP(sport=random.randint(1024, 65535),
+                  dport=random.randint(1024, 65535)) / \
               Raw(load=payload)
 
         packets.append(pkt)
@@ -57,62 +50,27 @@ def generate_udp_flood(src_ip, dst_ip, src_mac, dst_mac, num_packets):
 
 def generate_syn_flood(src_ip, dst_ip, src_mac, dst_mac, num_packets):
     """
-    Generate VARIED SYN flood attack (multiple attack vectors, all using TCP SYN)
+    Generate SYN flood attack (MULTI-LF paper replication - Mirai style)
 
-    Simulates multiple DDoS attack types, but all using SYN packets to pass switch filters:
-    - HTTP flood: SYN to port 80/443/8080 (40%)
-    - SSH flood: SYN to port 22/2222 (20%)
-    - HTTPS flood: SYN to port 443/8443 (20%)
-    - Telnet flood: SYN to port 23/2323 (10%)
-    - Custom services flood: SYN to ports 3389/5060/8000 (10%)
-
-    All are SYN-only (no handshake) to pass switch, but vary in:
-    - Target ports (simulates different attack vectors)
-    - Window sizes (simulates different botnet clients)
-    - Sequence numbers (randomized)
-    - TTL values (simulates geographic distribution)
+    Characteristics:
+    - SYN packets only (no handshake completion)
+    - Target common service ports: 80 (HTTP), 443 (HTTPS), 22 (SSH)
+    - Random source ports
+    - Random sequence numbers
+    - Simple and volumetric (typical Mirai botnet behavior)
     """
     packets = []
 
-    # Attack vectors (port groups simulating different DDoS types)
-    attack_vectors = [
-        # HTTP flood simulation (40%)
-        {'ports': [80, 8080, 8000], 'weight': 40, 'name': 'HTTP'},
-        # HTTPS flood simulation (20%)
-        {'ports': [443, 8443], 'weight': 20, 'name': 'HTTPS'},
-        # SSH brute-force flood simulation (20%)
-        {'ports': [22, 2222], 'weight': 20, 'name': 'SSH'},
-        # Telnet flood simulation (10%)
-        {'ports': [23, 2323], 'weight': 10, 'name': 'Telnet'},
-        # RDP/SIP flood simulation (10%)
-        {'ports': [3389, 5060], 'weight': 10, 'name': 'RDP/SIP'},
-    ]
-
-    # Create weighted list for random selection
-    attack_list = []
-    for vector in attack_vectors:
-        attack_list.extend([vector] * vector['weight'])
-
-    # Different window sizes (simulates diverse botnet)
-    window_sizes = [8192, 16384, 32768, 65535, 5840, 14600, 29200]
-
-    # TTL values (simulates geographic diversity)
-    ttl_values = [64, 128, 255, 32, 60, 120, 200]
+    # Common target ports for SYN flood (Mirai-style)
+    target_ports = [80, 443, 22]
 
     for i in range(num_packets):
-        # Select attack vector (weighted random)
-        vector = random.choice(attack_list)
-        target_port = random.choice(vector['ports'])
-
-        # Vary packet characteristics for realism
         pkt = Ether(src=src_mac, dst=dst_mac) / \
-              IP(src=src_ip, dst=dst_ip, ttl=random.choice(ttl_values)) / \
+              IP(src=src_ip, dst=dst_ip) / \
               TCP(sport=random.randint(1024, 65535),
-                  dport=target_port,
-                  flags='S',  # SYN flag only (passes switch)
-                  seq=random.randint(1000, 4000000000),
-                  window=random.choice(window_sizes),
-                  options=[('MSS', random.choice([1460, 1380, 1400]))])  # Vary MSS
+                  dport=random.choice(target_ports),
+                  flags='S',
+                  seq=random.randint(1000, 4000000000))
 
         packets.append(pkt)
 
@@ -307,20 +265,18 @@ def generate_mirai_attack(output_file, num_packets, attack_type,
                                                    packets_per_attacker)
         elif attack_type == 'mixed':
             # Mixed attack: Each attacker generates a TRUE MIX of packets
-            # SWITCH-SAFE PROPORTIONS: 60% SYN, 20% UDP (DNS), 10% HTTP, 10% ICMP
-            # (More SYN because it passes switch filters best)
+            # SWITCH-SAFE PROPORTIONS: 50% SYN, 40% UDP (516-byte), 10% ICMP
+            # Based on CloudLab switch testing - removed HTTP (bidirectional, often blocked)
             attacker_packets = []
 
             # Calculate packets per type for this attacker
-            syn_count = int(packets_per_attacker * 0.60)   # Majority SYN (passes switch)
-            udp_count = int(packets_per_attacker * 0.20)   # DNS queries only (realistic)
-            http_count = int(packets_per_attacker * 0.10)  # Some HTTP
-            icmp_count = packets_per_attacker - syn_count - udp_count - http_count  # Remaining
+            syn_count = int(packets_per_attacker * 0.50)   # SYN flood (passes switch)
+            udp_count = int(packets_per_attacker * 0.40)   # UDP flood 516-byte (CICDDoS2019 style)
+            icmp_count = packets_per_attacker - syn_count - udp_count  # Remaining ICMP
 
             # Generate each type (all with switch-safe payloads)
             attacker_packets.extend(generate_syn_flood(attacker_ip, target_ip, src_mac, dst_mac, syn_count))
             attacker_packets.extend(generate_udp_flood(attacker_ip, target_ip, src_mac, dst_mac, udp_count))
-            attacker_packets.extend(generate_http_flood(attacker_ip, target_ip, src_mac, dst_mac, http_count))
             attacker_packets.extend(generate_icmp_flood(attacker_ip, target_ip, src_mac, dst_mac, icmp_count))
 
             # Shuffle to mix packet types (important for realistic traffic pattern)
@@ -362,14 +318,11 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Attack Types:
-  udp    - UDP flood (DNS queries only - switch-safe)
-  syn    - VARIED SYN flood (simulates HTTP/HTTPS/SSH/Telnet/RDP floods via SYN packets)
-           40%% HTTP (ports 80/8080), 20%% HTTPS (443/8443), 20%% SSH (22/2222),
-           10%% Telnet (23/2323), 10%% RDP/SIP (3389/5060)
-           All use SYN-only to pass switch filters
+  udp    - UDP flood (516-byte payloads, random ports - CICDDoS2019 style)
+  syn    - SYN flood (ports 80/443/22 - simple Mirai style)
   http   - HTTP GET flood (full handshake - may be blocked by switch)
-  icmp   - ICMP flood (standard ping - may be blocked by switch)
-  mixed  - Mixed SYN-based attack (60%% varied SYN, 20%% DNS, 10%% HTTP, 10%% ICMP)
+  icmp   - ICMP flood (standard 64-byte ping)
+  mixed  - Mixed attack (50%% SYN, 40%% UDP, 10%% ICMP - switch-safe)
 
 Examples:
   # UDP flood with 5M packets
