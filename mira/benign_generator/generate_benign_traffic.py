@@ -127,7 +127,7 @@ def generate_dns_query(src_ip, dst_ip, src_mac, dst_mac):
                IP(src=dst_ip, dst=src_ip) / \
                UDP(sport=53, dport=query[UDP].sport) / \
                DNS(id=query[DNS].id, qr=1, aa=1, qd=query[DNS].qd,
-                   an=DNSRR(rrname=domain, ttl=300, rdata='10.0.0.100'))
+                   an=DNSRR(rrname=domain, ttl=300, rdata='10.10.1.2'))
     packets.append(response)
 
     return packets
