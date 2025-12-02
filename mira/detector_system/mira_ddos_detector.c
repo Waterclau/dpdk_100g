@@ -279,7 +279,7 @@ static struct ip_stats* get_ip_stats(uint32_t ip_addr)
     return new_entry;
 }
 
-/* Attack detection logic - COORDINATOR ONLY */
+/* Attack detection logic - COORDINATOR ONLY - AGGREGATE MODE */
 static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 {
     double elapsed = (double)(cur_tsc - g_stats.last_fast_detection_tsc) / hz;
@@ -295,167 +295,96 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         if (window_sec < 0.1) return;
 
         bool attack_detected = false;
-        uint32_t ip_count = rte_atomic32_read(&g_ip_count);
 
-        for (uint32_t i = 0; i < ip_count; i++) {
-            struct ip_stats *ip = &g_ip_table[i];
-            if (!ip->is_active) continue;
-            if (ip->ip_addr == SERVER_IP) continue;
+        /* AGGREGATE DETECTION - Use window stats from workers */
+        uint64_t window_base_pkts = 0, window_att_pkts = 0;
+        uint64_t window_syn_pkts = 0, window_udp_pkts = 0, window_icmp_pkts = 0;
+        uint64_t window_http_reqs = 0, window_dns_queries = 0;
 
-            /* Determine if baseline or attack network */
-            bool is_baseline = ((ip->ip_addr & NETWORK_MASK) == BASELINE_NETWORK);
-            bool is_attack = ((ip->ip_addr & NETWORK_MASK) == ATTACK_NETWORK);
+        for (int i = 0; i < NUM_RX_QUEUES; i++) {
+            window_base_pkts += window_baseline_pkts[i];
+            window_att_pkts += window_attack_pkts[i];
+        }
 
-            /* Read atomic counters */
-            uint64_t total_pkts = rte_atomic64_read(&ip->total_packets);
-            uint64_t udp_pkts = rte_atomic64_read(&ip->udp_packets);
-            uint64_t icmp_pkts = rte_atomic64_read(&ip->icmp_packets);
-            uint64_t syn_pkts = rte_atomic64_read(&ip->syn_packets);
-            uint64_t http_reqs = rte_atomic64_read(&ip->http_requests);
-            uint64_t dns_qs = rte_atomic64_read(&ip->dns_queries);
-            uint64_t ntp_qs = rte_atomic64_read(&ip->ntp_queries);
-            uint64_t ack_pkts = rte_atomic64_read(&ip->pure_ack_packets);
-            uint64_t frag_pkts = rte_atomic64_read(&ip->fragmented_packets);
+        /* Aggregate protocol stats from workers */
+        for (int i = 0; i < NUM_RX_QUEUES; i++) {
+            window_syn_pkts += g_worker_stats[i].syn_packets;
+            window_udp_pkts += g_worker_stats[i].udp_packets;
+            window_icmp_pkts += g_worker_stats[i].icmp_packets;
+            window_http_reqs += g_worker_stats[i].http_requests;
+            window_dns_queries += g_worker_stats[i].dns_queries;
+        }
 
-            double udp_pps = (double)udp_pkts / window_sec;
-            double syn_pps = (double)syn_pkts / window_sec;
-            double icmp_pps = (double)icmp_pkts / window_sec;
-            double total_pps = (double)total_pkts / window_sec;
-            double http_pps = (double)http_reqs / window_sec;
-            double dns_pps = (double)dns_qs / window_sec;
-            double ntp_pps = (double)ntp_qs / window_sec;
-            double ack_pps = (double)ack_pkts / window_sec;
-            double frag_pps = (double)frag_pkts / window_sec;
+        /* Calculate PPS rates */
+        double attack_pps = (double)window_att_pkts / window_sec;
+        double baseline_pps = (double)window_base_pkts / window_sec;
+        double syn_pps = (double)window_syn_pkts / window_sec;
+        double udp_pps = (double)window_udp_pkts / window_sec;
+        double icmp_pps = (double)window_icmp_pkts / window_sec;
+        double http_pps = (double)window_http_reqs / window_sec;
 
-            /* Select thresholds based on source network */
-            uint32_t udp_threshold = is_baseline ? BASELINE_UDP_THRESHOLD : ATTACK_UDP_THRESHOLD;
-            uint32_t syn_threshold = is_baseline ? BASELINE_SYN_THRESHOLD : ATTACK_SYN_THRESHOLD;
-            uint32_t http_threshold = is_baseline ? BASELINE_HTTP_THRESHOLD : ATTACK_HTTP_THRESHOLD;
-            uint32_t icmp_threshold = is_baseline ? BASELINE_ICMP_THRESHOLD : ATTACK_ICMP_THRESHOLD;
-            uint32_t total_threshold = is_baseline ? BASELINE_TOTAL_PPS_THRESHOLD : ATTACK_TOTAL_PPS_THRESHOLD;
+        /* DETECTION LOGIC - Aggregate based on 192.168.2.x traffic */
 
-            /* UDP Flood */
-            if (udp_pps > udp_threshold) {
+        /* Attack traffic present AND exceeds baseline significantly */
+        if (window_att_pkts > 0 && attack_pps > 50000) {  /* 50K pps threshold */
+
+            /* UDP Flood Detection */
+            if (udp_pps > 20000) {  /* 20K UDP pps */
                 g_stats.udp_flood_detections++;
                 g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "UDP FLOOD from %u.%u.%u.%u: %.0f pps (threshold: %u) | ",
-                        (ip->ip_addr >> 24) & 0xFF, (ip->ip_addr >> 16) & 0xFF,
-                        (ip->ip_addr >> 8) & 0xFF, ip->ip_addr & 0xFF,
-                        udp_pps, udp_threshold);
+                        "UDP FLOOD detected: %.0f UDP pps | ", udp_pps);
                 attack_detected = true;
             }
 
-            /* SYN Flood */
-            if (syn_pps > syn_threshold) {
+            /* SYN Flood Detection */
+            if (syn_pps > 30000) {  /* 30K SYN pps */
                 g_stats.syn_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "SYN FLOOD from %u.%u.%u.%u: %.0f SYN/s (threshold: %u) | ",
-                        (ip->ip_addr >> 24) & 0xFF, (ip->ip_addr >> 16) & 0xFF,
-                        (ip->ip_addr >> 8) & 0xFF, ip->ip_addr & 0xFF,
-                        syn_pps, syn_threshold);
+                        "SYN FLOOD detected: %.0f SYN pps | ", syn_pps);
                 attack_detected = true;
             }
 
-            /* ICMP Flood */
-            if (icmp_pps > icmp_threshold) {
+            /* ICMP Flood Detection */
+            if (icmp_pps > 10000) {  /* 10K ICMP pps */
                 g_stats.icmp_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "ICMP FLOOD from %u.%u.%u.%u: %.0f pps (threshold: %u) | ",
-                        (ip->ip_addr >> 24) & 0xFF, (ip->ip_addr >> 16) & 0xFF,
-                        (ip->ip_addr >> 8) & 0xFF, ip->ip_addr & 0xFF,
-                        icmp_pps, icmp_threshold);
+                        "ICMP FLOOD detected: %.0f ICMP pps | ", icmp_pps);
                 attack_detected = true;
             }
 
-            /* DNS Amplification */
-            if (is_attack && dns_pps > DNS_AMP_THRESHOLD) {
-                g_stats.dns_amp_detections++;
-                if (g_stats.alert_level < ALERT_HIGH)
-                    g_stats.alert_level = ALERT_HIGH;
-                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
-                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "DNS AMPLIFICATION from %u.%u.%u.%u: %.0f qps (threshold: %d) | ",
-                        (ip->ip_addr >> 24) & 0xFF, (ip->ip_addr >> 16) & 0xFF,
-                        (ip->ip_addr >> 8) & 0xFF, ip->ip_addr & 0xFF,
-                        dns_pps, DNS_AMP_THRESHOLD);
-                attack_detected = true;
-            }
-
-            /* NTP Amplification */
-            if (is_attack && ntp_pps > NTP_AMP_THRESHOLD) {
-                g_stats.ntp_amp_detections++;
-                if (g_stats.alert_level < ALERT_HIGH)
-                    g_stats.alert_level = ALERT_HIGH;
-                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
-                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "NTP AMPLIFICATION from %u.%u.%u.%u: %.0f qps (threshold: %d) | ",
-                        (ip->ip_addr >> 24) & 0xFF, (ip->ip_addr >> 16) & 0xFF,
-                        (ip->ip_addr >> 8) & 0xFF, ip->ip_addr & 0xFF,
-                        ntp_pps, NTP_AMP_THRESHOLD);
-                attack_detected = true;
-            }
-
-            /* ACK Flood */
-            if (is_attack && ack_pps > ACK_FLOOD_THRESHOLD) {
-                g_stats.ack_flood_detections++;
-                if (g_stats.alert_level < ALERT_HIGH)
-                    g_stats.alert_level = ALERT_HIGH;
-                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
-                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "ACK FLOOD from %u.%u.%u.%u: %.0f pps (threshold: %d) | ",
-                        (ip->ip_addr >> 24) & 0xFF, (ip->ip_addr >> 16) & 0xFF,
-                        (ip->ip_addr >> 8) & 0xFF, ip->ip_addr & 0xFF,
-                        ack_pps, ACK_FLOOD_THRESHOLD);
-                attack_detected = true;
-            }
-
-            /* HTTP Flood */
-            if (http_pps > http_threshold) {
+            /* HTTP Flood Detection */
+            if (http_pps > 15000) {  /* 15K HTTP req/s */
                 g_stats.http_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "HTTP FLOOD from %u.%u.%u.%u: %.0f rps (threshold: %u) | ",
-                        (ip->ip_addr >> 24) & 0xFF, (ip->ip_addr >> 16) & 0xFF,
-                        (ip->ip_addr >> 8) & 0xFF, ip->ip_addr & 0xFF,
-                        http_pps, http_threshold);
+                        "HTTP FLOOD detected: %.0f HTTP rps | ", http_pps);
                 attack_detected = true;
             }
 
-            /* Fragmentation Attack */
-            if (is_attack && frag_pps > FRAG_THRESHOLD) {
-                g_stats.frag_attack_detections++;
-                if (g_stats.alert_level < ALERT_MEDIUM)
-                    g_stats.alert_level = ALERT_MEDIUM;
-                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
-                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "FRAGMENTATION ATTACK from %u.%u.%u.%u: %.0f frag/s (threshold: %d) | ",
-                        (ip->ip_addr >> 24) & 0xFF, (ip->ip_addr >> 16) & 0xFF,
-                        (ip->ip_addr >> 8) & 0xFF, ip->ip_addr & 0xFF,
-                        frag_pps, FRAG_THRESHOLD);
-                attack_detected = true;
-            }
+            /* Multi-attack detection */
+            int attack_types = 0;
+            if (udp_pps > 10000) attack_types++;
+            if (syn_pps > 10000) attack_types++;
+            if (icmp_pps > 5000) attack_types++;
 
-            /* Packet Flood */
-            if (total_pps > total_threshold) {
+            if (attack_types >= 2 && !attack_detected) {
                 g_stats.total_flood_detections++;
-                if (g_stats.alert_level < ALERT_MEDIUM)
-                    g_stats.alert_level = ALERT_MEDIUM;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "PACKET FLOOD from %u.%u.%u.%u: %.0f pps (threshold: %u) | ",
-                        (ip->ip_addr >> 24) & 0xFF, (ip->ip_addr >> 16) & 0xFF,
-                        (ip->ip_addr >> 8) & 0xFF, ip->ip_addr & 0xFF,
-                        total_pps, total_threshold);
+                        "MULTI-ATTACK detected: %.0f attack pps (%d attack types) | ",
+                        attack_pps, attack_types);
                 attack_detected = true;
             }
         }
@@ -473,23 +402,10 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             }
         }
 
-        /* Reset window */
+        /* Reset detection window */
         if (window_sec >= DETECTION_WINDOW_SEC) {
             g_stats.window_start_tsc = cur_tsc;
-
-            for (uint32_t i = 0; i < ip_count; i++) {
-                rte_atomic64_clear(&g_ip_table[i].total_packets);
-                rte_atomic64_clear(&g_ip_table[i].tcp_packets);
-                rte_atomic64_clear(&g_ip_table[i].udp_packets);
-                rte_atomic64_clear(&g_ip_table[i].icmp_packets);
-                rte_atomic64_clear(&g_ip_table[i].syn_packets);
-                rte_atomic64_clear(&g_ip_table[i].ack_packets);
-                rte_atomic64_clear(&g_ip_table[i].http_requests);
-                rte_atomic64_clear(&g_ip_table[i].dns_queries);
-                rte_atomic64_clear(&g_ip_table[i].ntp_queries);
-                rte_atomic64_clear(&g_ip_table[i].pure_ack_packets);
-                rte_atomic64_clear(&g_ip_table[i].fragmented_packets);
-            }
+            /* No need to reset IP table in aggregate mode */
         }
     }
 }
