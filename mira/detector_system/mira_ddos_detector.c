@@ -170,11 +170,22 @@ struct detection_stats {
     uint64_t first_attack_packet_tsc;
     uint64_t first_detection_tsc;
 
-    /* MULTI-LF Comparison Metrics */
+    /* MULTI-LF Comparison Metrics - First Detection */
     double detection_latency_ms;
     uint64_t packets_until_detection;
     uint64_t bytes_until_detection;
     bool detection_triggered;
+
+    /* Multiple Detection Tracking - Aggregate Stats */
+    uint64_t total_detection_events;      /* Total number of detections */
+    double min_detection_latency_ms;      /* Fastest detection */
+    double max_detection_latency_ms;      /* Slowest detection */
+    double sum_detection_latencies_ms;    /* For average calculation */
+    uint64_t detections_under_20ms;       /* Histogram bins */
+    uint64_t detections_20_30ms;
+    uint64_t detections_30_40ms;
+    uint64_t detections_40_50ms;
+    uint64_t detections_over_50ms;
 
     /* DPDK Performance */
     uint64_t rx_packets_nic;
@@ -389,16 +400,55 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             }
         }
 
-        /* First detection timestamp */
-        if (attack_detected && !g_stats.detection_triggered) {
-            g_stats.first_detection_tsc = cur_tsc;
-            g_stats.detection_triggered = true;
-            g_stats.packets_until_detection = g_stats.total_packets;
-            g_stats.bytes_until_detection = g_stats.total_bytes;
+        /* Detection timestamp tracking - EVERY detection */
+        if (attack_detected) {
+            g_stats.total_detection_events++;
 
+            /* Calculate current detection latency */
+            double current_latency_ms = 0.0;
             if (g_stats.first_attack_packet_tsc > 0) {
                 uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
-                g_stats.detection_latency_ms = (double)latency_cycles * 1000.0 / hz;
+                current_latency_ms = (double)latency_cycles * 1000.0 / hz;
+            }
+
+            /* First detection - initialize metrics */
+            if (!g_stats.detection_triggered) {
+                g_stats.first_detection_tsc = cur_tsc;
+                g_stats.detection_triggered = true;
+                g_stats.packets_until_detection = g_stats.total_packets;
+                g_stats.bytes_until_detection = g_stats.total_bytes;
+                g_stats.detection_latency_ms = current_latency_ms;
+
+                /* Initialize min/max */
+                g_stats.min_detection_latency_ms = current_latency_ms;
+                g_stats.max_detection_latency_ms = current_latency_ms;
+            }
+
+            /* Update aggregate statistics for ALL detections */
+            if (current_latency_ms > 0) {
+                /* Update min/max */
+                if (current_latency_ms < g_stats.min_detection_latency_ms) {
+                    g_stats.min_detection_latency_ms = current_latency_ms;
+                }
+                if (current_latency_ms > g_stats.max_detection_latency_ms) {
+                    g_stats.max_detection_latency_ms = current_latency_ms;
+                }
+
+                /* Sum for average */
+                g_stats.sum_detection_latencies_ms += current_latency_ms;
+
+                /* Histogram bins */
+                if (current_latency_ms < 20.0) {
+                    g_stats.detections_under_20ms++;
+                } else if (current_latency_ms < 30.0) {
+                    g_stats.detections_20_30ms++;
+                } else if (current_latency_ms < 40.0) {
+                    g_stats.detections_30_40ms++;
+                } else if (current_latency_ms < 50.0) {
+                    g_stats.detections_40_50ms++;
+                } else {
+                    g_stats.detections_over_50ms++;
+                }
             }
         }
 
@@ -643,6 +693,45 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
             "    ✓ No training required\n"
             "    ✓ Line-rate processing (multi-core)\n"
             "    ✓ Constant memory usage\n\n");
+
+        /* Multiple Detection Statistics - Aggregate Analysis */
+        if (g_stats.total_detection_events > 1) {
+            double avg_latency = g_stats.sum_detection_latencies_ms / g_stats.total_detection_events;
+
+            len += snprintf(buffer + len, sizeof(buffer) - len,
+                "[MULTIPLE DETECTION STATISTICS]\n"
+                "=== Aggregate Detection Analysis ===\n\n"
+                "  Total detection events:    %" PRIu64 "\n"
+                "  Average detection latency: %.2f ms\n"
+                "  Min detection latency:     %.2f ms\n"
+                "  Max detection latency:     %.2f ms\n"
+                "  Latency range:             %.2f ms\n\n",
+                g_stats.total_detection_events,
+                avg_latency,
+                g_stats.min_detection_latency_ms,
+                g_stats.max_detection_latency_ms,
+                g_stats.max_detection_latency_ms - g_stats.min_detection_latency_ms);
+
+            /* Calculate histogram percentages */
+            double pct_under_20 = (double)g_stats.detections_under_20ms * 100.0 / g_stats.total_detection_events;
+            double pct_20_30 = (double)g_stats.detections_20_30ms * 100.0 / g_stats.total_detection_events;
+            double pct_30_40 = (double)g_stats.detections_30_40ms * 100.0 / g_stats.total_detection_events;
+            double pct_40_50 = (double)g_stats.detections_40_50ms * 100.0 / g_stats.total_detection_events;
+            double pct_over_50 = (double)g_stats.detections_over_50ms * 100.0 / g_stats.total_detection_events;
+
+            len += snprintf(buffer + len, sizeof(buffer) - len,
+                "  Detection Latency Histogram:\n"
+                "    < 20 ms:  %" PRIu64 " detections (%.1f%%)\n"
+                "    20-30 ms: %" PRIu64 " detections (%.1f%%)\n"
+                "    30-40 ms: %" PRIu64 " detections (%.1f%%)\n"
+                "    40-50 ms: %" PRIu64 " detections (%.1f%%)\n"
+                "    > 50 ms:  %" PRIu64 " detections (%.1f%%)\n\n",
+                g_stats.detections_under_20ms, pct_under_20,
+                g_stats.detections_20_30ms, pct_20_30,
+                g_stats.detections_30_40ms, pct_30_40,
+                g_stats.detections_40_50ms, pct_40_50,
+                g_stats.detections_over_50ms, pct_over_50);
+        }
     }
 
     double pps_current = (window_total_pkts > 0 && window_duration > 0.001) ?
@@ -1031,6 +1120,9 @@ int main(int argc, char *argv[])
     memset(window_attack_pkts, 0, sizeof(window_attack_pkts));
     memset(window_baseline_bytes, 0, sizeof(window_baseline_bytes));
     memset(window_attack_bytes, 0, sizeof(window_attack_bytes));
+
+    /* Initialize min_detection_latency to large value for tracking minimum */
+    g_stats.min_detection_latency_ms = 999999.0;
 
     printf("\n╔═══════════════════════════════════════════════════════════════════════╗\n");
     printf("║       MIRA DDoS DETECTOR - MULTI-CORE (%d workers + 1 coordinator)    ║\n", NUM_RX_QUEUES);
