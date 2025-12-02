@@ -22,11 +22,11 @@
 #define TX_RING_SIZE 8192
 #define NUM_MBUFS 262144
 #define MBUF_CACHE_SIZE 512
-#define BURST_SIZE 512
+#define BURST_SIZE 256//512
 #define MAX_PCAP_PACKETS 10000000
 
 /* Target transmission rate: 17 Gbps (to achieve ~7 Gbps real at detector) */
-#define TARGET_GBPS 17.0
+#define TARGET_GBPS 12.0//17
 
 static volatile uint8_t force_quit = 0;
 static uint16_t port_id = 0;

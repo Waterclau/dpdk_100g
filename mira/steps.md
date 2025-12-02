@@ -67,6 +67,15 @@ sudo python3 generate_benign_traffic.py \
     --server-ip 10.0.0.1 \
     --clients 500
 
+sudo python3 generate_benign_traffic.py \
+    --output ../test_benign_tg.pcap \
+    --packets 100000 \
+    --src-mac 00:00:00:00:00:01 \
+    --dst-mac 0c:42:a1:dd:5b:28 \
+    --client-range 192.168.1.0/24 \
+    --server-ip 10.0.0.1 \
+    --clients 500
+
 # Verify PCAP
 ls -lh ../benign_10M.pcap
 tcpdump -r ../benign_10M.pcap -c 10
