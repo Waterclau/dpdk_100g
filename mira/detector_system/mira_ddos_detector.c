@@ -628,17 +628,20 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         window_duration > 0 ? (window_att_bytes * 8.0) / (window_duration * 1e9) : 0.0,
         instantaneous_throughput_gbps, avg_pkt_size);
 
-    /* Calculate cumulative throughput (like sender) */
-    double cumulative_duration = (double)(cur_tsc - g_start_tsc) / hz;
+    /* Calculate cumulative throughput (like sender) - only if traffic started */
+    double cumulative_duration = 0.0;
     double cumulative_gbps = 0.0;
     double cumulative_mpps = 0.0;
-    if (cumulative_duration > 0.001) {
-        cumulative_gbps = (g_stats.total_bytes * 8.0) / (cumulative_duration * 1e9);
-        cumulative_mpps = (g_stats.total_packets / cumulative_duration) / 1e6;
+    if (g_start_tsc > 0 && g_stats.total_packets > 0) {
+        cumulative_duration = (double)(cur_tsc - g_start_tsc) / hz;
+        if (cumulative_duration > 0.001) {
+            cumulative_gbps = (g_stats.total_bytes * 8.0) / (cumulative_duration * 1e9);
+            cumulative_mpps = (g_stats.total_packets / cumulative_duration) / 1e6;
+        }
     }
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
-        "[CUMULATIVE TRAFFIC - Since start (%.1fs)]\n"
+        "[CUMULATIVE TRAFFIC - Since first packet (%.1fs)]\n"
         "  Total received:     %" PRIu64 " pkts (%.2f Mpps) | %.2f Gbps | %" PRIu64 " bytes\n\n",
         cumulative_duration,
         g_stats.total_packets, cumulative_mpps, cumulative_gbps, g_stats.total_bytes);
@@ -846,6 +849,11 @@ static int worker_thread(void *arg)
             local_total_pkts++;
             local_total_bytes += pkt_len;
 
+            /* Initialize global start timestamp on first packet received */
+            if (unlikely(g_start_tsc == 0)) {
+                g_start_tsc = rte_rdtsc();
+            }
+
             struct rte_ipv4_hdr *ip_hdr = (struct rte_ipv4_hdr *)(eth_hdr + 1);
             uint32_t src_ip = rte_be_to_cpu_32(ip_hdr->src_addr);
             uint8_t proto = ip_hdr->next_proto_id;
@@ -959,11 +967,12 @@ static int coordinator_thread(__rte_unused void *arg)
     printf("TSC frequency: %" PRIu64 " Hz\n", hz);
     printf("Detection granularity: %.0f ms (vs MULTI-LF: 1000 ms)\n\n", FAST_DETECTION_INTERVAL * 1000);
 
-    g_start_tsc = rte_rdtsc();  /* Initialize global start timestamp */
-    g_stats.window_start_tsc = g_start_tsc;
-    g_stats.last_stats_tsc = g_start_tsc;
-    g_stats.last_fast_detection_tsc = g_start_tsc;
-    last_window_reset_tsc = g_start_tsc;
+    /* g_start_tsc will be set by first packet received in worker threads */
+    uint64_t init_tsc = rte_rdtsc();
+    g_stats.window_start_tsc = init_tsc;
+    g_stats.last_stats_tsc = init_tsc;
+    g_stats.last_fast_detection_tsc = init_tsc;
+    last_window_reset_tsc = init_tsc;
 
     while (!force_quit) {
         uint64_t cur_tsc = rte_rdtsc();
