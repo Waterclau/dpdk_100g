@@ -396,8 +396,8 @@ Examples:
                        help='Destination MAC address (monitor NIC)')
     parser.add_argument('--attacker-range', default='203.0.113.0/24',
                        help='Attacker IP range (default: 203.0.113.0/24)')
-    parser.add_argument('--target-ip', default='10.0.0.1',
-                       help='Target server IP (default: 10.0.0.1)')
+    parser.add_argument('--target-ip', default='10.10.1.2',
+                       help='Target server IP (default: 10.10.1.2)')
     parser.add_argument('--attackers', type=int, default=200,
                        help='Number of attacker IPs (botnet size) (default: 200)')
 
