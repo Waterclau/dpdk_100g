@@ -37,6 +37,11 @@ static uint64_t total_packets_sent = 0;
 static uint64_t total_bytes_sent = 0;
 static uint64_t start_tsc = 0;
 
+/* Instantaneous statistics (for 5-second window) */
+static uint64_t last_window_packets = 0;
+static uint64_t last_window_bytes = 0;
+static uint64_t last_window_tsc = 0;
+
 /* PCAP packets storage - SIMPLE STRUCT (not mbufs) */
 struct packet_data {
     uint8_t data[2048];
@@ -180,6 +185,9 @@ static void send_loop(void)
     start_tsc = rte_rdtsc();
     last_stats_tsc = start_tsc;
     window_start_tsc = start_tsc;
+    last_window_tsc = start_tsc;
+    last_window_packets = 0;
+    last_window_bytes = 0;
 
     while (!force_quit) {
         /* Allocate fresh mbufs */
@@ -239,13 +247,25 @@ static void send_loop(void)
 
         /* Print statistics every 5 seconds */
         if (cur_tsc - last_stats_tsc >= hz * 5) {
+            /* Cumulative statistics (from start) */
             double elapsed = (double)(cur_tsc - start_tsc) / hz;
-            double gbps = (total_bytes_sent * 8.0) / (elapsed * 1e9);
-            double mpps = (total_packets_sent / elapsed) / 1e6;
+            double gbps_cumulative = (total_bytes_sent * 8.0) / (elapsed * 1e9);
+            double mpps_cumulative = (total_packets_sent / elapsed) / 1e6;
 
-            printf("[%.1fs] Sent: %lu pkts (%.2f Mpps) | %.2f Gbps | %lu bytes\n",
-                   elapsed, total_packets_sent, mpps, gbps, total_bytes_sent);
+            /* Instantaneous statistics (last 5 seconds) */
+            double window_duration = (double)(cur_tsc - last_window_tsc) / hz;
+            uint64_t window_packets = total_packets_sent - last_window_packets;
+            uint64_t window_bytes = total_bytes_sent - last_window_bytes;
+            double gbps_instant = (window_bytes * 8.0) / (window_duration * 1e9);
+            double mpps_instant = (window_packets / window_duration) / 1e6;
 
+            printf("[%.1fs] Sent: %lu pkts (%.2f Mpps) | Cumulative: %.2f Gbps | Instant: %.2f Gbps | %lu bytes\n",
+                   elapsed, total_packets_sent, mpps_cumulative, gbps_cumulative, gbps_instant, total_bytes_sent);
+
+            /* Update window markers */
+            last_window_packets = total_packets_sent;
+            last_window_bytes = total_bytes_sent;
+            last_window_tsc = cur_tsc;
             last_stats_tsc = cur_tsc;
         }
     }
