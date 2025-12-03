@@ -41,20 +41,20 @@ struct heavy_hitter {
     uint32_t count;
 };
 
-/* OctoSketch structure - one per attack type */
+/* OctoSketch structure - per-worker (NO ATOMICS) */
 struct octosketch {
-    /* Counter matrix: ROWS x COLS */
-    struct sketch_cell counters[SKETCH_ROWS][SKETCH_COLS];
+    /* Counter matrix: ROWS x COLS - LOCAL counters (no atomics needed) */
+    uint32_t counters[SKETCH_ROWS][SKETCH_COLS];
 
     /* Hash seeds for each row */
     uint32_t seeds[SKETCH_ROWS];
 
-    /* Statistics */
-    rte_atomic64_t total_updates;
-    rte_atomic64_t total_bytes;
+    /* Statistics - LOCAL (no atomics) */
+    uint64_t total_updates;
+    uint64_t total_bytes;
 
-    /* Per-IP tracking for heavy hitters (simplified) */
-    rte_atomic32_t ip_counts[65536];  /* Hash table for Top-K */
+    /* Per-IP tracking for heavy hitters - LOCAL (no atomics) */
+    uint32_t ip_counts[65536];  /* Hash table for Top-K */
 
     /* Metadata */
     char name[32];
@@ -67,18 +67,6 @@ static inline void octosketch_init(struct octosketch *sketch, const char *name)
     memset(sketch, 0, sizeof(struct octosketch));
     strncpy(sketch->name, name, sizeof(sketch->name) - 1);
 
-    /* Initialize counters */
-    for (int i = 0; i < SKETCH_ROWS; i++) {
-        for (int j = 0; j < SKETCH_COLS; j++) {
-            rte_atomic32_init(&sketch->counters[i][j].count);
-        }
-    }
-
-    /* Initialize IP counts */
-    for (int i = 0; i < 65536; i++) {
-        rte_atomic32_init(&sketch->ip_counts[i]);
-    }
-
     /* Initialize hash seeds (different per row) */
     sketch->seeds[0] = 0xdeadbeef;
     sketch->seeds[1] = 0xc0ffee00;
@@ -88,9 +76,6 @@ static inline void octosketch_init(struct octosketch *sketch, const char *name)
     sketch->seeds[5] = 0x12345678;
     sketch->seeds[6] = 0x9abcdef0;
     sketch->seeds[7] = 0x11223344;
-
-    rte_atomic64_init(&sketch->total_updates);
-    rte_atomic64_init(&sketch->total_bytes);
 }
 
 /* Hash function for sketch row */
@@ -99,28 +84,28 @@ static inline uint32_t octosketch_hash(uint32_t key, uint32_t seed)
     return rte_jhash_1word(key, seed) & SKETCH_MASK;
 }
 
-/* Update sketch with IP address (lock-free) */
+/* Update sketch with IP address (LOCAL - no atomics) */
 static inline void octosketch_update_ip(struct octosketch *sketch, uint32_t ip, uint32_t increment)
 {
     /* Update all rows with different hash functions */
     for (int i = 0; i < SKETCH_ROWS; i++) {
         uint32_t col = octosketch_hash(ip, sketch->seeds[i]);
-        rte_atomic32_add(&sketch->counters[i][col].count, increment);
+        sketch->counters[i][col] += increment;
     }
 
     /* Update IP-specific counter for heavy hitter tracking */
     uint32_t ip_idx = (ip >> 16) ^ (ip & 0xFFFF);  /* Simple hash */
     ip_idx = ip_idx % 65536;
-    rte_atomic32_add(&sketch->ip_counts[ip_idx], increment);
+    sketch->ip_counts[ip_idx] += increment;
 
     /* Update statistics */
-    rte_atomic64_add(&sketch->total_updates, increment);
+    sketch->total_updates += increment;
 }
 
 /* Update sketch with bytes */
 static inline void octosketch_update_bytes(struct octosketch *sketch, uint64_t bytes)
 {
-    rte_atomic64_add(&sketch->total_bytes, bytes);
+    sketch->total_bytes += bytes;
 }
 
 /* Query sketch for IP count (min across all rows - Conservative Update) */
@@ -130,7 +115,7 @@ static inline uint32_t octosketch_query_ip(struct octosketch *sketch, uint32_t i
 
     for (int i = 0; i < SKETCH_ROWS; i++) {
         uint32_t col = octosketch_hash(ip, sketch->seeds[i]);
-        uint32_t count = rte_atomic32_read(&sketch->counters[i][col].count);
+        uint32_t count = sketch->counters[i][col];
         if (count < min_count) {
             min_count = count;
         }
@@ -139,19 +124,47 @@ static inline uint32_t octosketch_query_ip(struct octosketch *sketch, uint32_t i
     return min_count;
 }
 
-/* Get total count across sketch (sum of first row - approximation) */
+/* Get total count across sketch */
 static inline uint64_t octosketch_get_total(struct octosketch *sketch)
 {
-    return rte_atomic64_read(&sketch->total_updates);
+    return sketch->total_updates;
 }
 
 /* Get total bytes */
 static inline uint64_t octosketch_get_bytes(struct octosketch *sketch)
 {
-    return rte_atomic64_read(&sketch->total_bytes);
+    return sketch->total_bytes;
 }
 
-/* Find Top-K heavy hitters (simplified: scan IP hash table) */
+/* Merge multiple sketches (coordinator aggregation) */
+static inline void octosketch_merge(struct octosketch *dst, struct octosketch *src[], int num_sketches)
+{
+    /* Zero out destination */
+    memset(dst->counters, 0, sizeof(dst->counters));
+    memset(dst->ip_counts, 0, sizeof(dst->ip_counts));
+    dst->total_updates = 0;
+    dst->total_bytes = 0;
+
+    /* Sum counters from all source sketches */
+    for (int s = 0; s < num_sketches; s++) {
+        for (int i = 0; i < SKETCH_ROWS; i++) {
+            for (int j = 0; j < SKETCH_COLS; j++) {
+                dst->counters[i][j] += src[s]->counters[i][j];
+            }
+        }
+
+        /* Merge IP counts */
+        for (int i = 0; i < 65536; i++) {
+            dst->ip_counts[i] += src[s]->ip_counts[i];
+        }
+
+        /* Sum statistics */
+        dst->total_updates += src[s]->total_updates;
+        dst->total_bytes += src[s]->total_bytes;
+    }
+}
+
+/* Find Top-K heavy hitters (LOCAL - no atomics) */
 static inline void octosketch_top_k(struct octosketch *sketch, int k,
                                    struct heavy_hitter *results)
 {
@@ -159,7 +172,7 @@ static inline void octosketch_top_k(struct octosketch *sketch, int k,
     memset(results, 0, k * sizeof(struct heavy_hitter));
 
     for (uint32_t i = 0; i < 65536; i++) {
-        uint32_t count = rte_atomic32_read(&sketch->ip_counts[i]);
+        uint32_t count = sketch->ip_counts[i];
         if (count == 0) continue;
 
         /* Reconstruct approximate IP from hash index */
@@ -184,20 +197,14 @@ static inline void octosketch_top_k(struct octosketch *sketch, int k,
 static inline void octosketch_reset(struct octosketch *sketch)
 {
     /* Reset counters */
-    for (int i = 0; i < SKETCH_ROWS; i++) {
-        for (int j = 0; j < SKETCH_COLS; j++) {
-            rte_atomic32_set(&sketch->counters[i][j].count, 0);
-        }
-    }
+    memset(sketch->counters, 0, sizeof(sketch->counters));
 
     /* Reset IP counts */
-    for (int i = 0; i < 65536; i++) {
-        rte_atomic32_set(&sketch->ip_counts[i], 0);
-    }
+    memset(sketch->ip_counts, 0, sizeof(sketch->ip_counts));
 
     /* Reset statistics */
-    rte_atomic64_set(&sketch->total_updates, 0);
-    rte_atomic64_set(&sketch->total_bytes, 0);
+    sketch->total_updates = 0;
+    sketch->total_bytes = 0;
 }
 
 /* Get memory footprint */
