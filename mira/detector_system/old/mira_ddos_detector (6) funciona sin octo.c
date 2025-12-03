@@ -1,20 +1,19 @@
 /* SPDX-License-Identifier: BSD-3-Clause
  * Copyright(c) 2025 MIRA Project
  *
- * MIRA DDoS Detector - MULTI-CORE + OCTOSKETCH VERSION
+ * MIRA DDoS Detector - MULTI-CORE VERSION (OPTIMIZED for 17+ Gbps)
  *
- * Multi-attack DDoS detector with multi-core processing + OctoSketch for line-rate detection
+ * Multi-attack DDoS detector with multi-core processing for line-rate detection
  * Detects: UDP Flood, SYN Flood, HTTP Flood, ICMP Flood, DNS/NTP Amp, ACK Flood
  *
  * Architecture:
- * - 14 Worker threads (lcores 1-14): RX processing with RSS + OctoSketch updates
- * - 1 Coordinator thread (lcore 15): Attack detection via sketch queries
- * - OctoSketch: Memory-efficient probabilistic counting (128KB per sketch)
+ * - 14 Worker threads (lcores 1-14): RX processing with RSS
+ * - 1 Coordinator thread (lcore 15): Attack detection and stats
+ * - Shared atomic counters for zero-lock aggregation
  *
- * Key Improvements:
- * - DPDK: Line-rate packet processing (10-100 Gbps)
- * - OctoSketch: O(1) memory, lock-free updates, heavy-hitter detection
- * - Detection latency: <50ms (vs MULTI-LF: 866ms = 17× faster)
+ * Key Comparison Metric:
+ * - MULTI-LF: 0.866 seconds detection latency
+ * - MIRA: <50ms detection latency (17-170× faster)
  */
 
 #include <stdint.h>
@@ -39,8 +38,6 @@
 #include <rte_atomic.h>
 #include <rte_hash.h>
 #include <rte_jhash.h>
-
-#include "octosketch.h"
 
 #define RX_RING_SIZE 32768       /* Max for uint16_t compatibility (must be power of 2) */
 #define TX_RING_SIZE 4096
@@ -231,14 +228,6 @@ static struct worker_stats g_worker_stats[NUM_RX_QUEUES] __rte_cache_aligned;
 static FILE *g_log_file = NULL;
 static struct rte_hash *ip_hash = NULL;
 
-/* OctoSketch - Global shared sketches (one per attack type) */
-static struct octosketch g_sketch_udp __rte_cache_aligned;    /* UDP flood detection */
-static struct octosketch g_sketch_syn __rte_cache_aligned;    /* SYN flood detection */
-static struct octosketch g_sketch_http __rte_cache_aligned;   /* HTTP flood detection */
-static struct octosketch g_sketch_icmp __rte_cache_aligned;   /* ICMP flood detection */
-static struct octosketch g_sketch_baseline __rte_cache_aligned; /* Baseline traffic */
-static struct octosketch g_sketch_attack __rte_cache_aligned;   /* Attack traffic (192.168.2.x) */
-
 /* Function declarations */
 static int worker_thread(void *arg);
 static int coordinator_thread(void *arg);
@@ -319,30 +308,32 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
         bool attack_detected = false;
 
-        /* OCTOSKETCH-BASED DETECTION - Query sketches directly (O(1) operation) */
-
-        /* Get totals from sketches */
-        uint64_t sketch_baseline_pkts = octosketch_get_total(&g_sketch_baseline);
-        uint64_t sketch_attack_pkts = octosketch_get_total(&g_sketch_attack);
-        uint64_t sketch_udp_pkts = octosketch_get_total(&g_sketch_udp);
-        uint64_t sketch_syn_pkts = octosketch_get_total(&g_sketch_syn);
-        uint64_t sketch_http_pkts = octosketch_get_total(&g_sketch_http);
-        uint64_t sketch_icmp_pkts = octosketch_get_total(&g_sketch_icmp);
-
-        /* Calculate PPS rates from sketches */
-        double attack_pps = octosketch_pps(&g_sketch_attack, window_sec);
-        double baseline_pps = octosketch_pps(&g_sketch_baseline, window_sec);
-        double udp_pps = (double)sketch_udp_pkts / window_sec;
-        double syn_pps = (double)sketch_syn_pkts / window_sec;
-        double icmp_pps = (double)sketch_icmp_pkts / window_sec;
-        double http_pps = (double)sketch_http_pkts / window_sec;
-
-        /* Fallback to worker stats for comparison (hybrid mode) */
+        /* AGGREGATE DETECTION - Use window stats from workers */
         uint64_t window_base_pkts = 0, window_att_pkts = 0;
+        uint64_t window_syn_pkts = 0, window_udp_pkts = 0, window_icmp_pkts = 0;
+        uint64_t window_http_reqs = 0, window_dns_queries = 0;
+
         for (int i = 0; i < NUM_RX_QUEUES; i++) {
             window_base_pkts += window_baseline_pkts[i];
             window_att_pkts += window_attack_pkts[i];
         }
+
+        /* Aggregate protocol stats from workers */
+        for (int i = 0; i < NUM_RX_QUEUES; i++) {
+            window_syn_pkts += g_worker_stats[i].syn_packets;
+            window_udp_pkts += g_worker_stats[i].udp_packets;
+            window_icmp_pkts += g_worker_stats[i].icmp_packets;
+            window_http_reqs += g_worker_stats[i].http_requests;
+            window_dns_queries += g_worker_stats[i].dns_queries;
+        }
+
+        /* Calculate PPS rates */
+        double attack_pps = (double)window_att_pkts / window_sec;
+        double baseline_pps = (double)window_base_pkts / window_sec;
+        double syn_pps = (double)window_syn_pkts / window_sec;
+        double udp_pps = (double)window_udp_pkts / window_sec;
+        double icmp_pps = (double)window_icmp_pkts / window_sec;
+        double http_pps = (double)window_http_reqs / window_sec;
 
         /* DETECTION LOGIC - Aggregate based on 192.168.2.x traffic */
 
@@ -468,17 +459,10 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             }
         }
 
-        /* Reset detection window and sketches */
+        /* Reset detection window */
         if (window_sec >= DETECTION_WINDOW_SEC) {
             g_stats.window_start_tsc = cur_tsc;
-
-            /* Reset all sketches for new window */
-            octosketch_reset(&g_sketch_udp);
-            octosketch_reset(&g_sketch_syn);
-            octosketch_reset(&g_sketch_http);
-            octosketch_reset(&g_sketch_icmp);
-            octosketch_reset(&g_sketch_baseline);
-            octosketch_reset(&g_sketch_attack);
+            /* No need to reset IP table in aggregate mode */
         }
     }
 }
@@ -711,36 +695,11 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
             g_stats.bytes_until_detection / (1024.0 * 1024.0));
 
         len += snprintf(buffer + len, sizeof(buffer) - len,
-            "  DPDK + OctoSketch Advantages:\n"
+            "  DPDK Advantages:\n"
             "    ✓ Real-time detection (50ms granularity)\n"
-            "    ✓ No training required (vs ML models)\n"
-            "    ✓ Line-rate processing (multi-core DPDK)\n"
-            "    ✓ O(1) memory (sketch-based, constant size)\n"
-            "    ✓ Lock-free updates (atomic operations)\n"
-            "    ✓ Heavy-hitter detection (Top-K IPs)\n\n");
-
-        /* OctoSketch Memory Efficiency */
-        size_t sketch_total_memory = octosketch_memory_size() * 6;  /* 6 sketches */
-        len += snprintf(buffer + len, sizeof(buffer) - len,
-            "[OCTOSKETCH METRICS]\n"
-            "=== Memory-Efficient Probabilistic Counting ===\n\n"
-            "  Total sketch memory:       %zu KB (6 sketches × %.1f KB)\n"
-            "  Baseline sketch updates:   %" PRIu64 "\n"
-            "  Attack sketch updates:     %" PRIu64 "\n"
-            "  UDP sketch updates:        %" PRIu64 "\n"
-            "  SYN sketch updates:        %" PRIu64 "\n"
-            "  HTTP sketch updates:       %" PRIu64 "\n"
-            "  ICMP sketch updates:       %" PRIu64 "\n"
-            "  Memory savings vs exact:   ~%.1f×\n\n",
-            sketch_total_memory / 1024,
-            octosketch_memory_size() / 1024.0,
-            octosketch_get_total(&g_sketch_baseline),
-            octosketch_get_total(&g_sketch_attack),
-            octosketch_get_total(&g_sketch_udp),
-            octosketch_get_total(&g_sketch_syn),
-            octosketch_get_total(&g_sketch_http),
-            octosketch_get_total(&g_sketch_icmp),
-            (rte_atomic32_read(&g_ip_count) * sizeof(struct ip_stats)) / (float)sketch_total_memory);
+            "    ✓ No training required\n"
+            "    ✓ Line-rate processing (multi-core)\n"
+            "    ✓ Constant memory usage\n\n");
 
         /* Multiple Detection Statistics - Aggregate Analysis */
         if (g_stats.total_detection_events > 1) {
@@ -926,16 +885,7 @@ static int worker_thread(void *arg)
                 g_stats.first_attack_packet_tsc = rte_rdtsc();
             }
 
-            /* Update OctoSketch for baseline/attack traffic (lock-free atomic) */
-            if (is_baseline) {
-                octosketch_update_ip(&g_sketch_baseline, src_ip, 1);
-                octosketch_update_bytes(&g_sketch_baseline, pkt_len);
-            } else if (is_attack) {
-                octosketch_update_ip(&g_sketch_attack, src_ip, 1);
-                octosketch_update_bytes(&g_sketch_attack, pkt_len);
-            }
-
-            /* Parse transport layer - OPTIMIZED for CPU efficiency + OctoSketch updates */
+            /* Parse transport layer - OPTIMIZED for CPU efficiency */
             if (likely(proto == IPPROTO_TCP)) {
                 local_tcp_pkts++;
                 struct rte_tcp_hdr *tcp_hdr = (struct rte_tcp_hdr *)((uint8_t *)ip_hdr + sizeof(struct rte_ipv4_hdr));
@@ -944,26 +894,14 @@ static int worker_thread(void *arg)
                 uint8_t tcp_flags = tcp_hdr->tcp_flags;
                 uint16_t dst_port_raw = tcp_hdr->dst_port;
 
-                /* SYN detection - single branch + sketch update */
+                /* SYN detection - single branch */
                 if (unlikely(tcp_flags & RTE_TCP_SYN_FLAG)) {
                     local_syn_pkts++;
                     local_syn_ack_pkts += (tcp_flags & RTE_TCP_ACK_FLAG) ? 1 : 0;
-
-                    /* Update SYN sketch for attack traffic */
-                    if (is_attack) {
-                        octosketch_update_ip(&g_sketch_syn, src_ip, 1);
-                    }
                 }
 
                 /* HTTP detection - use raw port (avoid byte swap if possible) */
-                if (dst_port_raw == rte_cpu_to_be_16(80)) {
-                    local_http_reqs++;
-
-                    /* Update HTTP sketch for attack traffic */
-                    if (is_attack) {
-                        octosketch_update_ip(&g_sketch_http, src_ip, 1);
-                    }
-                }
+                local_http_reqs += (dst_port_raw == rte_cpu_to_be_16(80)) ? 1 : 0;
             }
             else if (proto == IPPROTO_UDP) {
                 local_udp_pkts++;
@@ -972,19 +910,9 @@ static int worker_thread(void *arg)
                 /* DNS detection - check both ports at once */
                 uint16_t dns_port = rte_cpu_to_be_16(53);
                 local_dns_queries += ((udp_hdr->dst_port == dns_port) | (udp_hdr->src_port == dns_port)) ? 1 : 0;
-
-                /* Update UDP sketch for attack traffic */
-                if (is_attack) {
-                    octosketch_update_ip(&g_sketch_udp, src_ip, 1);
-                }
             }
             else if (proto == IPPROTO_ICMP) {
                 local_icmp_pkts++;
-
-                /* Update ICMP sketch for attack traffic */
-                if (is_attack) {
-                    octosketch_update_ip(&g_sketch_icmp, src_ip, 1);
-                }
             }
 
             rte_pktmbuf_free(m);
@@ -1200,30 +1128,14 @@ int main(int argc, char *argv[])
     memset(window_baseline_bytes, 0, sizeof(window_baseline_bytes));
     memset(window_attack_bytes, 0, sizeof(window_attack_bytes));
 
-    /* Initialize OctoSketches */
-    octosketch_init(&g_sketch_udp, "UDP");
-    octosketch_init(&g_sketch_syn, "SYN");
-    octosketch_init(&g_sketch_http, "HTTP");
-    octosketch_init(&g_sketch_icmp, "ICMP");
-    octosketch_init(&g_sketch_baseline, "Baseline");
-    octosketch_init(&g_sketch_attack, "Attack");
-
-    size_t total_sketch_mem = octosketch_memory_size() * 6;
-    printf("\n[OctoSketch Initialized]\n");
-    printf("  6 sketches × %.1f KB = %.1f KB total memory\n",
-           octosketch_memory_size() / 1024.0, total_sketch_mem / 1024.0);
-    printf("  Configuration: %d rows × %d columns per sketch\n",
-           SKETCH_ROWS, SKETCH_COLS);
-    printf("  Lock-free atomic updates for multi-core safety\n\n");
-
-    printf("╔═══════════════════════════════════════════════════════════════════════╗\n");
-    printf("║     MIRA DDoS DETECTOR - DPDK + OCTOSKETCH (%d workers + 1 coord)    ║\n", NUM_RX_QUEUES);
+    printf("\n╔═══════════════════════════════════════════════════════════════════════╗\n");
+    printf("║       MIRA DDoS DETECTOR - MULTI-CORE (%d workers + 1 coordinator)    ║\n", NUM_RX_QUEUES);
     printf("╚═══════════════════════════════════════════════════════════════════════╝\n\n");
     printf("Comparing against MULTI-LF (2025):\n");
     printf("  - MULTI-LF detection latency: 866 ms\n");
-    printf("  - MIRA detection latency:     <50 ms (17-170× faster)\n");
-    printf("  - DPDK architecture:          %d RX workers + 1 coordinator\n", NUM_RX_QUEUES);
-    printf("  - OctoSketch advantage:       O(1) memory, lock-free updates\n\n");
+    printf("  - MIRA detection latency:     <50 ms\n");
+    printf("  - Expected improvement:       17-170× faster\n");
+    printf("  - Multi-core architecture:    %d RX workers + 1 coordinator\n\n", NUM_RX_QUEUES);
     printf("Press Ctrl+C to exit...\n\n");
 
     /* Launch worker threads on lcores 1-%d and coordinator on last lcore */

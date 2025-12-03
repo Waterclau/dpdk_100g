@@ -1,12 +1,14 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright(c) 2025 MIRA Project
 
-# Makefile for MIRA DDoS Detector
+# Makefile for MIRA DDoS Detector - DPDK + OctoSketch
 # Compares against MULTI-LF (2025) detection latency
+# Features: Multi-core DPDK + Memory-efficient OctoSketch
 
 APP = mira_ddos_detector
 
 SRCS-y := mira_ddos_detector.c
+DEPS := octosketch.h
 
 # DPDK configuration
 PKGCONF ?= pkg-config
@@ -38,10 +40,11 @@ endif
 
 all: $(APP)
 
-$(APP): $(SRCS-y) Makefile $(PC_FILE)
+$(APP): $(SRCS-y) $(DEPS) Makefile $(PC_FILE)
 	$(CC) $(CFLAGS) $(SRCS-y) -o $(APP) $(LDFLAGS) $(LDFLAGS_STATIC)
 	@echo ""
 	@echo "Build successful! Binary: ./$(APP)"
+	@echo "Features: DPDK multi-core + OctoSketch (memory-efficient detection)"
 	@echo ""
 
 clean:
