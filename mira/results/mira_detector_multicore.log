@@ -1,0 +1,4625 @@
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      5985383
+  Baseline (192.168.1): 3826470 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        5274836
+  UDP packets:        528099
+  ICMP packets:       182448
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 3826470 pkts (100.0%)  396580654 bytes  0.63 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.63 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (0.6s)]
+  Total received:     5985383 pkts (9.49 Mpps) | 12.40 Gbps | 976982235 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        1187551
+  SYN-ACK packets:    593762
+  SYN/ACK ratio:      2.00
+  HTTP requests:      2738330
+  DNS queries:        367212
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         0.63 Gbps (0.77 Mpps)
+  Cycles available:   3907 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   5978070
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     1973393073 (99.9% empty)
+  Processed pkts:     5985383 (100.1% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      52978048
+  Baseline (192.168.1): 33870131 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        46694101
+  UDP packets:        4669401
+  ICMP packets:       1614546
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30042820 pkts (100.0%)  3113603083 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (5.6s)]
+  Total received:     52978048 pkts (9.41 Mpps) | 12.28 Gbps | 8648294736 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        10512590
+  SYN-ACK packets:    5256281
+  SYN/ACK ratio:      2.00
+  HTTP requests:      24240364
+  DNS queries:        3245783
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   52974933
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     3496380719 (99.3% empty)
+  Processed pkts:     52978048 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      99970463
+  Baseline (192.168.1): 63914805 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        88111417
+  UDP packets:        8811938
+  ICMP packets:       3047108
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30044082 pkts (100.0%)  3113862819 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (10.6s)]
+  Total received:     99970463 pkts (9.40 Mpps) | 12.28 Gbps | 16319542970 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        19837120
+  SYN-ACK packets:    9918546
+  SYN/ACK ratio:      2.00
+  HTTP requests:      45743205
+  DNS queries:        6124260
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   99967533
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     5019248617 (99.1% empty)
+  Processed pkts:     99970463 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      146962515
+  Baseline (192.168.1): 93957938 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        129528457
+  UDP packets:        12954548
+  ICMP packets:       4479510
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30042671 pkts (100.0%)  3113741724 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (15.6s)]
+  Total received:     146962515 pkts (9.40 Mpps) | 12.28 Gbps | 23990747893 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        29161714
+  SYN-ACK packets:    14580843
+  SYN/ACK ratio:      2.00
+  HTTP requests:      67243546
+  DNS queries:        9003676
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   146959776
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6542412735 (99.0% empty)
+  Processed pkts:     146962515 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      193954754
+  Baseline (192.168.1): 124002057 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        170947754
+  UDP packets:        17095304
+  ICMP packets:       5911696
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30043587 pkts (100.0%)  3113594142 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (20.6s)]
+  Total received:     193954754 pkts (9.40 Mpps) | 12.28 Gbps | 31661961030 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        38486589
+  SYN-ACK packets:    19243281
+  SYN/ACK ratio:      2.00
+  HTTP requests:      88747551
+  DNS queries:        11881374
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   193952160
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     8065321853 (98.9% empty)
+  Processed pkts:     193954754 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      240947122
+  Baseline (192.168.1): 154045923 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        212364278
+  UDP packets:        21238628
+  ICMP packets:       7344216
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30043380 pkts (100.0%)  3113810009 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (25.6s)]
+  Total received:     240947122 pkts (9.40 Mpps) | 12.27 Gbps | 39333131861 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        47810998
+  SYN-ACK packets:    23905485
+  SYN/ACK ratio:      2.00
+  HTTP requests:      110248722
+  DNS queries:        14760960
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   240944457
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     9588564715 (98.9% empty)
+  Processed pkts:     240947122 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      287938719
+  Baseline (192.168.1): 184088824 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        253782708
+  UDP packets:        25379663
+  ICMP packets:       8776348
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30042267 pkts (100.0%)  3113609981 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (30.6s)]
+  Total received:     287938719 pkts (9.40 Mpps) | 12.27 Gbps | 47004374623 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        57135846
+  SYN-ACK packets:    28567909
+  SYN/ACK ratio:      2.00
+  HTTP requests:      131749852
+  DNS queries:        17639280
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   287936079
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     11111714786 (98.9% empty)
+  Processed pkts:     287938719 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      334931359
+  Baseline (192.168.1): 214133637 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        295200149
+  UDP packets:        29522394
+  ICMP packets:       10208816
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 32242913 pkts (100.0%)  3113844347 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 97 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (35.6s)]
+  Total received:     334931359 pkts (9.40 Mpps) | 12.27 Gbps | 54675594756 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        66460398
+  SYN-ACK packets:    33230185
+  SYN/ACK ratio:      2.00
+  HTTP requests:      153253001
+  DNS queries:        20517890
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.45 Mpps)
+  Cycles available:   464 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   334928800
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     12634461038 (98.8% empty)
+  Processed pkts:     334931359 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      381923423
+  Baseline (192.168.1): 244176786 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        336617167
+  UDP packets:        33665032
+  ICMP packets:       11641224
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30042537 pkts (100.0%)  3113724457 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (40.6s)]
+  Total received:     381923423 pkts (9.40 Mpps) | 12.27 Gbps | 62346814741 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        75785004
+  SYN-ACK packets:    37892488
+  SYN/ACK ratio:      2.00
+  HTTP requests:      174753335
+  DNS queries:        23397380
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   381920554
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     14157523112 (98.8% empty)
+  Processed pkts:     381923423 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      428915369
+  Baseline (192.168.1): 274220665 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        378036323
+  UDP packets:        37805718
+  ICMP packets:       13073328
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30043471 pkts (100.0%)  3113587743 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (45.6s)]
+  Total received:     428915369 pkts (9.40 Mpps) | 12.27 Gbps | 70018019446 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        85109840
+  SYN-ACK packets:    42554906
+  SYN/ACK ratio:      2.00
+  HTTP requests:      196257147
+  DNS queries:        26275046
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   428912674
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     15680476125 (98.8% empty)
+  Processed pkts:     428915369 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      475908265
+  Baseline (192.168.1): 304264881 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        419453138
+  UDP packets:        41949155
+  ICMP packets:       14505972
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 32202146 pkts (100.0%)  3335879944 bytes  5.34 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   5.34 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (50.6s)]
+  Total received:     475908265 pkts (9.40 Mpps) | 12.27 Gbps | 77689242717 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        94434315
+  SYN-ACK packets:    47217144
+  SYN/ACK ratio:      2.00
+  HTTP requests:      217758474
+  DNS queries:        29154710
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         5.34 Gbps (6.44 Mpps)
+  Cycles available:   464 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   475905600
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     17202922140 (98.8% empty)
+  Processed pkts:     475908265 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      522899615
+  Baseline (192.168.1): 334307727 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        460871534
+  UDP packets:        46089985
+  ICMP packets:       15938096
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30042350 pkts (100.0%)  3113612604 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (55.6s)]
+  Total received:     522899615 pkts (9.40 Mpps) | 12.27 Gbps | 85360424203 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        103759130
+  SYN-ACK packets:    51879551
+  SYN/ACK ratio:      2.00
+  HTTP requests:      239259690
+  DNS queries:        32032812
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   522897057
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     18725778008 (98.8% empty)
+  Processed pkts:     522899615 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      569892057
+  Baseline (192.168.1): 364352449 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        502288807
+  UDP packets:        50232736
+  ICMP packets:       17370515
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30044240 pkts (100.0%)  3113825504 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (60.6s)]
+  Total received:     569892057 pkts (9.40 Mpps) | 12.27 Gbps | 93031610962 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        113083645
+  SYN-ACK packets:    56541808
+  SYN/ACK ratio:      2.00
+  HTTP requests:      260762855
+  DNS queries:        34911460
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   569889341
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     20249113016 (98.8% empty)
+  Processed pkts:     569892057 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      616884166
+  Baseline (192.168.1): 394395604 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        543705675
+  UDP packets:        54375533
+  ICMP packets:       18802958
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 34404477 pkts (100.0%)  3113729555 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 91 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (65.6s)]
+  Total received:     616884166 pkts (9.40 Mpps) | 12.27 Gbps | 100702862608 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        122408234
+  SYN-ACK packets:    61204102
+  SYN/ACK ratio:      2.00
+  HTTP requests:      282263075
+  DNS queries:        37791032
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.88 Mpps)
+  Cycles available:   435 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   616881472
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     21771831225 (98.8% empty)
+  Processed pkts:     616884166 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      663876034
+  Baseline (192.168.1): 424439395 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        585125023
+  UDP packets:        58516089
+  ICMP packets:       20234922
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30043166 pkts (100.0%)  3113578824 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (70.6s)]
+  Total received:     663876034 pkts (9.40 Mpps) | 12.27 Gbps | 108374074241 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        131733093
+  SYN-ACK packets:    65866532
+  SYN/ACK ratio:      2.00
+  HTTP requests:      303766778
+  DNS queries:        40668640
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   663873442
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     23294789782 (98.7% empty)
+  Processed pkts:     663876034 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      710868895
+  Baseline (192.168.1): 454483623 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        626541873
+  UDP packets:        62659460
+  ICMP packets:       21667562
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30043597 pkts (100.0%)  3113825120 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (75.6s)]
+  Total received:     710868895 pkts (9.40 Mpps) | 12.27 Gbps | 116045291439 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        141057583
+  SYN-ACK packets:    70528777
+  SYN/ACK ratio:      2.00
+  HTTP requests:      325268304
+  DNS queries:        43548296
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   710866245
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     24818014303 (98.7% empty)
+  Processed pkts:     710868895 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      757860756
+  Baseline (192.168.1): 484526650 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        667960486
+  UDP packets:        66800398
+  ICMP packets:       23099872
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30042429 pkts (100.0%)  3113585086 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (80.6s)]
+  Total received:     757860756 pkts (9.40 Mpps) | 12.27 Gbps | 123716533624 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        150382464
+  SYN-ACK packets:    75191218
+  SYN/ACK ratio:      2.00
+  HTTP requests:      346769697
+  DNS queries:        46426526
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   757858054
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     26340629863 (98.7% empty)
+  Processed pkts:     757860756 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      804853407
+  Baseline (192.168.1): 514571518 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        709378067
+  UDP packets:        70943109
+  ICMP packets:       24532231
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30044227 pkts (100.0%)  3564682455 bytes  5.70 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   5.70 Gbps  (avg pkt: 119 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (85.6s)]
+  Total received:     804853407 pkts (9.40 Mpps) | 12.27 Gbps | 131387737697 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        159707032
+  SYN-ACK packets:    79853502
+  SYN/ACK ratio:      2.00
+  HTTP requests:      368272967
+  DNS queries:        49305120
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         5.70 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   804850793
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     27863233261 (98.7% empty)
+  Processed pkts:     804853407 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      851845192
+  Baseline (192.168.1): 544614558 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        750794528
+  UDP packets:        75086020
+  ICMP packets:       25964644
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30042422 pkts (100.0%)  3113735749 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (90.6s)]
+  Total received:     851845192 pkts (9.40 Mpps) | 12.27 Gbps | 139058955201 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        169031539
+  SYN-ACK packets:    84515756
+  SYN/ACK ratio:      2.00
+  HTTP requests:      389772897
+  DNS queries:        52184686
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   851842544
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     29385965341 (98.7% empty)
+  Processed pkts:     851845192 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      898837407
+  Baseline (192.168.1): 574658552 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        792214427
+  UDP packets:        79226476
+  ICMP packets:       27396504
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 32178958 pkts (100.0%)  3787477465 bytes  6.06 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   6.06 Gbps  (avg pkt: 118 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (95.6s)]
+  Total received:     898837407 pkts (9.40 Mpps) | 12.27 Gbps | 146730199590 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        178356526
+  SYN-ACK packets:    89178249
+  SYN/ACK ratio:      2.00
+  HTTP requests:      411276905
+  DNS queries:        55062208
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         6.06 Gbps (6.43 Mpps)
+  Cycles available:   465 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   898834850
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     30908928684 (98.7% empty)
+  Processed pkts:     898837407 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      945830047
+  Baseline (192.168.1): 604702659 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        833630868
+  UDP packets:        83369955
+  ICMP packets:       28829224
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 32242289 pkts (100.0%)  3571022863 bytes  5.71 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   5.71 Gbps  (avg pkt: 111 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (100.6s)]
+  Total received:     945830047 pkts (9.40 Mpps) | 12.27 Gbps | 154401389125 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        187680932
+  SYN-ACK packets:    93840452
+  SYN/ACK ratio:      2.00
+  HTTP requests:      432778156
+  DNS queries:        57941974
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         5.71 Gbps (6.45 Mpps)
+  Cycles available:   464 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   945827434
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     32431883949 (98.7% empty)
+  Processed pkts:     945830047 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      992822059
+  Baseline (192.168.1): 634745842 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        875049782
+  UDP packets:        87510673
+  ICMP packets:       30261604
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30042593 pkts (100.0%)  3113538502 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (105.6s)]
+  Total received:     992822059 pkts (9.40 Mpps) | 12.27 Gbps | 162072631391 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        197005860
+  SYN-ACK packets:    98502916
+  SYN/ACK ratio:      2.00
+  HTTP requests:      454280149
+  DNS queries:        60820128
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   992819363
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     33954645072 (98.7% empty)
+  Processed pkts:     992822059 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1039814552
+  Baseline (192.168.1): 664790549 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        916467199
+  UDP packets:        91653485
+  ICMP packets:       31693868
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30044168 pkts (100.0%)  3113867609 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (110.6s)]
+  Total received:     1039814552 pkts (9.40 Mpps) | 12.27 Gbps | 169743832621 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        206330388
+  SYN-ACK packets:    103165181
+  SYN/ACK ratio:      2.00
+  HTTP requests:      475783054
+  DNS queries:        63698746
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1039811878
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     35477243336 (98.7% empty)
+  Processed pkts:     1039814552 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1086806175
+  Baseline (192.168.1): 694833457 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        957883576
+  UDP packets:        95796243
+  ICMP packets:       33126356
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 32182714 pkts (100.0%)  3113755696 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 97 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (115.6s)]
+  Total received:     1086806175 pkts (9.40 Mpps) | 12.27 Gbps | 177415053071 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        215654874
+  SYN-ACK packets:    107827423
+  SYN/ACK ratio:      2.00
+  HTTP requests:      497282714
+  DNS queries:        66578114
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.44 Mpps)
+  Cycles available:   465 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1086803619
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     37000293537 (98.7% empty)
+  Processed pkts:     1086806175 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1133798138
+  Baseline (192.168.1): 724877247 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        999303252
+  UDP packets:        99936682
+  ICMP packets:       34558204
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30043124 pkts (100.0%)  3335621349 bytes  5.34 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   5.34 Gbps  (avg pkt: 111 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (120.7s)]
+  Total received:     1133798138 pkts (9.40 Mpps) | 12.27 Gbps | 185086287705 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        224979825
+  SYN-ACK packets:    112489899
+  SYN/ACK ratio:      2.00
+  HTTP requests:      518786501
+  DNS queries:        69455693
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         5.34 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1133795543
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     38523498566 (98.7% empty)
+  Processed pkts:     1133798138 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1180791199
+  Baseline (192.168.1): 754921697 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        1040719895
+  UDP packets:        104080394
+  ICMP packets:       35990910
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30043844 pkts (100.0%)  3781819695 bytes  6.05 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   6.05 Gbps  (avg pkt: 126 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (125.7s)]
+  Total received:     1180791199 pkts (9.40 Mpps) | 12.27 Gbps | 192757499275 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        234304274
+  SYN-ACK packets:    117152123
+  SYN/ACK ratio:      2.00
+  HTTP requests:      540288151
+  DNS queries:        72335604
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         6.05 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1180788567
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     40046363672 (98.7% empty)
+  Processed pkts:     1180791199 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1227783071
+  Baseline (192.168.1): 784964758 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        1082138709
+  UDP packets:        108221056
+  ICMP packets:       37423306
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30042499 pkts (100.0%)  3113533387 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (130.7s)]
+  Total received:     1227783071 pkts (9.40 Mpps) | 12.27 Gbps | 200428737427 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        243629184
+  SYN-ACK packets:    121814578
+  SYN/ACK ratio:      2.00
+  HTTP requests:      561790004
+  DNS queries:        75213750
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1227780435
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     41568967332 (98.7% empty)
+  Processed pkts:     1227783071 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1274776096
+  Baseline (192.168.1): 815009852 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        1123556609
+  UDP packets:        112363931
+  ICMP packets:       38855558
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30044448 pkts (100.0%)  3113861657 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (135.7s)]
+  Total received:     1274776096 pkts (9.40 Mpps) | 12.27 Gbps | 208099959527 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        252953836
+  SYN-ACK packets:    126476904
+  SYN/ACK ratio:      2.00
+  HTTP requests:      583293375
+  DNS queries:        78092365
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1274773529
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     43091588542 (98.7% empty)
+  Processed pkts:     1274776096 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1321767557
+  Baseline (192.168.1): 845052638 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        1164972659
+  UDP packets:        116506826
+  ICMP packets:       40288072
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30042236 pkts (100.0%)  3113776097 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (140.7s)]
+  Total received:     1321767557 pkts (9.40 Mpps) | 12.27 Gbps | 215771161987 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        262278216
+  SYN-ACK packets:    131139094
+  SYN/ACK ratio:      2.00
+  HTTP requests:      604792675
+  DNS queries:        80971836
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1321765028
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     44614314675 (98.7% empty)
+  Processed pkts:     1321767557 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1368759392
+  Baseline (192.168.1): 875096330 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        1206392318
+  UDP packets:        120647218
+  ICMP packets:       41719856
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 32182458 pkts (100.0%)  3113578748 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 97 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (145.7s)]
+  Total received:     1368759392 pkts (9.40 Mpps) | 12.27 Gbps | 223442421606 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        271603174
+  SYN-ACK packets:    135801573
+  SYN/ACK ratio:      2.00
+  HTTP requests:      626296378
+  DNS queries:        83849356
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.44 Mpps)
+  Cycles available:   465 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1368756879
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     46137496178 (98.7% empty)
+  Processed pkts:     1368759392 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1415752323
+  Baseline (192.168.1): 905140684 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        1247808832
+  UDP packets:        124790863
+  ICMP packets:       43152630
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30043829 pkts (100.0%)  3113817050 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (150.7s)]
+  Total received:     1415752323 pkts (9.40 Mpps) | 12.27 Gbps | 231113609725 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        280927579
+  SYN-ACK packets:    140463776
+  SYN/ACK ratio:      2.00
+  HTTP requests:      647798084
+  DNS queries:        86729186
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1415749770
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     47660769490 (98.7% empty)
+  Processed pkts:     1415752323 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1462744135
+  Baseline (192.168.1): 935183773 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        1289227603
+  UDP packets:        128931492
+  ICMP packets:       44585040
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30042557 pkts (100.0%)  3330675431 bytes  5.33 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   5.33 Gbps  (avg pkt: 111 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (155.7s)]
+  Total received:     1462744135 pkts (9.40 Mpps) | 12.27 Gbps | 238784838703 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        290252498
+  SYN-ACK packets:    145126235
+  SYN/ACK ratio:      2.00
+  HTTP requests:      669299938
+  DNS queries:        89607284
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         5.33 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1462741461
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     49184186140 (98.7% empty)
+  Processed pkts:     1462744135 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1509737258
+  Baseline (192.168.1): 965228855 (63.9%)
+  Attack (192.168.2): 0 (0.0%)
+  TCP packets:        1330645813
+  UDP packets:        133074161
+  ICMP packets:       46017284
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30044442 pkts (100.0%)  3337202414 bytes  5.34 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   5.34 Gbps  (avg pkt: 111 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (160.7s)]
+  Total received:     1509737258 pkts (9.40 Mpps) | 12.27 Gbps | 246456078287 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        299577217
+  SYN-ACK packets:    149788594
+  SYN/ACK ratio:      2.00
+  HTTP requests:      690803330
+  DNS queries:        92485853
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Throughput:         5.34 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1509734607
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     50707362056 (98.7% empty)
+  Processed pkts:     1509737258 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1568112878
+  Baseline (192.168.1): 993528393 (63.4%)
+  Attack (192.168.2): 14101269 (0.9%)
+  TCP packets:        1376702793
+  UDP packets:        142630481
+  ICMP packets:       48779604
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 28298992 pkts (66.7%)  2936240636 bytes  4.69 Gbps
+  Attack (192.168.2): 14101269 pkts (33.3%)  3714512976 bytes  5.93 Gbps
+  Total throughput:   10.62 Gbps  (avg pkt: 157 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (165.7s)]
+  Total received:     1568112878 pkts (9.47 Mpps) | 12.43 Gbps | 257402539607 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        315406549
+  SYN-ACK packets:    154177817
+  SYN/ACK ratio:      2.05
+  HTTP requests:      713384354
+  DNS queries:        95201174
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   54
+  SYN flood events:   54
+  HTTP flood events:  54
+  ICMP flood events:  54
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 28687189 UDP pps | SYN FLOOD detected: 63453787 SYN pps | ICMP FLOOD detected: 9812570 ICMP pps | HTTP FLOOD detected: 143559537 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    13892352 updates
+  Estimated attack packets:  444555264 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    54
+  Average detection latency: 50.03 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     50.37 ms
+  Latency range:             16.04 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  53 detections (98.1%)
+
+[PERFORMANCE METRICS]
+  Throughput:         10.62 Gbps (8.47 Mpps)
+  Cycles available:   353 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1568107789
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     51890377063 (98.7% empty)
+  Processed pkts:     1568112878 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1635790236
+  Baseline (192.168.1): 1020360243 (62.4%)
+  Attack (192.168.2): 39794431 (2.4%)
+  TCP packets:        1426530916
+  UDP packets:        156628316
+  ICMP packets:       52631004
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 28902548 pkts (51.0%)  3001493604 bytes  4.80 Gbps
+  Attack (192.168.2): 27725297 pkts (49.0%)  7037233570 bytes  11.25 Gbps
+  Total throughput:   16.05 Gbps  (avg pkt: 177 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (170.7s)]
+  Total received:     1635790236 pkts (9.58 Mpps) | 12.70 Gbps | 271032857900 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        336572352
+  SYN-ACK packets:    158337848
+  SYN/ACK ratio:      2.13
+  HTTP requests:      736836111
+  DNS queries:        97773240
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   153
+  SYN flood events:   153
+  HTTP flood events:  153
+  ICMP flood events:  153
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 31433499 UDP pps | SYN FLOOD detected: 67550067 SYN pps | ICMP FLOOD detected: 10562820 ICMP pps | HTTP FLOOD detected: 147892955 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    25584000 updates
+  Estimated attack packets:  818688000 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    153
+  Average detection latency: 50.55 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     100.59 ms
+  Latency range:             66.26 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  152 detections (99.3%)
+
+[PERFORMANCE METRICS]
+  Throughput:         16.05 Gbps (11.32 Mpps)
+  Cycles available:   264 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1635785312
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     52789778339 (98.6% empty)
+  Processed pkts:     1635790236 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1703460316
+  Baseline (192.168.1): 1047184759 (61.5%)
+  Attack (192.168.2): 65489907 (3.8%)
+  TCP packets:        1476350108
+  UDP packets:        170629169
+  ICMP packets:       56481039
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26823562 pkts (49.3%)  2785357109 bytes  4.45 Gbps
+  Attack (192.168.2): 27600920 pkts (50.7%)  6769106998 bytes  10.83 Gbps
+  Total throughput:   15.28 Gbps  (avg pkt: 176 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (175.7s)]
+  Total received:     1703460316 pkts (9.70 Mpps) | 12.96 Gbps | 284662533358 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        357737601
+  SYN-ACK packets:    162496444
+  SYN/ACK ratio:      2.20
+  HTTP requests:      760281294
+  DNS queries:        100347705
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   251
+  SYN flood events:   251
+  HTTP flood events:  251
+  ICMP flood events:  251
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 34581733 UDP pps | SYN FLOOD detected: 72513649 SYN pps | ICMP FLOOD detected: 11448117 ICMP pps | HTTP FLOOD detected: 154136179 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    25330752 updates
+  Estimated attack packets:  810584064 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    251
+  Average detection latency: 50.66 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     100.60 ms
+  Latency range:             66.26 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  250 detections (99.6%)
+
+[PERFORMANCE METRICS]
+  Throughput:         15.28 Gbps (10.88 Mpps)
+  Cycles available:   275 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1703455447
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     53688833240 (98.6% empty)
+  Processed pkts:     1703460316 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1771133035
+  Baseline (192.168.1): 1074009086 (60.6%)
+  Attack (192.168.2): 91187479 (5.1%)
+  TCP packets:        1526173214
+  UDP packets:        184627246
+  ICMP packets:       60332575
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 28703496 pkts (49.4%)  3188975207 bytes  5.10 Gbps
+  Attack (192.168.2): 29389616 pkts (50.6%)  6769530362 bytes  10.83 Gbps
+  Total throughput:   15.93 Gbps  (avg pkt: 171 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (180.7s)]
+  Total received:     1771133035 pkts (9.80 Mpps) | 13.21 Gbps | 298292783564 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        378905198
+  SYN-ACK packets:    166655452
+  SYN/ACK ratio:      2.27
+  HTTP requests:      783726735
+  DNS queries:        102919526
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   350
+  SYN flood events:   350
+  HTTP flood events:  350
+  ICMP flood events:  350
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 37437553 UDP pps | SYN FLOOD detected: 76832229 SYN pps | ICMP FLOOD detected: 12233890 ICMP pps | HTTP FLOOD detected: 158920242 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    25330688 updates
+  Estimated attack packets:  810582016 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    350
+  Average detection latency: 50.71 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     100.60 ms
+  Latency range:             66.26 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  349 detections (99.7%)
+
+[PERFORMANCE METRICS]
+  Throughput:         15.93 Gbps (11.61 Mpps)
+  Cycles available:   257 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1771128139
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     54587343051 (98.5% empty)
+  Processed pkts:     1771133035 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1838786837
+  Baseline (192.168.1): 1100829313 (59.9%)
+  Attack (192.168.2): 116875390 (6.4%)
+  TCP packets:        1575981101
+  UDP packets:        198623170
+  ICMP packets:       64182566
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 28773406 pkts (52.8%)  2785238401 bytes  4.45 Gbps
+  Attack (192.168.2): 25687005 pkts (47.2%)  7261280088 bytes  11.61 Gbps
+  Total throughput:   16.07 Gbps  (avg pkt: 184 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (185.7s)]
+  Total received:     1838786837 pkts (9.90 Mpps) | 13.44 Gbps | 311918217066 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        400065586
+  SYN-ACK packets:    170813550
+  SYN/ACK ratio:      2.34
+  HTTP requests:      807164245
+  DNS queries:        105491703
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   448
+  SYN flood events:   448
+  HTTP flood events:  448
+  ICMP flood events:  448
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 40679223 UDP pps | SYN FLOOD detected: 81941934 SYN pps | ICMP FLOOD detected: 13145589 ICMP pps | HTTP FLOOD detected: 165340706 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    25063744 updates
+  Estimated attack packets:  802039808 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    448
+  Average detection latency: 50.74 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     100.60 ms
+  Latency range:             66.26 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  447 detections (99.8%)
+
+[PERFORMANCE METRICS]
+  Throughput:         16.07 Gbps (10.89 Mpps)
+  Cycles available:   275 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1838781960
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     55486628555 (98.5% empty)
+  Processed pkts:     1838786837 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1906454992
+  Baseline (192.168.1): 1127654026 (59.1%)
+  Attack (192.168.2): 142568775 (7.5%)
+  TCP packets:        1625796923
+  UDP packets:        212624936
+  ICMP packets:       68033133
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26823676 pkts (51.1%)  2785236182 bytes  4.45 Gbps
+  Attack (192.168.2): 25692398 pkts (48.9%)  6768814356 bytes  10.82 Gbps
+  Total throughput:   15.28 Gbps  (avg pkt: 182 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (190.7s)]
+  Total received:     1906454992 pkts (10.00 Mpps) | 13.66 Gbps | 325547167830 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        421229743
+  SYN-ACK packets:    174972061
+  SYN/ACK ratio:      2.41
+  HTTP requests:      830606976
+  DNS queries:        108067186
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   545
+  SYN flood events:   545
+  HTTP flood events:  545
+  ICMP flood events:  545
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 43989358 UDP pps | SYN FLOOD detected: 87158110 SYN pps | ICMP FLOOD detected: 14076257 ICMP pps | HTTP FLOOD detected: 171894609 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    24810272 updates
+  Estimated attack packets:  793928704 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    545
+  Average detection latency: 50.85 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.20 ms
+  Latency range:             66.87 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  544 detections (99.8%)
+
+[PERFORMANCE METRICS]
+  Throughput:         15.28 Gbps (10.50 Mpps)
+  Cycles available:   285 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1906450119
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     56385451322 (98.4% empty)
+  Processed pkts:     1906454992 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      1974120393
+  Baseline (192.168.1): 1154478842 (58.5%)
+  Attack (192.168.2): 168261424 (8.5%)
+  TCP packets:        1675617536
+  UDP packets:        226620899
+  ICMP packets:       71881958
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 28733363 pkts (52.8%)  2984070003 bytes  4.77 Gbps
+  Attack (192.168.2): 25691772 pkts (47.2%)  6768449846 bytes  10.82 Gbps
+  Total throughput:   15.60 Gbps  (avg pkt: 179 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (195.7s)]
+  Total received:     1974120393 pkts (10.09 Mpps) | 13.87 Gbps | 339175788940 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        442394528
+  SYN-ACK packets:    179131227
+  SYN/ACK ratio:      2.47
+  HTTP requests:      854053891
+  DNS queries:        110637847
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   643
+  SYN flood events:   643
+  HTTP flood events:  643
+  ICMP flood events:  643
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 46904140 UDP pps | SYN FLOOD detected: 91566003 SYN pps | ICMP FLOOD detected: 14877793 ICMP pps | HTTP FLOOD detected: 176778124 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    24808224 updates
+  Estimated attack packets:  793863168 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    643
+  Average detection latency: 50.93 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.20 ms
+  Latency range:             66.87 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  642 detections (99.8%)
+
+[PERFORMANCE METRICS]
+  Throughput:         15.60 Gbps (10.88 Mpps)
+  Cycles available:   275 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   1974115438
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     57284328579 (98.4% empty)
+  Processed pkts:     1974120393 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2041781565
+  Baseline (192.168.1): 1181297927 (57.9%)
+  Attack (192.168.2): 193957329 (9.5%)
+  TCP packets:        1725429914
+  UDP packets:        240619315
+  ICMP packets:       75732336
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26818279 pkts (49.4%)  2785125215 bytes  4.45 Gbps
+  Attack (192.168.2): 27500338 pkts (50.6%)  7245171392 bytes  11.59 Gbps
+  Total throughput:   16.04 Gbps  (avg pkt: 185 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (200.7s)]
+  Total received:     2041781565 pkts (10.17 Mpps) | 14.06 Gbps | 352803848023 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        463558716
+  SYN-ACK packets:    183289379
+  SYN/ACK ratio:      2.53
+  HTTP requests:      877494455
+  DNS queries:        113209780
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   741
+  SYN flood events:   741
+  HTTP flood events:  741
+  ICMP flood events:  741
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 50314570 UDP pps | SYN FLOOD detected: 96939661 SYN pps | ICMP FLOOD detected: 15836697 ICMP pps | HTTP FLOOD detected: 183523486 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    24554880 updates
+  Estimated attack packets:  785756160 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    741
+  Average detection latency: 50.92 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.20 ms
+  Latency range:             66.87 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  740 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         16.04 Gbps (10.86 Mpps)
+  Cycles available:   275 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2041776824
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     58182797007 (98.3% empty)
+  Processed pkts:     2041781565 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2109446257
+  Baseline (192.168.1): 1208121119 (57.3%)
+  Attack (192.168.2): 219649659 (10.4%)
+  TCP packets:        1775247797
+  UDP packets:        254615809
+  ICMP packets:       79582651
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 28774327 pkts (51.0%)  2989210497 bytes  4.78 Gbps
+  Attack (192.168.2): 27598054 pkts (49.0%)  7239051074 bytes  11.58 Gbps
+  Total throughput:   16.36 Gbps  (avg pkt: 181 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (205.7s)]
+  Total received:     2109446257 pkts (10.26 Mpps) | 14.25 Gbps | 366432293954 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        484721985
+  SYN-ACK packets:    187447843
+  SYN/ACK ratio:      2.59
+  HTTP requests:      900935332
+  DNS queries:        115783028
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   840
+  SYN flood events:   840
+  HTTP flood events:  840
+  ICMP flood events:  840
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 53260001 UDP pps | SYN FLOOD detected: 101393282 SYN pps | ICMP FLOOD detected: 16646941 ICMP pps | HTTP FLOOD detected: 188456500 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    24548736 updates
+  Estimated attack packets:  785559552 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    840
+  Average detection latency: 50.91 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.20 ms
+  Latency range:             66.87 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  839 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         16.36 Gbps (11.27 Mpps)
+  Cycles available:   265 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2109441400
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     59081694562 (98.3% empty)
+  Processed pkts:     2109446257 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2177117906
+  Baseline (192.168.1): 1234948042 (56.7%)
+  Attack (192.168.2): 245345441 (11.3%)
+  TCP packets:        1825068959
+  UDP packets:        268614950
+  ICMP packets:       83433997
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26826018 pkts (49.4%)  2985648847 bytes  4.77 Gbps
+  Attack (192.168.2): 27521500 pkts (50.6%)  7745142740 bytes  12.39 Gbps
+  Total throughput:   17.16 Gbps  (avg pkt: 197 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (210.7s)]
+  Total received:     2177117906 pkts (10.33 Mpps) | 14.43 Gbps | 380061503873 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        505887215
+  SYN-ACK packets:    191606653
+  SYN/ACK ratio:      2.64
+  HTTP requests:      924382749
+  DNS queries:        118355175
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   938
+  SYN flood events:   938
+  HTTP flood events:  938
+  ICMP flood events:  938
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 56774669 UDP pps | SYN FLOOD detected: 106929255 SYN pps | ICMP FLOOD detected: 17635130 ICMP pps | HTTP FLOOD detected: 195399801 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    24296128 updates
+  Estimated attack packets:  777476096 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    938
+  Average detection latency: 50.90 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.20 ms
+  Latency range:             66.87 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  937 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         17.16 Gbps (10.86 Mpps)
+  Cycles available:   275 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2177113178
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     59980668835 (98.2% empty)
+  Processed pkts:     2177117906 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2244792883
+  Baseline (192.168.1): 1261775181 (56.2%)
+  Attack (192.168.2): 271042122 (12.1%)
+  TCP packets:        1874890522
+  UDP packets:        282616690
+  ICMP packets:       87285673
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26826135 pkts (47.8%)  2990567859 bytes  4.78 Gbps
+  Attack (192.168.2): 29276351 pkts (52.2%)  6769677338 bytes  10.83 Gbps
+  Total throughput:   15.61 Gbps  (avg pkt: 174 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (215.7s)]
+  Total received:     2244792883 pkts (10.41 Mpps) | 14.60 Gbps | 393691983740 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        527052762
+  SYN-ACK packets:    195765349
+  SYN/ACK ratio:      2.69
+  HTTP requests:      947827163
+  DNS queries:        120929241
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   1036
+  SYN flood events:   1036
+  HTTP flood events:  1036
+  ICMP flood events:  1036
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 60364779 UDP pps | SYN FLOOD detected: 112583085 SYN pps | ICMP FLOOD detected: 18644366 ICMP pps | HTTP FLOOD detected: 202489642 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    24038400 updates
+  Estimated attack packets:  769228800 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    1036
+  Average detection latency: 50.89 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.20 ms
+  Latency range:             66.87 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  1035 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         15.61 Gbps (11.22 Mpps)
+  Cycles available:   267 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2244788109
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     60879592012 (98.2% empty)
+  Processed pkts:     2244792883 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2312458543
+  Baseline (192.168.1): 1288599253 (55.7%)
+  Attack (192.168.2): 296734523 (12.8%)
+  TCP packets:        1924708726
+  UDP packets:        296614452
+  ICMP packets:       91135365
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26823106 pkts (51.1%)  2785331028 bytes  4.45 Gbps
+  Attack (192.168.2): 25691471 pkts (48.9%)  7754925318 bytes  12.40 Gbps
+  Total throughput:   16.86 Gbps  (avg pkt: 201 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (220.7s)]
+  Total received:     2312458543 pkts (10.48 Mpps) | 14.77 Gbps | 407321177610 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        548216710
+  SYN-ACK packets:    199924142
+  SYN/ACK ratio:      2.74
+  HTTP requests:      971271246
+  DNS queries:        123501146
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   1134
+  SYN flood events:   1134
+  HTTP flood events:  1134
+  ICMP flood events:  1134
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 63374033 UDP pps | SYN FLOOD detected: 117133012 SYN pps | ICMP FLOOD detected: 19471968 ICMP pps | HTTP FLOOD detected: 207529920 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    24034976 updates
+  Estimated attack packets:  769119232 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    1134
+  Average detection latency: 50.93 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.20 ms
+  Latency range:             66.87 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  1133 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         16.86 Gbps (10.50 Mpps)
+  Cycles available:   285 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2312453727
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     61778700944 (98.2% empty)
+  Processed pkts:     2312458543 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2380123540
+  Baseline (192.168.1): 1315424018 (55.3%)
+  Attack (192.168.2): 322426196 (13.5%)
+  TCP packets:        1974523681
+  UDP packets:        310613634
+  ICMP packets:       94986225
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26823819 pkts (51.1%)  2785477717 bytes  4.45 Gbps
+  Attack (192.168.2): 25690779 pkts (48.9%)  7248506280 bytes  11.59 Gbps
+  Total throughput:   16.05 Gbps  (avg pkt: 191 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (225.7s)]
+  Total received:     2380123540 pkts (10.55 Mpps) | 14.92 Gbps | 420948882509 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        569378956
+  SYN-ACK packets:    204082493
+  SYN/ACK ratio:      2.79
+  HTTP requests:      994714223
+  DNS queries:        126076219
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   1231
+  SYN flood events:   1231
+  HTTP flood events:  1231
+  ICMP flood events:  1231
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 67075060 UDP pps | SYN FLOOD detected: 122959869 SYN pps | ICMP FLOOD detected: 20512261 ICMP pps | HTTP FLOOD detected: 214830696 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    23775136 updates
+  Estimated attack packets:  760804352 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    1231
+  Average detection latency: 50.97 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.20 ms
+  Latency range:             66.87 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  1230 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         16.05 Gbps (10.50 Mpps)
+  Cycles available:   285 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2380118561
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     62677910679 (98.1% empty)
+  Processed pkts:     2380123540 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2447790984
+  Baseline (192.168.1): 1342247965 (54.8%)
+  Attack (192.168.2): 348119837 (14.2%)
+  TCP packets:        2024341090
+  UDP packets:        324612409
+  ICMP packets:       98837487
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30651039 pkts (52.7%)  2984463206 bytes  4.77 Gbps
+  Attack (192.168.2): 27473012 pkts (47.3%)  7263836562 bytes  11.62 Gbps
+  Total throughput:   16.39 Gbps  (avg pkt: 176 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (230.7s)]
+  Total received:     2447790984 pkts (10.61 Mpps) | 15.07 Gbps | 434578685129 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        590541629
+  SYN-ACK packets:    208241227
+  SYN/ACK ratio:      2.84
+  HTTP requests:      1018157272
+  DNS queries:        128649379
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   1330
+  SYN flood events:   1330
+  HTTP flood events:  1330
+  ICMP flood events:  1330
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 70116121 UDP pps | SYN FLOOD detected: 127556796 SYN pps | ICMP FLOOD detected: 21348868 ICMP pps | HTTP FLOOD detected: 219922051 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    23776384 updates
+  Estimated attack packets:  760844288 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    1330
+  Average detection latency: 50.96 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.20 ms
+  Latency range:             66.87 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  1329 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         16.39 Gbps (11.62 Mpps)
+  Cycles available:   257 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2447786142
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     63576851229 (98.1% empty)
+  Processed pkts:     2447790984 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2515446375
+  Baseline (192.168.1): 1369067334 (54.4%)
+  Attack (192.168.2): 373810946 (14.9%)
+  TCP packets:        2074148231
+  UDP packets:        338611337
+  ICMP packets:       102686807
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 28744664 pkts (51.1%)  2784902282 bytes  4.45 Gbps
+  Attack (192.168.2): 27518773 pkts (48.9%)  6768116308 bytes  10.82 Gbps
+  Total throughput:   15.28 Gbps  (avg pkt: 170 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (235.7s)]
+  Total received:     2515446375 pkts (10.67 Mpps) | 15.21 Gbps | 448205286045 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        611702180
+  SYN-ACK packets:    212398553
+  SYN/ACK ratio:      2.88
+  HTTP requests:      1041597503
+  DNS queries:        131223402
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   1428
+  SYN flood events:   1428
+  HTTP flood events:  1428
+  ICMP flood events:  1428
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 73931887 UDP pps | SYN FLOOD detected: 133561988 SYN pps | ICMP FLOOD detected: 22420862 ICMP pps | HTTP FLOOD detected: 227438751 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    23516608 updates
+  Estimated attack packets:  752531456 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    1428
+  Average detection latency: 50.95 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.20 ms
+  Latency range:             66.87 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  1427 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         15.28 Gbps (11.25 Mpps)
+  Cycles available:   266 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2515441480
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     64475784620 (98.1% empty)
+  Processed pkts:     2515446375 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2583112737
+  Baseline (192.168.1): 1395890772 (54.0%)
+  Attack (192.168.2): 399502988 (15.5%)
+  TCP packets:        2123964658
+  UDP packets:        352609519
+  ICMP packets:       106538560
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 28756099 pkts (52.8%)  2785624757 bytes  4.45 Gbps
+  Attack (192.168.2): 25690978 pkts (47.2%)  8217788890 bytes  13.14 Gbps
+  Total throughput:   17.60 Gbps  (avg pkt: 202 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (240.7s)]
+  Total received:     2583112737 pkts (10.73 Mpps) | 15.35 Gbps | 461834604505 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        632864035
+  SYN-ACK packets:    216557007
+  SYN/ACK ratio:      2.92
+  HTTP requests:      1065036916
+  DNS queries:        133797233
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   1525
+  SYN flood events:   1525
+  HTTP flood events:  1525
+  ICMP flood events:  1525
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 77831425 UDP pps | SYN FLOOD detected: 139699201 SYN pps | ICMP FLOOD detected: 23516930 ICMP pps | HTTP FLOOD detected: 235119625 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    23258752 updates
+  Estimated attack packets:  744280064 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    1525
+  Average detection latency: 50.98 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.21 ms
+  Latency range:             66.88 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  1524 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         17.60 Gbps (10.88 Mpps)
+  Cycles available:   275 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2583107936
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     65375115481 (98.0% empty)
+  Processed pkts:     2583112737 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2650763210
+  Baseline (192.168.1): 1422708898 (53.7%)
+  Attack (192.168.2): 425190011 (16.0%)
+  TCP packets:        2173774228
+  UDP packets:        366602404
+  ICMP packets:       110386578
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26817191 pkts (49.4%)  2784589919 bytes  4.45 Gbps
+  Attack (192.168.2): 27465997 pkts (50.6%)  6766774486 bytes  10.82 Gbps
+  Total throughput:   15.27 Gbps  (avg pkt: 176 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (245.7s)]
+  Total received:     2650763210 pkts (10.79 Mpps) | 15.48 Gbps | 475460189286 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        654023527
+  SYN-ACK packets:    220714760
+  SYN/ACK ratio:      2.96
+  HTTP requests:      1088478959
+  DNS queries:        136368044
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   1624
+  SYN flood events:   1624
+  HTTP flood events:  1624
+  ICMP flood events:  1624
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 80939767 UDP pps | SYN FLOOD detected: 144399501 SYN pps | ICMP FLOOD detected: 24371692 ICMP pps | HTTP FLOOD detected: 240326782 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    23253440 updates
+  Estimated attack packets:  744110080 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    1624
+  Average detection latency: 50.97 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.21 ms
+  Latency range:             66.88 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  1623 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         15.27 Gbps (10.85 Mpps)
+  Cycles available:   276 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2650758296
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     66274212423 (98.0% empty)
+  Processed pkts:     2650763210 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2718439283
+  Baseline (192.168.1): 1449535286 (53.3%)
+  Attack (192.168.2): 450888911 (16.6%)
+  TCP packets:        2223598347
+  UDP packets:        380603138
+  ICMP packets:       114237798
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26825329 pkts (51.1%)  3186364553 bytes  5.10 Gbps
+  Attack (192.168.2): 25697992 pkts (48.9%)  6770224754 bytes  10.83 Gbps
+  Total throughput:   15.92 Gbps  (avg pkt: 190 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (250.7s)]
+  Total received:     2718439283 pkts (10.84 Mpps) | 15.61 Gbps | 489091531729 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        675191134
+  SYN-ACK packets:    224873875
+  SYN/ACK ratio:      3.00
+  HTTP requests:      1111925607
+  DNS queries:        138941364
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   1721
+  SYN flood events:   1721
+  HTTP flood events:  1721
+  ICMP flood events:  1721
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 84963106 UDP pps | SYN FLOOD detected: 150729849 SYN pps | ICMP FLOOD detected: 25502069 ICMP pps | HTTP FLOOD detected: 248242170 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    23007200 updates
+  Estimated attack packets:  736230400 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    1721
+  Average detection latency: 50.99 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.21 ms
+  Latency range:             66.88 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  1720 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         15.92 Gbps (10.50 Mpps)
+  Cycles available:   285 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2718434299
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     67173036258 (98.0% empty)
+  Processed pkts:     2718439283 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2786099786
+  Baseline (192.168.1): 1476355663 (53.0%)
+  Attack (192.168.2): 476582408 (17.1%)
+  TCP packets:        2273412273
+  UDP packets:        394599323
+  ICMP packets:       118088190
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26819403 pkts (51.1%)  2784840571 bytes  4.45 Gbps
+  Attack (192.168.2): 25692472 pkts (48.9%)  7262711246 bytes  11.61 Gbps
+  Total throughput:   16.07 Gbps  (avg pkt: 191 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (255.7s)]
+  Total received:     2786099786 pkts (10.90 Mpps) | 15.73 Gbps | 502719200286 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        696354648
+  SYN-ACK packets:    229032391
+  SYN/ACK ratio:      3.04
+  HTTP requests:      1135367688
+  DNS queries:        141512411
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   1819
+  SYN flood events:   1819
+  HTTP flood events:  1819
+  ICMP flood events:  1819
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 88106381 UDP pps | SYN FLOOD detected: 155482595 SYN pps | ICMP FLOOD detected: 26366813 ICMP pps | HTTP FLOOD detected: 253506117 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    22999104 updates
+  Estimated attack packets:  735971328 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    1819
+  Average detection latency: 51.01 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.21 ms
+  Latency range:             66.88 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  1818 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         16.07 Gbps (10.50 Mpps)
+  Cycles available:   285 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2786094941
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     68072063265 (97.9% empty)
+  Processed pkts:     2786099786 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2853766187
+  Baseline (192.168.1): 1503180735 (52.7%)
+  Attack (192.168.2): 502274212 (17.6%)
+  TCP packets:        2323229344
+  UDP packets:        408597991
+  ICMP packets:       121938852
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26824088 pkts (51.1%)  2785316507 bytes  4.45 Gbps
+  Attack (192.168.2): 25690868 pkts (48.9%)  6768024974 bytes  10.82 Gbps
+  Total throughput:   15.28 Gbps  (avg pkt: 182 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (260.7s)]
+  Total received:     2853766187 pkts (10.95 Mpps) | 15.84 Gbps | 516346929656 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        717518209
+  SYN-ACK packets:    233190836
+  SYN/ACK ratio:      3.08
+  HTTP requests:      1158813514
+  DNS queries:        144086031
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   1917
+  SYN flood events:   1917
+  HTTP flood events:  1917
+  ICMP flood events:  1917
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 92255543 UDP pps | SYN FLOOD detected: 162008668 SYN pps | ICMP FLOOD detected: 27532385 ICMP pps | HTTP FLOOD detected: 261658861 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    22739040 updates
+  Estimated attack packets:  727649280 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    1917
+  Average detection latency: 51.00 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.21 ms
+  Latency range:             66.88 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  1916 detections (99.9%)
+
+[PERFORMANCE METRICS]
+  Throughput:         15.28 Gbps (10.50 Mpps)
+  Cycles available:   285 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2853761209
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     68970931560 (97.9% empty)
+  Processed pkts:     2853766187 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2921424530
+  Baseline (192.168.1): 1530005539 (52.4%)
+  Attack (192.168.2): 527958156 (18.1%)
+  TCP packets:        2373043452
+  UDP packets:        422593320
+  ICMP packets:       125787758
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 28756807 pkts (51.1%)  2983981806 bytes  4.77 Gbps
+  Attack (192.168.2): 27505328 pkts (48.9%)  6766019848 bytes  10.82 Gbps
+  Total throughput:   15.59 Gbps  (avg pkt: 173 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (265.7s)]
+  Total received:     2921424530 pkts (10.99 Mpps) | 15.96 Gbps | 529972999842 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        738678815
+  SYN-ACK packets:    237349602
+  SYN/ACK ratio:      3.11
+  HTTP requests:      1182256523
+  DNS queries:        146659976
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   2015
+  SYN flood events:   2015
+  HTTP flood events:  2015
+  ICMP flood events:  2015
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 96500111 UDP pps | SYN FLOOD detected: 168685142 SYN pps | ICMP FLOOD detected: 28724531 ICMP pps | HTTP FLOOD detected: 270000301 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    22476864 updates
+  Estimated attack packets:  719259648 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    2015
+  Average detection latency: 50.99 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.21 ms
+  Latency range:             66.88 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  2014 detections (100.0%)
+
+[PERFORMANCE METRICS]
+  Throughput:         15.59 Gbps (11.25 Mpps)
+  Cycles available:   266 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2921419764
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     69869858012 (97.9% empty)
+  Processed pkts:     2921424530 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      2989091589
+  Baseline (192.168.1): 1556830712 (52.1%)
+  Attack (192.168.2): 553650492 (18.5%)
+  TCP packets:        2422860849
+  UDP packets:        436592214
+  ICMP packets:       129638526
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26824244 pkts (49.4%)  2989997223 bytes  4.78 Gbps
+  Attack (192.168.2): 27494491 pkts (50.6%)  6767998894 bytes  10.82 Gbps
+  Total throughput:   15.60 Gbps  (avg pkt: 180 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (270.7s)]
+  Total received:     2989091589 pkts (11.04 Mpps) | 16.06 Gbps | 543601105455 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        759842799
+  SYN-ACK packets:    241508508
+  SYN/ACK ratio:      3.15
+  HTTP requests:      1205700831
+  DNS queries:        149234108
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   2114
+  SYN flood events:   2114
+  HTTP flood events:  2114
+  ICMP flood events:  2114
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 99717929 UDP pps | SYN FLOOD detected: 173550162 SYN pps | ICMP FLOOD detected: 29609617 ICMP pps | HTTP FLOOD detected: 275390246 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    22482944 updates
+  Estimated attack packets:  719454208 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    2114
+  Average detection latency: 50.99 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.21 ms
+  Latency range:             66.88 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  2113 detections (100.0%)
+
+[PERFORMANCE METRICS]
+  Throughput:         15.60 Gbps (10.86 Mpps)
+  Cycles available:   275 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   2989086710
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     70768750102 (97.8% empty)
+  Processed pkts:     2989091589 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      3056757075
+  Baseline (192.168.1): 1583656385 (51.8%)
+  Attack (192.168.2): 579340076 (19.0%)
+  TCP packets:        2472679562
+  UDP packets:        450589938
+  ICMP packets:       133487575
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 26824580 pkts (47.8%)  2785557392 bytes  4.45 Gbps
+  Attack (192.168.2): 29293024 pkts (52.2%)  6767248466 bytes  10.82 Gbps
+  Total throughput:   15.28 Gbps  (avg pkt: 170 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (275.7s)]
+  Total received:     3056757075 pkts (11.09 Mpps) | 16.17 Gbps | 557229093924 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        781006327
+  SYN-ACK packets:    245667505
+  SYN/ACK ratio:      3.18
+  HTTP requests:      1229145070
+  DNS queries:        151808061
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   2212
+  SYN flood events:   2212
+  HTTP flood events:  2212
+  ICMP flood events:  2212
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 104098340 UDP pps | SYN FLOOD detected: 180437726 SYN pps | ICMP FLOOD detected: 30839602 ICMP pps | HTTP FLOOD detected: 283986152 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    22222080 updates
+  Estimated attack packets:  711106560 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    2212
+  Average detection latency: 50.98 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.21 ms
+  Latency range:             66.88 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  2211 detections (100.0%)
+
+[PERFORMANCE METRICS]
+  Throughput:         15.28 Gbps (11.22 Mpps)
+  Cycles available:   267 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   3056752314
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     71667510637 (97.8% empty)
+  Processed pkts:     3056757075 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      3122576872
+  Baseline (192.168.1): 1610790855 (51.6%)
+  Attack (192.168.2): 602702936 (19.3%)
+  TCP packets:        2521761252
+  UDP packets:        463696387
+  ICMP packets:       137119233
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 27133612 pkts (51.8%)  2816979242 bytes  4.51 Gbps
+  Attack (192.168.2): 25228186 pkts (48.2%)  6155475782 bytes  9.84 Gbps
+  Total throughput:   14.35 Gbps  (avg pkt: 171 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (280.7s)]
+  Total received:     3122576872 pkts (11.12 Mpps) | 16.25 Gbps | 570323027532 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        801101021
+  SYN-ACK packets:    249875084
+  SYN/ACK ratio:      3.21
+  HTTP requests:      1252425717
+  DNS queries:        154409466
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   2311
+  SYN flood events:   2311
+  HTTP flood events:  2311
+  ICMP flood events:  2311
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 107146966 UDP pps | SYN FLOOD detected: 185111486 SYN pps | ICMP FLOOD detected: 31684328 ICMP pps | HTTP FLOOD detected: 289399515 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    19897376 updates
+  Estimated attack packets:  636716032 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    2311
+  Average detection latency: 50.97 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.21 ms
+  Latency range:             66.88 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  2310 detections (100.0%)
+
+[PERFORMANCE METRICS]
+  Throughput:         14.35 Gbps (10.47 Mpps)
+  Cycles available:   286 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   3122574136
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     72622836157 (97.8% empty)
+  Processed pkts:     3122576872 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      3169579586
+  Baseline (192.168.1): 1640842118 (51.8%)
+  Attack (192.168.2): 602702936 (19.0%)
+  TCP packets:        2563187730
+  UDP packets:        467839733
+  ICMP packets:       138552123
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 32025044 pkts (94.9%)  3321473514 bytes  5.31 Gbps
+  Attack (192.168.2): 1735320 pkts (5.1%)  0 bytes  0.00 Gbps
+  Total throughput:   5.31 Gbps  (avg pkt: 98 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (285.7s)]
+  Total received:     3169579586 pkts (11.09 Mpps) | 16.18 Gbps | 577995988361 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        810427598
+  SYN-ACK packets:    254538372
+  SYN/ACK ratio:      3.18
+  HTTP requests:      1273933235
+  DNS queries:        157288482
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   2409
+  SYN flood events:   2409
+  HTTP flood events:  2409
+  ICMP flood events:  2409
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mUDP FLOOD detected: 109380779 UDP pps | SYN FLOOD detected: 189475655 SYN pps | ICMP FLOOD detected: 32393225 ICMP pps | HTTP FLOOD detected: 297835417 HTTP rps | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    0 updates
+  Estimated attack packets:  0 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    2409
+  Average detection latency: 50.97 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.21 ms
+  Latency range:             66.88 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  2408 detections (100.0%)
+
+[PERFORMANCE METRICS]
+  Throughput:         5.31 Gbps (6.75 Mpps)
+  Cycles available:   443 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   3169576892
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     74146533827 (97.8% empty)
+  Processed pkts:     3169579586 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      3216571975
+  Baseline (192.168.1): 1670885473 (51.9%)
+  Attack (192.168.2): 602702936 (18.7%)
+  TCP packets:        2604604955
+  UDP packets:        471982453
+  ICMP packets:       139984567
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168.1): 30042446 pkts (100.0%)  3113693920 bytes  4.98 Gbps
+  Attack (192.168.2): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   4.98 Gbps  (avg pkt: 104 bytes)
+
+[CUMULATIVE TRAFFIC - Since first packet (290.7s)]
+  Total received:     3216571975 pkts (11.06 Mpps) | 16.12 Gbps | 585667175726 bytes
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        819752239
+  SYN-ACK packets:    259200693
+  SYN/ACK ratio:      3.16
+  HTTP requests:      1295433801
+  DNS queries:        160168071
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   2409
+  SYN flood events:   2409
+  HTTP flood events:  2409
+  ICMP flood events:  2409
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   34.33 ms (vs MULTI-LF: 866 ms)
+    Improvement:             25.2× faster
+
+  Packets until detection:   1509737258
+  Bytes until detection:     246456078287 (235038.83 MB)
+
+  DPDK + OctoSketch Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required (vs ML models)
+    ✓ Line-rate processing (multi-core DPDK)
+    ✓ O(1) memory (sketch-based, constant size)
+    ✓ Lock-free updates (atomic operations)
+    ✓ Heavy-hitter detection (Top-K IPs)
+
+[OCTOSKETCH METRICS - Optimized Architecture]
+=== Per-Worker Sketches + Sampling (1/32 packets) ===
+
+  Architecture:              Per-worker (NO atomics, NO contention)
+  Total sketch memory:       5377 KB (14 workers × 384.1 KB)
+  Sampling rate:             1 in 32 packets (3.1% overhead)
+  Attack traffic sampled:    0 updates
+  Estimated attack packets:  0 (×32 sampling factor)
+  Sketch overhead:           ~1.56% of fast-path cycles
+  Memory efficiency:         O(1) constant, 384.1 KB per worker
+
+[MULTIPLE DETECTION STATISTICS]
+=== Aggregate Detection Analysis ===
+
+  Total detection events:    2409
+  Average detection latency: 50.97 ms
+  Min detection latency:     34.33 ms
+  Max detection latency:     101.21 ms
+  Latency range:             66.88 ms
+
+  Detection Latency Histogram:
+    < 20 ms:  0 detections (0.0%)
+    20-30 ms: 0 detections (0.0%)
+    30-40 ms: 0 detections (0.0%)
+    40-50 ms: 0 detections (0.0%)
+    > 50 ms:  2408 detections (100.0%)
+
+[PERFORMANCE METRICS]
+  Throughput:         4.98 Gbps (6.01 Mpps)
+  Cycles available:   498 cycles/pkt (lower = higher load)
+  Active IPs:         0
+  Worker threads:     14 (lcores 1-14)
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   3216569289
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     75669632304 (97.8% empty)
+  Processed pkts:     3216571975 (100.0% of NIC RX)
+

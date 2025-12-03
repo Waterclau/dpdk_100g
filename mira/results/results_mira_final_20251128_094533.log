@@ -1,0 +1,3439 @@
+EAL: Detected 32 lcore(s)
+EAL: Detected 1 NUMA nodes
+EAL: Multi-process socket /var/run/dpdk/rte/mp_socket
+EAL: Selected IOVA mode 'VA'
+EAL: No available hugepages reported in hugepages-1048576kB
+EAL: Probing VFIO support...
+EAL: VFIO support initialized
+EAL: PCI device 0000:41:00.0 on NUMA socket 0
+EAL:   probe driver: 15b3:1017 net_mlx5
+Number of available ports: 1
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║       MIRA DDoS DETECTOR - MULTI-LF (2025) Comparison                ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+Comparing against MULTI-LF (2025):
+  - MULTI-LF detection latency: 866 ms
+  - MIRA detection latency:     <50 ms
+  - Expected improvement:       17-170× faster
+
+Press Ctrl+C to exit...
+
+
+Core 1 processing packets from port 0
+TSC frequency: 2990000000 Hz
+Detection granularity: 50 ms (vs MULTI-LF: 1000 ms)
+Ready to receive packets...
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      6
+  Baseline (192.168): 4 (66.7%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        6
+  UDP packets:        0
+  ICMP packets:       0
+
+[INSTANTANEOUS TRAFFIC - Last 8.2 seconds]
+  Baseline (192.168): 4 pkts (100.0%)  310 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 78 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        3
+  SYN-ACK packets:    1
+  SYN/ACK ratio:      3.00
+  HTTP requests:      4
+  DNS queries:        0
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      270 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         2
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   6
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     245356197 (100.0% empty)
+  Processed pkts:     6 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      9910692
+  Baseline (192.168): 6337266 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        8745029
+  UDP packets:        865007
+  ICMP packets:       300656
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6337262 pkts (100.0%)  653373244 bytes  1.05 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.05 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        1968554
+  SYN-ACK packets:    984276
+  SYN/ACK ratio:      2.00
+  HTTP requests:      4558376
+  DNS queries:        605326
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      406 cycles
+  Throughput:         1.05 Gbps
+  Active IPs:         257
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   9910692
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     319981522 (98.6% empty)
+  Processed pkts:     9910692 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      19986760
+  Baseline (192.168): 12781764 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        17638755
+  UDP packets:        1746703
+  ICMP packets:       601302
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6444498 pkts (100.0%)  668389648 bytes  1.07 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.07 Gbps  (avg pkt: 104 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        3971309
+  SYN-ACK packets:    1985653
+  SYN/ACK ratio:      2.00
+  HTTP requests:      9176753
+  DNS queries:        1221853
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      407 cycles
+  Throughput:         1.07 Gbps
+  Active IPs:         257
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   19986760
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     393280810 (97.8% empty)
+  Processed pkts:     19986760 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      30063948
+  Baseline (192.168): 19227162 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        26517509
+  UDP packets:        2635688
+  ICMP packets:       910750
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6445398 pkts (100.0%)  667830982 bytes  1.07 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.07 Gbps  (avg pkt: 104 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        5970644
+  SYN-ACK packets:    2985320
+  SYN/ACK ratio:      2.00
+  HTTP requests:      13791701
+  DNS queries:        1838825
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      407 cycles
+  Throughput:         1.07 Gbps
+  Active IPs:         257
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   30063948
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     466614016 (97.2% empty)
+  Processed pkts:     30063948 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      40134134
+  Baseline (192.168): 25666603 (64.0%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        35391613
+  UDP packets:        3523183
+  ICMP packets:       1219337
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6439441 pkts (100.0%)  664998654 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        7968309
+  SYN-ACK packets:    3984154
+  SYN/ACK ratio:      2.00
+  HTTP requests:      18414509
+  DNS queries:        2455525
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      407 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         257
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   40134134
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     540079846 (96.7% empty)
+  Processed pkts:     40134134 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      50228553
+  Baseline (192.168): 32120725 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        44293453
+  UDP packets:        4407493
+  ICMP packets:       1527606
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6454122 pkts (100.0%)  663428840 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        9971740
+  SYN-ACK packets:    4985870
+  SYN/ACK ratio:      2.00
+  HTTP requests:      23064873
+  DNS queries:        3072864
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      407 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         257
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   50228553
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     613389182 (96.4% empty)
+  Processed pkts:     50228553 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      60297980
+  Baseline (192.168): 38560470 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        53162015
+  UDP packets:        5301562
+  ICMP packets:       1834402
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6439745 pkts (100.0%)  665439657 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        11968054
+  SYN-ACK packets:    5984027
+  SYN/ACK ratio:      2.00
+  HTTP requests:      27682210
+  DNS queries:        3694775
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      407 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         257
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   60297980
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     686961633 (96.1% empty)
+  Processed pkts:     60297980 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      70399840
+  Baseline (192.168): 45019085 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        62064379
+  UDP packets:        6186708
+  ICMP packets:       2148752
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6458615 pkts (100.0%)  667122211 bytes  1.07 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.07 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        13972746
+  SYN-ACK packets:    6986371
+  SYN/ACK ratio:      2.00
+  HTTP requests:      32310188
+  DNS queries:        4313374
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      407 cycles
+  Throughput:         1.07 Gbps
+  Active IPs:         257
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   70399840
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     760134680 (95.9% empty)
+  Processed pkts:     70399840 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      80480573
+  Baseline (192.168): 51466779 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        70958020
+  UDP packets:        7065676
+  ICMP packets:       2456876
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6447694 pkts (100.0%)  664736674 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        15974778
+  SYN-ACK packets:    7987388
+  SYN/ACK ratio:      2.00
+  HTTP requests:      36953529
+  DNS queries:        4927184
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      407 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         257
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   80480573
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     833541558 (95.8% empty)
+  Processed pkts:     80480573 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      90577798
+  Baseline (192.168): 57922581 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        79870883
+  UDP packets:        7946097
+  ICMP packets:       2760816
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6455802 pkts (100.0%)  666987405 bytes  1.07 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.07 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        17981771
+  SYN-ACK packets:    8990885
+  SYN/ACK ratio:      2.00
+  HTTP requests:      41589772
+  DNS queries:        5538129
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      407 cycles
+  Throughput:         1.07 Gbps
+  Active IPs:         257
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   90577798
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     906831115 (95.6% empty)
+  Processed pkts:     90577798 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      100669817
+  Baseline (192.168): 64373450 (63.9%)
+  Attack (203.0.113): 0 (0.0%)
+  TCP packets:        88765946
+  UDP packets:        8834099
+  ICMP packets:       3069770
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6450869 pkts (100.0%)  667140470 bytes  1.07 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.07 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        19985260
+  SYN-ACK packets:    9992629
+  SYN/ACK ratio:      2.00
+  HTTP requests:      46209334
+  DNS queries:        6154840
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   0
+  HTTP flood events:  0
+  ICMP flood events:  0
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:0
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      407 cycles
+  Throughput:         1.07 Gbps
+  Active IPs:         257
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   100669817
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     980218710 (95.5% empty)
+  Processed pkts:     100669817 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157750
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.6 seconds]
+  Baseline (192.168): 3655709 pkts (56.9%)  378161470 bytes  0.46 Gbps
+  Attack (203.0.113): 2770825 pkts (43.1%)  658329308 bytes  0.80 Gbps
+  Total throughput:   1.26 Gbps  (avg pkt: 161 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [1;31mHIGH[0m
+  Reason:             [1;31mICMP FLOOD from 203.0.113.0: 295578 pps (threshold: 3000) | PACKET FLOOD from 203.0.113.0: 295578 pps (threshold: 8000) | SYN FLOOD from 203.0.113.1: 125477 SYN/s (threshold: 3000) | HTTP FLOOD from 203.0.113.1: 17543 rps (threshold: 2500) | PACKET FLOOD from 203.0.113.1: 125477 pps (threshold: 8000) | [0m
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         1.26 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157750
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     1115196025 (95.9% empty)
+  Processed pkts:     109157750 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157753
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 10.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157753
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     1416615176 (96.7% empty)
+  Processed pkts:     109157753 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157757
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157757
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     1597509458 (97.1% empty)
+  Processed pkts:     109157757 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157759
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157759
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     1778615375 (97.4% empty)
+  Processed pkts:     109157759 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157762
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157762
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     1959965332 (97.6% empty)
+  Processed pkts:     109157762 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157764
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157764
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     2140972138 (97.8% empty)
+  Processed pkts:     109157764 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157767
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157767
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     2322164842 (98.0% empty)
+  Processed pkts:     109157767 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157770
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157770
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     2503278871 (98.2% empty)
+  Processed pkts:     109157770 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157773
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157773
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     2684544458 (98.3% empty)
+  Processed pkts:     109157773 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157775
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157775
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     2865673802 (98.4% empty)
+  Processed pkts:     109157775 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157778
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157778
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     3046792465 (98.5% empty)
+  Processed pkts:     109157778 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157780
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157780
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     3227734680 (98.6% empty)
+  Processed pkts:     109157780 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157784
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157784
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     3408762083 (98.6% empty)
+  Processed pkts:     109157784 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157786
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157786
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     3589702315 (98.7% empty)
+  Processed pkts:     109157786 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157789
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157789
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     3770971243 (98.8% empty)
+  Processed pkts:     109157789 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157791
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157791
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     3952240598 (98.8% empty)
+  Processed pkts:     109157791 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157794
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157794
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     4133206988 (98.9% empty)
+  Processed pkts:     109157794 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157797
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157797
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     4313879524 (98.9% empty)
+  Processed pkts:     109157797 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157800
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157800
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     4494732484 (99.0% empty)
+  Processed pkts:     109157800 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157802
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157802
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     4675578246 (99.0% empty)
+  Processed pkts:     109157802 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157805
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157805
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     4856855149 (99.0% empty)
+  Processed pkts:     109157805 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157807
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157807
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     5038127367 (99.1% empty)
+  Processed pkts:     109157807 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157811
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157811
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     5219276167 (99.1% empty)
+  Processed pkts:     109157811 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157813
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157813
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     5400534226 (99.1% empty)
+  Processed pkts:     109157813 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157816
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157816
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     5581607476 (99.2% empty)
+  Processed pkts:     109157816 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157818
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157818
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     5762943889 (99.2% empty)
+  Processed pkts:     109157818 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157821
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157821
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     5944117859 (99.2% empty)
+  Processed pkts:     109157821 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      109157824
+  Baseline (192.168): 68029159 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        94629827
+  UDP packets:        9338842
+  ICMP packets:       5189078
+
+[INSTANTANEOUS TRAFFIC - Last 6.1 seconds]
+  Baseline (192.168): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.00 Gbps  (avg pkt: 0 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        21945032
+  SYN-ACK packets:    10559652
+  SYN/ACK ratio:      2.08
+  HTTP requests:      48944099
+  DNS queries:        6504501
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      414 cycles
+  Throughput:         0.00 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   109157824
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6125218099 (99.2% empty)
+  Processed pkts:     109157824 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      110984912
+  Baseline (192.168): 69197666 (62.3%)
+  Attack (203.0.113): 2770825 (2.5%)
+  TCP packets:        96237919
+  UDP packets:        9500985
+  ICMP packets:       5245928
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 1168507 pkts (100.0%)  120380584 bytes  0.19 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.19 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        22307109
+  SYN-ACK packets:    10740692
+  SYN/ACK ratio:      2.08
+  HTTP requests:      49783078
+  DNS queries:        6617466
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      413 cycles
+  Throughput:         0.19 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   110984912
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6260788796 (99.2% empty)
+  Processed pkts:     110984912 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      121013903
+  Baseline (192.168): 75610281 (62.5%)
+  Attack (203.0.113): 2770825 (2.3%)
+  TCP packets:        105084327
+  UDP packets:        10377392
+  ICMP packets:       5552102
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6412615 pkts (100.0%)  662078953 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        24298610
+  SYN-ACK packets:    11736441
+  SYN/ACK ratio:      2.07
+  HTTP requests:      54387692
+  DNS queries:        7228009
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      413 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   121013903
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6334174759 (99.2% empty)
+  Processed pkts:     121013903 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      131045205
+  Baseline (192.168): 82023950 (62.6%)
+  Attack (203.0.113): 2770825 (2.1%)
+  TCP packets:        113924399
+  UDP packets:        11260497
+  ICMP packets:       5860226
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6413669 pkts (100.0%)  662093404 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        26289135
+  SYN-ACK packets:    12731703
+  SYN/ACK ratio:      2.06
+  HTTP requests:      58991847
+  DNS queries:        7844186
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      413 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   131045205
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6407531825 (99.1% empty)
+  Processed pkts:     131045205 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      141071590
+  Baseline (192.168): 88435078 (62.7%)
+  Attack (203.0.113): 2770825 (2.0%)
+  TCP packets:        122766916
+  UDP packets:        12139328
+  ICMP packets:       6165261
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6411128 pkts (100.0%)  662516652 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        28279895
+  SYN-ACK packets:    13727084
+  SYN/ACK ratio:      2.06
+  HTTP requests:      63592343
+  DNS queries:        8455409
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      412 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   141071590
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6480965168 (99.1% empty)
+  Processed pkts:     141071590 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      151102830
+  Baseline (192.168): 94846937 (62.8%)
+  Attack (203.0.113): 2770825 (1.8%)
+  TCP packets:        131609637
+  UDP packets:        13019740
+  ICMP packets:       6473366
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6411859 pkts (100.0%)  663115711 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        30271010
+  SYN-ACK packets:    14722642
+  SYN/ACK ratio:      2.06
+  HTTP requests:      68187809
+  DNS queries:        9068235
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      412 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   151102830
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6554298977 (99.0% empty)
+  Processed pkts:     151102830 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      161135229
+  Baseline (192.168): 101261029 (62.8%)
+  Attack (203.0.113): 2770825 (1.7%)
+  TCP packets:        140451194
+  UDP packets:        13904063
+  ICMP packets:       6779882
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6414092 pkts (100.0%)  663179403 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 103 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        32261433
+  SYN-ACK packets:    15717853
+  SYN/ACK ratio:      2.05
+  HTTP requests:      72785443
+  DNS queries:        9682861
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      412 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   161135229
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6627611764 (99.0% empty)
+  Processed pkts:     161135229 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      171161588
+  Baseline (192.168): 107669026 (62.9%)
+  Attack (203.0.113): 2770825 (1.6%)
+  TCP packets:        149285887
+  UDP packets:        14787304
+  ICMP packets:       7088304
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6407997 pkts (100.0%)  663234933 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 104 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        34250360
+  SYN-ACK packets:    16712315
+  SYN/ACK ratio:      2.05
+  HTTP requests:      77373370
+  DNS queries:        10298660
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      412 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   171161588
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6700982263 (98.9% empty)
+  Processed pkts:     171161588 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      181175535
+  Baseline (192.168): 114069638 (63.0%)
+  Attack (203.0.113): 2770825 (1.5%)
+  TCP packets:        158108343
+  UDP packets:        15671833
+  ICMP packets:       7395265
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6400612 pkts (100.0%)  662722820 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 104 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        36236271
+  SYN-ACK packets:    17705271
+  SYN/ACK ratio:      2.05
+  HTTP requests:      81955014
+  DNS queries:        10915155
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      412 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   181175535
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6774522179 (98.8% empty)
+  Processed pkts:     181175535 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      191186318
+  Baseline (192.168): 120468550 (63.0%)
+  Attack (203.0.113): 2770825 (1.4%)
+  TCP packets:        166929113
+  UDP packets:        16552552
+  ICMP packets:       7704556
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6398912 pkts (100.0%)  662932929 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 104 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        38221984
+  SYN-ACK packets:    18698128
+  SYN/ACK ratio:      2.04
+  HTTP requests:      86533975
+  DNS queries:        11528294
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      412 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   191186318
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6848053095 (98.8% empty)
+  Processed pkts:     191186318 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      201184580
+  Baseline (192.168): 126860133 (63.1%)
+  Attack (203.0.113): 2770825 (1.4%)
+  TCP packets:        175744278
+  UDP packets:        17429732
+  ICMP packets:       8010472
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6391583 pkts (100.0%)  661980023 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 104 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        40206268
+  SYN-ACK packets:    19690271
+  SYN/ACK ratio:      2.04
+  HTTP requests:      91112228
+  DNS queries:        12139892
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      411 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   201184580
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6921547326 (98.7% empty)
+  Processed pkts:     201184580 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      211180609
+  Baseline (192.168): 133250614 (63.1%)
+  Attack (203.0.113): 2770825 (1.3%)
+  TCP packets:        184559399
+  UDP packets:        18305187
+  ICMP packets:       8315922
+
+[INSTANTANEOUS TRAFFIC - Last 5.0 seconds]
+  Baseline (192.168): 6390481 pkts (100.0%)  662587616 bytes  1.06 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   1.06 Gbps  (avg pkt: 104 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        42190509
+  SYN-ACK packets:    20682392
+  SYN/ACK ratio:      2.04
+  HTTP requests:      95686389
+  DNS queries:        12748975
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      411 cycles
+  Throughput:         1.06 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   211180609
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     6995115969 (98.7% empty)
+  Processed pkts:     211180609 (100.0% of NIC RX)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║          MIRA DDoS DETECTOR - STATISTICS                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+[PACKET COUNTERS - GLOBAL]
+  Total packets:      213494307
+  Baseline (192.168): 134730304 (63.1%)
+  Attack (203.0.113): 2770825 (1.3%)
+  TCP packets:        186598631
+  UDP packets:        18508702
+  ICMP packets:       8386869
+
+[INSTANTANEOUS TRAFFIC - Last 7.6 seconds]
+  Baseline (192.168): 1479690 pkts (100.0%)  153171367 bytes  0.16 Gbps
+  Attack (203.0.113): 0 pkts (0.0%)  0 bytes  0.00 Gbps
+  Total throughput:   0.16 Gbps  (avg pkt: 104 bytes)
+
+[ATTACK-SPECIFIC COUNTERS]
+  SYN packets:        42649592
+  SYN-ACK packets:    20911932
+  SYN/ACK ratio:      2.04
+  HTTP requests:      96746633
+  DNS queries:        12890259
+
+[ATTACK DETECTIONS - Cumulative Events]
+  UDP flood events:   0
+  SYN flood events:   16
+  HTTP flood events:  14
+  ICMP flood events:  31
+  DNS amp events:     0
+  NTP amp events:     0
+  ACK flood events:   0
+  Frag attack events: 0
+  Packet flood events:45
+  (Note: Events count IPs exceeding thresholds per 50ms window)
+
+[ALERT STATUS]
+  Alert level:        [0mNONE[0m
+  Reason:             None
+
+[MULTI-LF (2025) COMPARISON]
+=== Detection Performance vs ML-Based System ===
+
+  First Detection Latency:   41.47 ms (vs MULTI-LF: 866 ms)
+    Improvement:             20.9× faster
+
+  Packets until detection:   103414626
+  Bytes until detection:     16855899193 (16075.04 MB)
+
+  DPDK Advantages:
+    ✓ Real-time detection (50ms granularity)
+    ✓ No training required
+    ✓ Line-rate processing
+    ✓ Constant memory usage
+
+[PERFORMANCE METRICS]
+  Cycles/packet:      411 cycles
+  Throughput:         0.16 Gbps
+  Active IPs:         260
+
+[DPDK NIC STATISTICS]
+  RX packets (NIC):   213494307
+  RX dropped (HW):    [0m0[0m (imissed)
+  RX no mbufs:        [0m0[0m (buffer exhaustion)
+  RX errors:          0
+  Total drops:        [0m0 (0.00%)[0m
+  RX burst calls:     7205831322 (98.7% empty)
+  Processed pkts:     213494307 (100.0% of NIC RX)
+
+
+Signal 15 received, preparing to exit...
+
+Signal 15 received, preparing to exit...
+
+Shutting down...
