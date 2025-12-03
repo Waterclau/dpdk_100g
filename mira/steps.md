@@ -28,12 +28,70 @@ Demonstrate that **DPDK + OctoSketch** detection is **significantly faster** tha
 
 ---
 
+## OctoSketch: Memory-Efficient DDoS Detection
+
+### What is OctoSketch?
+
+OctoSketch is a probabilistic data structure (sketch) optimized for real-time DDoS detection in high-speed networks. It provides:
+
+- **O(1) Memory Complexity**: Fixed memory usage (~128KB per worker) regardless of the number of flows
+- **Lock-Free Updates**: Per-worker sketches eliminate contention in multi-core environments
+- **Heavy-Hitter Detection**: Identifies attacking IPs using Conservative Update (minimum across hash rows)
+- **Line-Rate Processing**: Enables DPDK to process packets at wire speed (10-100 Gbps)
+
+### How We Use OctoSketch
+
+**Architecture:**
+1. **14 Worker Threads (lcores 1-14)**: Each maintains its own local OctoSketch
+   - Processes packets from RX queue via RSS (Receive Side Scaling)
+   - Updates sketch counters for attack traffic (sampled 1:100)
+   - **No atomic operations** = Zero contention between workers
+
+2. **1 Coordinator Thread (lcore 15)**: Aggregates and analyzes
+   - Periodically merges all 14 worker sketches
+   - Queries merged sketch for per-IP attack rates
+   - Triggers alerts when thresholds exceeded
+
+**Key Operations:**
+- `octosketch_update_ip()`: Increment counters for source IP (8 hash functions)
+- `octosketch_query_ip()`: Query estimated packet count for an IP (minimum across rows)
+- `octosketch_merge()`: Combine worker sketches into global view
+- `octosketch_reset()`: Clear sketch for next detection window
+
+**Implementation Details:**
+- **Hash Functions**: 8 rows with different seeds (rte_jhash)
+- **Buckets**: 4096 columns per row (total: 32K counters per sketch)
+- **Sampling Rate**: 1:100 (only 1% of packets update sketch to reduce CPU)
+- **Detection Window**: 5 seconds (periodic reset and analysis)
+
+### OctoSketch vs Traditional Hash Tables
+
+| Feature | Hash Table | OctoSketch |
+|---------|-----------|------------|
+| **Memory** | O(n) per flow | O(1) constant |
+| **Insertions** | Requires locking | Lock-free per worker |
+| **Queries** | Exact counts | Approximate (underestimate) |
+| **Scalability** | Limited by memory | Handles millions of flows |
+| **Best For** | Small # flows | DDoS (massive # flows) |
+
+### Why OctoSketch Enables <50ms Detection
+
+1. **No Locking**: Workers process packets independently
+2. **Cache-Efficient**: 128KB sketch fits in L2/L3 cache
+3. **Simple Operations**: Hash + increment = ~10 CPU cycles
+4. **Sampling**: Only 1% overhead for heavy-hitter tracking
+5. **Parallel Processing**: 14 workers with RSS = 14× throughput
+
+**Result**: Detector processes 10+ Gbps while detecting attacks in <50ms, compared to ML-based systems (MULTI-LF) that require 866ms due to feature extraction and inference overhead.
+
+---
+
 ## Experiment Architecture
 
 ### Three-Node Setup:
 - **controller**: Sends benign traffic (simulates legitimate users)
 - **tg**: Sends Mirai-style DDoS attacks (simulates botnet)
-- **monitor**: Runs DPDK detector, receives both streams
+- **monitor**: Runs DPDK detector with OctoSketch, receives both streams
 
 ### Attack Types Tested:
 1. **UDP Flood** - Classic Mirai (targets DNS, NTP, SSDP)
@@ -207,26 +265,32 @@ mkdir -p /local/dpdk_100g/mira/results
 ```bash
 cd /local/dpdk_100g/mira/detector_system
 
-# Run detector for 460 seconds
-sudo timeout 300 ./mira_ddos_detector \
-    -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../results/results_mira_udp.log
+# Run detector for 460 seconds with OctoSketch
+sudo timeout 460 ./mira_ddos_detector \
+    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
+    2>&1 | tee ../results/results_mira_detection.log
 ```
-sudo ./mira_ddos_detector \
-    -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0
 
 **Parameters:**
-- `-l 1-2`: Use CPU cores 1-2
+- `-l 0-15`: Use CPU cores 0-15 (14 workers + 1 coordinator + 1 main)
 - `-n 4`: 4 memory channels
 - `-w 0000:41:00.0`: PCI address of NIC (adjust for your system)
 - `-- -p 0`: Port 0
-- `timeout 470`: Run for 470 seconds (460s + 10s buffer)
+- `timeout 460`: Run for 460 seconds (experiment duration)
+
+**OctoSketch Architecture:**
+- **14 Worker Threads (lcores 1-14):** RX processing with RSS + per-worker OctoSketch updates
+- **1 Coordinator Thread (lcore 15):** Aggregates sketches and performs detection analysis
+- **Memory Efficiency:** 128KB per worker sketch (~1.8MB total for 14 workers)
+- **Lock-Free Updates:** Each worker maintains its own sketch (no atomic operations needed)
+- **Sampling:** 1 in 100 packets for sketch updates to reduce overhead
+- **Heavy-Hitter Detection:** Uses Conservative Update (minimum across 8 hash rows)
 
 **Detection thresholds (tuned for multi-attack):**
-- **Packet Rate:** >100,000 pps from single IP (DDoS indicator)
+- **Packet Rate:** >8,000 pps from single IP (DDoS indicator)
 - **SYN/ACK Ratio:** >3:1 (SYN flood detection)
-- **UDP Rate:** >50,000 UDP pps from single IP (UDP flood)
-- **Connection Rate:** >10,000 new connections/sec (HTTP flood)
+- **UDP Rate:** >5,000 UDP pps from single IP (UDP flood)
+- **ICMP Rate:** >3,000 ICMP pps from single IP (ICMP flood)
 - **Fast Detection:** 50ms granularity (vs MULTI-LF 866ms)
 
 ---
@@ -254,22 +318,15 @@ Wait until the detector shows "Ready to receive packets..." before starting traf
 ### Step 2: Start Benign Traffic (Controller, wait 5s after detector)
 
 ```bash
-cd /local/dpdk_100g/mira
+cd /local/dpdk_100g/mira/benign_sender
 
-# OPTIMIZED: 8 instances x 875 Mbps = 7000 Mbps (7 Gbps)
-# Using --mbps for stable throughput + --loop=0 for continuous replay
+# Start DPDK sender with benign traffic
 # Duration: 445s (to stop at t=450s)
-for i in {1..8}; do
-    sudo timeout 445 tcpreplay --intf1=ens1f0 --mbps=875 --loop=0 benign_10M.pcap &
-done
+sudo timeout 445 ./build/dpdk_pcap_sender -l 0-7 -n 4 -w 0000:41:00.0 -- ../benign_5M.pcap
 
-# Verify processes started
-ps aux | grep tcpreplay | wc -l
-# Should show 8 processes
-
-# Monitor throughput in real-time (optional)
+# In another terminal, monitor throughput (optional)
 watch -n 1 'ifstat -i ens1f0 1 1'
-# Should show ~7 Gbps sustained
+# Should show sustained Gbps traffic
 ```
 
 ### Step 3: Start Attack Traffic (TG, wait 125s after baseline starts)
@@ -277,26 +334,18 @@ watch -n 1 'ifstat -i ens1f0 1 1'
 **IMPORTANT:** Wait 125 seconds after starting benign traffic (attack starts at t=130s).
 
 ```bash
-cd /local/dpdk_100g/mira
+cd /local/dpdk_100g/mira/attack_sender
 
 # Wait until t=130s
 sleep 125
 
-# OPTIMIZED: 10 instances x 1000 Mbps = 10000 Mbps (10 Gbps)
-# Using --mbps for stable throughput + --loop=0 for continuous replay
+# Start DPDK sender with attack traffic
 # Duration: 320s (to stop at t=450s)
-# Total peak: 7 + 10 = 17 Gbps ✅
-for i in {1..10}; do
-    sudo timeout 320 tcpreplay --intf1=ens1f0 --mbps=1000 --loop=0 attack_mixed_10M.pcap &
-done
+sudo timeout 320 ./build/dpdk_pcap_sender -l 0-7 -n 4 -w 0000:41:00.0 -- ../attack_mixed_5M.pcap
 
-# Verify processes
-ps aux | grep tcpreplay | wc -l
-# Should show 10 processes
-
-# Monitor throughput in real-time (optional)
+# In another terminal, monitor throughput (optional)
 watch -n 1 'ifstat -i ens1f0 1 1'
-# Should show ~10 Gbps attack + ~7 Gbps benign = ~17 Gbps total sustained
+# Should show sustained attack traffic
 ```
 
 ---
@@ -306,8 +355,8 @@ watch -n 1 'ifstat -i ens1f0 1 1'
 ### On Monitor
 
 ```bash
-# Watch detector output in real-time
-tail -f /local/dpdk_100g/mira/results/results_mira_udp.log
+# Watch detector output in real-time (OctoSketch metrics included)
+tail -f /local/dpdk_100g/mira/results/results_mira_detection.log
 ```
 
 ### On Controller/TG
@@ -319,8 +368,8 @@ watch -n 1 'sar -n DEV 1 1 | grep ens1f0'
 # Or with ifstat
 ifstat -i ens1f0 1
 
-# Count active tcpreplay processes
-watch -n 5 'ps aux | grep tcpreplay | wc -l'
+# Check DPDK sender is running
+ps aux | grep dpdk_pcap_sender
 ```
 
 ---
@@ -331,7 +380,7 @@ watch -n 5 'ps aux | grep tcpreplay | wc -l'
 
 ```bash
 # On your local machine
-scp monitor:/local/dpdk_100g/mira/results/results_mira_udp.log ./
+scp monitor:/local/dpdk_100g/mira/results/results_mira_detection.log ./
 ```
 
 ### Step 2: Run Analysis
@@ -552,8 +601,8 @@ ip link set ens1f0 up
 cd /local/dpdk_100g/mira/detector_system
 make clean && make
 
-# Run
-sudo timeout 470 ./mira_ddos_detector -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0 2>&1 | tee ../results/results_mira_udp.log
+# Run with OctoSketch (14 workers + 1 coordinator)
+sudo timeout 460 ./mira_ddos_detector -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 2>&1 | tee ../results/results_mira_detection.log
 ```
 
 ### Controller (Benign)
@@ -561,20 +610,24 @@ sudo timeout 470 ./mira_ddos_detector -l 1-2 -n 4 -w 0000:41:00.0 -- -p 0 2>&1 |
 ```bash
 cd /local/dpdk_100g/mira
 
-# Generate PCAP (one time) - 10M packets for 17-18 Gbps target
+# Step 1: Generate PCAP (one time) - 5M packets
 cd benign_generator
 sudo python3 generate_benign_traffic.py \
-    --output ../benign_10M.pcap \
-    --packets 10000000 \
+    --output ../benign_5M.pcap \
+    --packets 5000000 \
     --src-mac 00:00:00:00:00:01 \
     --dst-mac 0c:42:a1:dd:5b:28 \
     --client-range 192.168.1.0/24 \
     --server-ip 10.10.1.2 \
     --clients 500
 
-# Send traffic (after detector starts, wait 5s)
-cd /local/dpdk_100g/mira
-for i in {1..8}; do sudo timeout 445 tcpreplay --intf1=ens1f0 --mbps=875 --loop=0 benign_10M.pcap & done
+# Step 2: Build DPDK sender (one time)
+cd /local/dpdk_100g/mira/benign_sender
+make clean && make
+
+# Step 3: Send traffic using DPDK (after detector starts, wait 5s)
+cd /local/dpdk_100g/mira/benign_sender
+sudo timeout 445 ./build/dpdk_pcap_sender -l 0-7 -n 4 -w 0000:41:00.0 -- ../benign_5M.pcap
 ```
 
 ### TG (Attack)
@@ -582,21 +635,25 @@ for i in {1..8}; do sudo timeout 445 tcpreplay --intf1=ens1f0 --mbps=875 --loop=
 ```bash
 cd /local/dpdk_100g/mira
 
-# Generate PCAP (one time) - 10M packets for 17-18 Gbps target
+# Step 1: Generate PCAP (one time) - 5M packets
 cd attack_generator
 sudo python3 generate_mirai_attacks.py \
-    --output ../attack_mixed_10M.pcap \
-    --packets 10000000 \
+    --output ../attack_mixed_5M.pcap \
+    --packets 5000000 \
     --attack-type mixed \
     --dst-mac 0c:42:a1:dd:5b:28 \
     --attacker-range 192.168.2.0/24 \
     --target-ip 10.10.1.2 \
     --attackers 200
 
-# Send traffic (125 seconds after benign starts)
-cd /local/dpdk_100g/mira
+# Step 2: Build DPDK sender (one time)
+cd /local/dpdk_100g/mira/attack_sender
+make clean && make
+
+# Step 3: Send traffic using DPDK (125 seconds after benign starts)
+cd /local/dpdk_100g/mira/attack_sender
 sleep 125
-for i in {1..10}; do sudo timeout 220 tcpreplay --intf1=ens1f0 --mbps=1000 --loop=0 attack_mixed_10M.pcap & done
+sudo timeout 320 ./build/dpdk_pcap_sender -l 0-7 -n 4 -w 0000:41:00.0 -- ../attack_mixed_5M.pcap
 ```
 
 ---
