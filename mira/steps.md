@@ -130,14 +130,8 @@ sudo python3 generate_mirai_attacks.py \
 
 # Option 4: Mixed Attack (RECOMMENDED - 50% SYN + 40% UDP + 10% ICMP)
 # Generate 10M packets for better throughput (17-18 Gbps target)
-sudo python3 generate_mirai_attacks.py \
-    --output ../attack_mixed_10M.pcap \
-    --packets 10000000 \
-    --attack-type mixed \
-    --dst-mac 0c:42:a1:dd:5b:28 \
-    --attacker-range 192.168.2.0/24 \
-    --target-ip 10.10.1.2 \
-    --attackers 200
+
+
 
 # Verify PCAP
 ls -lh ../attack_*.pcap
