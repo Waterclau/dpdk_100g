@@ -2,7 +2,7 @@
 
 **Multi-attack DDoS Detection with DPDK + OctoSketch**
 
-**Comparing against MULTI-LF (2025) - ML-Based Detection System**
+**Comparing against MULTI-LF (2025) - Continuous Learning ML Framework for Multi-Environment Networks**
 
 ---
 
@@ -25,10 +25,17 @@
 Demonstrate that **DPDK + OctoSketch** detection is significantly faster than ML-based approaches for real-time DDoS detection.
 
 **Comparison Baseline:**
-- **MULTI-LF (2025)**: ML-based continuous learning framework
-  - Detection latency: **866 ms**
-  - Requires training and domain adaptation
-  - Published in arXiv:2504.11575
+- **MULTI-LF (2025)**: Multi-Level continuous learning framework combining lightweight (M1) and complex (M2) ML models with human-in-the-loop
+  - **Architecture**: Two-tier ML system (M1: fast initial detection, M2: high-confidence refinement)
+  - **Detection latency**: **866 ms** (measured on live traffic in Docker-NS3 testbed)
+  - **Feature extraction**: Statistical features computed over 1-second windows
+  - **Continuous learning**: Weight interpolation (α=0.75) to mitigate catastrophic forgetting
+  - **Accuracy**: 0.999 (99.9%) on Multi-Environment (M-En) traffic
+  - **Human intervention**: Required for only 0.0026% of packets (3 out of 115,795 packets)
+  - **Throughput**: 66,130 packets/sec (M1 lightweight model)
+  - **Training**: Requires labeled datasets from multiple domains (IoT + Traditional networks)
+  - **Deployment**: Docker-NS3 testbed with live traffic replay
+  - **Published**: arXiv:2504.11575v2 (November 2025)
 
 **Our Approach:**
 - **MIRA (DPDK + OctoSketch)**: Hardware-accelerated statistical detection
@@ -852,6 +859,30 @@ for (int i = 0; i < NUM_RX_QUEUES; i++) {
 - Attackers send thousands/millions of packets (1% error is negligible)
 - Speed and scalability matter more than precision
 
+### System Component Summary
+
+The following table summarizes the role, workload, and impact of each major component in the MIRA detection system:
+
+| Component                    | What it does                                                            | Type of work                     | Frequency                   | Benefits it provides                                        | Without it…                                                 |
+| ---------------------------- | ----------------------------------------------------------------------- | -------------------------------- | --------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
+| **DPDK**                     | Captures and processes packets at high speed                            | Fast-path / Data plane           | Every packet                | Sustains line-rate (15–20 Gbps), 0 drops, <50 ms detection  | System would not achieve high-throughput real-time analysis |
+| **DPDK (Workers)**           | Classify packets (TCP/UDP/ICMP), SYN/HTTP detection, baseline vs attack | Deterministic fast processing    | Every packet                | Low CPU cost (~260–285 cycles/pkt), multi-core scaling      | Packet loss and slow detection                              |
+| **DPDK (Coordinator)**       | Aggregates per-core stats and triggers attack detection                 | Control-plane lightweight task   | Every 50 ms                 | Immediate flood detection (<50–70 ms)                       | Detection becomes slower and less reactive                  |
+| **OctoSketch (Per-worker)**  | Maintains probabilistic flow counters without contention                | Telemetry & statistical tracking | Sampled (1/16–1/32 packets) | Runs without atomic contention; fast-path remains untouched | CPU overhead grows and throughput collapses                 |
+| **OctoSketch (Merge stage)** | Merges worker sketches into a global view                               | Aggregation & analysis           | Every window (50 ms)        | Global heavy-hitter estimation and traffic distribution     | No visibility of top attackers                              |
+| **OctoSketch (Final role)**  | Identifies heavy hitters and attack origin patterns                     | Advanced analytics               | On attack activity          | Deep insight into source behavior without performance loss  | You detect attacks but don't understand who caused them     |
+
+**Key Takeaways:**
+
+- **DPDK** provides the high-performance packet I/O foundation (kernel bypass, zero-copy, poll-mode)
+- **Workers** handle the data plane: per-packet classification and statistics with minimal overhead
+- **Coordinator** implements the control plane: aggregates worker stats and makes detection decisions
+- **OctoSketch** adds intelligent telemetry: tracks flows probabilistically with O(1) memory
+- **Sampling** (1:16 or 1:32) keeps sketch overhead low (~3% CPU) while preserving detection accuracy
+- **Separation of concerns**: Workers focus on speed, coordinator on detection, sketches on analytics
+
+This architecture achieves **25.2× faster detection than MULTI-LF** by eliminating ML inference overhead and feature aggregation delays, while processing packets at **line-rate with 0 drops**.
+
 ---
 
 ## Results Obtained
@@ -992,15 +1023,22 @@ Sketch Overhead:       ~3% CPU (sampling reduces from ~100% to 3%)
 | Dimension | MULTI-LF (2025) | MIRA (DPDK + OctoSketch) | Improvement |
 |-----------|-----------------|--------------------------|-------------|
 | **Detection Latency** | 866 ms | **34.33 ms** | **25.2× faster** |
-| **Detection Window** | 1000 ms | **50 ms** | **20× finer granularity** |
-| **CPU Utilization** | 10.05% | O(1) scalable | **Line-rate capable** |
-| **Memory** | 3.63 MB | 5.3 MB (O(1) constant) | **Flow-independent** |
-| **Training** | Required (continuous learning) | **None** | **Zero training time** |
-| **Adaptation** | Domain-specific | **Automatic** | **No retraining** |
-| **Throughput** | Not specified | **17.60 Gbps peak** | **Hardware-accelerated** |
-| **Packets Processed** | Not specified | **87.7 billion** | **Long-duration stability** |
-| **Accuracy** | 0.999 (99.9%) | All 4 attacks detected | **Real-time multi-attack** |
-| **False Positives** | Not specified | 0 (2409 correct alerts) | **Threshold-based** |
+| **Detection Window** | 1000 ms (1-second intervals) | **50 ms** | **20× finer granularity** |
+| **Method** | ML inference + feature extraction | Statistical thresholds + sketch queries | **No ML overhead** |
+| **Architecture** | Two-tier: M1 (BNB/PER/SGDC) + M2 (RF/MLP) | Multi-core DPDK with OctoSketch | **Hardware parallelism** |
+| **CPU Utilization** | 10.05% (M2 model) | 80-90% (14 worker cores) | **Distributed processing** |
+| **Memory** | 3.63 MB (M2 model) | 5.3 MB sketches (O(1) constant) | **Flow-independent** |
+| **Training** | Required (400K samples for M1, 40M for M2) | **None** | **Zero training time** |
+| **Continuous Learning** | Yes (weight interpolation α=0.75) | **No retraining needed** | **Static thresholds** |
+| **Human-in-the-Loop** | 0.0026% packets (3/115,795) | **None** | **Fully automated** |
+| **Adaptation** | Needs retraining for new attacks | **Automatic** (threshold-based) | **No domain adaptation** |
+| **Throughput** | 66,130 pps (M1 lightweight) | **17.60 Gbps peak** (~10M pps) | **151× higher pps** |
+| **Packets Processed** | 115,795 packets (real-time test) | **87.7 billion** (3.3 hours) | **756,000× more packets** |
+| **Accuracy** | 0.999 (99.9%) | All 4 attacks detected (2409 windows) | **Real-time multi-attack** |
+| **False Positives** | Not measured | 0 (2409 correct alerts) | **Threshold-based precision** |
+| **Feature Processing** | 24 statistical features (1-sec windows) | **Direct packet inspection** | **No feature aggregation delay** |
+| **Dataset** | M-En Dataset (IoT + Traditional) | **Live mixed traffic** (17 Gbps) | **Production-ready** |
+| **Testbed** | Docker-NS3 simulation | **Real NICs + DPDK** | **Bare-metal performance** |
 
 ---
 
@@ -1015,19 +1053,44 @@ Sketch Overhead:       ~3% CPU (sampling reduces from ~100% to 3%)
 
 **Why the difference?**
 
-**MULTI-LF approach:**
-1. Collect packets for 1-second window
-2. Extract features (packet rates, flow stats, etc.)
-3. Run ML model inference
-4. Generate prediction
-5. **Total: 866 ms**
+**MULTI-LF approach (ML-based):**
+1. **Feature aggregation**: Collect packets for 1-second window (1000 ms)
+2. **Feature extraction**: Compute 24 statistical features (entropy, variance, flow rates, etc.)
+   - Packet Count, Destination Port Entropy, Source Entropy
+   - SYN/ACK/TCP/UDP Frequency, Connection Errors (RST)
+   - Average Packet Size, Payload Size, Sequence Number Variance
+3. **M1 model inference** (lightweight): BNB, MNB, PER, or SGDC
+   - Confidence threshold: 90%
+   - If confidence < 90% → forward to M2
+4. **M2 model inference** (complex): Random Forest or MLP
+   - Higher accuracy but more computational cost
+   - If confidence < 90% → forward to human expert
+5. **Continuous learning**: Weight interpolation (75% old + 25% new)
+6. **Total pipeline**: Feature extraction + M1 + (optional M2/human) = **866 ms average**
 
-**MIRA approach:**
-1. Workers process packets in real-time (DPDK poll mode)
-2. Update sketches on-the-fly (per-worker, lock-free)
-3. Coordinator merges sketches every 50ms
-4. Check thresholds (simple comparisons)
-5. **Total: <50 ms**
+**Key bottlenecks in MULTI-LF:**
+- 1-second feature aggregation window (cannot detect faster)
+- Feature computation overhead (entropy, variance calculations)
+- ML model inference latency (tree traversal in RF, matrix operations in MLP)
+- Sequential pipeline (M1 → M2 → human if needed)
+
+**MIRA approach (Hardware-accelerated):**
+1. **Instant processing**: Workers process packets as they arrive (DPDK poll mode, no buffering)
+2. **Direct inspection**: Parse L3/L4 headers directly (IP, TCP, UDP, ICMP)
+3. **Sketch updates**: Simple hash + increment operations (~10 CPU cycles)
+   - Per-worker sketches (lock-free, no contention)
+   - Sampling 1:32 reduces overhead to 3.12%
+4. **50ms windows**: Coordinator merges sketches every 50ms
+5. **Threshold checks**: Simple comparisons (UDP pps > 5,000, SYN pps > 3,000, etc.)
+6. **Immediate alert**: No feature aggregation delay
+7. **Total: 34.33 ms** (measured from attack start to first detection)
+
+**Key advantages of MIRA:**
+- No 1-second buffering requirement (20× faster detection windows)
+- No feature extraction overhead (direct packet inspection)
+- No ML inference latency (simple threshold comparisons)
+- Hardware parallelism (14 workers + RSS distribution)
+- Zero-copy packet processing (DPDK kernel bypass)
 
 ### 2. Scalability and Stability
 
