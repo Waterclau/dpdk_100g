@@ -72,13 +72,13 @@
 #define STATS_INTERVAL_SEC 5.0
 #define DETECTION_WINDOW_SEC 5.0
 
-/* IP tracking */
+/* IP tracking - CLOUDLAB INTERNAL NETWORK (10.x.x.x) */
 #define MAX_IPS 65536
-#define BASELINE_NETWORK 0xC0A80100     /* 192.168.1.x - benign traffic */
-#define ATTACK_NETWORK   0xC0A80200     /* 192.168.2.x - attack traffic (changed from 203.0.113.x) */
+#define BASELINE_NETWORK 0x0A0A0100     /* 10.10.1.x - benign traffic (CloudLab internal) */
+#define ATTACK_NETWORK   0x0A0A0200     /* 10.10.2.x - attack traffic (CloudLab internal) */
 #define NETWORK_MASK     0xFFFFFF00
 
-#define SERVER_IP 0x0A000001
+#define SERVER_IP 0x0A0A0102            /* 10.10.1.2 - Server IP (CloudLab internal) */
 
 /* Alert levels */
 typedef enum {
@@ -347,7 +347,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         double icmp_pps = (double)window_icmp_pkts / window_sec;
         double http_pps = (double)window_http_reqs / window_sec;
 
-        /* DETECTION LOGIC - Aggregate based on 192.168.2.x traffic */
+        /* DETECTION LOGIC - Aggregate based on 10.10.2.x traffic */
 
         /* Attack traffic present AND exceeds baseline significantly */
         if (window_att_pkts > 0 && attack_pps > 50000) {  /* 50K pps threshold */
@@ -605,8 +605,8 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[PACKET COUNTERS - GLOBAL]\n"
         "  Total packets:      %" PRIu64 "\n"
-        "  Baseline (192.168.1): %" PRIu64 " (%.1f%%)\n"
-        "  Attack (192.168.2): %" PRIu64 " (%.1f%%)\n"
+        "  Baseline (10.10.1.x): %" PRIu64 " (%.1f%%)\n"
+        "  Attack (10.10.2.x): %" PRIu64 " (%.1f%%)\n"
         "  TCP packets:        %" PRIu64 "\n"
         "  UDP packets:        %" PRIu64 "\n"
         "  ICMP packets:       %" PRIu64 "\n\n",
@@ -621,8 +621,8 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[INSTANTANEOUS TRAFFIC - Last %.1f seconds]\n"
-        "  Baseline (192.168.1): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
-        "  Attack (192.168.2): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
+        "  Baseline (10.10.1.x): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
+        "  Attack (10.10.2.x): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
         "  Total throughput:   %.2f Gbps  (avg pkt: %.0f bytes)\n\n",
         window_duration,
         window_base_pkts, inst_baseline_pct, window_base_bytes,

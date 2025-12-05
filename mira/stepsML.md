@@ -200,24 +200,26 @@ Generate realistic traffic PCAPs for training data collection.
 cd /local/dpdk_100g/mira/benign_generator
 
 # Option 1: Normal speed (300s timeline, realistic phases)
+# ⚠️  IMPORTANT: Use 10.x.x.x IPs (CloudLab internal network), NOT 192.168.x.x!
 python3 generate_benign_traffic_v2.py \
     --output ../benign_10M_v2.pcap \
     --packets 10000000 \
     --src-mac 00:00:00:00:00:01 \
     --dst-mac 0c:42:a1:dd:5b:28 \
-    --client-range 192.168.1.0/24 \
-    --server-ip 10.0.0.1 \
+    --client-range 10.10.1.0/24 \
+    --server-ip 10.10.1.2 \
     --clients 500
 
 # Option 2: 50x faster (300s → 6s timeline, phases preserved, ~12Gbps replay)
+# ⚠️  IMPORTANT: Use 10.x.x.x IPs (CloudLab internal network), NOT 192.168.x.x!
 python3 generate_benign_traffic_v2.py \
     --output ../benign_10M_v2_fast.pcap \
     --packets 10000000 \
     --speedup 50 \
     --src-mac 00:00:00:00:00:01 \
     --dst-mac 0c:42:a1:dd:5b:28 \
-    --client-range 192.168.1.0/24 \
-    --server-ip 10.0.0.1 \
+    --client-range 10.10.1.0/24 \
+    --server-ip 10.10.1.2 \
     --clients 500
 ```
 
