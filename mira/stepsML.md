@@ -347,7 +347,128 @@ tcpdump -r ../benign_10M_v2_fast.pcap -n -tttt | head -10
 **Recommendation:**
 - Use **v2 without speedup** for realistic temporal replay with `--pcap-timed`
 - Use **v2 with --speedup 50** for high-speed ML training data collection (~12Gbps)
+- Use **v2 with --adaptive** for continuous high-speed realistic traffic (BEST for long-running experiments)
 - Use **v1** for simpler experiments
+
+### Step 0.3: NEW - Adaptive Mode (Continuous Realistic Traffic at 12Gbps)
+
+**What is Adaptive Mode?**
+
+Adaptive mode is a **high-speed continuous traffic replayer** that:
+- Uses PCAP as a **pool of packets** (not a fixed sequence)
+- Generates **phase-based protocol distribution** (HTTP/DNS/SSH/UDP mix changes over time)
+- Maintains **12Gbps sustained** throughput without interruption
+- Runs **indefinitely** until Ctrl+C or `--duration` limit
+- **No dependency on PCAP timestamps** - generates own timing
+
+**Key Advantages:**
+✅ Continuous traffic (no gaps, no restarts)
+✅ Realistic phase rotation (HTTP peak → DNS burst → SSH stable → repeat)
+✅ Full line-rate (~12Gbps sustained)
+✅ Protocol diversity maintained
+✅ Perfect for ML training data collection (hours/days of traffic)
+
+**Usage Examples:**
+
+```bash
+cd /local/dpdk_100g/mira/benign_sender
+
+# Build (same v2 binary, new --adaptive flag)
+make -f Makefile_v2 v2
+
+# Example 1: Adaptive mode with default phases (loop forever at 12Gbps)
+sudo ./dpdk_pcap_sender_v2 \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../benign_10M_v2.pcap --adaptive --loop
+
+# Example 2: Adaptive mode for 5 minutes with custom phases
+sudo ./dpdk_pcap_sender_v2 \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../benign_10M_v2.pcap --adaptive --duration 300 --phases phases_example.json
+
+# Example 3: Adaptive mode at 10Gbps with jitter
+sudo ./dpdk_pcap_sender_v2 \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../benign_10M_v2.pcap --adaptive --rate-gbps 10 --jitter 15 --loop
+```
+
+**Default Phases (if no `--phases` file provided):**
+
+```
+Phase 1 (30s): HTTP Peak   - 60% HTTP, 20% DNS, 10% SSH, 10% UDP
+Phase 2 (15s): DNS Burst   - 30% HTTP, 50% DNS, 10% SSH, 10% UDP
+Phase 3 (45s): SSH Stable  - 50% HTTP, 15% DNS, 25% SSH, 10% UDP
+→ Loops back to Phase 1
+```
+
+**Custom Phases File (`phases_example.json`):**
+
+```json
+[
+  {"duration": 30, "http": 0.60, "dns": 0.20, "ssh": 0.10, "udp": 0.10},
+  {"duration": 15, "http": 0.30, "dns": 0.50, "ssh": 0.10, "udp": 0.10},
+  {"duration": 45, "http": 0.50, "dns": 0.15, "ssh": 0.25, "udp": 0.10}
+]
+```
+
+**Expected Output:**
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║         DPDK PCAP SENDER v2.0 - ADAPTIVE REPLAY MODE            ║
+╚══════════════════════════════════════════════════════════════════╝
+
+Target rate: 12.0 Gbps  |  Jitter: ±0.0%  |  Loop: YES
+Duration: unlimited
+Phases: 3 loaded
+Press Ctrl+C to stop
+
+[ADAPTIVE] Loaded 3 phases:
+  Phase 1: 30s - HTTP:60% DNS:20% SSH:10% UDP:10%
+  Phase 2: 15s - HTTP:30% DNS:50% SSH:10% UDP:10%
+  Phase 3: 45s - HTTP:50% DNS:15% SSH:25% UDP:10%
+
+[PROTOCOL CLASSIFICATION]
+  HTTP:  4,500,000 packets (45.0%)
+  DNS:   2,200,000 packets (22.0%)
+  SSH:   2,100,000 packets (21.0%)
+  UDP:     400,000 packets ( 4.0%)
+
+[PHASE 1/3] Starting - 30s - HTTP:60% DNS:20% SSH:10% UDP:10%
+[5.0s] Phase 1/3 | 7200000 pkts (1.44 Mpps) | Avg: 11.98 Gbps | Inst: 12.01 Gbps
+[10.0s] Phase 1/3 | 14400000 pkts (1.44 Mpps) | Avg: 12.00 Gbps | Inst: 12.02 Gbps
+...
+[30.0s] Phase 1/3 | 43200000 pkts (1.44 Mpps) | Avg: 12.00 Gbps | Inst: 11.99 Gbps
+
+[PHASE 2/3] Switching - 15s - HTTP:30% DNS:50% SSH:10% UDP:10%
+[35.0s] Phase 2/3 | 50400000 pkts (1.44 Mpps) | Avg: 12.00 Gbps | Inst: 12.00 Gbps
+...
+
+[PHASE 3/3] Switching - 45s - HTTP:50% DNS:15% SSH:25% UDP:10%
+...
+
+[PHASE 1/3] Switching - 30s - HTTP:60% DNS:20% SSH:10% UDP:10%
+(loops indefinitely until Ctrl+C)
+```
+
+**When to Use Adaptive Mode:**
+
+| Scenario | Best Mode |
+|----------|-----------|
+| Quick 5-minute ML data collection | v2 + --speedup 50 |
+| Realistic temporal behavior study | v2 + --pcap-timed |
+| **Long-running continuous traffic (hours/days)** | **v2 + --adaptive --loop** ✅ |
+| ML training with phase diversity | v2 + --adaptive --duration 3600 |
+| Stress testing detector at full rate | v2 + --adaptive --rate-gbps 12 |
+
+**Comparison:**
+
+| Feature | --pcap-timed | --speedup 50 | **--adaptive** |
+|---------|-------------|--------------|----------------|
+| Speed | ~500Mbps | ~12Gbps | **~12Gbps** |
+| Duration | PCAP length | PCAP length | **Infinite** |
+| Phases | Fixed sequence | Fixed (compressed) | **Loop/custom** |
+| Use case | Research | Fast collection | **Production-like** |
 
 ---
 
