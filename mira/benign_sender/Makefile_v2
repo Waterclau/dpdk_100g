@@ -1,0 +1,58 @@
+# Makefile for DPDK PCAP Sender v2.0 with Temporal Replay Support
+
+APP_V1 = dpdk_pcap_sender
+APP_V2 = dpdk_pcap_sender_v2
+
+PKGCONF ?= pkg-config
+
+# DPDK flags
+PC_FILE := $(shell $(PKGCONF) --path libdpdk 2>/dev/null)
+CFLAGS += -O3 $(shell $(PKGCONF) --cflags libdpdk)
+CFLAGS += -Wall -Wextra
+LDFLAGS_SHARED = $(shell $(PKGCONF) --libs libdpdk)
+
+# PCAP library
+LDFLAGS_SHARED += -lpcap
+
+# Source files
+SRC_V1 = dpdk_pcap_sender.c
+SRC_V2 = dpdk_pcap_sender_v2.c
+
+# Build both versions
+all: $(APP_V1) $(APP_V2)
+
+# v1: Original fast sender
+$(APP_V1): $(SRC_V1) Makefile
+	$(CC) $(CFLAGS) $(SRC_V1) -o $(APP_V1) $(LDFLAGS_SHARED)
+	@echo ""
+	@echo "✓ Built: $(APP_V1) (original - max speed)"
+	@echo ""
+
+# v2: Temporal replay sender
+$(APP_V2): $(SRC_V2) Makefile_v2
+	$(CC) $(CFLAGS) $(SRC_V2) -o $(APP_V2) $(LDFLAGS_SHARED)
+	@echo ""
+	@echo "✓ Built: $(APP_V2) (temporal replay support)"
+	@echo ""
+
+clean:
+	rm -f $(APP_V1) $(APP_V2)
+
+help:
+	@echo "DPDK PCAP Sender Build System"
+	@echo ""
+	@echo "Targets:"
+	@echo "  all       - Build both v1 and v2 (default)"
+	@echo "  v1        - Build v1 only (original)"
+	@echo "  v2        - Build v2 only (temporal replay)"
+	@echo "  clean     - Remove binaries"
+	@echo ""
+	@echo "Versions:"
+	@echo "  v1: $(APP_V1) - Original sender (max speed, 12 Gbps target)"
+	@echo "  v2: $(APP_V2) - Temporal replay (--pcap-timed, --jitter, --phase-mode)"
+	@echo ""
+
+v1: $(APP_V1)
+v2: $(APP_V2)
+
+.PHONY: all clean help v1 v2

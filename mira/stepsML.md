@@ -5,6 +5,27 @@
 
 ## 📊 CURRENT STATUS - Updated 2025-12-05
 
+### ✅ Phase 0: COMPLETED - Traffic Generation v2.0 (ML-Enhanced)
+**Realistic benign traffic generator with temporal phases + Temporal replay sender.**
+
+#### Traffic Generator v2.0:
+- ✅ `generate_benign_traffic_v2.py` - 4 temporal phases (HTTP/DNS/SSH/UDP)
+- ✅ Variable packet sizes (±20-50% jitter)
+- ✅ Traffic intensity variations (0.5× to 1.3×)
+- ✅ Inter-packet timing jitter (10-80ms per phase)
+- ✅ Better for ML training (feature diversity)
+
+#### Sender v2.0 (Temporal Replay):
+- ✅ `dpdk_pcap_sender_v2.c` - Preserves temporal phases
+- ✅ `--pcap-timed` flag - Respects PCAP timestamps
+- ✅ `--jitter X` - Adds timing variability (±X%)
+- ✅ `--speedup N` - Replay faster/slower (1× to 1000×)
+- ✅ Backward compatible (without flags = v1 behavior)
+
+**Result:** Benign traffic with realistic temporal patterns for better ML training.
+
+---
+
 ### ✅ Phase 4: COMPLETED - ML Detector Code Integration
 **All ML code has been successfully integrated into the detector system.**
 
@@ -270,30 +291,73 @@ Collect detector logs from generated traffic to create labeled training dataset.
 
 ### Step 1: Run Detector to Collect Benign Traffic Data
 
-**Prerequisite:** Complete Phase 0 to generate `benign_10M_v2.pcap` first!
+**Prerequisites:**
+1. ✅ Phase 0 complete: `benign_10M_v2.pcap` generated
+2. ✅ Compile `dpdk_pcap_sender_v2` with temporal replay support
+
+```bash
+# First, build the v2 sender (if not done)
+cd /local/dpdk_100g/mira/benign_sender
+make -f Makefile_v2 v2
+```
+
+**Run Data Collection:**
 
 ```bash
 # Terminal 1 - Monitor node (start first)
 cd /local/dpdk_100g/mira/detector_system
-sudo timeout 300 ./mira_ddos_detector \
+sudo timeout 320 ./mira_ddos_detector \
     -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
     2>&1 | tee ../ml_system/datasets/raw_logs/benign_baseline_v2.log
 
-# Terminal 2 - Controller node (wait 5s, then start)
+# Terminal 2 - Controller node (wait 5s, then start with TEMPORAL REPLAY)
 cd /local/dpdk_100g/mira/benign_sender
 sleep 5
-sudo timeout 295 ./build/dpdk_pcap_sender \
-    -l 0-7 -n 4 -w 0000:41:00.0 -- ../benign_10M_v2.pcap
+sudo timeout 315 ./dpdk_pcap_sender_v2 \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../benign_10M_v2.pcap --pcap-timed --jitter 10
 ```
 
-**What happens:**
-- Detector runs for 300s, monitoring traffic
-- PCAP sender replays the ML-enhanced benign traffic (10M packets with temporal phases)
-- Detector logs all statistics to `benign_baseline_v2.log`
-- This log will be parsed to extract ML features
+**NEW in v2.0 sender:**
+- `--pcap-timed`: Respects PCAP timestamps → **temporal phases are preserved!**
+- `--jitter 10`: Adds ±10% random timing variation → more realistic
 
-**Duration:** ~300 seconds
-**Traffic characteristics:** Temporal phases (HTTP peak → DNS burst → SSH stable → UDP light)
+**What happens:**
+- Detector runs for 320s, monitoring traffic
+- Sender replays traffic **with temporal pacing** (not flat!)
+  - Minutes 0-5: HTTP Peak (high traffic)
+  - Minutes 5-8: DNS Burst (DNS-heavy)
+  - Minutes 8-12: SSH Stable (low, steady traffic)
+  - Minutes 12-15: UDP Light (background UDP)
+- Detector logs show **phase transitions** in PPS rates
+- This log will be parsed to extract ML features with **temporal diversity**
+
+**Duration:** ~300 seconds (real-time replay)
+**Traffic characteristics:**
+- **Phase 1 (0-100s):** HTTP peak → ~45K PPS
+- **Phase 2 (100-160s):** DNS burst → ~30K PPS with DNS spikes
+- **Phase 3 (160-240s):** SSH stable → ~20K PPS steady
+- **Phase 4 (240-300s):** UDP light → ~15K PPS background
+
+**Expected detector output (temporal phases visible):**
+```
+[10s]  Baseline: 192.168.1.x - 45000 pps (HTTP peak phase)
+[100s] Baseline: 192.168.1.x - 35000 pps (DNS burst phase)
+[180s] Baseline: 192.168.1.x - 20000 pps (SSH stable phase)
+[260s] Baseline: 192.168.1.x - 15000 pps (UDP light phase)
+```
+
+**vs Old v1 sender (flat traffic):**
+```
+[10s]  Baseline: 192.168.1.x - 500000 pps (constant max speed)
+[100s] Baseline: 192.168.1.x - 500000 pps (no phases)
+```
+
+**Verification:**
+```bash
+# Check that phases are visible in logs
+grep "Baseline:" ../ml_system/datasets/raw_logs/benign_baseline_v2.log | head -50
+```
 
 ### Step 2: Run Detector to Collect UDP Flood Data
 
