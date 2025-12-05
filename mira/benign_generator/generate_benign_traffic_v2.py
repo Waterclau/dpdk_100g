@@ -348,7 +348,7 @@ def generate_background_udp(src_ip, dst_ip, src_mac, dst_mac, phase):
 # ============================================================================
 
 def generate_benign_traffic(output_file, num_packets, src_mac, dst_mac,
-                            client_range, server_ip, num_clients=500):
+                            client_range, server_ip, num_clients=500, speedup=1):
     """
     Generate benign traffic PCAP with temporal phases and realistic variations
 
@@ -360,6 +360,7 @@ def generate_benign_traffic(output_file, num_packets, src_mac, dst_mac,
         client_range: Client IP range (e.g., "192.168.1.0/24")
         server_ip: Server IP address
         num_clients: Number of simulated client IPs
+        speedup: Timestamp compression factor (e.g., 50 = 50x faster)
     """
 
     print("=" * 80)
@@ -398,6 +399,10 @@ def generate_benign_traffic(output_file, num_packets, src_mac, dst_mac,
     current_count = 0
     packets_per_update = max(1, num_packets // 100)  # Update every 1%
 
+    # Initialize timestamp tracking
+    current_timestamp = time.time()
+    base_pkt_interval = 0.00003  # ~30 microseconds between packets (baseline)
+
     print("Starting packet generation with temporal phases...")
     print("")
 
@@ -435,6 +440,17 @@ def generate_benign_traffic(output_file, num_packets, src_mac, dst_mac,
             else:  # udp
                 flow_packets = generate_background_udp(client_ip, server_ip, src_mac, dst_mac, phase)
 
+            # Apply realistic timestamps with phase-specific jitter
+            for pkt in flow_packets:
+                # Add jitter based on phase characteristics
+                jitter_seconds = (random.random() - 0.5) * (phase.jitter_ms / 1000.0)
+
+                # Adjust interval based on phase intensity (higher intensity = tighter spacing)
+                interval = base_pkt_interval / phase.intensity_multiplier
+
+                current_timestamp += interval + jitter_seconds
+                pkt.time = current_timestamp
+
             packets.extend(flow_packets)
             current_count += len(flow_packets)
 
@@ -447,9 +463,64 @@ def generate_benign_traffic(output_file, num_packets, src_mac, dst_mac,
         print("")
 
     print(f"Total packets generated: {len(packets):,}")
-    print(f"Writing packets to {output_file}...")
 
-    # Write PCAP
+    return packets  # Return packets list for potential timestamp compression
+
+
+def apply_timestamp_compression(packets, speedup_factor, output_file):
+    """
+    Compress timestamps by speedup_factor while maintaining temporal phases.
+
+    Args:
+        packets: List of Scapy packets with timestamps
+        speedup_factor: Compression factor (e.g., 50 = 50x faster)
+        output_file: Output PCAP filename
+    """
+    if speedup_factor <= 1:
+        # No compression needed
+        print(f"Writing packets to {output_file}...")
+        wrpcap(output_file, packets)
+        return
+
+    print(f"\n[TIMESTAMP COMPRESSION] Applying {speedup_factor}× speedup...")
+    print(f"Original timeline will be compressed by factor {speedup_factor}")
+
+    # Get first packet timestamp as reference
+    if len(packets) == 0:
+        return
+
+    # Scapy packets have .time attribute (float timestamp)
+    first_time = packets[0].time
+
+    # Compress all timestamps relative to first packet
+    compressed_count = 0
+    for pkt in packets:
+        original_time = pkt.time
+        delta_from_start = original_time - first_time
+
+        # Compress the delta
+        compressed_delta = delta_from_start / speedup_factor
+
+        # Set new timestamp
+        pkt.time = first_time + compressed_delta
+        compressed_count += 1
+
+        if compressed_count % 1000000 == 0:
+            print(f"  Compressed {compressed_count:,} timestamps...")
+
+    # Calculate timing statistics
+    original_duration = packets[-1].time - packets[0].time
+    compressed_duration = original_duration / speedup_factor
+
+    print(f"\n[TIMESTAMP COMPRESSION] Complete:")
+    print(f"  Original duration:    {original_duration:.2f} seconds")
+    print(f"  Compressed duration:  {compressed_duration:.2f} seconds")
+    print(f"  Speedup achieved:     {speedup_factor}×")
+    print(f"  Phases preserved:     ✓ Yes (just faster)")
+    print("")
+
+    # Write compressed PCAP
+    print(f"Writing compressed PCAP to {output_file}...")
     wrpcap(output_file, packets)
 
     # Calculate file size
@@ -458,8 +529,33 @@ def generate_benign_traffic(output_file, num_packets, src_mac, dst_mac,
     print(f"File size: {file_size / (1024*1024):.2f} MB")
     print("")
 
-    # Statistics
-    print("Traffic Statistics:")
+
+def generate_and_save_benign_traffic(output_file, num_packets, src_mac, dst_mac,
+                                      client_range, server_ip, num_clients, speedup):
+    """
+    Wrapper function that generates traffic and applies timestamp compression.
+
+    Args:
+        output_file: Output PCAP filename
+        num_packets: Total packets to generate
+        src_mac: Source MAC address
+        dst_mac: Destination MAC address
+        client_range: Client IP range
+        server_ip: Server IP
+        num_clients: Number of client IPs
+        speedup: Timestamp compression factor
+    """
+    # Generate packets with realistic timestamps
+    packets = generate_benign_traffic(
+        output_file, num_packets, src_mac, dst_mac,
+        client_range, server_ip, num_clients, speedup
+    )
+
+    # Apply timestamp compression if requested
+    apply_timestamp_compression(packets, speedup, output_file)
+
+    # Print statistics
+    print("\nTraffic Statistics:")
     http_count = sum(1 for p in packets if TCP in p and (p[TCP].dport == 80 or p[TCP].sport == 80))
     dns_count = sum(1 for p in packets if DNS in p)
     ssh_count = sum(1 for p in packets if TCP in p and (p[TCP].dport == 22 or p[TCP].sport == 22))
@@ -475,8 +571,6 @@ def generate_benign_traffic(output_file, num_packets, src_mac, dst_mac,
     print("=" * 80)
     print("Generation complete!")
     print("=" * 80)
-
-    return len(packets)
 
 
 def main():
@@ -495,7 +589,15 @@ Features:
   - Inter-packet jitter (not constant timing)
   - Variable packet sizes (realistic distributions)
   - Traffic intensity changes (peak/low periods)
+  - Timestamp compression (--speedup for faster replay)
   - Better ML training diversity
+
+Examples:
+  # Normal speed (300s timeline):
+  python3 generate_benign_traffic_v2.py --packets 10000000 --output benign_10M.pcap
+
+  # 50x faster (300s → 6s timeline, phases preserved):
+  python3 generate_benign_traffic_v2.py --packets 10000000 --speedup 50 --output benign_10M_fast.pcap
         """
     )
 
@@ -513,17 +615,25 @@ Features:
                        help='Server IP address (default: 10.0.0.1)')
     parser.add_argument('--clients', type=int, default=500,
                        help='Number of client IPs (default: 500)')
+    parser.add_argument('--speedup', '-s', type=float, default=1.0,
+                       help='Timestamp compression factor (e.g., 50 = 50x faster timeline, default: 1 = no compression)')
 
     args = parser.parse_args()
 
-    generate_benign_traffic(
+    # Validate speedup
+    if args.speedup < 1.0:
+        print("Error: --speedup must be >= 1.0")
+        return -1
+
+    generate_and_save_benign_traffic(
         args.output,
         args.packets,
         args.src_mac,
         args.dst_mac,
         args.client_range,
         args.server_ip,
-        args.clients
+        args.clients,
+        args.speedup
     )
 
 

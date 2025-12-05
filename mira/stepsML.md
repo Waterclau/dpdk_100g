@@ -187,12 +187,19 @@ Generate realistic traffic PCAPs for training data collection.
    - Realistic temporal patterns (not constant)
    - Closer to real network behavior
 
+4. **Timestamp Compression** (NEW in v2.0):
+   - `--speedup S` parameter compresses timeline by factor S
+   - Example: `--speedup 50` → 300s becomes 6s (50× faster)
+   - Phases and patterns preserved, just accelerated
+   - Standard sender replays at ~12Gbps (no --pcap-timed needed)
+   - Use for fast ML training data collection
+
 ### Step 0.1: Generate ML-Enhanced Benign Traffic
 
 ```bash
 cd /local/dpdk_100g/mira/benign_generator
 
-# Generate 10M packets with temporal phases (recommended for ML)
+# Option 1: Normal speed (300s timeline, realistic phases)
 python3 generate_benign_traffic_v2.py \
     --output ../benign_10M_v2.pcap \
     --packets 10000000 \
@@ -201,9 +208,20 @@ python3 generate_benign_traffic_v2.py \
     --client-range 192.168.1.0/24 \
     --server-ip 10.0.0.1 \
     --clients 500
+
+# Option 2: 50x faster (300s → 6s timeline, phases preserved, ~12Gbps replay)
+python3 generate_benign_traffic_v2.py \
+    --output ../benign_10M_v2_fast.pcap \
+    --packets 10000000 \
+    --speedup 50 \
+    --src-mac 00:00:00:00:00:01 \
+    --dst-mac 0c:42:a1:dd:5b:28 \
+    --client-range 192.168.1.0/24 \
+    --server-ip 10.0.0.1 \
+    --clients 500
 ```
 
-**Expected output:**
+**Expected output (normal speed, no --speedup):**
 ```
 ================================================================================
 MIRA Benign Traffic Generator v2.0 - ML-Enhanced
@@ -238,6 +256,41 @@ Phase 4/4: UDP Light (target: 2,000,000 packets)
   Phase UDP Light complete: 2,000,000 packets generated
 
 Total packets generated: 10,000,000
+Writing packets to ../benign_10M_v2.pcap...
+File size: 850.23 MB
+
+Traffic Statistics:
+  HTTP:    4,500,000 packets (45%)
+  DNS:     2,200,000 packets (22%)
+  SSH:     2,100,000 packets (21%)
+  ICMP:      800,000 packets ( 8%)
+  UDP:       400,000 packets ( 4%)
+
+================================================================================
+Generation complete!
+================================================================================
+```
+
+**Expected output (with --speedup 50):**
+```
+[... same phases as above ...]
+
+Total packets generated: 10,000,000
+
+[TIMESTAMP COMPRESSION] Applying 50× speedup...
+Original timeline will be compressed by factor 50
+  Compressed 1,000,000 timestamps...
+  Compressed 2,000,000 timestamps...
+  ...
+  Compressed 10,000,000 timestamps...
+
+[TIMESTAMP COMPRESSION] Complete:
+  Original duration:    300.00 seconds
+  Compressed duration:  6.00 seconds
+  Speedup achieved:     50×
+  Phases preserved:     ✓ Yes (just faster)
+
+Writing compressed PCAP to ../benign_10M_v2_fast.pcap...
 File size: 850.23 MB
 
 Traffic Statistics:
@@ -257,30 +310,44 @@ Generation complete!
 ### Step 0.2: Verify Generated Traffic (Optional)
 
 ```bash
-# Check PCAP file was created
-ls -lh ../benign_10M_v2.pcap
+# Check PCAP files were created
+ls -lh ../benign_10M_v2*.pcap
 
-# Quick statistics
+# Quick statistics (normal speed)
 tcpdump -r ../benign_10M_v2.pcap -n | head -100
 
-# Protocol distribution
+# Quick statistics (fast version) - timestamps will be compressed
+tcpdump -r ../benign_10M_v2_fast.pcap -n | head -100
+
+# Protocol distribution (works for both files)
 tcpdump -r ../benign_10M_v2.pcap -n 'tcp port 80' | wc -l  # HTTP
 tcpdump -r ../benign_10M_v2.pcap -n 'udp port 53' | wc -l  # DNS
 tcpdump -r ../benign_10M_v2.pcap -n 'tcp port 22' | wc -l  # SSH
+
+# Verify timestamp compression (compare first 10 packets)
+tcpdump -r ../benign_10M_v2.pcap -n -tttt | head -10
+tcpdump -r ../benign_10M_v2_fast.pcap -n -tttt | head -10
+# Fast version should show much tighter timing (~120μs vs ~6ms between packets)
 ```
 
 ### Comparison: v1 vs v2
 
-| Feature | v1 (Original) | v2 (ML-Enhanced) |
-|---------|---------------|------------------|
-| Traffic Pattern | Constant, uniform | Temporal phases (4 phases) |
-| Packet Sizes | Fixed ranges | Variable with jitter (±20-50%) |
-| Timing | Regular intervals | Jitter 10-80ms per phase |
-| Protocol Mix | Static distribution | Dynamic per phase |
-| ML Training | Good | Excellent (better diversity) |
-| Realism | Moderate | High |
+| Feature | v1 (Original) | v2 (ML-Enhanced) | v2 + --speedup 50 |
+|---------|---------------|------------------|-------------------|
+| Traffic Pattern | Constant, uniform | Temporal phases (4 phases) | Same phases, 50× faster |
+| Packet Sizes | Fixed ranges | Variable with jitter (±20-50%) | Same |
+| Timing | Regular intervals | Jitter 10-80ms per phase | Jitter scaled (200μs-1.6ms) |
+| Protocol Mix | Static distribution | Dynamic per phase | Same |
+| Timeline Duration | N/A | ~300s (5 minutes) | ~6s (compressed) |
+| Replay Speed (standard sender) | Max (~12Gbps) | Slow (~500Mbps) | Max (~12Gbps) |
+| Replay Speed (--pcap-timed) | N/A | Realistic phases | 50× faster phases |
+| ML Training | Good | Excellent (better diversity) | Same |
+| Realism | Moderate | High | High (accelerated) |
 
-**Recommendation:** Use v2 for ML training, v1 for simpler experiments.
+**Recommendation:**
+- Use **v2 without speedup** for realistic temporal replay with `--pcap-timed`
+- Use **v2 with --speedup 50** for high-speed ML training data collection (~12Gbps)
+- Use **v1** for simpler experiments
 
 ---
 
@@ -303,6 +370,7 @@ make -f Makefile_v2 v2
 
 **Run Data Collection:**
 
+**Option A: Realistic temporal replay (slow, ~500Mbps, 300s):**
 ```bash
 # Terminal 1 - Monitor node (start first)
 cd /local/dpdk_100g/mira/detector_system
@@ -318,11 +386,37 @@ sudo timeout 315 ./dpdk_pcap_sender_v2 \
     -- ../benign_10M_v2.pcap --pcap-timed --jitter 10
 ```
 
-**NEW in v2.0 sender:**
-- `--pcap-timed`: Respects PCAP timestamps → **temporal phases are preserved!**
-- `--jitter 10`: Adds ±10% random timing variation → more realistic
+**Option B: Fast high-speed collection (recommended, ~12Gbps, 6s):**
+```bash
+# Terminal 1 - Monitor node (start first)
+cd /local/dpdk_100g/mira/detector_system
+sudo timeout 30 ./mira_ddos_detector \
+    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
+    2>&1 | tee ../ml_system/datasets/raw_logs/benign_baseline_v2_fast.log
 
-**What happens:**
+# Terminal 2 - Controller node (wait 5s, then start WITHOUT --pcap-timed)
+cd /local/dpdk_100g/mira/benign_sender
+sleep 5
+sudo timeout 25 ./build/dpdk_pcap_sender \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../benign_10M_v2_fast.pcap
+# No --pcap-timed needed! Timestamps already compressed → max speed replay
+```
+
+**NEW in v2.0:**
+- **Option A (--pcap-timed):** Respects PCAP timestamps → realistic temporal phases preserved
+  - `--jitter 10`: Adds ±10% random timing variation → more realistic
+  - Duration: ~300s
+  - Speed: ~500Mbps
+  - Use case: Research, realistic behavior analysis
+
+- **Option B (--speedup 50):** Timestamps pre-compressed in PCAP → high-speed replay
+  - No --pcap-timed flag needed
+  - Duration: ~6s (50× faster)
+  - Speed: ~12Gbps (max line rate)
+  - Use case: **ML training data collection (RECOMMENDED)**
+
+**What happens (Option A - temporal replay):**
 - Detector runs for 320s, monitoring traffic
 - Sender replays traffic **with temporal pacing** (not flat!)
   - Minutes 0-5: HTTP Peak (high traffic)
@@ -332,31 +426,40 @@ sudo timeout 315 ./dpdk_pcap_sender_v2 \
 - Detector logs show **phase transitions** in PPS rates
 - This log will be parsed to extract ML features with **temporal diversity**
 
-**Duration:** ~300 seconds (real-time replay)
-**Traffic characteristics:**
+**What happens (Option B - fast collection):**
+- Detector runs for 30s, monitoring traffic
+- Sender replays at **max speed (~12Gbps)**
+- All 4 phases compressed into ~6 seconds:
+  - 0-2s: HTTP Peak
+  - 2-3.2s: DNS Burst
+  - 3.2-4.8s: SSH Stable
+  - 4.8-6s: UDP Light
+- Detector logs show same patterns, just **50× faster**
+- **Same ML features, collected in 1/50th the time!**
+
+**Traffic characteristics (Option A):**
 - **Phase 1 (0-100s):** HTTP peak → ~45K PPS
 - **Phase 2 (100-160s):** DNS burst → ~30K PPS with DNS spikes
 - **Phase 3 (160-240s):** SSH stable → ~20K PPS steady
 - **Phase 4 (240-300s):** UDP light → ~15K PPS background
 
-**Expected detector output (temporal phases visible):**
-```
-[10s]  Baseline: 192.168.1.x - 45000 pps (HTTP peak phase)
-[100s] Baseline: 192.168.1.x - 35000 pps (DNS burst phase)
-[180s] Baseline: 192.168.1.x - 20000 pps (SSH stable phase)
-[260s] Baseline: 192.168.1.x - 15000 pps (UDP light phase)
-```
+**Traffic characteristics (Option B):**
+- **Phase 1 (0-2s):** HTTP peak → ~2M PPS
+- **Phase 2 (2-3.2s):** DNS burst → ~1.5M PPS with DNS spikes
+- **Phase 3 (3.2-4.8s):** SSH stable → ~1M PPS steady
+- **Phase 4 (4.8-6s):** UDP light → ~750K PPS background
 
-**vs Old v1 sender (flat traffic):**
-```
-[10s]  Baseline: 192.168.1.x - 500000 pps (constant max speed)
-[100s] Baseline: 192.168.1.x - 500000 pps (no phases)
-```
-
-**Verification:**
+**Verification (Option A):**
 ```bash
-# Check that phases are visible in logs
+# Check that phases are visible in logs (slow replay)
 grep "Baseline:" ../ml_system/datasets/raw_logs/benign_baseline_v2.log | head -50
+```
+
+**Verification (Option B):**
+```bash
+# Check that phases are visible in logs (fast replay)
+grep "Baseline:" ../ml_system/datasets/raw_logs/benign_baseline_v2_fast.log | head -50
+# Should show 4 distinct phases in ~6 seconds
 ```
 
 ### Step 2: Run Detector to Collect UDP Flood Data

@@ -38,7 +38,7 @@ The generator simulates realistic network behavior by dividing traffic into 4 ph
 python3 generate_benign_traffic_v2.py --output benign_10M_v2.pcap --packets 10000000
 ```
 
-### All Parameters
+### All Parameters (Including NEW --speedup)
 
 ```bash
 python3 generate_benign_traffic_v2.py \
@@ -48,7 +48,8 @@ python3 generate_benign_traffic_v2.py \
     --dst-mac 0c:42:a1:dd:5b:28 \
     --client-range 192.168.1.0/24 \
     --server-ip 10.0.0.1 \
-    --clients 500
+    --clients 500 \
+    --speedup 50
 ```
 
 ### Parameters Explained
