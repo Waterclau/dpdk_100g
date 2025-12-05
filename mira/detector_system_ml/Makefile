@@ -13,10 +13,10 @@ CFLAGS += -I/usr/local/include
 LDFLAGS_SHARED += -L/usr/local/lib -l_lightgbm
 
 # Source files
-SRCS = mira_ddos_detector_ml.c ml_inference.c
+SRCS = detectorML.c ml_inference.c
 OBJS = $(SRCS:.c=.o)
 
-TARGET = mira_ddos_detector_ml
+TARGET = detectorML
 
 all: $(TARGET)
 
