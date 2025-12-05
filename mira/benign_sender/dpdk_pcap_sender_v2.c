@@ -242,9 +242,13 @@ static int parse_phases_file(const char *filename)
         return -1;
     }
 
-    fread(content, 1, fsize, f);
+    size_t bytes_read = fread(content, 1, fsize, f);
     fclose(f);
     content[fsize] = 0;
+
+    if (bytes_read != (size_t)fsize) {
+        printf("Warning: Read %zu bytes, expected %ld\n", bytes_read, fsize);
+    }
 
     // Simple JSON parsing (expects array format)
     // Format: [{"duration": 30, "http": 0.60, "dns": 0.20, "ssh": 0.10, "udp": 0.10}, ...]
@@ -374,7 +378,7 @@ static void create_default_phases(void)
 }
 
 /* Port initialization */
-static int port_init(uint16_t port, struct rte_mempool *mbuf_pool)
+static int port_init(uint16_t port, struct rte_mempool *mbuf_pool __rte_unused)
 {
     struct rte_eth_conf port_conf = {
         .txmode = {
@@ -563,9 +567,7 @@ static int load_pcap(const char *filename)
 /* NEW: Timed sending loop (respects timestamps) */
 static void send_loop_timed(void)
 {
-    struct rte_mbuf *pkts[BURST_SIZE];
     uint16_t nb_tx;
-    uint32_t i;
     uint64_t hz = rte_get_tsc_hz();
     uint64_t last_stats_tsc = 0;
 
@@ -762,7 +764,6 @@ static void send_loop_fast(void)
             uint64_t window_packets = total_packets_sent - last_window_packets;
             uint64_t window_bytes = total_bytes_sent - last_window_bytes;
             double gbps_instant = (window_bytes * 8.0) / (window_duration * 1e9);
-            double mpps_instant = (window_packets / window_duration) / 1e6;
 
             printf("[%.1fs] Sent: %lu pkts (%.2f Mpps) | Cumulative: %.2f Gbps | Instant: %.2f Gbps | %lu bytes\n",
                    elapsed, total_packets_sent, mpps_cumulative, gbps_cumulative, gbps_instant, total_bytes_sent);
@@ -968,7 +969,6 @@ static void send_loop_adaptive(void)
             uint64_t window_packets = total_packets_sent - last_window_packets;
             uint64_t window_bytes = total_bytes_sent - last_window_bytes;
             double gbps_instant = (window_bytes * 8.0) / (window_duration * 1e9);
-            double mpps_instant = (window_packets / window_duration) / 1e6;
 
             printf("[%.1fs] Phase %u/%u | %lu pkts (%.2f Mpps) | Avg: %.2f Gbps | Inst: %.2f Gbps\n",
                    elapsed, current_phase + 1, adaptive_cfg.num_phases,
@@ -1034,6 +1034,8 @@ int main(int argc, char *argv[])
     char *pcap_file = NULL;
     int opt;
     int option_index;
+    char *phases_file = NULL;
+    float jitter;  // Declare here to avoid error in switch
 
     /* NEW: Long options for temporal replay and adaptive mode */
     static struct option long_options[] = {
@@ -1049,8 +1051,6 @@ int main(int argc, char *argv[])
         {"help", no_argument, NULL, 'h'},
         {NULL, 0, NULL, 0}
     };
-
-    char *phases_file = NULL;
 
     ret = rte_eal_init(argc, argv);
     if (ret < 0)
@@ -1079,7 +1079,7 @@ int main(int argc, char *argv[])
             printf("[CONFIG] Adaptive mode enabled\n");
             break;
         case 'j':
-            float jitter = atof(optarg);
+            jitter = atof(optarg);
             if (jitter < 0 || jitter > 100) {
                 printf("Error: Jitter must be between 0 and 100\n");
                 return -1;
