@@ -217,7 +217,8 @@ def generate_http_flood(src_ip, dst_ip, src_mac, dst_mac, phase):
     packets.append(ack)
 
     # HTTP Request with Mirai signature
-    http_req = random.choice(MIRAI_HTTP_PAYLOADS) % dst_ip.encode()
+    # Format the payload by replacing %s with target IP (bytes formatting)
+    http_req = random.choice(MIRAI_HTTP_PAYLOADS).replace(b"%s", dst_ip.encode())
 
     req = Ether(src=src_mac, dst=dst_mac) / \
           IP(src=src_ip, dst=dst_ip) / \
