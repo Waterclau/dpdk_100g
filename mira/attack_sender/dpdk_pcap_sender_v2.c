@@ -1830,9 +1830,16 @@ int main(int argc, char *argv[])
     /* NEW: Choose sending loop based on configuration */
     if (attack_cfg.enabled) {
         /* NEW: Adaptive-attack mode with phase-based DDoS attack distribution */
-        printf("\n🔥🔥🔥 LAUNCHING ADAPTIVE ATTACK MODE 🔥🔥🔥\n");
+        printf("\n╔═══════════════════════════════════════════════════════════════════╗\n");
+        printf("║          🔥🔥🔥 LAUNCHING ADAPTIVE ATTACK MODE 🔥🔥🔥            ║\n");
+        printf("╚═══════════════════════════════════════════════════════════════════╝\n\n");
         printf("⚠️  WARNING: Continuous DDoS attack traffic will be generated\n");
-        printf("⚠️  Ensure you are using INTERNAL network (10.x.x.x), NOT control network!\n");
+        printf("⚠️  CRITICAL: Use ONLY CloudLab INTERNAL network!\n");
+        printf("    ✅ ALLOWED:  10.10.1.x (benign) and 10.10.2.x (attack)\n");
+        printf("    ✅ NIC:      ens1f0 (PCI 0000:41:00.0)\n");
+        printf("    ❌ FORBIDDEN: 192.168.x.x (control network - experiment will be TERMINATED!)\n");
+        printf("    ❌ FORBIDDEN: eno33 (control interface)\n");
+        printf("⚠️  Verify PCAP IPs before running: tcpdump -r <file> -n | head\n");
         printf("⚠️  Press Ctrl+C to stop attack\n\n");
         send_loop_adaptive_attack();
     } else if (adaptive_cfg.enabled) {

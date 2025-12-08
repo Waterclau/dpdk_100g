@@ -236,10 +236,11 @@ def generate_dns_flood(src_ip, dst_ip, src_mac, dst_mac, phase):
     domain = random.choice(MIRAI_DNS_QUERIES)
 
     # DNS query (amplification target)
+    # qtype=255 is DNS ANY query (use number instead of string for Scapy compatibility)
     query = Ether(src=src_mac, dst=dst_mac) / \
             IP(src=src_ip, dst=dst_ip) / \
             UDP(sport=sport, dport=53) / \
-            DNS(rd=1, qd=DNSQR(qname=domain, qtype='ANY'))  # ANY query for amplification
+            DNS(rd=1, qd=DNSQR(qname=domain, qtype=255))  # 255 = ANY query for amplification
     packets.append(query)
 
     return packets
