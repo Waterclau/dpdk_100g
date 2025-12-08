@@ -352,6 +352,259 @@ tcpdump -r ../benign_10M_v2_fast.pcap -n -tttt | head -10
 - Use **v2 with --adaptive** for continuous high-speed realistic traffic (BEST for long-running experiments)
 - Use **v1** for simpler experiments
 
+---
+
+### Step 0.4: Generate Mirai-Style DDoS Attack Traffic (v2)
+
+**NEW in v2.0:** `generate_mirai_attacks_v2.py` - Realistic attack traffic with temporal phases
+
+We now have an attack generator that matches the structural improvements of the benign generator, adapted for DDoS attacks.
+
+#### Attack Traffic Generator v2.0 Features:
+
+1. **Attack Phases** (4 escalating phases):
+   - Phase 1 (10%): Warm-up Scan - Reconnaissance phase
+   - Phase 2 (40%): SYN Flood Peak - Main attack wave
+   - Phase 3 (30%): Mixed Bot Waves - Distributed attack patterns
+   - Phase 4 (20%): Random Spikes - Unpredictable bursts
+
+2. **Attack Vectors**:
+   - SYN Flood (ports 80, 443, 22, 23, 2323, 37215, 52869, 5555)
+   - UDP Flood (516-byte payloads, CICDDoS2019 style)
+   - HTTP Flood (complete handshake with Mirai payloads)
+   - DNS Amplification (ANY queries)
+   - ACK Scans (reconnaissance)
+
+3. **Mirai Signatures**:
+   - Real botnet HTTP payloads (setup.cgi, IoT exploits)
+   - Port scanning patterns
+   - Multiple attack types mixed realistically
+
+4. **CloudLab Compliance**:
+   - ⚠️ Default IPs: `10.10.2.0/24` for attackers (internal network)
+   - ⚠️ Default target: `10.10.1.2` (internal network)
+   - NEVER uses 192.168.x.x (control network violation)
+
+5. **Timestamp Compression**:
+   - Same `--speedup` parameter as benign generator
+   - Phases and attack patterns preserved, just accelerated
+
+#### Generate Attack Traffic:
+
+```bash
+cd /local/dpdk_100g/mira/attack_generator
+
+# Option 1: Normal speed (realistic attack timeline, 4 phases over ~300s)
+# ⚠️  IMPORTANT: Use 10.x.x.x IPs (CloudLab internal network), NOT 192.168.x.x!
+python3 generate_mirai_attacks_v2.py \
+    --output ../attack_mirai_10M_v2.pcap \
+    --packets 10000000 \
+    --attack-type mixed \
+    --intensity 1.0 \
+    --src-mac 00:00:00:00:00:02 \
+    --dst-mac 0c:42:a1:dd:5b:28 \
+    --attacker-range 10.10.2.0/24 \
+    --target-ip 10.10.1.2 \
+    --attackers 200
+
+# Option 2: 50x faster (300s → 6s timeline, ~12Gbps replay)
+# ⚠️  IMPORTANT: Use 10.x.x.x IPs (CloudLab internal network), NOT 192.168.x.x!
+python3 generate_mirai_attacks_v2.py \
+    --output ../attack_mirai_10M_v2_fast.pcap \
+    --packets 10000000 \
+    --attack-type mixed \
+    --speedup 50 \
+    --intensity 1.5 \
+    --src-mac 00:00:00:00:00:02 \
+    --dst-mac 0c:42:a1:dd:5b:28 \
+    --attacker-range 10.10.2.0/24 \
+    --target-ip 10.10.1.2 \
+    --attackers 200
+
+# Option 3: Specific attack type (SYN flood only)
+python3 generate_mirai_attacks_v2.py \
+    --output ../attack_syn_5M_v2.pcap \
+    --packets 5000000 \
+    --attack-type syn \
+    --intensity 3.0 \
+    --attacker-range 10.10.2.0/24 \
+    --target-ip 10.10.1.2
+
+# Option 4: High-intensity random attack pattern
+python3 generate_mirai_attacks_v2.py \
+    --output ../attack_random_10M_v2.pcap \
+    --packets 10000000 \
+    --attack-type random \
+    --intensity 5.0 \
+    --speedup 50 \
+    --attacker-range 10.10.2.0/24 \
+    --target-ip 10.10.1.2
+```
+
+#### Attack Types:
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| `mixed` | All attack types mixed (default) | ML training, realistic scenario |
+| `syn` | SYN flood only | SYN-specific detection testing |
+| `udp` | UDP flood only | UDP-specific detection testing |
+| `http` | HTTP flood only | Application-layer attack testing |
+| `dns` | DNS amplification only | DNS-specific testing |
+| `random` | Randomized attack type per phase | Unpredictable attack simulation |
+
+#### Intensity Levels:
+
+| Intensity | Description | Attack Multiplier |
+|-----------|-------------|-------------------|
+| 1.0 | Normal (default) | Baseline attack rate |
+| 2.0 | Medium | 2× more packets |
+| 3.0 | High | 3× more packets |
+| 5.0 | Maximum | 5× more packets (extreme) |
+
+**Expected output (normal speed, mixed attack):**
+
+```
+================================================================================
+MIRA Attack Generator v2.0 - Mirai-Style DDoS with Temporal Phases
+================================================================================
+Target packets: 10,000,000
+Output file: ../attack_mirai_10M_v2.pcap
+Attack type: mixed
+Intensity: 1.0×
+Attackers: 200 botnet IPs (10.10.2.0/24)
+Target: 10.10.1.2
+
+Attack Phases:
+  1. Warm-up Scan   - 10% (1,000,000 pkts) - Intensity: 0.3×, Jitter: 200ms
+  2. SYN Flood Peak - 40% (4,000,000 pkts) - Intensity: 5.0×, Jitter: 5ms
+  3. Mixed Bot Waves- 30% (3,000,000 pkts) - Intensity: 3.0×, Jitter: 50ms
+  4. Random Spikes  - 20% (2,000,000 pkts) - Intensity: 2.0×, Jitter: 150ms
+
+Starting attack generation with temporal phases...
+
+Phase 1/4: Warm-up Scan (target: 1,000,000 packets)
+  Progress: 1,000,000/10,000,000 (10%)
+  Phase Warm-up Scan complete: 1,000,000 packets generated
+
+Phase 2/4: SYN Flood Peak (target: 4,000,000 packets)
+  Progress: 2,000,000/10,000,000 (20%)
+  Progress: 3,000,000/10,000,000 (30%)
+  Progress: 4,000,000/10,000,000 (40%)
+  Progress: 5,000,000/10,000,000 (50%)
+  Phase SYN Flood Peak complete: 4,000,000 packets generated
+
+Phase 3/4: Mixed Bot Waves (target: 3,000,000 packets)
+  Progress: 6,000,000/10,000,000 (60%)
+  Progress: 7,000,000/10,000,000 (70%)
+  Progress: 8,000,000/10,000,000 (80%)
+  Phase Mixed Bot Waves complete: 3,000,000 packets generated
+
+Phase 4/4: Random Spikes (target: 2,000,000 packets)
+  Progress: 9,000,000/10,000,000 (90%)
+  Phase Random Spikes complete: 2,000,000 packets generated
+
+Total packets generated: 10,000,000
+Writing packets to ../attack_mirai_10M_v2.pcap...
+File size: 620.45 MB
+
+Attack Statistics:
+  SYN Flood:    4,200,000 packets (42%)
+  UDP Flood:    2,800,000 packets (28%)
+  HTTP Flood:   1,500,000 packets (15%)
+  DNS Amplif:   1,200,000 packets (12%)
+  ACK Scan:       300,000 packets ( 3%)
+
+Mirai Signatures:
+  IoT Exploit Requests:    150,000
+  Port Scan Attempts:      300,000
+  Botnet Handshakes:       450,000
+
+================================================================================
+Attack generation complete!
+================================================================================
+```
+
+**Expected output (with --speedup 50):**
+
+```
+[... same phases as above ...]
+
+[TIMESTAMP COMPRESSION] Applying 50× speedup...
+Original timeline will be compressed by factor 50
+  Compressed 1,000,000 timestamps...
+  Compressed 2,000,000 timestamps...
+  ...
+  Compressed 10,000,000 timestamps...
+
+[TIMESTAMP COMPRESSION] Complete:
+  Original duration:    300.00 seconds
+  Compressed duration:  6.00 seconds
+  Speedup achieved:     50×
+  Phases preserved:     ✓ Yes (just faster)
+
+Writing compressed PCAP to ../attack_mirai_10M_v2_fast.pcap...
+File size: 620.45 MB
+
+Attack Statistics:
+  SYN Flood:    4,200,000 packets (42%)
+  UDP Flood:    2,800,000 packets (28%)
+  HTTP Flood:   1,500,000 packets (15%)
+  DNS Amplif:   1,200,000 packets (12%)
+  ACK Scan:       300,000 packets ( 3%)
+
+================================================================================
+Attack generation complete!
+================================================================================
+```
+
+#### Verify Attack Traffic:
+
+```bash
+# Check PCAP files were created
+ls -lh ../attack_mirai_10M_v2*.pcap
+
+# Quick statistics (normal speed)
+tcpdump -r ../attack_mirai_10M_v2.pcap -n | head -100
+
+# Quick statistics (fast version) - timestamps will be compressed
+tcpdump -r ../attack_mirai_10M_v2_fast.pcap -n | head -100
+
+# Attack type distribution
+tcpdump -r ../attack_mirai_10M_v2.pcap -n 'tcp[tcpflags] == tcp-syn' | wc -l  # SYN
+tcpdump -r ../attack_mirai_10M_v2.pcap -n 'udp and not port 53' | wc -l       # UDP flood
+tcpdump -r ../attack_mirai_10M_v2.pcap -n 'tcp port 80' | wc -l               # HTTP
+tcpdump -r ../attack_mirai_10M_v2.pcap -n 'udp port 53' | wc -l               # DNS
+
+# Verify timestamp compression (compare first 10 packets)
+tcpdump -r ../attack_mirai_10M_v2.pcap -n -tttt | head -10
+tcpdump -r ../attack_mirai_10M_v2_fast.pcap -n -tttt | head -10
+# Fast version should show much tighter timing
+```
+
+#### Attack Comparison: Benign vs Attack
+
+| Aspect | Benign Traffic v2 | Attack Traffic v2 |
+|--------|------------------|-------------------|
+| Source IPs | 10.10.1.0/24 (500 clients) | 10.10.2.0/24 (200 bots) |
+| Target | 10.10.1.2 (server) | 10.10.1.2 (victim) |
+| Phases | HTTP/DNS/SSH/UDP normal | Scan/Peak/Waves/Spikes |
+| Intensity | 0.5×-1.3× (moderate) | 0.3×-5.0× (extreme) |
+| Protocols | HTTP, DNS, SSH, ICMP, UDP | SYN, UDP flood, HTTP flood, DNS amp, ACK scan |
+| Timing Jitter | 10-80ms (realistic) | 5-200ms (varied by phase) |
+| Realism | Normal network behavior | Mirai botnet behavior |
+| ML Use | Benign class training | Attack class training |
+
+**Recommendation for ML Training:**
+
+1. **Benign baseline**: `generate_benign_traffic_v2.py --speedup 50 --packets 10000000`
+2. **Mixed attack**: `generate_mirai_attacks_v2.py --speedup 50 --attack-type mixed --packets 10000000`
+3. **SYN flood**: `generate_mirai_attacks_v2.py --speedup 50 --attack-type syn --packets 5000000`
+4. **UDP flood**: `generate_mirai_attacks_v2.py --speedup 50 --attack-type udp --packets 5000000`
+5. **HTTP flood**: `generate_mirai_attacks_v2.py --speedup 50 --attack-type http --packets 5000000`
+6. **DNS amplification**: `generate_mirai_attacks_v2.py --speedup 50 --attack-type dns --packets 5000000`
+
+This gives you comprehensive training data with temporal diversity, all collected at high speed (~12Gbps).
+
 ### Step 0.3: NEW - Adaptive Mode (Continuous Realistic Traffic at 12Gbps)
 
 **What is Adaptive Mode?**
@@ -585,71 +838,115 @@ grep "Baseline:" ../ml_system/datasets/raw_logs/benign_baseline_v2_fast.log | he
 # Should show 4 distinct phases in ~6 seconds
 ```
 
-### Step 2: Run Detector to Collect UDP Flood Data
+### Step 2: Run Detector to Collect UDP Flood Data (v2 - Fast Collection)
+
+**Prerequisites:**
+1. ✅ Phase 0.4 complete: Attack PCAPs generated with v2 generator
+
+**Option A: Fast collection (RECOMMENDED, using --speedup 50 PCAPs):**
 
 ```bash
-# Terminal 1 - Monitor node
+# Terminal 1 - Monitor node (start first)
 cd /local/dpdk_100g/mira/detector_system
-sudo timeout 200 ./mira_ddos_detector \
+sudo timeout 30 ./mira_ddos_detector \
     -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/udp_flood.log
+    2>&1 | tee ../ml_system/datasets/raw_logs/udp_flood_v2.log
 
-# Terminal 2 - TG node (wait 5s, then start)
+# Terminal 2 - TG node (wait 5s, then start at max speed)
 cd /local/dpdk_100g/mira/attack_sender
 sleep 5
-sudo timeout 195 ./build/dpdk_pcap_sender \
-    -l 0-7 -n 4 -w 0000:41:00.0 -- ../attack_udp_5M.pcap
+sudo timeout 25 ./build/dpdk_pcap_sender \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../attack_udp_5M_v2_fast.pcap
+# No --pcap-timed needed! Timestamps already compressed → max speed replay
 ```
 
-### Step 3: Run Detector to Collect SYN Flood Data
+**Option B: Realistic temporal replay (slower, ~500Mbps):**
 
 ```bash
 # Terminal 1 - Monitor node
 cd /local/dpdk_100g/mira/detector_system
-sudo timeout 200 ./mira_ddos_detector \
+sudo timeout 320 ./mira_ddos_detector \
     -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/syn_flood.log
+    2>&1 | tee ../ml_system/datasets/raw_logs/udp_flood_v2_temporal.log
+
+# Terminal 2 - TG node (wait 5s, then start with TEMPORAL REPLAY)
+cd /local/dpdk_100g/mira/attack_sender
+sleep 5
+sudo timeout 315 ./dpdk_pcap_sender_v2 \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../attack_udp_5M_v2.pcap --pcap-timed --jitter 10
+```
+
+### Step 3: Run Detector to Collect SYN Flood Data (v2)
+
+```bash
+# Terminal 1 - Monitor node
+cd /local/dpdk_100g/mira/detector_system
+sudo timeout 30 ./mira_ddos_detector \
+    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
+    2>&1 | tee ../ml_system/datasets/raw_logs/syn_flood_v2.log
+
+# Terminal 2 - TG node (use fast PCAP generated with --speedup 50)
+cd /local/dpdk_100g/mira/attack_sender
+sleep 5
+sudo timeout 25 ./build/dpdk_pcap_sender \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../attack_syn_5M_v2_fast.pcap
+```
+
+### Step 4: Run Detector to Collect HTTP Flood Data (v2 - NEW)
+
+```bash
+# Terminal 1 - Monitor node
+cd /local/dpdk_100g/mira/detector_system
+sudo timeout 30 ./mira_ddos_detector \
+    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
+    2>&1 | tee ../ml_system/datasets/raw_logs/http_flood_v2.log
 
 # Terminal 2 - TG node
 cd /local/dpdk_100g/mira/attack_sender
 sleep 5
-sudo timeout 195 ./build/dpdk_pcap_sender \
-    -l 0-7 -n 4 -w 0000:41:00.0 -- ../attack_syn_5M.pcap
+sudo timeout 25 ./build/dpdk_pcap_sender \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../attack_http_5M_v2_fast.pcap
 ```
 
-### Step 4: Run Detector to Collect ICMP Flood Data
+### Step 5: Run Detector to Collect DNS Amplification Data (v2 - NEW)
 
 ```bash
 # Terminal 1 - Monitor node
 cd /local/dpdk_100g/mira/detector_system
-sudo timeout 200 ./mira_ddos_detector \
+sudo timeout 30 ./mira_ddos_detector \
     -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/icmp_flood.log
+    2>&1 | tee ../ml_system/datasets/raw_logs/dns_flood_v2.log
 
 # Terminal 2 - TG node
 cd /local/dpdk_100g/mira/attack_sender
 sleep 5
-sudo timeout 195 ./build/dpdk_pcap_sender \
-    -l 0-7 -n 4 -w 0000:41:00.0 -- ../attack_icmp_5M.pcap
+sudo timeout 25 ./build/dpdk_pcap_sender \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../attack_dns_5M_v2_fast.pcap
 ```
 
-### Step 5: Run Detector to Collect Mixed Attack Data
+### Step 6: Run Detector to Collect Mixed Attack Data (v2)
 
 ```bash
 # Terminal 1 - Monitor node
 cd /local/dpdk_100g/mira/detector_system
-sudo timeout 300 ./mira_ddos_detector \
+sudo timeout 30 ./mira_ddos_detector \
     -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/mixed_attack.log
+    2>&1 | tee ../ml_system/datasets/raw_logs/mixed_attack_v2.log
 
 # Terminal 2 - TG node
 cd /local/dpdk_100g/mira/attack_sender
 sleep 5
-sudo timeout 295 ./build/dpdk_pcap_sender \
-    -l 0-7 -n 4 -w 0000:41:00.0 -- ../attack_mixed_10M.pcap
+sudo timeout 25 ./build/dpdk_pcap_sender \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../attack_mirai_10M_v2_fast.pcap
 ```
 
-### Step 6: Verify Raw Logs Collected
+### Step 7: Verify Raw Logs Collected
 
 ```bash
 cd /local/dpdk_100g/mira/ml_system/datasets/raw_logs
@@ -657,16 +954,30 @@ cd /local/dpdk_100g/mira/ml_system/datasets/raw_logs
 # Check all logs exist
 ls -lh
 
-# Expected files:
-# - benign_baseline.log
-# - udp_flood.log
-# - syn_flood.log
-# - icmp_flood.log
-# - mixed_attack.log
+# Expected files (v2 - fast collection):
+# - benign_baseline_v2.log or benign_baseline_v2_fast.log
+# - udp_flood_v2.log
+# - syn_flood_v2.log
+# - http_flood_v2.log (NEW)
+# - dns_flood_v2.log (NEW)
+# - mixed_attack_v2.log
 
 # Count detection events
-grep -c "ALERT" *.log
+grep -c "ALERT" *_v2.log
+
+# Check temporal phases in benign log (if using --pcap-timed)
+grep "Baseline:" benign_baseline_v2.log | head -50
+
+# Verify attack phases
+grep "Attack:" mixed_attack_v2.log | head -50
 ```
+
+**NEW in v2.0 data collection:**
+- ✅ **6× faster collection**: ~30s per attack type (vs ~200s in v1) using --speedup 50
+- ✅ **More attack types**: Added HTTP flood and DNS amplification
+- ✅ **Temporal diversity**: All phases preserved in compressed timeline
+- ✅ **Better ML training**: More diverse features due to phase variations
+- ✅ **Total collection time**: ~3-4 minutes for all datasets (vs ~15-20 minutes in v1)
 
 ---
 
@@ -684,41 +995,52 @@ cd /local/dpdk_100g/mira/ml_system
 pip3 install --user pandas numpy scikit-learn lightgbm matplotlib seaborn
 ```
 
-### Step 2: Extract Features from All Logs
+### Step 2: Extract Features from All Logs (v2 - Enhanced)
 
 ```bash
 cd /local/dpdk_100g/mira/ml_system/01_data_collection
 
-# Benign traffic
+# Benign traffic (v2 with temporal phases)
 python3 feature_extractor.py \
-    --input ../datasets/raw_logs/benign_baseline.log \
-    --output ../datasets/processed/benign_baseline.csv \
+    --input ../datasets/raw_logs/benign_baseline_v2_fast.log \
+    --output ../datasets/processed/benign_baseline_v2.csv \
     --label benign
 
-# UDP Flood
+# UDP Flood (v2)
 python3 feature_extractor.py \
-    --input ../datasets/raw_logs/udp_flood.log \
-    --output ../datasets/processed/udp_flood.csv \
+    --input ../datasets/raw_logs/udp_flood_v2.log \
+    --output ../datasets/processed/udp_flood_v2.csv \
     --label udp_flood
 
-# SYN Flood
+# SYN Flood (v2)
 python3 feature_extractor.py \
-    --input ../datasets/raw_logs/syn_flood.log \
-    --output ../datasets/processed/syn_flood.csv \
+    --input ../datasets/raw_logs/syn_flood_v2.log \
+    --output ../datasets/processed/syn_flood_v2.csv \
     --label syn_flood
 
-# ICMP Flood
+# HTTP Flood (v2 - NEW)
 python3 feature_extractor.py \
-    --input ../datasets/raw_logs/icmp_flood.log \
-    --output ../datasets/processed/icmp_flood.csv \
-    --label icmp_flood
+    --input ../datasets/raw_logs/http_flood_v2.log \
+    --output ../datasets/processed/http_flood_v2.csv \
+    --label http_flood
 
-# Mixed Attack
+# DNS Amplification (v2 - NEW)
 python3 feature_extractor.py \
-    --input ../datasets/raw_logs/mixed_attack.log \
-    --output ../datasets/processed/mixed_attack.csv \
+    --input ../datasets/raw_logs/dns_flood_v2.log \
+    --output ../datasets/processed/dns_flood_v2.csv \
+    --label dns_flood
+
+# Mixed Attack (v2)
+python3 feature_extractor.py \
+    --input ../datasets/raw_logs/mixed_attack_v2.log \
+    --output ../datasets/processed/mixed_attack_v2.csv \
     --label mixed_attack
 ```
+
+**NEW in v2.0 feature extraction:**
+- ✅ **More attack classes**: 6 classes total (benign + 5 attack types)
+- ✅ **Temporal features**: Captures phase transitions due to v2 generator
+- ✅ **Better diversity**: More varied features due to attack escalation patterns
 
 ### Step 3: Verify Extracted Features
 
