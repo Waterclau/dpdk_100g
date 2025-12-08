@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-MIRA Mirai-Style DDoS Attack Generator v2.0 - ML-Enhanced
+MIRA Mirai-Style DDoS Attack Generator v2.0 - ML-Enhanced (SWITCH-SAFE)
 
 Generates realistic Mirai-style DDoS attacks with temporal attack phases:
 - Escalated attack patterns (warm-up → peak → waves → spikes)
 - Temporal jitter and intensity variations
 - CloudLab internal network IPs (10.10.x.x)
 - Timestamp compression for high-speed replay
-- Multiple attack vectors with realistic signatures
+- SWITCH-SAFE: Only SYN, UDP, and ACK attacks (HTTP/DNS blocked by CloudLab switch)
 
 Key improvements over v1:
 - Attack phases (Warm-up scan, SYN peak, Mixed waves, Random spikes)
@@ -16,6 +16,7 @@ Key improvements over v1:
 - Mirai payload signatures
 - Better for ML training (feature diversity)
 - Timestamp compression (--speedup) for accelerated replay
+- CloudLab virtual switch compatibility (removed bidirectional HTTP/DNS)
 
 Usage:
     python3 generate_mirai_attacks_v2.py --output attack_10M_v2.pcap --packets 10000000 --attack-type mixed
@@ -59,15 +60,17 @@ class AttackPhase:
 
 
 # Define realistic attack phases (simulates escalating DDoS attack)
+# SWITCH-SAFE VERSION: HTTP and DNS removed (blocked by CloudLab virtual switch)
+# Safe protocols: SYN (unidirectional), UDP (unidirectional), ACK scans
 ATTACK_PHASES = [
     # Phase 1: Warm-up Scan (10% of time) - Reconnaissance
     AttackPhase(
         name="Warm-up Scan",
         duration_pct=10,
         syn_weight=30,    # 30% SYN scans
-        udp_weight=10,    # 10% UDP probes
-        http_weight=5,    # 5% HTTP probes
-        dns_weight=5,     # 5% DNS queries
+        udp_weight=20,    # 20% UDP probes (increased from 10)
+        http_weight=0,    # 0% HTTP (BLOCKED BY SWITCH)
+        dns_weight=0,     # 0% DNS (BLOCKED BY SWITCH)
         ack_weight=50,    # 50% ACK scans (reconnaissance)
         intensity_multiplier=0.3,  # Low intensity
         jitter_ms=200     # High jitter (slow probing)
@@ -78,9 +81,9 @@ ATTACK_PHASES = [
         name="SYN Flood Peak",
         duration_pct=40,
         syn_weight=70,    # 70% SYN flood (main attack)
-        udp_weight=20,    # 20% UDP flood
-        http_weight=5,    # 5% HTTP flood
-        dns_weight=3,     # 3% DNS flood
+        udp_weight=28,    # 28% UDP flood (increased from 20)
+        http_weight=0,    # 0% HTTP (BLOCKED BY SWITCH)
+        dns_weight=0,     # 0% DNS (BLOCKED BY SWITCH)
         ack_weight=2,     # 2% ACK scans
         intensity_multiplier=5.0,  # Maximum intensity
         jitter_ms=5       # Low jitter (sustained blast)
@@ -90,10 +93,10 @@ ATTACK_PHASES = [
     AttackPhase(
         name="Mixed Bot Waves",
         duration_pct=30,
-        syn_weight=35,    # 35% SYN
-        udp_weight=35,    # 35% UDP
-        http_weight=15,   # 15% HTTP
-        dns_weight=10,    # 10% DNS amplification
+        syn_weight=50,    # 50% SYN (increased from 35)
+        udp_weight=45,    # 45% UDP (increased from 35)
+        http_weight=0,    # 0% HTTP (BLOCKED BY SWITCH)
+        dns_weight=0,     # 0% DNS (BLOCKED BY SWITCH)
         ack_weight=5,     # 5% ACK
         intensity_multiplier=3.0,  # High intensity
         jitter_ms=50      # Moderate jitter (wave patterns)
@@ -103,10 +106,10 @@ ATTACK_PHASES = [
     AttackPhase(
         name="Random Spikes",
         duration_pct=20,
-        syn_weight=40,    # 40% SYN
-        udp_weight=30,    # 30% UDP
-        http_weight=10,   # 10% HTTP
-        dns_weight=10,    # 10% DNS
+        syn_weight=50,    # 50% SYN (increased from 40)
+        udp_weight=40,    # 40% UDP (increased from 30)
+        http_weight=0,    # 0% HTTP (BLOCKED BY SWITCH)
+        dns_weight=0,     # 0% DNS (BLOCKED BY SWITCH)
         ack_weight=10,    # 10% ACK
         intensity_multiplier=2.0,  # Medium-high intensity
         jitter_ms=150     # High jitter (unpredictable timing)
