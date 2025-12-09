@@ -40,6 +40,7 @@
 #define BURST_SIZE 256
 #define MAX_PCAP_PACKETS 10000000
 #define MAX_PCAP_FILES 1024
+#define MAX_PKT_LEN 4096
 
 /* Target transmission rate for non-timed mode */
 #define TARGET_GBPS 12.0
@@ -159,7 +160,7 @@ enum attack_type {
 };
 
 struct packet_data {
-    uint8_t data[2048];
+    uint8_t data[MAX_PKT_LEN];
     uint16_t len;
     struct timeval timestamp;      /* NEW: Store original PCAP timestamp */
     enum packet_protocol protocol; /* NEW: Protocol classification */
@@ -917,6 +918,13 @@ static int load_pcap(const char *filename)
     pcap_close(pcap);
     printf("Loaded %u packets from PCAP\n", num_pcap_packets);
 
+    /* NEW: Skip classification in multi-PCAP mode (just replay as-is) */
+    if (multi_pcap_mode) {
+        printf("\n[MULTI-PCAP MODE] Skipping packet classification - direct replay mode\n");
+        printf("  All packets will be sent sequentially as they appear in the PCAP\n\n");
+        return 0;
+    }
+
     /* NEW: Build protocol-classified indexes for adaptive mode */
     if (adaptive_cfg.enabled) {
         printf("Classifying packets by protocol for adaptive mode...\n");
@@ -1489,6 +1497,159 @@ static void send_loop_adaptive(void)
     printf("Phases completed:    %u cycles\n", current_phase / adaptive_cfg.num_phases);
 }
 
+/* NEW: Multi-PCAP sequential sending loop (no classification, direct replay) */
+static void send_loop_multi_pcap(void)
+{
+    struct rte_mbuf *pkts[BURST_SIZE];
+    uint16_t nb_tx;
+    uint32_t i;
+    uint64_t hz = rte_get_tsc_hz();
+    uint64_t last_stats_tsc = 0;
+
+    printf("\n╔══════════════════════════════════════════════════════════════════╗\n");
+    printf("║         DPDK PCAP SENDER v2.0 - MULTI-PCAP REPLAY MODE          ║\n");
+    printf("╚══════════════════════════════════════════════════════════════════╝\n\n");
+    printf("📁 Multi-PCAP Mode: ENABLED (%u files in queue)\n", num_pcap_files);
+    printf("🔁 Loop Mode: INFINITE (will cycle through all PCAP files continuously)\n");
+    printf("🎯 Target rate: %.1f Gbps\n", attack_cfg.target_gbps);
+    printf("📦 Direct Replay: NO packet classification, sequential transmission\n");
+    printf("🛑 Press Ctrl+C to stop\n\n");
+
+    /* Rate limiting variables */
+    const uint64_t target_bytes_per_sec = (uint64_t)(attack_cfg.target_gbps * 1e9 / 8.0);
+    uint64_t bytes_sent_in_window = 0;
+    uint64_t window_start_tsc = 0;
+
+    start_tsc = rte_rdtsc();
+    last_stats_tsc = start_tsc;
+    window_start_tsc = start_tsc;
+    last_window_tsc = start_tsc;
+    last_window_packets = 0;
+    last_window_bytes = 0;
+
+    while (!force_quit) {
+        uint64_t cur_tsc = rte_rdtsc();
+
+        /* Multi-PCAP mode - Check if we need to load next file */
+        if (current_packet_idx >= num_pcap_packets) {
+            printf("\n[MULTI-PCAP] Finished PCAP [%u/%u]: %s\n",
+                   current_pcap_file_idx + 1, num_pcap_files,
+                   basename(pcap_file_list[current_pcap_file_idx]));
+
+            /* Move to next PCAP file */
+            current_pcap_file_idx = (current_pcap_file_idx + 1) % num_pcap_files;
+
+            printf("[MULTI-PCAP] Loading next PCAP [%u/%u]: %s\n",
+                   current_pcap_file_idx + 1, num_pcap_files,
+                   basename(pcap_file_list[current_pcap_file_idx]));
+
+            /* Free current PCAP data */
+            free_current_pcap_data();
+
+            /* Load next PCAP */
+            if (load_pcap(pcap_file_list[current_pcap_file_idx]) != 0) {
+                printf("Error: Failed to load next PCAP file, stopping\n");
+                break;
+            }
+
+            printf("[MULTI-PCAP] Successfully loaded %u packets\n\n", num_pcap_packets);
+        }
+
+        /* Allocate fresh mbufs */
+        if (rte_pktmbuf_alloc_bulk(mbuf_pool, pkts, BURST_SIZE) != 0) {
+            rte_delay_us_block(100);
+            continue;
+        }
+
+        /* Fill mbufs with PCAP data (sequential, no classification) */
+        for (i = 0; i < BURST_SIZE; i++) {
+            struct packet_data *pkt_data = &pcap_packets[current_packet_idx];
+
+            char *pkt_buf = rte_pktmbuf_mtod(pkts[i], char *);
+            rte_memcpy(pkt_buf, pkt_data->data, pkt_data->len);
+            pkts[i]->data_len = pkt_data->len;
+            pkts[i]->pkt_len = pkt_data->len;
+
+            current_packet_idx++;
+            if (current_packet_idx >= num_pcap_packets)
+                break;  // Will load next file on next iteration
+        }
+
+        /* Adjust burst size if we hit end of file */
+        uint32_t actual_burst = (i < BURST_SIZE) ? i : BURST_SIZE;
+
+        /* Send burst */
+        nb_tx = rte_eth_tx_burst(port_id, 0, pkts, actual_burst);
+        total_packets_sent += nb_tx;
+
+        /* Track bytes for rate limiting */
+        for (i = 0; i < nb_tx; i++) {
+            bytes_sent_in_window += pkts[i]->pkt_len;
+            total_bytes_sent += pkts[i]->pkt_len;
+        }
+
+        /* Free unsent packets */
+        if (unlikely(nb_tx < actual_burst)) {
+            for (i = nb_tx; i < actual_burst; i++)
+                rte_pktmbuf_free(pkts[i]);
+        }
+
+        /* Rate limiting */
+        double elapsed_sec = (double)(cur_tsc - window_start_tsc) / hz;
+
+        if (elapsed_sec >= 1.0) {
+            /* Reset window every second */
+            bytes_sent_in_window = 0;
+            window_start_tsc = cur_tsc;
+        } else if (bytes_sent_in_window > (uint64_t)(target_bytes_per_sec * elapsed_sec)) {
+            /* Too fast, calculate sleep time */
+            double bytes_expected = target_bytes_per_sec * elapsed_sec;
+            double bytes_over = bytes_sent_in_window - bytes_expected;
+            uint64_t sleep_ns = (uint64_t)((bytes_over * 8.0 * 1e9) / (attack_cfg.target_gbps * 1e9));
+
+            if (sleep_ns > 0 && sleep_ns < 100000) {
+                rte_delay_us_block(sleep_ns / 1000);
+            }
+        }
+
+        /* Print statistics every 5 seconds */
+        if (cur_tsc - last_stats_tsc >= hz * 5) {
+            double elapsed = (double)(cur_tsc - start_tsc) / hz;
+            double gbps_cumulative = (total_bytes_sent * 8.0) / (elapsed * 1e9);
+            double mpps_cumulative = (total_packets_sent / elapsed) / 1e6;
+
+            double window_duration = (double)(cur_tsc - last_window_tsc) / hz;
+            uint64_t window_packets = total_packets_sent - last_window_packets;
+            uint64_t window_bytes = total_bytes_sent - last_window_bytes;
+            double gbps_instant = (window_bytes * 8.0) / (window_duration * 1e9);
+
+            printf("[%.1fs] PCAP [%u/%u] | %lu pkts (%.2f Mpps) | Avg: %.2f Gbps | Inst: %.2f Gbps\n",
+                   elapsed, current_pcap_file_idx + 1, num_pcap_files,
+                   total_packets_sent, mpps_cumulative, gbps_cumulative, gbps_instant);
+
+            last_window_packets = total_packets_sent;
+            last_window_bytes = total_bytes_sent;
+            last_window_tsc = cur_tsc;
+            last_stats_tsc = cur_tsc;
+        }
+    }
+
+    printf("\n╔══════════════════════════════════════════════════════════════════╗\n");
+    printf("║                MULTI-PCAP REPLAY COMPLETE - FINAL STATS         ║\n");
+    printf("╚══════════════════════════════════════════════════════════════════╝\n\n");
+
+    double elapsed = (double)(rte_rdtsc() - start_tsc) / hz;
+    double gbps = (total_bytes_sent * 8.0) / (elapsed * 1e9);
+    double mpps = (total_packets_sent / elapsed) / 1e6;
+
+    printf("Total packets sent:  %lu\n", total_packets_sent);
+    printf("Total bytes sent:    %lu\n", total_bytes_sent);
+    printf("Duration:            %.2f seconds\n", elapsed);
+    printf("Average throughput:  %.2f Gbps\n", gbps);
+    printf("Average pps:         %.2f Mpps\n", mpps);
+    printf("\n🛑 Multi-PCAP replay terminated.\n");
+}
+
 /* NEW: Adaptive ATTACK mode - High-speed continuous attack with phase-based distribution */
 static void send_loop_adaptive_attack(void)
 {
@@ -1801,6 +1962,11 @@ static void print_usage(const char *prgname)
     printf("  <pcap_file>               Single PCAP file to replay\n");
     printf("  --pcap-dir <directory>    🔁 Directory with multiple PCAP files (automatic loop)\n");
     printf("                            Default: %s\n", DEFAULT_PCAP_DIR);
+    printf("                            ⚠️  In multi-PCAP mode:\n");
+    printf("                            - Adaptive/attack phases are DISABLED\n");
+    printf("                            - NO packet classification (SYN/UDP/HTTP)\n");
+    printf("                            - Direct sequential replay only\n");
+    printf("                            - Infinite loop through all files\n");
     printf("\n");
     printf("MODES:\n");
     printf("  --pcap-timed              Replay PCAP respecting timestamps (temporal phases)\n");
@@ -1838,10 +2004,11 @@ static void print_usage(const char *prgname)
     printf("  %s -l 0-7 -- attack_mirai_10M_v2.pcap --adaptive-attack --rate-gbps 10 --loop\n\n", prgname);
     printf("  # 🔥 ATTACK MODE: DDoS with custom phases, jitter, 300s duration:\n");
     printf("  %s -l 0-7 -- attack.pcap --adaptive-attack --attack-phases phases_attack.json --jitter 15 --duration 300\n\n", prgname);
-    printf("  # 🔥🔁 MULTI-PCAP ATTACK MODE: Auto-load all PCAPs from directory (infinite loop):\n");
-    printf("  %s -l 0-7 -- --pcap-dir /proj/softmeasure-PG0/CICD/remapped/ --adaptive-attack --rate-gbps 10\n\n", prgname);
-    printf("  # 🔥🔁 MULTI-PCAP ATTACK MODE: Use default directory:\n");
-    printf("  %s -l 0-7 -- --pcap-dir --adaptive-attack --rate-gbps 12 --jitter 10\n\n", prgname);
+    printf("  # 🔥🔁 MULTI-PCAP MODE: Auto-load all PCAPs from directory (infinite loop, direct replay):\n");
+    printf("  %s -l 0-7 -- --pcap-dir /proj/softmeasure-PG0/CICD/remapped/ --rate-gbps 10\n\n", prgname);
+    printf("  # 🔥🔁 MULTI-PCAP MODE: Use default directory with 12 Gbps:\n");
+    printf("  %s -l 0-7 -- --pcap-dir --rate-gbps 12\n\n", prgname);
+    printf("  # Note: --adaptive-attack and --attack-phases are IGNORED in multi-PCAP mode\n\n");
     printf("\nPHASE FILE FORMAT (BENIGN - JSON):\n");
     printf("  [{\"duration\": 30, \"http\": 0.60, \"dns\": 0.20, \"ssh\": 0.10, \"udp\": 0.10},\n");
     printf("   {\"duration\": 15, \"http\": 0.30, \"dns\": 0.50, \"ssh\": 0.10, \"udp\": 0.10}]\n");
@@ -1974,8 +2141,17 @@ int main(int argc, char *argv[])
         }
     }
 
-    /* Load or create phases for adaptive mode */
-    if (adaptive_cfg.enabled) {
+    /* NEW: Override adaptive/attack modes if multi-PCAP is enabled */
+    if (pcap_dir && (adaptive_cfg.enabled || attack_cfg.enabled)) {
+        printf("\n⚠️  WARNING: Multi-PCAP mode detected!\n");
+        printf("    --adaptive and --adaptive-attack flags will be IGNORED\n");
+        printf("    Multi-PCAP mode uses direct sequential replay (no packet classification)\n\n");
+        adaptive_cfg.enabled = 0;
+        attack_cfg.enabled = 0;
+    }
+
+    /* Load or create phases for adaptive mode (only if NOT multi-PCAP) */
+    if (adaptive_cfg.enabled && !pcap_dir) {
         if (phases_file) {
             if (parse_phases_file(phases_file) != 0) {
                 printf("Error: Failed to parse phases file, using defaults\n");
@@ -1986,8 +2162,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    /* NEW: Load or create attack phases for adaptive-attack mode */
-    if (attack_cfg.enabled) {
+    /* NEW: Load or create attack phases for adaptive-attack mode (only if NOT multi-PCAP) */
+    if (attack_cfg.enabled && !pcap_dir) {
         if (attack_phases_file) {
             if (parse_attack_phases_file(attack_phases_file) != 0) {
                 printf("Error: Failed to parse attack phases file, using defaults\n");
@@ -2010,8 +2186,9 @@ int main(int argc, char *argv[])
     if (rte_eth_dev_count_avail() == 0)
         rte_exit(EXIT_FAILURE, "No Ethernet ports available\n");
 
+    /* NEW: Use larger mbuf size (4096) to avoid "packet too large" warnings */
     mbuf_pool = rte_pktmbuf_pool_create("MBUF_POOL", NUM_MBUFS,
-        MBUF_CACHE_SIZE, 0, RTE_MBUF_DEFAULT_BUF_SIZE, rte_socket_id());
+        MBUF_CACHE_SIZE, 0, MAX_PKT_LEN + RTE_PKTMBUF_HEADROOM, rte_socket_id());
 
     if (mbuf_pool == NULL)
         rte_exit(EXIT_FAILURE, "Cannot create mbuf pool\n");
@@ -2048,7 +2225,21 @@ int main(int argc, char *argv[])
     }
 
     /* NEW: Choose sending loop based on configuration */
-    if (attack_cfg.enabled) {
+    if (multi_pcap_mode) {
+        /* NEW: Multi-PCAP mode - Sequential direct replay (no classification) */
+        printf("\n╔═══════════════════════════════════════════════════════════════════╗\n");
+        printf("║          🔁🔁🔁 LAUNCHING MULTI-PCAP REPLAY MODE 🔁🔁🔁         ║\n");
+        printf("╚═══════════════════════════════════════════════════════════════════╝\n\n");
+        printf("⚠️  WARNING: Attack traffic will be generated from multiple PCAPs\n");
+        printf("⚠️  CRITICAL: Use ONLY CloudLab INTERNAL network!\n");
+        printf("    ✅ ALLOWED:  10.10.1.x (benign) and 10.10.2.x (attack)\n");
+        printf("    ✅ NIC:      ens1f0 (PCI 0000:41:00.0)\n");
+        printf("    ❌ FORBIDDEN: 192.168.x.x (control network - experiment will be TERMINATED!)\n");
+        printf("    ❌ FORBIDDEN: eno33 (control interface)\n");
+        printf("⚠️  Mode: Direct sequential replay (NO adaptive phases)\n");
+        printf("⚠️  Press Ctrl+C to stop\n\n");
+        send_loop_multi_pcap();
+    } else if (attack_cfg.enabled) {
         /* NEW: Adaptive-attack mode with phase-based DDoS attack distribution */
         printf("\n╔═══════════════════════════════════════════════════════════════════╗\n");
         printf("║          🔥🔥🔥 LAUNCHING ADAPTIVE ATTACK MODE 🔥🔥🔥            ║\n");
