@@ -1,0 +1,67 @@
+sudo python3 generate_benign_traffic_v2.py \
+    --output ../benign_10M.pcap \
+    --packets 10000000 \
+    --speedup 50 \
+    --src-mac 00:00:00:00:00:01 \
+    --dst-mac 0c:42:a1:dd:5b:28 \
+    --client-range 10.10.1.0/24 \
+    --server-ip 10.0.0.1 \
+    --clients 500
+
+  python3 generate_benign_traffic_v2.py \
+      --output ../benign_10M_cloudlab.pcap \
+      --packets 10000000 \
+      --client-range 10.10.1.0/24 \
+      --server-ip 10.10.1.2
+
+
+sudo ./dpdk_pcap_sender_v2 \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../benign_10k_fast.pcap --pcap-timed --jitter 10
+
+sudo ./dpdk_pcap_sender_v2 \
+      -l 0-7 -n 4 -w 0000:41:00.0 \
+      -- ../benign_10k_fast.pcap --adaptive --rate-gbps 10 --jitter 15 --loop
+
+
+# Test 1: Modo adaptive con fases por defecto
+  sudo ./dpdk_pcap_sender_v2 \
+      -l 0-7 -n 4 -w 0000:41:00.0 \
+      -- ../benign_10k_fast.pcap --adaptive --loop
+
+  # Test 2: Modo adaptive con archivo de fases
+  sudo ./dpdk_pcap_sender_v2 \
+      -l 0-7 -n 4 -w 0000:41:00.0 \
+      -- ../benign_10k_fast.pcap --adaptive --phases phases_example.json --duration 300
+
+  # Test 3: Modo adaptive a 10Gbps con jitter
+  sudo ./dpdk_pcap_sender_v2 \
+      -l 0-7 -n 4 -w 0000:41:00.0 \
+      -- ../benign_10M_v2.pcap --adaptive --rate-gbps 10 --jitter 15 --loop
+
+sudo python3 generate_mirai_attacks_v2.py \
+    --output ../attack_mirai_10M_v2.pcap \
+    --packets 10000000 \
+    --attack-type mixed \
+    --speedup 50 \
+    --intensity 1.5 \
+    --attacker-range 10.10.2.0/24 \
+    --target-ip 10.10.1.2
+
+sudo python3 generate_mirai_attacks_v2.py \
+    --output /proj/softmeasure-PG0/attack_mira_10M_v2.pcap \
+    --packets 10000 \
+    --attack-type mixed \
+    --speedup 50 \
+    --intensity 1.5 \
+    --attacker-range 10.10.2.0/24 \
+    --target-ip 10.10.1.2
+sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- /share/attack_mira_test.pcap --adaptive --phases phases_attack.json
+ sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- /proj/softmeasure-PG0/attack_mira_test.pcap --adaptive --phases phases_attack.json
+
+
+sudo ./dpdk_pcap_sender_v2 \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../attack_mirai_10k_v2.pcap --adaptive --phases phases_attack.json

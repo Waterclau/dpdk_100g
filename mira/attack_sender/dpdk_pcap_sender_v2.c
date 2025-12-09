@@ -24,6 +24,8 @@
 #include <time.h>
 #include <sys/stat.h>
 #include <ctype.h>
+#include <dirent.h>
+#include <libgen.h>
 
 #include <rte_eal.h>
 #include <rte_ethdev.h>
@@ -37,9 +39,13 @@
 #define MBUF_CACHE_SIZE 512
 #define BURST_SIZE 256
 #define MAX_PCAP_PACKETS 10000000
+#define MAX_PCAP_FILES 1024
 
 /* Target transmission rate for non-timed mode */
 #define TARGET_GBPS 12.0
+
+/* NEW: Multi-PCAP directory replay */
+#define DEFAULT_PCAP_DIR "/proj/softmeasure-PG0/CICD/remapped/"
 
 static volatile uint8_t force_quit = 0;
 static uint16_t port_id = 0;
@@ -163,6 +169,12 @@ struct packet_data {
 static struct packet_data *pcap_packets = NULL;
 static uint32_t num_pcap_packets = 0;
 static uint32_t current_packet_idx = 0;
+
+/* NEW: Multi-PCAP file management */
+static char **pcap_file_list = NULL;
+static uint32_t num_pcap_files = 0;
+static uint32_t current_pcap_file_idx = 0;
+static uint8_t multi_pcap_mode = 0;
 
 /* NEW: Protocol-classified packet pools for adaptive mode */
 static uint32_t *http_packets = NULL;   // Indices of HTTP packets
@@ -667,6 +679,136 @@ static void create_default_attack_phases(void)
                p->syn_pct*100, p->udp_pct*100, p->http_pct*100, p->dns_pct*100, p->icmp_pct*100);
     }
     printf("\n");
+}
+
+/* NEW: Scan directory for .pcap files */
+static int scan_pcap_directory(const char *dir_path)
+{
+    DIR *dir;
+    struct dirent *entry;
+    struct stat file_stat;
+    char full_path[1024];
+
+    printf("\n[MULTI-PCAP] Scanning directory: %s\n", dir_path);
+
+    dir = opendir(dir_path);
+    if (!dir) {
+        printf("Error: Cannot open directory: %s\n", dir_path);
+        return -1;
+    }
+
+    /* Allocate file list */
+    pcap_file_list = malloc(MAX_PCAP_FILES * sizeof(char *));
+    if (!pcap_file_list) {
+        printf("Error: Failed to allocate memory for file list\n");
+        closedir(dir);
+        return -1;
+    }
+
+    num_pcap_files = 0;
+
+    /* Scan directory for .pcap files */
+    while ((entry = readdir(dir)) != NULL && num_pcap_files < MAX_PCAP_FILES) {
+        /* Check if file ends with .pcap */
+        size_t name_len = strlen(entry->d_name);
+        if (name_len < 5 || strcmp(entry->d_name + name_len - 5, ".pcap") != 0)
+            continue;
+
+        /* Build full path */
+        snprintf(full_path, sizeof(full_path), "%s/%s", dir_path, entry->d_name);
+
+        /* Check if it's a regular file */
+        if (stat(full_path, &file_stat) == 0 && S_ISREG(file_stat.st_mode)) {
+            /* Allocate and store file path */
+            pcap_file_list[num_pcap_files] = malloc(strlen(full_path) + 1);
+            if (!pcap_file_list[num_pcap_files]) {
+                printf("Error: Failed to allocate memory for file path\n");
+                continue;
+            }
+            strcpy(pcap_file_list[num_pcap_files], full_path);
+            num_pcap_files++;
+        }
+    }
+
+    closedir(dir);
+
+    if (num_pcap_files == 0) {
+        printf("Error: No .pcap files found in directory: %s\n", dir_path);
+        free(pcap_file_list);
+        pcap_file_list = NULL;
+        return -1;
+    }
+
+    printf("[MULTI-PCAP] Found %u PCAP files:\n", num_pcap_files);
+    for (uint32_t i = 0; i < num_pcap_files; i++) {
+        printf("  [%u] %s\n", i + 1, basename(pcap_file_list[i]));
+    }
+    printf("\n");
+
+    multi_pcap_mode = 1;
+    return 0;
+}
+
+/* NEW: Free PCAP data and prepare for next file */
+static void free_current_pcap_data(void)
+{
+    if (pcap_packets) {
+        free(pcap_packets);
+        pcap_packets = NULL;
+    }
+
+    /* Free protocol classification arrays */
+    if (http_packets) {
+        free(http_packets);
+        http_packets = NULL;
+    }
+    if (dns_packets) {
+        free(dns_packets);
+        dns_packets = NULL;
+    }
+    if (ssh_packets) {
+        free(ssh_packets);
+        ssh_packets = NULL;
+    }
+    if (udp_packets) {
+        free(udp_packets);
+        udp_packets = NULL;
+    }
+
+    /* Free attack classification arrays */
+    if (syn_attack_packets) {
+        free(syn_attack_packets);
+        syn_attack_packets = NULL;
+    }
+    if (udp_attack_packets) {
+        free(udp_attack_packets);
+        udp_attack_packets = NULL;
+    }
+    if (http_attack_packets) {
+        free(http_attack_packets);
+        http_attack_packets = NULL;
+    }
+    if (dns_attack_packets) {
+        free(dns_attack_packets);
+        dns_attack_packets = NULL;
+    }
+    if (icmp_attack_packets) {
+        free(icmp_attack_packets);
+        icmp_attack_packets = NULL;
+    }
+
+    /* Reset counters */
+    num_pcap_packets = 0;
+    current_packet_idx = 0;
+    num_http = 0;
+    num_dns = 0;
+    num_ssh = 0;
+    num_udp = 0;
+    num_syn_attack = 0;
+    num_udp_attack = 0;
+    num_http_attack = 0;
+    num_dns_attack = 0;
+    num_icmp_attack = 0;
 }
 
 /* Port initialization */
@@ -1360,6 +1502,13 @@ static void send_loop_adaptive_attack(void)
     printf("║      DPDK PCAP SENDER v2.0 - ADAPTIVE ATTACK REPLAY MODE        ║\n");
     printf("╚══════════════════════════════════════════════════════════════════╝\n\n");
     printf("⚡ Attack Mode: ENABLED\n");
+
+    /* NEW: Show multi-PCAP mode status */
+    if (multi_pcap_mode) {
+        printf("📁 Multi-PCAP Mode: ENABLED (%u files in queue)\n", num_pcap_files);
+        printf("🔁 Loop Mode: INFINITE (will cycle through all PCAP files continuously)\n");
+    }
+
     printf("🎯 Target rate: %.1f Gbps  |  Jitter: ±%.1f%%  |  Loop: %s\n",
            attack_cfg.target_gbps, attack_cfg.jitter_pct,
            attack_cfg.loop_mode ? "YES (infinite)" : "NO");
@@ -1417,6 +1566,39 @@ static void send_loop_adaptive_attack(void)
 
     while (!force_quit) {
         uint64_t cur_tsc = rte_rdtsc();
+
+        /* NEW: Multi-PCAP mode - Check if we need to load next file */
+        if (multi_pcap_mode && current_packet_idx >= num_pcap_packets) {
+            printf("\n[MULTI-PCAP] Finished PCAP [%u/%u]: %s\n",
+                   current_pcap_file_idx + 1, num_pcap_files,
+                   basename(pcap_file_list[current_pcap_file_idx]));
+
+            /* Move to next PCAP file */
+            current_pcap_file_idx = (current_pcap_file_idx + 1) % num_pcap_files;
+
+            printf("[MULTI-PCAP] Loading next PCAP [%u/%u]: %s\n",
+                   current_pcap_file_idx + 1, num_pcap_files,
+                   basename(pcap_file_list[current_pcap_file_idx]));
+
+            /* Free current PCAP data */
+            free_current_pcap_data();
+
+            /* Load next PCAP */
+            if (load_pcap(pcap_file_list[current_pcap_file_idx]) != 0) {
+                printf("Error: Failed to load next PCAP file, stopping attack\n");
+                break;
+            }
+
+            printf("[MULTI-PCAP] Successfully loaded %u packets\n\n", num_pcap_packets);
+
+            /* Check if we have attack packets */
+            if (num_syn_attack == 0 && num_udp_attack == 0 && num_http_attack == 0 &&
+                num_dns_attack == 0 && num_icmp_attack == 0) {
+                printf("Warning: No classified attack packets in this PCAP, skipping...\n");
+                current_packet_idx = num_pcap_packets;  // Force skip to next file
+                continue;
+            }
+        }
 
         // Check total duration limit
         if (attack_cfg.duration_sec > 0 &&
@@ -1614,7 +1796,12 @@ static void send_loop_adaptive_attack(void)
 /* NEW: Print usage with new options */
 static void print_usage(const char *prgname)
 {
-    printf("\nUsage: %s [EAL options] -- <pcap_file> [OPTIONS]\n\n", prgname);
+    printf("\nUsage: %s [EAL options] -- <pcap_file|--pcap-dir <directory>> [OPTIONS]\n\n", prgname);
+    printf("INPUT OPTIONS:\n");
+    printf("  <pcap_file>               Single PCAP file to replay\n");
+    printf("  --pcap-dir <directory>    🔁 Directory with multiple PCAP files (automatic loop)\n");
+    printf("                            Default: %s\n", DEFAULT_PCAP_DIR);
+    printf("\n");
     printf("MODES:\n");
     printf("  --pcap-timed              Replay PCAP respecting timestamps (temporal phases)\n");
     printf("  --adaptive                Adaptive high-speed replay with phase-based protocol mix (BENIGN)\n");
@@ -1647,10 +1834,14 @@ static void print_usage(const char *prgname)
     printf("  %s -l 0-7 -- benign_10M_v2.pcap --adaptive --loop\n\n", prgname);
     printf("  # Adaptive mode with custom phases and 10Gbps:\n");
     printf("  %s -l 0-7 -- benign.pcap --adaptive --rate-gbps 10 --phases custom.json --duration 300\n\n", prgname);
-    printf("  # 🔥 ATTACK MODE: Continuous DDoS attack at 10Gbps (infinite loop):\n");
+    printf("  # 🔥 ATTACK MODE: Single PCAP at 10Gbps (infinite loop):\n");
     printf("  %s -l 0-7 -- attack_mirai_10M_v2.pcap --adaptive-attack --rate-gbps 10 --loop\n\n", prgname);
     printf("  # 🔥 ATTACK MODE: DDoS with custom phases, jitter, 300s duration:\n");
     printf("  %s -l 0-7 -- attack.pcap --adaptive-attack --attack-phases phases_attack.json --jitter 15 --duration 300\n\n", prgname);
+    printf("  # 🔥🔁 MULTI-PCAP ATTACK MODE: Auto-load all PCAPs from directory (infinite loop):\n");
+    printf("  %s -l 0-7 -- --pcap-dir /proj/softmeasure-PG0/CICD/remapped/ --adaptive-attack --rate-gbps 10\n\n", prgname);
+    printf("  # 🔥🔁 MULTI-PCAP ATTACK MODE: Use default directory:\n");
+    printf("  %s -l 0-7 -- --pcap-dir --adaptive-attack --rate-gbps 12 --jitter 10\n\n", prgname);
     printf("\nPHASE FILE FORMAT (BENIGN - JSON):\n");
     printf("  [{\"duration\": 30, \"http\": 0.60, \"dns\": 0.20, \"ssh\": 0.10, \"udp\": 0.10},\n");
     printf("   {\"duration\": 15, \"http\": 0.30, \"dns\": 0.50, \"ssh\": 0.10, \"udp\": 0.10}]\n");
@@ -1666,6 +1857,7 @@ int main(int argc, char *argv[])
 {
     int ret;
     char *pcap_file = NULL;
+    char *pcap_dir = NULL;
     int opt;
     int option_index;
     char *phases_file = NULL;
@@ -1674,6 +1866,7 @@ int main(int argc, char *argv[])
 
     /* NEW: Long options for temporal replay, adaptive mode, and adaptive-attack mode */
     static struct option long_options[] = {
+        {"pcap-dir", optional_argument, NULL, 'D'},
         {"pcap-timed", no_argument, NULL, 't'},
         {"adaptive", no_argument, NULL, 'a'},
         {"adaptive-attack", no_argument, NULL, 'A'},
@@ -1696,17 +1889,19 @@ int main(int argc, char *argv[])
     argc -= ret;
     argv += ret;
 
-    if (argc < 2) {
-        print_usage(argv[0]);
-        return -1;
-    }
-
-    pcap_file = argv[1];
-
     /* Parse application arguments (after --) */
-    optind = 2;  // Start after pcap_file
-    while ((opt = getopt_long(argc, argv, "taAj:ps:r:f:F:ld:h", long_options, &option_index)) != -1) {
+    optind = 1;
+    while ((opt = getopt_long(argc, argv, "D::taAj:ps:r:f:F:ld:h", long_options, &option_index)) != -1) {
         switch (opt) {
+        case 'D':
+            /* --pcap-dir option */
+            if (optarg) {
+                pcap_dir = optarg;
+            } else {
+                pcap_dir = (char *)DEFAULT_PCAP_DIR;
+            }
+            printf("[CONFIG] PCAP directory mode: %s\n", pcap_dir);
+            break;
         case 't':
             replay_cfg.pcap_timed = 1;
             printf("[CONFIG] Timed replay enabled\n");
@@ -1824,8 +2019,33 @@ int main(int argc, char *argv[])
     if (port_init(port_id, mbuf_pool) != 0)
         rte_exit(EXIT_FAILURE, "Cannot init port %u\n", port_id);
 
-    if (load_pcap(pcap_file) != 0)
-        rte_exit(EXIT_FAILURE, "Failed to load PCAP file\n");
+    /* NEW: Handle multi-PCAP directory mode or single file mode */
+    if (pcap_dir) {
+        /* Multi-PCAP mode: scan directory and load all .pcap files */
+        if (scan_pcap_directory(pcap_dir) != 0)
+            rte_exit(EXIT_FAILURE, "Failed to scan PCAP directory\n");
+
+        /* Load first PCAP file from the list */
+        printf("[MULTI-PCAP] Loading first PCAP: %s\n", pcap_file_list[0]);
+        if (load_pcap(pcap_file_list[0]) != 0)
+            rte_exit(EXIT_FAILURE, "Failed to load first PCAP file\n");
+    } else {
+        /* Single PCAP mode: check if pcap_file was provided */
+        if (!pcap_file) {
+            /* No file and no directory specified, check if there's a positional argument */
+            if (optind < argc) {
+                pcap_file = argv[optind];
+            } else {
+                printf("Error: No PCAP file or directory specified\n");
+                print_usage(argv[0]);
+                return -1;
+            }
+        }
+
+        printf("[SINGLE-PCAP] Loading: %s\n", pcap_file);
+        if (load_pcap(pcap_file) != 0)
+            rte_exit(EXIT_FAILURE, "Failed to load PCAP file\n");
+    }
 
     /* NEW: Choose sending loop based on configuration */
     if (attack_cfg.enabled) {
@@ -1875,6 +2095,16 @@ int main(int argc, char *argv[])
     if (http_attack_packets) free(http_attack_packets);
     if (dns_attack_packets) free(dns_attack_packets);
     if (icmp_attack_packets) free(icmp_attack_packets);
+
+    /* NEW: Cleanup multi-PCAP file list */
+    if (pcap_file_list) {
+        printf("Freeing PCAP file list...\n");
+        for (uint32_t i = 0; i < num_pcap_files; i++) {
+            if (pcap_file_list[i])
+                free(pcap_file_list[i]);
+        }
+        free(pcap_file_list);
+    }
 
     printf("Cleanup complete.\n");
     printf("Sender stopped.\n");
