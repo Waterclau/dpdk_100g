@@ -242,7 +242,7 @@ static void send_loop(void)
             double bytes_over = bytes_sent_in_window - bytes_expected;
             uint64_t sleep_ns = (uint64_t)((bytes_over * 8.0 * 1e9) / (target_gbps * 1e9));
 
-            if (sleep_ns > 0 && sleep_ns < 100000) {
+            if (sleep_ns > 0 && sleep_ns < 10000000) {  /* Max 10ms sleep */
                 rte_delay_us_block(sleep_ns / 1000);
             }
         }
