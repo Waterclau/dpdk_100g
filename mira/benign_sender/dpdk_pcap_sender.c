@@ -11,6 +11,7 @@
 #include <string.h>
 #include <signal.h>
 #include <pcap.h>
+#include <getopt.h>
 
 #include <rte_eal.h>
 #include <rte_ethdev.h>
@@ -26,9 +27,10 @@
 #define MAX_PCAP_PACKETS 10000000
 
 /* Target transmission rate: 17 Gbps (to achieve ~7 Gbps real at detector) */
-#define TARGET_GBPS 12.0//17
+#define DEFAULT_TARGET_GBPS 12.0
 
 static volatile uint8_t force_quit = 0;
+static float target_gbps = DEFAULT_TARGET_GBPS;  /* Configurable via --rate-gbps */
 static uint16_t port_id = 0;
 static struct rte_mempool *mbuf_pool = NULL;
 
@@ -172,14 +174,14 @@ static void send_loop(void)
     uint64_t last_stats_tsc = 0;
 
     /* Rate limiting variables */
-    const uint64_t target_bytes_per_sec = (uint64_t)(TARGET_GBPS * 1e9 / 8.0);
+    const uint64_t target_bytes_per_sec = (uint64_t)(target_gbps * 1e9 / 8.0);
     uint64_t bytes_sent_in_window = 0;
     uint64_t window_start_tsc = 0;
 
     printf("\n╔═══════════════════════════════════════════════════════════╗\n");
-    printf("║      DPDK PCAP SENDER - %.1f Gbps baseline transmission     ║\n", TARGET_GBPS);
+    printf("║      DPDK PCAP SENDER - %.1f Gbps baseline transmission     ║\n", target_gbps);
     printf("╚═══════════════════════════════════════════════════════════╝\n\n");
-    printf("Starting packet transmission at %.1f Gbps...\n", TARGET_GBPS);
+    printf("Starting packet transmission at %.1f Gbps...\n", target_gbps);
     printf("Press Ctrl+C to stop\n\n");
 
     start_tsc = rte_rdtsc();
@@ -238,7 +240,7 @@ static void send_loop(void)
             /* Too fast, calculate sleep time */
             double bytes_expected = target_bytes_per_sec * elapsed_sec;
             double bytes_over = bytes_sent_in_window - bytes_expected;
-            uint64_t sleep_ns = (uint64_t)((bytes_over * 8.0 * 1e9) / (TARGET_GBPS * 1e9));
+            uint64_t sleep_ns = (uint64_t)((bytes_over * 8.0 * 1e9) / (target_gbps * 1e9));
 
             if (sleep_ns > 0 && sleep_ns < 100000) {
                 rte_delay_us_block(sleep_ns / 1000);
@@ -286,6 +288,13 @@ int main(int argc, char *argv[])
 {
     int ret;
     char *pcap_file = NULL;
+    int opt;
+    int option_index = 0;
+
+    static struct option long_options[] = {
+        {"rate-gbps", required_argument, NULL, 'r'},
+        {NULL, 0, NULL, 0}
+    };
 
     ret = rte_eal_init(argc, argv);
     if (ret < 0)
@@ -294,12 +303,32 @@ int main(int argc, char *argv[])
     argc -= ret;
     argv += ret;
 
-    if (argc < 2) {
-        printf("Usage: %s [EAL options] -- <pcap_file>\n", argv[0]);
-        return -1;
+    /* Parse application arguments (after --) */
+    optind = 1;
+    while ((opt = getopt_long(argc, argv, "r:", long_options, &option_index)) != -1) {
+        switch (opt) {
+        case 'r':
+            target_gbps = atof(optarg);
+            if (target_gbps <= 0 || target_gbps > 100) {
+                printf("Error: Rate must be between 0 and 100 Gbps\n");
+                return -1;
+            }
+            printf("[CONFIG] Target rate: %.1f Gbps\n", target_gbps);
+            break;
+        default:
+            printf("Usage: %s [EAL options] -- <pcap_file> [--rate-gbps X]\n", argv[0]);
+            return -1;
+        }
     }
 
-    pcap_file = argv[1];
+    /* Get PCAP file from remaining arguments */
+    if (optind < argc) {
+        pcap_file = argv[optind];
+    } else {
+        printf("Error: No PCAP file specified\n");
+        printf("Usage: %s [EAL options] -- <pcap_file> [--rate-gbps X]\n", argv[0]);
+        return -1;
+    }
 
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);

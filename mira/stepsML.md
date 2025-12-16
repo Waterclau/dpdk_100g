@@ -111,6 +111,47 @@ Create a **hybrid detection system**:
 
 ---
 
+## 🔑 CRITICAL: Two Detector Versions
+
+This experiment uses **TWO different detectors** at different phases:
+
+### 📁 Detector Directories
+
+```
+mira/
+├── detector_system/                 ← Detector WITHOUT ML
+│   ├── mira_ddos_detector.c        (threshold-based detection)
+│   └── mira_ddos_detector          (compiled binary)
+│
+└── detector_system_ml/              ← Detector WITH ML
+    ├── detectorML.c                (hybrid: thresholds + LightGBM)
+    ├── ml_inference.c              (LightGBM C API wrapper)
+    ├── lightgbm_model.txt          (trained model - generated in Phase 3)
+    └── detectorML                  (compiled binary)
+```
+
+### 📊 When to Use Each Detector
+
+| Phase | Detector to Use | Directory | Binary | Why |
+|-------|----------------|-----------|---------|-----|
+| **Phase 1** | WITHOUT ML | `detector_system/` | `mira_ddos_detector` | Collecting training data (no model yet) |
+| **Phase 2-3** | N/A | - | - | Feature extraction & model training |
+| **Phase 4** | WITH ML | `detector_system_ml/` | `detectorML` | Testing trained model |
+
+### ⚠️ Common Mistake to Avoid
+
+**DON'T** use `detector_system_ml/detectorML` in Phase 1 - it will fail because the model doesn't exist yet!
+
+**Workflow:**
+```
+Phase 1: detector_system/mira_ddos_detector → collect logs
+Phase 2: Python scripts → extract features from logs
+Phase 3: Python scripts → train model → lightgbm_model.txt
+Phase 4: detector_system_ml/detectorML → use trained model
+```
+
+---
+
 ## Architecture - EMBEDDED ML
 
 ```
@@ -729,54 +770,54 @@ Press Ctrl+C to stop
 
 ## Phase 1: Data Collection for Training
 
+### ⚠️ IMPORTANT: Use Detector WITHOUT ML
+
+For Phase 1 (data collection), you must use the **original detector WITHOUT ML**:
+- **Directory:** `detector_system/` (NOT `detector_system_ml/`)
+- **Binary:** `mira_ddos_detector` (NOT `detectorML`)
+- **Why:** The ML detector requires a trained model, which we don't have yet. We're collecting data TO train the model.
+
+After training (Phase 3), you'll use `detector_system_ml/detectorML` in Phase 4.
+
+---
+
 ### Goal
 Collect detector logs from generated traffic to create labeled training dataset.
 
 ### Step 1: Run Detector to Collect Benign Traffic Data
 
 **Prerequisites:**
-1. ✅ Phase 0 complete: `benign_10M_v2.pcap` generated
-2. ✅ Compile `dpdk_pcap_sender_v2` with temporal replay support
-
-```bash
-# First, build the v2 sender (if not done)
-cd /local/dpdk_100g/mira/benign_sender
-make -f Makefile_v2 v2
-```
+1. ✅ Benign PCAP ready: `benign_10M.pcap`
+2. ✅ Sender compiled: `dpdk_pcap_sender_v2`
 
 **Run Data Collection:**
 
-**Option A: Realistic temporal replay (slow, ~500Mbps, 300s):**
 ```bash
-# Terminal 1 - Monitor node (start first)
-cd /local/dpdk_100g/mira/detector_system
-sudo timeout 320 ./mira_ddos_detector \
+# ========================================
+# Terminal 1 - MONITOR (detector WITHOUT ML)
+# ========================================
+cd /local/dpdk_100g/mira/detector_system    # ← Use detector_system/ (NO ML)
+
+# Create logs directory
+mkdir -p ../ml_system/datasets/raw_logs
+
+# Run detector for 2 minutes (120 seconds)
+sudo timeout 120 ./mira_ddos_detector \      # ← Binary WITHOUT ML
     -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/benign_baseline_v2.log
+    2>&1 | tee ../ml_system/datasets/raw_logs/benign_baseline.log
 
-# Terminal 2 - Controller node (wait 5s, then start with TEMPORAL REPLAY)
+# ========================================
+# Terminal 2 - CONTROLLER (benign traffic with adaptive mode)
+# ========================================
 cd /local/dpdk_100g/mira/benign_sender
-sleep 5
-sudo timeout 315 ./dpdk_pcap_sender_v2 \
-    -l 0-7 -n 4 -w 0000:41:00.0 \
-    -- ../benign_10M_v2.pcap --pcap-timed --jitter 10
-```
 
-**Option B: Fast high-speed collection (recommended, ~12Gbps, 6s):**
-```bash
-# Terminal 1 - Monitor node (start first)
-cd /local/dpdk_100g/mira/detector_system
-sudo timeout 30 ./mira_ddos_detector \
-    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/benign_baseline_v2_fast.log
-
-# Terminal 2 - Controller node (wait 5s, then start WITHOUT --pcap-timed)
-cd /local/dpdk_100g/mira/benign_sender
+# Wait 5s after detector starts
 sleep 5
-sudo timeout 25 ./build/dpdk_pcap_sender \
+
+# Send benign traffic for 115 seconds (adaptive mode with realistic phases)
+sudo timeout 115 ./dpdk_pcap_sender_v2 \
     -l 0-7 -n 4 -w 0000:41:00.0 \
-    -- ../benign_10M_v2_fast.pcap
-# No --pcap-timed needed! Timestamps already compressed → max speed replay
+    -- ../benign_10M.pcap --adaptive --rate-gbps 12 --jitter 15 --loop
 ```
 
 **NEW in v2.0:**
@@ -838,115 +879,113 @@ grep "Baseline:" ../ml_system/datasets/raw_logs/benign_baseline_v2_fast.log | he
 # Should show 4 distinct phases in ~6 seconds
 ```
 
-### Step 2: Run Detector to Collect UDP Flood Data (v2 - Fast Collection)
+### Step 2: Run Detector to Collect Attack Traffic Data (CIC-IDS Dataset)
 
 **Prerequisites:**
-1. ✅ Phase 0.4 complete: Attack PCAPs generated with v2 generator
+1. ✅ CIC-IDS PCAPs with corrected MACs in `/proj/softmeasure-PG0/CICD/remapped/`
+2. ✅ Sender compiled: `dpdk_pcap_sender_v2`
 
-**Option A: Fast collection (RECOMMENDED, using --speedup 50 PCAPs):**
-
-```bash
-# Terminal 1 - Monitor node (start first)
-cd /local/dpdk_100g/mira/detector_system
-sudo timeout 30 ./mira_ddos_detector \
-    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/udp_flood_v2.log
-
-# Terminal 2 - TG node (wait 5s, then start at max speed)
-cd /local/dpdk_100g/mira/attack_sender
-sleep 5
-sudo timeout 25 ./build/dpdk_pcap_sender \
-    -l 0-7 -n 4 -w 0000:41:00.0 \
-    -- ../attack_udp_5M_v2_fast.pcap
-# No --pcap-timed needed! Timestamps already compressed → max speed replay
-```
-
-**Option B: Realistic temporal replay (slower, ~500Mbps):**
+**Using Multi-PCAP Mode with Real CIC-IDS Attack Data:**
 
 ```bash
-# Terminal 1 - Monitor node
-cd /local/dpdk_100g/mira/detector_system
-sudo timeout 320 ./mira_ddos_detector \
-    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/udp_flood_v2_temporal.log
+# ========================================
+# Terminal 1 - MONITOR (detector WITHOUT ML)
+# ========================================
+cd /local/dpdk_100g/mira/detector_system    # ← Use detector_system/ (NO ML)
 
-# Terminal 2 - TG node (wait 5s, then start with TEMPORAL REPLAY)
+# Run detector for 3 minutes (180 seconds)
+sudo timeout 180 ./mira_ddos_detector \      # ← Binary WITHOUT ML
+    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
+    2>&1 | tee ../ml_system/datasets/raw_logs/attack_cic_ids.log
+
+# ========================================
+# Terminal 2 - TG (attack traffic from CIC-IDS multi-pcap)
+# ========================================
 cd /local/dpdk_100g/mira/attack_sender
+
+# Wait 5s after detector starts
 sleep 5
-sudo timeout 315 ./dpdk_pcap_sender_v2 \
+
+# Send attack traffic from CIC-IDS dataset (252 PCAP files, multi-pcap mode)
+sudo timeout 175 ./dpdk_pcap_sender_v2 \
     -l 0-7 -n 4 -w 0000:41:00.0 \
-    -- ../attack_udp_5M_v2.pcap --pcap-timed --jitter 10
+    -- --pcap-dir=/proj/softmeasure-PG0/CICD/remapped/ \
+    --rate-gbps 12
 ```
 
-### Step 3: Run Detector to Collect SYN Flood Data (v2)
+**What this collects:**
+- Real DDoS attack patterns from CIC-IDS 2018 dataset
+- Multiple attack types: UDP flood, SYN flood, HTTP flood, DNS amplification
+- 252 different PCAP files replayed sequentially
+- Attack source IPs: `10.10.2.x` (remapped from original dataset)
+- Target IP: `10.10.1.2`
+
+---
+
+### Step 3: Run Detector to Collect Mixed Traffic Data (Benign + Attack)
+
+**Prerequisites:**
+1. ✅ Benign PCAP ready: `benign_10M.pcap`
+2. ✅ CIC-IDS PCAPs ready: `/proj/softmeasure-PG0/CICD/remapped/`
+
+**Realistic Scenario - Simultaneous Benign and Attack Traffic:**
 
 ```bash
-# Terminal 1 - Monitor node
-cd /local/dpdk_100g/mira/detector_system
-sudo timeout 30 ./mira_ddos_detector \
-    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/syn_flood_v2.log
+# ========================================
+# Terminal 1 - MONITOR (detector WITHOUT ML)
+# ========================================
+cd /local/dpdk_100g/mira/detector_system    # ← Use detector_system/ (NO ML)
 
-# Terminal 2 - TG node (use fast PCAP generated with --speedup 50)
-cd /local/dpdk_100g/mira/attack_sender
+# Run detector for 5 minutes (300 seconds)
+sudo timeout 300 ./mira_ddos_detector \      # ← Binary WITHOUT ML
+    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
+    2>&1 | tee ../ml_system/datasets/raw_logs/mixed_traffic.log
+
+# ========================================
+# Terminal 2 - CONTROLLER (benign traffic, start FIRST)
+# ========================================
+cd /local/dpdk_100g/mira/benign_sender
+
+# Wait 5s after detector starts
 sleep 5
-sudo timeout 25 ./build/dpdk_pcap_sender \
+
+# Send benign traffic for 295 seconds (rate limited to 6 Gbps to leave room for attack)
+sudo timeout 295 ./dpdk_pcap_sender_v2 \
     -l 0-7 -n 4 -w 0000:41:00.0 \
-    -- ../attack_syn_5M_v2_fast.pcap
+    -- ../benign_10M.pcap --adaptive --rate-gbps 6 --jitter 15 --loop
+
+# ========================================
+# Terminal 3 - TG (attack traffic, start 60s AFTER benign)
+# ========================================
+cd /local/dpdk_100g/mira/attack_sender
+
+# Wait 65s (60s baseline + 5s buffer)
+sleep 65
+
+# Send attack traffic for 230 seconds (rate limited to 6 Gbps)
+sudo timeout 230 ./dpdk_pcap_sender_v2 \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- --pcap-dir=/proj/softmeasure-PG0/CICD/remapped/ \
+    --rate-gbps 6
 ```
 
-### Step 4: Run Detector to Collect HTTP Flood Data (v2 - NEW)
-
-```bash
-# Terminal 1 - Monitor node
-cd /local/dpdk_100g/mira/detector_system
-sudo timeout 30 ./mira_ddos_detector \
-    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/http_flood_v2.log
-
-# Terminal 2 - TG node
-cd /local/dpdk_100g/mira/attack_sender
-sleep 5
-sudo timeout 25 ./build/dpdk_pcap_sender \
-    -l 0-7 -n 4 -w 0000:41:00.0 \
-    -- ../attack_http_5M_v2_fast.pcap
+**Timeline:**
+```
+0-5s:     Detector starting
+5-65s:    Benign traffic only (60s baseline)
+65-300s:  Benign + Attack traffic (235s mixed)
+300s:     All processes stop
 ```
 
-### Step 5: Run Detector to Collect DNS Amplification Data (v2 - NEW)
+**What this collects:**
+- Realistic mixed traffic scenario
+- Baseline period (benign only) for comparison
+- Attack detection in presence of legitimate traffic
+- Both `10.10.1.x` (benign) and `10.10.2.x` (attack) traffic simultaneously
 
-```bash
-# Terminal 1 - Monitor node
-cd /local/dpdk_100g/mira/detector_system
-sudo timeout 30 ./mira_ddos_detector \
-    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/dns_flood_v2.log
+---
 
-# Terminal 2 - TG node
-cd /local/dpdk_100g/mira/attack_sender
-sleep 5
-sudo timeout 25 ./build/dpdk_pcap_sender \
-    -l 0-7 -n 4 -w 0000:41:00.0 \
-    -- ../attack_dns_5M_v2_fast.pcap
-```
-
-### Step 6: Run Detector to Collect Mixed Attack Data (v2)
-
-```bash
-# Terminal 1 - Monitor node
-cd /local/dpdk_100g/mira/detector_system
-sudo timeout 30 ./mira_ddos_detector \
-    -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/mixed_attack_v2.log
-
-# Terminal 2 - TG node
-cd /local/dpdk_100g/mira/attack_sender
-sleep 5
-sudo timeout 25 ./build/dpdk_pcap_sender \
-    -l 0-7 -n 4 -w 0000:41:00.0 \
-    -- ../attack_mirai_10M_v2_fast.pcap
-```
-
-### Step 7: Verify Raw Logs Collected
+### Step 4: Verify Raw Logs Collected
 
 ```bash
 cd /local/dpdk_100g/mira/ml_system/datasets/raw_logs
@@ -954,30 +993,33 @@ cd /local/dpdk_100g/mira/ml_system/datasets/raw_logs
 # Check all logs exist
 ls -lh
 
-# Expected files (v2 - fast collection):
-# - benign_baseline_v2.log or benign_baseline_v2_fast.log
-# - udp_flood_v2.log
-# - syn_flood_v2.log
-# - http_flood_v2.log (NEW)
-# - dns_flood_v2.log (NEW)
-# - mixed_attack_v2.log
+# Expected files:
+# - benign_baseline.log      (~5-10 MB)  - 2 minutes of benign traffic
+# - attack_cic_ids.log       (~15-30 MB) - 3 minutes of CIC-IDS attacks
+# - mixed_traffic.log        (~20-40 MB) - 5 minutes of mixed traffic
 
 # Count detection events
-grep -c "ALERT" *_v2.log
+grep -c "ALERT" benign_baseline.log   # Should be 0 or very low
+grep -c "ALERT" attack_cic_ids.log    # Should be >100
+grep -c "ALERT" mixed_traffic.log     # Should be >50
 
-# Check temporal phases in benign log (if using --pcap-timed)
-grep "Baseline:" benign_baseline_v2.log | head -50
+# Check benign traffic stats
+grep "Baseline:" benign_baseline.log | head -20
 
-# Verify attack phases
-grep "Attack:" mixed_attack_v2.log | head -50
+# Check attack traffic stats
+grep "Attack:" attack_cic_ids.log | head -20
+
+# Verify mixed traffic has both
+grep "Baseline:" mixed_traffic.log | head -10
+grep "Attack:" mixed_traffic.log | head -10
 ```
 
-**NEW in v2.0 data collection:**
-- ✅ **6× faster collection**: ~30s per attack type (vs ~200s in v1) using --speedup 50
-- ✅ **More attack types**: Added HTTP flood and DNS amplification
-- ✅ **Temporal diversity**: All phases preserved in compressed timeline
-- ✅ **Better ML training**: More diverse features due to phase variations
-- ✅ **Total collection time**: ~3-4 minutes for all datasets (vs ~15-20 minutes in v1)
+**Data Collection Summary:**
+- ✅ **benign_baseline.log**: Pure benign traffic with adaptive phases (HTTP/DNS/SSH/UDP mix)
+- ✅ **attack_cic_ids.log**: Real DDoS attacks from CIC-IDS 2018 dataset (252 PCAPs)
+- ✅ **mixed_traffic.log**: Realistic scenario with both benign and attack traffic
+- ✅ **Total collection time**: ~10 minutes (2 + 3 + 5 minutes)
+- ✅ **Traffic diversity**: Real-world attack patterns + realistic benign behavior
 
 ---
 
@@ -995,52 +1037,45 @@ cd /local/dpdk_100g/mira/ml_system
 pip3 install --user pandas numpy scikit-learn lightgbm matplotlib seaborn
 ```
 
-### Step 2: Extract Features from All Logs (v2 - Enhanced)
+### Step 2: Extract Features from All Logs
 
 ```bash
 cd /local/dpdk_100g/mira/ml_system/01_data_collection
 
-# Benign traffic (v2 with temporal phases)
+# Create output directory
+mkdir -p ../datasets/processed
+
+# 1. Extract features from benign traffic log
 python3 feature_extractor.py \
-    --input ../datasets/raw_logs/benign_baseline_v2_fast.log \
-    --output ../datasets/processed/benign_baseline_v2.csv \
+    --input ../datasets/raw_logs/benign_baseline.log \
+    --output ../datasets/processed/benign_baseline.csv \
     --label benign
 
-# UDP Flood (v2)
+# 2. Extract features from attack traffic log (CIC-IDS)
 python3 feature_extractor.py \
-    --input ../datasets/raw_logs/udp_flood_v2.log \
-    --output ../datasets/processed/udp_flood_v2.csv \
-    --label udp_flood
+    --input ../datasets/raw_logs/attack_cic_ids.log \
+    --output ../datasets/processed/attack_cic_ids.csv \
+    --label attack
 
-# SYN Flood (v2)
+# 3. Extract features from mixed traffic log
 python3 feature_extractor.py \
-    --input ../datasets/raw_logs/syn_flood_v2.log \
-    --output ../datasets/processed/syn_flood_v2.csv \
-    --label syn_flood
-
-# HTTP Flood (v2 - NEW)
-python3 feature_extractor.py \
-    --input ../datasets/raw_logs/http_flood_v2.log \
-    --output ../datasets/processed/http_flood_v2.csv \
-    --label http_flood
-
-# DNS Amplification (v2 - NEW)
-python3 feature_extractor.py \
-    --input ../datasets/raw_logs/dns_flood_v2.log \
-    --output ../datasets/processed/dns_flood_v2.csv \
-    --label dns_flood
-
-# Mixed Attack (v2)
-python3 feature_extractor.py \
-    --input ../datasets/raw_logs/mixed_attack_v2.log \
-    --output ../datasets/processed/mixed_attack_v2.csv \
-    --label mixed_attack
+    --input ../datasets/raw_logs/mixed_traffic.log \
+    --output ../datasets/processed/mixed_traffic.csv \
+    --label mixed
 ```
 
-**NEW in v2.0 feature extraction:**
-- ✅ **More attack classes**: 6 classes total (benign + 5 attack types)
-- ✅ **Temporal features**: Captures phase transitions due to v2 generator
-- ✅ **Better diversity**: More varied features due to attack escalation patterns
+**Features Extracted (13 total):**
+- `total_packets`, `total_bytes` - Volume metrics
+- `udp_packets`, `tcp_packets`, `icmp_packets` - Protocol distribution
+- `syn_packets`, `http_requests`, `dns_queries` - Application-level stats
+- `baseline_packets`, `attack_packets` - Source IP classification
+- `udp_tcp_ratio`, `syn_total_ratio`, `baseline_attack_ratio` - Derived ratios
+- `bytes_per_packet` - Average packet size
+
+**Label Classes:**
+- `benign` - Normal traffic only
+- `attack` - DDoS attack traffic from CIC-IDS dataset
+- `mixed` - Combination of benign and attack traffic
 
 ### Step 3: Verify Extracted Features
 
@@ -1197,6 +1232,17 @@ bash verify_integration.sh
 
 ## Phase 5: Run ML-Enhanced Detector
 
+### ⚠️ IMPORTANT: Now Use Detector WITH ML
+
+For Phase 5 (validation), you must use the **ML-enhanced detector**:
+- **Directory:** `detector_system_ml/` (NOT `detector_system/`)
+- **Binary:** `detectorML` (NOT `mira_ddos_detector`)
+- **Why:** Now you have a trained model and want to test hybrid detection (thresholds + ML)
+
+This is the OPPOSITE of Phase 1, where you used the detector WITHOUT ML.
+
+---
+
 ### Goal
 Execute detector with embedded ML and compare with threshold-only version.
 
@@ -1207,24 +1253,28 @@ Time     Monitor                    Controller           TG
 ─────────────────────────────────────────────────────────────────
 0s       Start detector w/ ML       -                    -
 5s       -                          Start benign         -
-5-130s   Baseline monitoring        Benign running       -
-130s     -                          -                    Start attack
-130-450s ML-enhanced detection      Benign continues     Attack active
-450s     -                          Traffic stops        Traffic stops
-460s     Detector stops             -                    -
+5-65s    Baseline monitoring        Benign running       -
+65s      -                          -                    Start attack
+65-300s  ML-enhanced detection      Benign continues     Attack active
+300s     -                          Traffic stops        Traffic stops
 ```
 
 ### Step 1: Run ML-Enhanced Detector
 
 ```bash
-# Terminal 1 - Monitor node
-cd /local/dpdk_100g/mira/detector_system_ml
+# ========================================
+# Terminal 1 - MONITOR (detector WITH ML)
+# ========================================
+cd /local/dpdk_100g/mira/detector_system_ml    # ← Use detector_system_ml/ (WITH ML)
 
-# Create results directory if it doesn't exist
+# Verify model exists
+ls -lh lightgbm_model.txt
+
+# Create results directory
 mkdir -p ../results/ml_enhanced
 
-# Run detector with ML (binary name: detectorML)
-sudo timeout 460 ./detectorML \
+# Run detector with ML for 5 minutes
+sudo timeout 300 ./detectorML \                 # ← Binary WITH ML
     -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
     2>&1 | tee ../results/ml_enhanced/detection_with_ml.log
 ```
@@ -1260,23 +1310,36 @@ Configuration:
 ### Step 2: Start Benign Traffic (wait 5s after detector)
 
 ```bash
-# Terminal 2 - Controller node
+# ========================================
+# Terminal 2 - CONTROLLER (benign traffic)
+# ========================================
 cd /local/dpdk_100g/mira/benign_sender
 
+# Wait 5s after detector starts
 sleep 5
-sudo timeout 445 ./build/dpdk_pcap_sender \
-    -l 0-7 -n 4 -w 0000:41:00.0 -- ../benign_10M.pcap
+
+# Send benign traffic for 295 seconds (adaptive mode, rate limited to 6 Gbps)
+sudo timeout 295 ./dpdk_pcap_sender_v2 \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- ../benign_10M.pcap --adaptive --rate-gbps 6 --jitter 15 --loop
 ```
 
-### Step 3: Start Attack Traffic (wait 130s after benign)
+### Step 3: Start Attack Traffic (wait 60s after benign)
 
 ```bash
-# Terminal 3 - TG node
+# ========================================
+# Terminal 3 - TG (attack traffic from CIC-IDS)
+# ========================================
 cd /local/dpdk_100g/mira/attack_sender
 
-sleep 130
-sudo timeout 325 ./build/dpdk_pcap_sender \
-    -l 0-7 -n 4 -w 0000:41:00.0 -- ../attack_mixed_10M.pcap
+# Wait 65s (60s baseline + 5s buffer)
+sleep 65
+
+# Send attack traffic for 230 seconds (multi-pcap mode, rate limited to 6 Gbps)
+sudo timeout 230 ./dpdk_pcap_sender_v2 \
+    -l 0-7 -n 4 -w 0000:41:00.0 \
+    -- --pcap-dir=/proj/softmeasure-PG0/CICD/remapped/ \
+    --rate-gbps 6
 ```
 
 ### Step 4: Monitor Detection in Real-Time (Optional)
