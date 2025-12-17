@@ -4,12 +4,18 @@ Prepare Dataset for Training
 Combines multiple CSV files and splits into train/val/test sets
 
 Usage:
+    # Shell will expand wildcard
     python3 prepare_dataset.py \
         --input ../datasets/processed/*.csv \
         --output ../datasets/splits/ \
         --train-ratio 0.7 \
         --val-ratio 0.15 \
         --test-ratio 0.15
+
+    # Or specify files explicitly
+    python3 prepare_dataset.py \
+        --input ../datasets/processed/benign.csv ../datasets/processed/attack.csv \
+        --output ../datasets/splits/
 """
 
 import argparse
@@ -20,13 +26,19 @@ from sklearn.model_selection import train_test_split
 import glob
 
 
-def load_and_combine_datasets(input_pattern: str) -> pd.DataFrame:
+def load_and_combine_datasets(input_files) -> pd.DataFrame:
     """Load multiple CSV files and combine them"""
 
-    csv_files = glob.glob(input_pattern)
+    # Handle both list of files and glob pattern
+    if isinstance(input_files, str):
+        csv_files = glob.glob(input_files)
+    elif isinstance(input_files, list):
+        csv_files = input_files
+    else:
+        csv_files = list(input_files)
 
     if not csv_files:
-        raise ValueError(f"No CSV files found matching pattern: {input_pattern}")
+        raise ValueError(f"No CSV files provided or found")
 
     print(f"[INFO] Found {len(csv_files)} CSV files:")
     for f in csv_files:
@@ -129,9 +141,16 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Prepare dataset with default 70/15/15 split
+  # Prepare dataset with default 70/15/15 split (shell expands wildcard)
   python3 prepare_dataset.py \\
       --input ../datasets/processed/*.csv \\
+      --output ../datasets/splits/
+
+  # Specify files explicitly
+  python3 prepare_dataset.py \\
+      --input ../datasets/processed/benign_baseline.csv \\
+              ../datasets/processed/attack_cic_ids.csv \\
+              ../datasets/processed/mixed_traffic.csv \\
       --output ../datasets/splits/
 
   # Custom split ratios
@@ -144,8 +163,8 @@ Examples:
         """
     )
 
-    parser.add_argument('--input', type=str, required=True,
-                       help='Input CSV files pattern (e.g., ../datasets/processed/*.csv)')
+    parser.add_argument('--input', type=str, required=True, nargs='+',
+                       help='Input CSV files (can specify multiple files or use wildcards)')
     parser.add_argument('--output', type=str, required=True,
                        help='Output directory for splits')
     parser.add_argument('--train-ratio', type=float, default=0.7,
