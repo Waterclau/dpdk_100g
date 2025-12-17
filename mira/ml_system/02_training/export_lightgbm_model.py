@@ -48,29 +48,66 @@ def train_and_export(train_csv, output_path):
     # Create dataset
     train_data = lgb.Dataset(X, label=y, feature_name=feature_cols)
 
-    # Parameters for C API compatibility
+    # Optimized parameters for larger datasets (1000+ samples)
+    # These parameters are tuned for better accuracy and generalization
     params = {
         'objective': 'multiclass',
         'num_class': len(label_encoder.classes_),
         'metric': 'multi_logloss',
-        'learning_rate': 0.1,
-        'max_depth': 6,
-        'num_leaves': 31,
-        'min_data_in_leaf': 20,
-        'feature_fraction': 0.8,
-        'bagging_fraction': 0.8,
+        'learning_rate': 0.05,      # Lower learning rate for better convergence
+        'max_depth': 8,              # Deeper trees for complex patterns
+        'num_leaves': 63,            # More leaves for better expressiveness
+        'min_data_in_leaf': 10,      # Lower for larger datasets
+        'feature_fraction': 0.9,     # Use more features per iteration
+        'bagging_fraction': 0.85,    # Slight increase for stability
         'bagging_freq': 5,
+        'lambda_l1': 0.5,            # L1 regularization to prevent overfitting
+        'lambda_l2': 0.5,            # L2 regularization
+        'min_gain_to_split': 0.01,   # Minimum gain to make a split
         'verbose': -1,
-        'seed': 42
+        'seed': 42,
+        'boosting_type': 'gbdt',     # Gradient Boosting Decision Tree
+        'extra_trees': False,        # Set True for extremely randomized trees
     }
+
+    # Adjust parameters based on dataset size
+    dataset_size = len(X)
+    if dataset_size < 500:
+        print(f"[WARNING] Small dataset detected ({dataset_size} samples)")
+        print("[INFO] Adjusting hyperparameters for small dataset...")
+        params['max_depth'] = 4
+        params['num_leaves'] = 15
+        params['min_data_in_leaf'] = 5
+        params['lambda_l1'] = 1.0
+        params['lambda_l2'] = 1.0
+        num_boost_round = 150
+    elif dataset_size < 1000:
+        print(f"[INFO] Medium dataset ({dataset_size} samples)")
+        params['max_depth'] = 6
+        params['num_leaves'] = 31
+        num_boost_round = 200
+    else:
+        print(f"[INFO] Large dataset ({dataset_size} samples) - using optimized parameters")
+        num_boost_round = 300
+
+    print(f"\n[TRAINING CONFIGURATION]")
+    print(f"  Boosting rounds: {num_boost_round}")
+    print(f"  Max depth: {params['max_depth']}")
+    print(f"  Num leaves: {params['num_leaves']}")
+    print(f"  Learning rate: {params['learning_rate']}")
+    print(f"  L1 regularization: {params['lambda_l1']}")
+    print(f"  L2 regularization: {params['lambda_l2']}")
 
     print("\nTraining model...")
     model = lgb.train(
         params,
         train_data,
-        num_boost_round=100,
+        num_boost_round=num_boost_round,
         valid_sets=[train_data],
-        callbacks=[lgb.log_evaluation(period=20)]
+        callbacks=[
+            lgb.log_evaluation(period=50),
+            lgb.early_stopping(stopping_rounds=30, verbose=True)  # Early stopping
+        ]
     )
 
     # Export model

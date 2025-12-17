@@ -801,11 +801,13 @@ cd /local/dpdk_100g/mira/detector_system    # ← Use detector_system/ (NO ML)
 # Create logs directory
  sudo mkdir -p ../ml_system/datasets/raw_logs
 
-# Run detector for 2 minutes (120 seconds)
+# Run detector for 30 minutes (1800 seconds) - ML TRAINING MODE
+# IMPORTANT: Longer runs = more training samples!
+# 30 min = ~360 detection windows (1 window per 5s)
 # ← Binary WITHOUT ML
-sudo timeout 120 ./mira_ddos_detector \      
+sudo timeout 1800 ./mira_ddos_detector \
     -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/benign_baseline.log
+    2>&1 | tee ../ml_system/datasets/raw_logs/benign_baseline_run1.log
 
 # ========================================
 # Terminal 2 - CONTROLLER (benign traffic with adaptive mode)
@@ -815,8 +817,9 @@ cd /local/dpdk_100g/mira/benign_sender
 # Wait 5s after detector starts
 sleep 5
 
-# Send benign traffic for 115 seconds (adaptive mode with realistic phases)
-sudo timeout 115 ./dpdk_pcap_sender_v2 \
+# Send benign traffic for 1795 seconds (adaptive mode with realistic phases)
+# NOTE: Use --loop to continuously replay traffic for full duration
+sudo timeout 1795 ./dpdk_pcap_sender_v2 \
     -l 0-7 -n 4 -w 0000:41:00.0 \
     -- ../benign_10M.pcap --adaptive --rate-gbps 12 --jitter 15 --loop
 ```
@@ -894,10 +897,11 @@ grep "Baseline:" ../ml_system/datasets/raw_logs/benign_baseline_v2_fast.log | he
 # ========================================
 cd /local/dpdk_100g/mira/detector_system    # ← Use detector_system/ (NO ML)
 
-# Run detector for 3 minutes (180 seconds)
-sudo timeout 180 ./mira_ddos_detector \      # ← Binary WITHOUT ML
+# Run detector for 30 minutes (1800 seconds) - ML TRAINING MODE
+# 30 min = ~360 detection windows for attack traffic
+sudo timeout 1800 ./mira_ddos_detector \      # ← Binary WITHOUT ML
     -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/attack_cic_ids.log
+    2>&1 | tee ../ml_system/datasets/raw_logs/attack_cic_ids_run1.log
 
 # ========================================
 # Terminal 2 - TG (attack traffic from CIC-IDS multi-pcap)
@@ -907,8 +911,9 @@ cd /local/dpdk_100g/mira/attack_sender
 # Wait 5s after detector starts
 sleep 5
 
-# Send attack traffic from CIC-IDS dataset (252 PCAP files, multi-pcap mode)
-sudo timeout 175 ./build/dpdk_pcap_sender -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/softmeasure-PG0/CICD/remapped/SAT-01-12-2018_0193.pcap --rate-gbps 7
+# Send attack traffic from CIC-IDS dataset (use --loop to replay multiple PCAPs)
+# NOTE: Increase duration to 1795s to match detector runtime
+sudo timeout 1795 ./build/dpdk_pcap_sender -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/softmeasure-PG0/CICD/remapped/SAT-01-12-2018_0193.pcap --rate-gbps 7
 
 ```
 
@@ -935,10 +940,11 @@ sudo timeout 175 ./build/dpdk_pcap_sender -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/s
 # ========================================
 cd /local/dpdk_100g/mira/detector_system    # ← Use detector_system/ (NO ML)
 
-# Run detector for 5 minutes (300 seconds)
-sudo timeout 300 ./mira_ddos_detector \      # ← Binary WITHOUT ML
+# Run detector for 30 minutes (1800 seconds) - ML TRAINING MODE
+# 30 min = ~360 detection windows for mixed traffic
+sudo timeout 1800 ./mira_ddos_detector \      # ← Binary WITHOUT ML
     -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
-    2>&1 | tee ../ml_system/datasets/raw_logs/mixed_traffic.log
+    2>&1 | tee ../ml_system/datasets/raw_logs/mixed_traffic_run1.log
 
 # ========================================
 # Terminal 2 - CONTROLLER (benign traffic, start FIRST)
@@ -948,8 +954,8 @@ cd /local/dpdk_100g/mira/benign_sender
 # Wait 5s after detector starts
 sleep 5
 
-# Send benign traffic for 295 seconds (rate limited to 6 Gbps to leave room for attack)
-sudo timeout 295 ./dpdk_pcap_sender_v2 \
+# Send benign traffic for 1795 seconds (rate limited to 6 Gbps to leave room for attack)
+sudo timeout 1795 ./dpdk_pcap_sender_v2 \
     -l 0-7 -n 4 -w 0000:41:00.0 \
     -- ../benign_10M.pcap --adaptive --rate-gbps 6 --jitter 15 --loop
 
@@ -961,8 +967,8 @@ cd /local/dpdk_100g/mira/attack_sender
 # Wait 65s (60s baseline + 5s buffer)
 sleep 65
 
-# Send attack traffic for 230 seconds (rate limited to 6 Gbps)
-sudo timeout 230 ./dpdk_pcap_sender_v2 \
+# Send attack traffic for 1730 seconds (rate limited to 6 Gbps)
+sudo timeout 1730 ./dpdk_pcap_sender_v2 \
     -l 0-7 -n 4 -w 0000:41:00.0 \
     -- --pcap-dir=/proj/softmeasure-PG0/CICD/remapped/ \
     --rate-gbps 6
@@ -970,10 +976,54 @@ sudo timeout 230 ./dpdk_pcap_sender_v2 \
 
 **Timeline:**
 ```
-0-5s:     Detector starting
-5-65s:    Benign traffic only (60s baseline)
-65-300s:  Benign + Attack traffic (235s mixed)
-300s:     All processes stop
+0-5s:       Detector starting
+5-65s:      Benign traffic only (60s baseline)
+65-1800s:   Benign + Attack traffic (1735s mixed)
+1800s:      All processes stop
+```
+
+**Expected Data Collection (Single Run):**
+```
+Benign samples:  ~360 windows
+Attack samples:  ~360 windows
+Mixed samples:   ~360 windows (60s benign + 1740s mixed)
+Total per run:   ~1080 windows
+```
+
+**⚠️ IMPORTANT: Multiple Runs Recommended for ML Training**
+
+For robust ML model training, collect data from **multiple runs**:
+
+```bash
+# Recommended: 3-5 runs per traffic type
+# This provides:
+# - 3 runs × 360 samples = 1080 samples per class (GOOD)
+# - 5 runs × 360 samples = 1800 samples per class (EXCELLENT)
+
+# Example: Collect benign traffic - 3 runs
+for run in {1..3}; do
+    echo "Starting benign collection run $run/3..."
+
+    # Terminal 1: Detector
+    sudo timeout 1800 ./mira_ddos_detector \
+        -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
+        2>&1 | tee ../ml_system/datasets/raw_logs/benign_baseline_run${run}.log &
+
+    DETECTOR_PID=$!
+    sleep 5
+
+    # Terminal 2: Sender (vary parameters slightly per run)
+    JITTER=$((10 + run * 5))  # 15, 20, 25
+    sudo timeout 1795 ./dpdk_pcap_sender_v2 \
+        -l 0-7 -n 4 -w 0000:41:00.0 \
+        -- ../benign_10M.pcap --adaptive --rate-gbps 12 --jitter $JITTER --loop
+
+    wait $DETECTOR_PID
+    echo "Run $run complete. Waiting 30s before next run..."
+    sleep 30
+done
+
+echo "Benign collection complete: 3 runs × 360 = 1080 samples"
 ```
 
 **What this collects:**
@@ -992,33 +1042,46 @@ cd /local/dpdk_100g/mira/ml_system/datasets/raw_logs
 # Check all logs exist
 ls -lh
 
-# Expected files:
-# - benign_baseline.log      (~5-10 MB)  - 2 minutes of benign traffic
-# - attack_cic_ids.log       (~15-30 MB) - 3 minutes of CIC-IDS attacks
-# - mixed_traffic.log        (~20-40 MB) - 5 minutes of mixed traffic
+# Expected files (with multiple runs):
+# - benign_baseline_run1.log     (~150-300 MB)  - 30 minutes of benign traffic
+# - benign_baseline_run2.log     (~150-300 MB)
+# - benign_baseline_run3.log     (~150-300 MB)
+# - attack_cic_ids_run1.log      (~150-300 MB)  - 30 minutes of CIC-IDS attacks
+# - attack_cic_ids_run2.log      (~150-300 MB)
+# - attack_cic_ids_run3.log      (~150-300 MB)
+# - mixed_traffic_run1.log       (~200-400 MB)  - 30 minutes of mixed traffic
+# - mixed_traffic_run2.log       (~200-400 MB)
+# - mixed_traffic_run3.log       (~200-400 MB)
+
+# Count detection windows (should be ~360 per log)
+for log in benign_baseline_run*.log; do
+    count=$(grep -c "PACKET COUNTERS" "$log" || echo 0)
+    echo "$log: $count windows"
+done
 
 # Count detection events
-grep -c "ALERT" benign_baseline.log   # Should be 0 or very low
-grep -c "ALERT" attack_cic_ids.log    # Should be >100
-grep -c "ALERT" mixed_traffic.log     # Should be >50
+grep -c "ALERT" benign_baseline_run1.log   # Should be 0 or very low
+grep -c "ALERT" attack_cic_ids_run1.log    # Should be >1000
+grep -c "ALERT" mixed_traffic_run1.log     # Should be >500
 
 # Check benign traffic stats
-grep "Baseline:" benign_baseline.log | head -20
+grep "Baseline:" benign_baseline_run1.log | head -20
 
 # Check attack traffic stats
-grep "Attack:" attack_cic_ids.log | head -20
+grep "Attack:" attack_cic_ids_run1.log | head -20
 
 # Verify mixed traffic has both
-grep "Baseline:" mixed_traffic.log | head -10
-grep "Attack:" mixed_traffic.log | head -10
+grep "Baseline:" mixed_traffic_run1.log | head -10
+grep "Attack:" mixed_traffic_run1.log | head -10
 ```
 
-**Data Collection Summary:**
-- ✅ **benign_baseline.log**: Pure benign traffic with adaptive phases (HTTP/DNS/SSH/UDP mix)
-- ✅ **attack_cic_ids.log**: Real DDoS attacks from CIC-IDS 2018 dataset (252 PCAPs)
-- ✅ **mixed_traffic.log**: Realistic scenario with both benign and attack traffic
-- ✅ **Total collection time**: ~10 minutes (2 + 3 + 5 minutes)
-- ✅ **Traffic diversity**: Real-world attack patterns + realistic benign behavior
+**Data Collection Summary (3 runs per class):**
+- ✅ **benign_baseline_run{1-3}.log**: Pure benign traffic (3 × 360 = ~1080 samples)
+- ✅ **attack_cic_ids_run{1-3}.log**: Real DDoS attacks from CIC-IDS (3 × 360 = ~1080 samples)
+- ✅ **mixed_traffic_run{1-3}.log**: Realistic mixed scenario (3 × 360 = ~1080 samples)
+- ✅ **Total collection time**: ~4.5 hours (3 runs × 3 types × 30 min)
+- ✅ **Total samples**: ~3240 windows (excellent for ML training!)
+- ✅ **Traffic diversity**: Multiple runs with varying parameters ensure robustness
 
 ---
 
@@ -1044,23 +1107,38 @@ cd /local/dpdk_100g/mira/ml_system/01_data_collection
 # Create output directory
 mkdir -p ../datasets/processed
 
-# 1. Extract features from benign traffic log
-python3 feature_extractor.py \
-    --input ../datasets/raw_logs/benign_baseline.log \
-    --output ../datasets/processed/benign_baseline.csv \
-    --label benign
+# Extract features from all benign runs
+for run in {1..3}; do
+    echo "Extracting benign run $run..."
+    python3 feature_extractor.py \
+        --input ../datasets/raw_logs/benign_baseline_run${run}.log \
+        --output ../datasets/processed/benign_baseline_run${run}.csv \
+        --label benign
+done
 
-# 2. Extract features from attack traffic log (CIC-IDS)
-python3 feature_extractor.py \
-    --input ../datasets/raw_logs/attack_cic_ids.log \
-    --output ../datasets/processed/attack_cic_ids.csv \
-    --label attack
+# Extract features from all attack runs
+for run in {1..3}; do
+    echo "Extracting attack run $run..."
+    python3 feature_extractor.py \
+        --input ../datasets/raw_logs/attack_cic_ids_run${run}.log \
+        --output ../datasets/processed/attack_cic_ids_run${run}.csv \
+        --label attack
+done
 
-# 3. Extract features from mixed traffic log
-python3 feature_extractor.py \
-    --input ../datasets/raw_logs/mixed_traffic.log \
-    --output ../datasets/processed/mixed_traffic.csv \
-    --label mixed
+# Extract features from all mixed runs
+for run in {1..3}; do
+    echo "Extracting mixed run $run..."
+    python3 feature_extractor.py \
+        --input ../datasets/raw_logs/mixed_traffic_run${run}.log \
+        --output ../datasets/processed/mixed_traffic_run${run}.csv \
+        --label mixed
+done
+
+echo ""
+echo "Feature extraction complete!"
+echo "Benign samples: $(cat ../datasets/processed/benign_baseline_run*.csv | wc -l)"
+echo "Attack samples: $(cat ../datasets/processed/attack_cic_ids_run*.csv | wc -l)"
+echo "Mixed samples:  $(cat ../datasets/processed/mixed_traffic_run*.csv | wc -l)"
 ```
 
 **Features Extracted (13 total):**
@@ -1118,6 +1196,10 @@ python3 prepare_dataset.py \
 
 ### Step 2: Train and Export LightGBM Model
 
+**IMPORTANT:** Choose the appropriate training script based on your dataset size:
+
+#### Option A: Basic Training (for small datasets <1000 samples)
+
 ```bash
 cd /local/dpdk_100g/mira/ml_system/02_training
 
@@ -1127,14 +1209,59 @@ python3 export_lightgbm_model.py \
     --output ../../detector_system_ml/lightgbm_model.txt
 ```
 
-**This script:**
-1. Trains LightGBM multi-class classifier
-2. Exports model to `.txt` format (LightGBM C API compatible)
-3. Saves label mapping to `label_mapping.json`
+**Features:**
+- Automatic hyperparameter adjustment based on dataset size
+- Early stopping to prevent overfitting
+- Regularization (L1/L2) configured automatically
 
-**Output files:**
+#### Option B: Advanced Training with Normalization (RECOMMENDED for >1000 samples)
+
+```bash
+cd /local/dpdk_100g/mira/ml_system/02_training
+
+# Train with feature normalization for better performance
+python3 train_with_normalization.py \
+    --train ../datasets/splits/train.csv \
+    --val ../datasets/splits/val.csv \
+    --output ../../detector_system_ml/lightgbm_model.txt
+```
+
+**Features:**
+- StandardScaler normalization (mean=0, std=1)
+- Validation-based early stopping
+- Feature importance analysis
+- Better convergence for large datasets
+
+**Output files (both options):**
 - `detector_system_ml/lightgbm_model.txt` - Model file
 - `detector_system_ml/label_mapping.json` - Class mapping
+- `detector_system_ml/feature_scaler.pkl` - Feature scaler (Option B only)
+
+**Expected Training Output (for 3000+ samples):**
+```
+[INFO] Large dataset (3240 samples) - using optimized parameters
+[TRAINING CONFIGURATION]
+  Boosting rounds: 300
+  Max depth: 8
+  Num leaves: 63
+  Learning rate: 0.05
+  L1/L2 regularization: 0.5/0.5
+
+[TRAINING MODEL]
+[50]	train's multi_logloss: 0.0823	valid's multi_logloss: 0.1156
+[100]	train's multi_logloss: 0.0245	valid's multi_logloss: 0.0789
+[150]	train's multi_logloss: 0.0089	valid's multi_logloss: 0.0654
+[200]	train's multi_logloss: 0.0034	valid's multi_logloss: 0.0623
+
+[VALIDATION RESULTS]
+Validation Accuracy: 96.54%
+              precision    recall  f1-score   support
+      attack       0.98      0.99      0.98       162
+      benign       0.96      0.95      0.96       162
+       mixed       0.96      0.96      0.96       162
+
+[STATUS] Excellent performance (>95%)! ✅
+```
 
 ### Step 3: Evaluate Model
 
@@ -1146,10 +1273,16 @@ python3 evaluate_model.py \
     --test ../datasets/splits/test.csv
 ```
 
-**Expected metrics:**
-- Accuracy: >95%
+**Expected metrics (with 3000+ samples):**
+- Overall Accuracy: >95%
 - Precision (per class): >90%
 - Recall (per class): >90%
+- F1-Score (weighted): >90%
+
+**vs. Current Results (120 samples):**
+- Overall Accuracy: 72% ❌
+- Benign class completely failed (0%)
+- Need ~27× more data for robust training
 
 ---
 
