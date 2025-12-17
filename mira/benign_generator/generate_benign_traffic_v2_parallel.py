@@ -38,6 +38,7 @@ import struct
 import time
 import os
 import sys
+import ipaddress
 import multiprocessing as mp
 from pathlib import Path
 from scapy.all import *
@@ -647,9 +648,6 @@ Examples:
     if args.cores < 0:
         print("Error: --cores must be >= 0 (0 = auto-detect all cores)")
         return 1
-
-    # Import ipaddress for IP range handling
-    import ipaddress
 
     generate_benign_traffic_parallel(
         args.output,
