@@ -799,10 +799,11 @@ Collect detector logs from generated traffic to create labeled training dataset.
 cd /local/dpdk_100g/mira/detector_system    # ← Use detector_system/ (NO ML)
 
 # Create logs directory
-mkdir -p ../ml_system/datasets/raw_logs
+ sudo mkdir -p ../ml_system/datasets/raw_logs
 
 # Run detector for 2 minutes (120 seconds)
-sudo timeout 120 ./mira_ddos_detector \      # ← Binary WITHOUT ML
+# ← Binary WITHOUT ML
+sudo timeout 120 ./mira_ddos_detector \      
     -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
     2>&1 | tee ../ml_system/datasets/raw_logs/benign_baseline.log
 
@@ -907,10 +908,8 @@ cd /local/dpdk_100g/mira/attack_sender
 sleep 5
 
 # Send attack traffic from CIC-IDS dataset (252 PCAP files, multi-pcap mode)
-sudo timeout 175 ./dpdk_pcap_sender_v2 \
-    -l 0-7 -n 4 -w 0000:41:00.0 \
-    -- --pcap-dir=/proj/softmeasure-PG0/CICD/remapped/ \
-    --rate-gbps 12
+sudo timeout 175 ./build/dpdk_pcap_sender -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/softmeasure-PG0/CICD/remapped/SAT-01-12-2018_0193.pcap --rate-gbps 7
+
 ```
 
 **What this collects:**

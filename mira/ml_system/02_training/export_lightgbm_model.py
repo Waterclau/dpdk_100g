@@ -28,8 +28,12 @@ def train_and_export(train_csv, output_path):
     print(f"\nLoading: {train_csv}")
     df = pd.read_csv(train_csv)
 
-    # Prepare features
-    feature_cols = [col for col in df.columns if col not in ['timestamp', 'label']]
+    # Prepare features (exclude 'label' and 'timestamp' if present)
+    exclude_cols = ['label']
+    if 'timestamp' in df.columns:
+        exclude_cols.append('timestamp')
+
+    feature_cols = [col for col in df.columns if col not in exclude_cols]
     X = df[feature_cols].values
     y_labels = df['label'].values
 
