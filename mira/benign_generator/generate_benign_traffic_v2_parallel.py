@@ -364,6 +364,10 @@ def generate_chunk_worker(args):
     current_timestamp = time.time() + time_offset
     base_pkt_interval = 0.00003  # ~30 microseconds between packets (baseline)
 
+    # Progress tracking
+    packets_per_update = max(1, num_packets // 20)  # Update every 5%
+    last_progress_print = 0
+
     print(f"[Worker {worker_id}] Generating {num_packets:,} packets...", flush=True)
 
     # Generate traffic phase by phase
@@ -373,6 +377,11 @@ def generate_chunk_worker(args):
         phase_distribution = phase.get_traffic_distribution()
 
         while current_count - phase_start < phase_target:
+            # Progress update
+            if current_count > 0 and current_count - last_progress_print >= packets_per_update:
+                percent = min(100, current_count * 100 // num_packets)
+                print(f"[Worker {worker_id}] Progress: {current_count:,}/{num_packets:,} ({percent}%)", flush=True)
+                last_progress_print = current_count
             # Select random client
             client_ip = random.choice(client_ips)
 
@@ -411,12 +420,15 @@ def generate_chunk_worker(args):
                 packets = packets[:num_packets]
                 break
 
+    # Final progress update
+    print(f"[Worker {worker_id}] Progress: {len(packets):,}/{num_packets:,} (100%)", flush=True)
+
     # Write partial PCAP file
     partial_file = f"{output_file}.part{worker_id}.pcap"
     print(f"[Worker {worker_id}] Writing {len(packets):,} packets to {partial_file}...", flush=True)
     wrpcap(partial_file, packets)
 
-    print(f"[Worker {worker_id}] Complete!", flush=True)
+    print(f"[Worker {worker_id}] ✓ Complete! Generated {len(packets):,} packets", flush=True)
     return partial_file
 
 
@@ -461,6 +473,14 @@ def generate_benign_traffic_parallel(output_file, num_packets, src_mac, dst_mac,
         print(f"[INFO] Packets per core: ~{num_packets // cores:,}")
         print("")
 
+    print("Process will execute in 3 phases:")
+    print("  Phase 1: Parallel packet generation (per-worker)")
+    print("  Phase 2: Merge partial PCAPs and sort by timestamp")
+    print("  Phase 3: Apply speedup compression and write final PCAP")
+    print("")
+    print("=" * 80)
+    print("")
+
     # Calculate packets per worker
     packets_per_worker = num_packets // cores
     remainder = num_packets % cores
@@ -490,7 +510,9 @@ def generate_benign_traffic_parallel(output_file, num_packets, src_mac, dst_mac,
         ))
 
     # Generate packets in parallel
-    print("Starting parallel packet generation...")
+    print("=" * 80)
+    print("[PHASE 1/3] Parallel packet generation")
+    print("=" * 80)
     print("")
     start_time = time.time()
 
@@ -510,45 +532,75 @@ def generate_benign_traffic_parallel(output_file, num_packets, src_mac, dst_mac,
     print("")
 
     # Merge partial PCAP files
-    print("[INFO] Merging partial PCAP files...")
+    print("")
+    print("=" * 80)
+    print("[PHASE 2/3] Merging partial PCAP files...")
+    print("=" * 80)
     merge_start = time.time()
 
     # Load all packets and sort by timestamp
     all_packets = []
     for idx, partial_file in enumerate(partial_files):
-        print(f"  Loading {partial_file}...", flush=True)
+        print(f"  [{idx+1}/{len(partial_files)}] Loading {partial_file}...", flush=True)
         packets = rdpcap(partial_file)
         all_packets.extend(packets)
+        print(f"       Loaded {len(packets):,} packets (total so far: {len(all_packets):,})", flush=True)
 
     # Sort by timestamp
+    print("")
     print(f"  Sorting {len(all_packets):,} packets by timestamp...", flush=True)
     all_packets.sort(key=lambda pkt: pkt.time)
+    print(f"  ✓ Sorting complete", flush=True)
 
     # Apply speedup compression if requested
     if speedup > 1.0:
-        print(f"\n[TIMESTAMP COMPRESSION] Applying {speedup}× speedup...", flush=True)
+        print("")
+        print("=" * 80)
+        print(f"[PHASE 3/3] Applying timestamp compression ({speedup}× speedup)...")
+        print("=" * 80)
         first_time = all_packets[0].time
-        for pkt in all_packets:
+        last_time = all_packets[-1].time
+        original_duration = last_time - first_time
+
+        packets_per_update = max(1, len(all_packets) // 10)  # Update every 10%
+        for idx, pkt in enumerate(all_packets):
+            if idx > 0 and idx % packets_per_update == 0:
+                percent = idx * 100 // len(all_packets)
+                print(f"  Compressing timestamps: {percent}% ({idx:,}/{len(all_packets):,})", flush=True)
+
             delta_from_start = pkt.time - first_time
             compressed_delta = delta_from_start / speedup
             pkt.time = first_time + compressed_delta
 
+        compressed_duration = all_packets[-1].time - first_time
+        print(f"  ✓ Compression complete", flush=True)
+        print(f"     Original duration:   {original_duration:.2f}s", flush=True)
+        print(f"     Compressed duration: {compressed_duration:.2f}s", flush=True)
+        print(f"     Speedup achieved:    {speedup}×", flush=True)
+    else:
+        print("")
+        print("=" * 80)
+        print("[PHASE 3/3] Writing final PCAP...")
+        print("=" * 80)
+
     # Write final PCAP
-    print(f"  Writing final PCAP to {output_file}...", flush=True)
+    print(f"  Writing {len(all_packets):,} packets to {output_file}...", flush=True)
     wrpcap(output_file, all_packets)
+    print(f"  ✓ PCAP file written successfully", flush=True)
 
     merge_time = time.time() - merge_start
-    print(f"[INFO] Merge complete in {merge_time:.1f}s")
+    print("")
+    print(f"[INFO] Merge and write complete in {merge_time:.1f}s")
     print("")
 
     # Cleanup temporary files
-    print("[INFO] Cleaning up temporary files...")
-    for partial_file in partial_files:
+    print("[CLEANUP] Removing temporary files...")
+    for idx, partial_file in enumerate(partial_files):
         try:
             os.remove(partial_file)
-            print(f"  Removed {partial_file}")
+            print(f"  [{idx+1}/{len(partial_files)}] Removed {os.path.basename(partial_file)}", flush=True)
         except Exception as e:
-            print(f"  Warning: Could not remove {partial_file}: {e}")
+            print(f"  Warning: Could not remove {partial_file}: {e}", flush=True)
 
     print("")
 
@@ -557,17 +609,24 @@ def generate_benign_traffic_parallel(output_file, num_packets, src_mac, dst_mac,
     file_size_mb = file_size / (1024 * 1024)
 
     total_time = time.time() - start_time
-    print(f"File size: {file_size_mb:.2f} MB")
+
+    print("")
+    print("=" * 80)
+    print("GENERATION COMPLETE!")
+    print("=" * 80)
+    print("")
+    print(f"Output file: {output_file}")
+    print(f"File size: {file_size_mb:.2f} MB ({file_size:,} bytes)")
     print("")
     print(f"[PERFORMANCE SUMMARY]")
-    print(f"  Total time: {total_time:.1f}s ({total_time / 60:.1f} minutes)")
-    print(f"  Generation rate: {num_packets / total_time / 1000:.1f}K packets/sec")
-    print(f"  Cores used: {cores}")
-    print(f"  Speedup vs single core: ~{cores}×")
+    print(f"  Total time:        {total_time:.1f}s ({total_time / 60:.1f} minutes)")
+    print(f"  Generation rate:   {num_packets / total_time / 1000:.1f}K packets/sec")
+    print(f"  Cores used:        {cores}")
+    print(f"  Speedup achieved:  ~{cores}× vs single core")
     print("")
 
     # Print traffic statistics
-    print("Traffic Statistics:")
+    print("[TRAFFIC STATISTICS]")
     http_count = sum(1 for p in all_packets if TCP in p and (p[TCP].dport == 80 or p[TCP].sport == 80))
     dns_count = sum(1 for p in all_packets if DNS in p)
     ssh_count = sum(1 for p in all_packets if TCP in p and (p[TCP].dport == 22 or p[TCP].sport == 22))
@@ -575,14 +634,23 @@ def generate_benign_traffic_parallel(output_file, num_packets, src_mac, dst_mac,
     udp_count = sum(1 for p in all_packets if UDP in p and DNS not in p)
 
     total = len(all_packets)
-    print(f"  HTTP:  {http_count:8,} packets ({http_count*100//total:2d}%)")
-    print(f"  DNS:   {dns_count:8,} packets ({dns_count*100//total:2d}%)")
-    print(f"  SSH:   {ssh_count:8,} packets ({ssh_count*100//total:2d}%)")
-    print(f"  ICMP:  {icmp_count:8,} packets ({icmp_count*100//total:2d}%)")
-    print(f"  UDP:   {udp_count:8,} packets ({udp_count*100//total:2d}%)")
+    print(f"  HTTP:  {http_count:9,} packets ({http_count*100//total:3d}%)")
+    print(f"  DNS:   {dns_count:9,} packets ({dns_count*100//total:3d}%)")
+    print(f"  SSH:   {ssh_count:9,} packets ({ssh_count*100//total:3d}%)")
+    print(f"  ICMP:  {icmp_count:9,} packets ({icmp_count*100//total:3d}%)")
+    print(f"  UDP:   {udp_count:9,} packets ({udp_count*100//total:3d}%)")
+    print(f"  ────────────────────────────────────")
+    print(f"  TOTAL: {total:9,} packets (100%)")
     print("")
     print("=" * 80)
-    print("Generation complete!")
+    print("")
+    print("✓ All done! PCAP file ready for use.")
+    print("")
+    print("Next steps:")
+    print(f"  1. Verify: tcpdump -r {output_file} -c 10 -n")
+    print(f"  2. Stats:  capinfos {output_file}")
+    print(f"  3. Use with DPDK sender or ML training pipeline")
+    print("")
     print("=" * 80)
 
 
