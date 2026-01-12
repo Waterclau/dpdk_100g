@@ -934,6 +934,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         rx_pkts_nic > 0 ? (double)g_stats.total_packets * 100.0 / rx_pkts_nic : 0.0);
 
     printf("%s", buffer);
+    fflush(stdout);  /* Force immediate write to stdout (no buffering) */
 
     if (g_log_file) {
         fprintf(g_log_file, "%s", buffer);

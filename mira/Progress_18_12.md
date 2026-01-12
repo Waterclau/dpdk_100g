@@ -158,8 +158,8 @@ We extract **13 features** from each detection window (5 seconds):
 8. `dns_queries` - DNS query count (port 53)
 
 **Source Classification:**
-9. `baseline_packets` - Packets from benign sources (10.10.1.x)
-10. `attack_packets` - Packets from attack sources (10.10.2.x)
+9. `baseline_packets` - Packets from benign sources (10.10.2.x)
+10. `attack_packets` - Packets from attack sources (10.10.3.x)
 
 **Derived Ratios:**
 11. `udp_tcp_ratio` - UDP/TCP ratio
