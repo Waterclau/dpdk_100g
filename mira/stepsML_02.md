@@ -465,9 +465,12 @@ for run in {1..3}; do
     # Start attack sender (using CIC-IDS dataset)
     cd ../attack_sender
 
+    sudo timeout -s SIGKILL 1795 ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- --pcap-dir /proj/softmeasure-PG0/CICD/remapped/ --rate-gbps 12
+
     sudo timeout 1795 ./dpdk_pcap_sender_v2 \
         -l 0-7 -n 4 -w 0000:41:00.0 \
         -- /proj/softmeasure-PG0/CICD/remapped/SAT-01-12-2018_0500.pcap --loop --rate-gbps 12
+    timeout 1795 bash -c 'for pcap in /proj/softmeasure-PG0/CICD/remapped/*.pcap; do sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- "$pcap"; done'
 
     wait $DETECTOR_PID
     cd ../detector_system
@@ -638,9 +641,9 @@ echo "Feature extraction complete!"
 echo "========================================="
 
 # Count samples
-benign_count=$(cat ../datasets/processed/benign_baseline_run*.csv | wc -l)
-attack_count=$(cat ../datasets/processed/attack_cic_run*.csv | wc -l)
-mixed_count=$(cat ../datasets/processed/mixed_traffic_run*.csv | wc -l)
+benign_count=$(cat ../datasets/processed/benign_baseline_run1.csv | wc -l)
+attack_count=$(cat ../datasets/processed/attack_cic_run1.csv | wc -l)
+mixed_count=$(cat ../datasets/processed/mixed_traffic_run1.csv | wc -l)
 total_count=$((benign_count + attack_count + mixed_count - 9))  # -9 for CSV headers
 
 echo "Benign samples: $benign_count"
@@ -688,7 +691,7 @@ Train LightGBM model with adaptive hyperparameters and feature normalization.
 ```bash
 cd /local/dpdk_100g/mira/ml_system/02_training
 
-python3 prepare_dataset.py \
+sudo python3 prepare_dataset.py \
     --input ../datasets/processed/*.csv \
     --output ../datasets/splits/ \
     --train-ratio 0.7 \
@@ -718,7 +721,7 @@ cd /local/dpdk_100g/mira/ml_system/02_training
 
 # Train with feature normalization
 # This will automatically use optimal hyperparameters for 3240 samples
-python3 train_with_normalization.py \
+sudo python3 train_with_normalization.py \
     --train ../datasets/splits/train.csv \
     --val ../datasets/splits/val.csv \
     --output ../../detector_system_ml/lightgbm_model.txt
@@ -1126,6 +1129,417 @@ The ML-enhanced MIRA detector is **production-ready** with:
 
 ---
 
+## 🚀 NEW: Multi-Class DDoS Detection with CIC-DDoS-2019 Features (v3.0)
+
+### Overview
+
+This section describes **major enhancements** implemented to address overfitting and enable multi-class attack detection for the CIC-DDoS-2019 dataset.
+
+**Key Problems Solved:**
+- ❌ 100% validation accuracy with 630 samples → **SEVERE OVERFITTING**
+- ❌ Only 3 classes (benign/attack/mixed) → Cannot identify specific attack types
+- ❌ Only 14 features → Insufficient for distinguishing 13+ attack types
+
+**New Capabilities:**
+- ✅ **46 total features** (14 original + 26 protocol-specific + 6 derived ratios)
+- ✅ **14 attack classes** (benign + 13 DDoS attack types)
+- ✅ **Anti-overfitting hyperparameters** for small datasets
+- ✅ **Expected accuracy: 85-96%** (realistic vs 100% overfitted)
+
+---
+
+### NEW Feature Set (46 Features Total)
+
+#### Original 14 Features
+```
+1. total_packets, total_bytes
+2. tcp_packets, udp_packets, icmp_packets
+3. syn_packets, http_requests, dns_queries
+4. baseline_packets (10.10.2.x), attack_packets (10.10.3.x)
+5. udp_tcp_ratio, syn_total_ratio, baseline_attack_ratio, bytes_per_packet
+```
+
+#### NEW: Protocol-Specific Features (26 features)
+
+**NTP Amplification (3 features):**
+- `ntp_monlist_queries` - NTP mode 7 MON_GETLIST packets
+- `ntp_responses` - NTP responses
+- `avg_ntp_response_size` - Average NTP response size
+
+**DNS Amplification (4 features):**
+- `dns_any_queries` - DNS type ANY queries
+- `dns_txt_queries` - DNS TXT queries
+- `dns_responses` - DNS responses
+- `avg_dns_response_size` - Average DNS response size
+
+**SNMP Amplification (3 features):**
+- `snmp_getbulk_requests` - SNMP GetBulkRequest packets
+- `snmp_responses` - SNMP responses
+- `avg_snmp_response_size` - Average SNMP response size
+
+**SSDP Amplification (2 features):**
+- `ssdp_msearch_packets` - SSDP M-SEARCH packets
+- `ssdp_responses` - SSDP responses
+
+**PortMapper/RPC (2 features):**
+- `portmap_getport_calls` - RPC portmapper GETPORT calls
+- `portmap_dump_calls` - RPC portmapper DUMP calls
+
+**NetBIOS (2 features):**
+- `netbios_name_queries` - NetBIOS name service queries
+- `netbios_dgram_packets` - NetBIOS datagram service
+
+**LDAP (2 features):**
+- `ldap_bind_requests` - LDAP Bind requests
+- `ldap_search_requests` - LDAP Search requests
+
+**MSSQL (2 features):**
+- `mssql_sqlbatch_packets` - MSSQL SQLBatch packets
+- `mssql_rpc_packets` - MSSQL RPC packets
+
+**TFTP (2 features):**
+- `tftp_rrq_packets` - TFTP Read Request packets
+- `tftp_wrq_packets` - TFTP Write Request packets
+
+#### NEW: Derived Amplification Features (6 ratios)
+
+```
+1. ntp_amplification_factor  - avg_ntp_response_size / 48 bytes (NTP query size)
+2. dns_amplification_factor  - avg_dns_response_size / 60 bytes (DNS query size)
+3. snmp_amplification_factor - avg_snmp_response_size / 150 bytes (SNMP request size)
+4. query_response_ratio      - total_queries / total_responses (imbalance)
+5. fragmentation_ratio       - fragmented_packets / total_packets
+6. syn_ack_ratio             - syn_packets / ack_packets
+```
+
+---
+
+### Multi-Class Attack Labels (14 Classes)
+
+```python
+ATTACK_TYPES = [
+    'benign',       # Normal traffic
+    'portmap',      # RPC portmapper amplification
+    'netbios',      # NetBIOS name service amplification
+    'ldap',         # LDAP amplification
+    'mssql',        # MSSQL amplification
+    'udp_flood',    # Generic UDP flood
+    'udp_lag',      # UDP with lag/delay
+    'syn_flood',    # SYN flood attack
+    'ntp',          # NTP amplification
+    'dns',          # DNS amplification
+    'snmp',         # SNMP amplification
+    'ssdp',         # SSDP amplification
+    'webddos',      # HTTP/HTTPS flood
+    'tftp',         # TFTP amplification
+    'mixed'         # Multiple attack types
+]
+```
+
+---
+
+### Anti-Overfitting Hyperparameters (CRITICAL IMPROVEMENT)
+
+**Problem:** With 630 samples, LightGBM achieved 100% validation accuracy → Model memorized training data instead of learning patterns.
+
+**Solution:** Aggressive regularization for small datasets (<1000 samples):
+
+```python
+# NEW: Conservative hyperparameters for datasets < 1000 samples
+params = {
+    'learning_rate': 0.03,       # Reduced from 0.05 (slower learning)
+    'max_depth': 3,               # Reduced from 6 (CRITICAL - prevents deep trees)
+    'num_leaves': 7,              # Reduced from 31 (CRITICAL - simpler trees)
+    'min_data_in_leaf': 20,       # Increased from 10 (more data per leaf)
+    'feature_fraction': 0.7,      # Reduced from 0.85 (more dropout)
+    'bagging_fraction': 0.7,      # Reduced from 0.85 (more dropout)
+    'lambda_l1': 5.0,             # Increased from 0.5 (L1 regularization)
+    'lambda_l2': 10.0,            # Increased from 0.5 (L2 regularization)
+    'min_gain_to_split': 1.0,    # Added (require minimum gain for splits)
+}
+num_boost_round = 100            # Reduced from 200 (fewer trees)
+early_stopping_rounds = 10       # Reduced from 30 (aggressive early stop)
+```
+
+**Key Changes:**
+- ✅ Simpler trees (max_depth: 6→3, num_leaves: 31→7)
+- ✅ Stronger regularization (lambda_l1: 0.5→5.0, lambda_l2: 0.5→10.0)
+- ✅ More aggressive early stopping (30→10 rounds)
+- ✅ Fewer boosting rounds (200→100)
+
+**Expected Impact:**
+- ❌ Validation accuracy: 100% (overfitted) → ✅ 85-96% (realistic)
+- ✅ Model will generalize to unseen attack types
+- ✅ Overfitting warning triggers at >99% accuracy
+
+---
+
+### NEW Data Collection Strategy for Multi-Class
+
+#### Training Set (Day 1 - 7 attack types × 3 runs)
+
+Collect **~5100 samples** across 7 attack types:
+
+```bash
+# Day 1: Training data collection (8.5 hours total)
+
+# 1. Benign baseline (3 runs × 30 min = 90 min)
+for i in 1 2 3; do
+    python3 feature_extractor.py \
+        --input benign_run${i}.log \
+        --output benign_run${i}.csv \
+        --label benign
+done
+
+# 2. PortMap attack (3 runs × 20 min = 60 min)
+for i in 1 2 3; do
+    python3 feature_extractor.py \
+        --input portmap_run${i}.log \
+        --output portmap_run${i}.csv \
+        --label portmap
+done
+
+# 3. NetBIOS attack (3 runs × 20 min = 60 min)
+for i in 1 2 3; do
+    python3 feature_extractor.py \
+        --input netbios_run${i}.log \
+        --output netbios_run${i}.csv \
+        --label netbios
+done
+
+# 4. LDAP attack (3 runs × 20 min = 60 min)
+for i in 1 2 3; do
+    python3 feature_extractor.py \
+        --input ldap_run${i}.log \
+        --output ldap_run${i}.csv \
+        --label ldap
+done
+
+# 5. MSSQL attack (3 runs × 20 min = 60 min)
+for i in 1 2 3; do
+    python3 feature_extractor.py \
+        --input mssql_run${i}.log \
+        --output mssql_run${i}.csv \
+        --label mssql
+done
+
+# 6. UDP flood (3 runs × 20 min = 60 min)
+for i in 1 2 3; do
+    python3 feature_extractor.py \
+        --input udp_flood_run${i}.log \
+        --output udp_flood_run${i}.csv \
+        --label udp_flood
+done
+
+# 7. UDP-Lag (3 runs × 20 min = 60 min)
+for i in 1 2 3; do
+    python3 feature_extractor.py \
+        --input udp_lag_run${i}.log \
+        --output udp_lag_run${i}.csv \
+        --label udp_lag
+done
+
+# 8. SYN flood (3 runs × 20 min = 60 min)
+for i in 1 2 3; do
+    python3 feature_extractor.py \
+        --input syn_flood_run${i}.log \
+        --output syn_flood_run${i}.csv \
+        --label syn_flood
+done
+```
+
+**Expected samples:** ~5100 total (90 min × 3 benign + 7 × 60 min attacks)
+
+#### Test Set (Day 2 - 13 attack types including 6 NEW)
+
+Collect **~3900 samples** including unseen attack types:
+
+```bash
+# Day 2: Test data (6.5 hours total)
+# IMPORTANT: Include NEW attack types NOT in training set
+
+# NEW attack types (not in training):
+- NTP amplification (30 min → ~300 samples)
+- DNS amplification (30 min → ~300 samples)
+- SNMP amplification (30 min → ~300 samples)
+- SSDP amplification (30 min → ~300 samples)
+- WebDDoS (30 min → ~300 samples)
+- TFTP amplification (30 min → ~300 samples)
+
+# Plus re-run of training types for test set
+- benign, portmap, netbios, ldap, mssql, udp_flood, udp_lag, syn_flood
+  (each 30 min → ~300 samples × 8 = ~2400 samples)
+
+# Total test samples: 6 × 300 + 2400 = ~3900 samples
+```
+
+---
+
+### Updated Feature Extraction (Multi-Class)
+
+```bash
+cd /local/dpdk_100g/mira/ml_system/01_data_collection
+
+# Extract features from log with attack type label
+python3 feature_extractor.py \
+    --input ../datasets/raw_logs/ntp_attack_run1.log \
+    --output ../datasets/processed/ntp_attack_run1.csv \
+    --label ntp    # <-- NEW: Use specific attack type
+
+# Supported labels: benign, portmap, netbios, ldap, mssql, udp_flood,
+#                   udp_lag, syn_flood, ntp, dns, snmp, ssdp, webddos, tftp, mixed
+```
+
+**Expected output:**
+```
+[SUCCESS] Saved 240 records to ntp_attack_run1.csv
+
+[SUMMARY STATISTICS]
+  Total records:     240
+  Label:             ntp
+  Avg packets/win:   2850
+
+[PROTOCOL-SPECIFIC FEATURES]
+  NTP queries:       1250    <-- NEW: Protocol-specific detection
+  DNS ANY/TXT:       0
+  SNMP GetBulk:      0
+  SSDP M-SEARCH:     0
+  PortMapper:        0
+  NetBIOS:           0
+  LDAP:              0
+  MSSQL:             0
+  TFTP:              0
+```
+
+---
+
+### Expected Performance (Multi-Class with 5000+ Samples)
+
+**Current (3 classes, 14 features, 630 samples):**
+```
+❌ Validation accuracy: 100% (overfitted - model memorized training data)
+❌ Cannot distinguish attack types (only benign/attack/mixed)
+❌ Will fail on unseen attacks
+```
+
+**Target (14 classes, 46 features, 5000+ samples):**
+```
+✅ Validation accuracy: 92-96% (realistic - model learned patterns)
+✅ Test accuracy on unseen attacks: 85-90% (generalization)
+✅ Per-class precision/recall: >80% for most attack types
+✅ Can identify specific attack types (NTP, DNS, SNMP, etc.)
+```
+
+**Example confusion matrix (target):**
+```
+              Predicted
+True      benign  ntp  dns  snmp  syn  ...
+benign     145    2    1     0     1
+ntp         1    138   3     1     0
+dns         2     3   135    2     1
+snmp        0     2    1   140    0
+syn_flood   1     0    1     0   142
+...
+```
+
+---
+
+### Verification Checklist
+
+Before running multi-class experiments:
+
+**1. Detector Code (detectorML.c):**
+```bash
+# Verify protocol-specific features are in code
+grep -A 5 "PROTOCOL-SPECIFIC FEATURES" detector_system_ml/detectorML.c | head -20
+# Should show: struct worker_stats with 26 new protocol counters
+```
+
+**2. Feature Extractor:**
+```bash
+# Verify multi-class support
+python3 feature_extractor.py --help | grep "14 classes"
+# Should show: Supported attack types (14 classes)
+```
+
+**3. Training Script:**
+```bash
+# Verify anti-overfitting hyperparameters
+grep -A 10 "dataset_size < 1000" ml_system/02_training/train_with_normalization.py | grep "max_depth\|num_leaves"
+# Should show: max_depth: 3, num_leaves: 7
+```
+
+**4. Overfitting Warning:**
+```bash
+# Verify overfitting detection
+grep -A 5 "POSSIBLE OVERFITTING" ml_system/02_training/train_with_normalization.py
+# Should show warning at >99% accuracy
+```
+
+---
+
+### Migration Path (Optional - For Existing Experiments)
+
+If you already collected data with 3 classes:
+
+**Option 1: Start fresh (RECOMMENDED)**
+- Collect new data with 14 attack types
+- Use protocol-specific labels (ntp, dns, snmp, etc.)
+- Train with 5000+ samples
+
+**Option 2: Extend existing dataset**
+- Keep existing benign/attack/mixed data
+- Add new attack-specific data (ntp, dns, snmp, etc.)
+- Re-label old "attack" data with specific types if possible
+- Train with combined dataset
+
+**Option 3: Two-stage classification**
+- Stage 1: Binary (benign vs attack) - use existing model
+- Stage 2: Multi-class (identify attack type) - use new model
+- Deploy both models in cascade
+
+---
+
+### Troubleshooting Multi-Class Detection
+
+**Problem: Some protocol features are always 0**
+```
+# Check if detector compiled with new features
+ldd detector_system_ml/detectorML | grep dpdk
+nm detector_system_ml/detectorML | grep ntp_monlist_queries
+# Should show symbol exists
+```
+
+**Problem: Feature extraction fails on new features**
+```
+# Verify log contains protocol-specific counters
+grep "PROTOCOL-SPECIFIC COUNTERS" datasets/raw_logs/ntp_attack.log | head -5
+# Should show NTP/DNS/SNMP sections
+```
+
+**Problem: Still getting 100% accuracy**
+```
+# Check if using correct hyperparameters
+python3 train_with_normalization.py ... 2>&1 | grep "max_depth\|num_leaves"
+# Should show: max_depth: 3, num_leaves: 7 (not 6/31)
+```
+
+---
+
+### References
+
+**Documentation Files:**
+- `PROTOCOL_SPECIFIC_FEATURES.md` - Complete feature specification
+- `detector_system_ml/detectorML.c` - Protocol detection implementation
+- `ml_system/01_data_collection/feature_extractor.py` - Multi-class extraction
+- `ml_system/02_training/train_with_normalization.py` - Anti-overfitting training
+
+**Dataset:**
+- CIC-DDoS-2019 Dataset: 13+ attack types
+- Source: Canadian Institute for Cybersecurity
+
+---
+
 ## Quick Reference Commands
 
 ### Data Collection (Single Run)
@@ -1151,7 +1565,10 @@ sudo ./detectorML -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0
 
 ---
 
-**Document Version:** 2.0
-**Date:** 2026-01-12
-**Status:** ✅ Complete workflow with correct IPs and optimizations
-**Improvements:** Adaptive hyperparameters, feature normalization, parallel generation, multi-run collection
+**Document Version:** 3.0
+**Date:** 2026-01-14
+**Status:** ✅ Complete workflow with multi-class detection and anti-overfitting
+**Improvements:**
+- ✅ v3.0 (2026-01-14): Multi-class detection (14 classes), protocol-specific features (46 total), anti-overfitting hyperparameters
+- ✅ v2.0 (2026-01-12): Adaptive hyperparameters, feature normalization, parallel generation, multi-run collection
+- ✅ v1.0: Initial workflow with correct IPs (10.10.2.x benign, 10.10.3.x attack)

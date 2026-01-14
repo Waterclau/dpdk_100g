@@ -109,24 +109,25 @@ def train_and_export(train_csv, val_csv, output_path):
         }
         num_boost_round = 150
     elif dataset_size < 1000:
-        print(f"\n[INFO] Medium dataset ({dataset_size} samples)")
+        print(f"\n[WARNING] Medium dataset ({dataset_size} samples) - Using conservative hyperparameters to prevent overfitting")
         params = {
             'objective': 'multiclass',
             'num_class': len(label_encoder.classes_),
             'metric': 'multi_logloss',
-            'learning_rate': 0.05,
-            'max_depth': 6,
-            'num_leaves': 31,
-            'min_data_in_leaf': 10,
-            'feature_fraction': 0.85,
-            'bagging_fraction': 0.85,
+            'learning_rate': 0.03,           # Reduced from 0.05
+            'max_depth': 3,                   # Reduced from 6 (CRITICAL for small data)
+            'num_leaves': 7,                  # Reduced from 31 (CRITICAL for small data)
+            'min_data_in_leaf': 20,           # Increased from 10
+            'feature_fraction': 0.7,          # Reduced from 0.85 (more dropout)
+            'bagging_fraction': 0.7,          # Reduced from 0.85 (more dropout)
             'bagging_freq': 5,
-            'lambda_l1': 0.5,
-            'lambda_l2': 0.5,
+            'lambda_l1': 5.0,                 # Increased from 0.5 (L1 regularization)
+            'lambda_l2': 10.0,                # Increased from 0.5 (L2 regularization)
+            'min_gain_to_split': 1.0,        # Added (require minimum gain for splits)
             'verbose': -1,
             'seed': 42
         }
-        num_boost_round = 200
+        num_boost_round = 100                # Reduced from 200
     else:
         print(f"\n[INFO] Large dataset ({dataset_size} samples)")
         params = {
@@ -157,6 +158,10 @@ def train_and_export(train_csv, val_csv, output_path):
 
     # Train model
     print("\n[TRAINING MODEL]")
+    # Adaptive early stopping based on dataset size
+    early_stop_rounds = 10 if dataset_size < 1000 else 20 if dataset_size < 2000 else 30
+    print(f"  Early stopping rounds: {early_stop_rounds} (aggressive for small datasets)")
+
     model = lgb.train(
         params,
         train_data,
@@ -165,7 +170,7 @@ def train_and_export(train_csv, val_csv, output_path):
         valid_names=['train', 'valid'],
         callbacks=[
             lgb.log_evaluation(period=50),
-            lgb.early_stopping(stopping_rounds=30, verbose=True)
+            lgb.early_stopping(stopping_rounds=early_stop_rounds, verbose=True)
         ]
     )
 
@@ -228,8 +233,18 @@ def train_and_export(train_csv, val_csv, output_path):
         print("\n[STATUS] Good performance (90-95%). May benefit from:")
         print("  - Fine-tuning hyperparameters")
         print("  - Collecting more diverse data")
+    elif val_accuracy < 0.99:
+        print("\n[STATUS] Excellent performance (95-99%)! ✅")
     else:
-        print("\n[STATUS] Excellent performance (>95%)! ✅")
+        print("\n⚠️  [WARNING] POSSIBLE OVERFITTING DETECTED! ⚠️")
+        print(f"  Validation accuracy = {val_accuracy*100:.2f}% (suspiciously high)")
+        print(f"  Training samples = {dataset_size}")
+        print("\n  Recommendations:")
+        print("  1. Collect at least 5-10× more training data (target: 5000+ samples)")
+        print("  2. Use K-fold cross-validation to verify generalization")
+        print("  3. Test on completely unseen attack types (not in training set)")
+        print("  4. Check if validation set is too similar to training set")
+        print("\n  Current model may NOT generalize to real-world traffic!")
 
 
 def main():

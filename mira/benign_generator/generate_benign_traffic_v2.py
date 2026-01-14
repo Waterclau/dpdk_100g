@@ -609,10 +609,10 @@ Examples:
                        help='Source MAC address (default: 00:00:00:00:00:01)')
     parser.add_argument('--dst-mac', default='0c:42:a1:dd:5b:28',
                        help='Destination MAC address (default: 0c:42:a1:dd:5b:28)')
-    parser.add_argument('--client-range', default='10.10.1.0/24',
-                       help='Client IP range (default: 10.10.1.0/24 - USE CLOUDLAB INTERNAL NETWORK)')
-    parser.add_argument('--server-ip', default='10.10.1.2',
-                       help='Server IP address (default: 10.10.1.2 - USE CLOUDLAB INTERNAL NETWORK)')
+    parser.add_argument('--client-range', default='10.10.2.0/24',
+                       help='Client IP range (default: 10.10.2.0/24 - SIMULATED BASELINE NETWORK)')
+    parser.add_argument('--server-ip', default='10.10.2.1',
+                       help='Server IP address (default: 10.10.2.1 - SIMULATED BASELINE NETWORK)')
     parser.add_argument('--clients', type=int, default=500,
                        help='Number of client IPs (default: 500)')
     parser.add_argument('--speedup', '-s', type=float, default=1.0,
