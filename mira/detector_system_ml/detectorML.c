@@ -75,8 +75,8 @@
 
 /* IP tracking */
 #define MAX_IPS 65536
-#define BASELINE_NETWORK 0xC0A80100     /* 192.168.1.x - benign traffic */
-#define ATTACK_NETWORK   0xC0A80200     /* 192.168.2.x - attack traffic (changed from 203.0.113.x) */
+#define BASELINE_NETWORK 0x0A0A0200     /* 10.10.2.x - benign traffic (CloudLab internal) */
+#define ATTACK_NETWORK   0x0A0A0300     /* 10.10.3.x - attack traffic (CloudLab internal) */
 #define NETWORK_MASK     0xFFFFFF00
 
 #define SERVER_IP 0x0A000001
@@ -1319,6 +1319,10 @@ static int worker_thread(void *arg)
                 /* MSSQL UDP detection (port 1434) */
                 else if (udp_dst_port == 1434) {
                     local_mssql_sqlbatch++;  // MSSQL UDP traffic
+                }
+                /* CLDAP/LDAP UDP detection (port 389) */
+                else if (udp_dst_port == 389) {
+                    local_ldap_search++;  // CLDAP (Connectionless LDAP) traffic
                 }
             }
             else if (proto == IPPROTO_ICMP) {

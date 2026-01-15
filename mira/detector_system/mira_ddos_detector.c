@@ -129,6 +129,48 @@ struct worker_stats {
     uint64_t baseline_bytes;
     uint64_t attack_bytes;
 
+    /* ========== Protocol-Specific Features for CIC-DDoS-2019 (26 features) ========== */
+    /* NTP Amplification Detection (3 features) */
+    uint64_t ntp_monlist_queries;      // NTP mode 7 MON_GETLIST packets
+    uint64_t ntp_responses;             // NTP responses
+    uint64_t ntp_response_size_sum;     // Sum for calculating avg_ntp_response_size
+
+    /* DNS Amplification Detection (4 features) */
+    uint64_t dns_any_queries;           // DNS type ANY queries
+    uint64_t dns_txt_queries;           // DNS TXT queries
+    uint64_t dns_responses;             // DNS responses
+    uint64_t dns_response_size_sum;     // Sum for calculating avg_dns_response_size
+
+    /* SNMP Amplification Detection (3 features) */
+    uint64_t snmp_getbulk_requests;     // SNMP GetBulkRequest packets
+    uint64_t snmp_responses;            // SNMP responses
+    uint64_t snmp_response_size_sum;    // Sum for calculating avg_snmp_response_size
+
+    /* SSDP Amplification Detection (2 features) */
+    uint64_t ssdp_msearch_packets;      // SSDP M-SEARCH packets
+    uint64_t ssdp_responses;            // SSDP responses
+
+    /* PortMapper/RPC Detection (2 features) */
+    uint64_t portmap_getport_calls;     // RPC portmapper GETPORT calls
+    uint64_t portmap_dump_calls;        // RPC portmapper DUMP calls
+
+    /* NetBIOS Detection (2 features) */
+    uint64_t netbios_name_queries;      // NetBIOS name service queries
+    uint64_t netbios_dgram_packets;     // NetBIOS datagram service
+
+    /* LDAP Detection (2 features) */
+    uint64_t ldap_bind_requests;        // LDAP Bind requests
+    uint64_t ldap_search_requests;      // LDAP Search requests
+
+    /* MSSQL Detection (2 features) */
+    uint64_t mssql_sqlbatch_packets;    // MSSQL SQLBatch packets
+    uint64_t mssql_rpc_packets;         // MSSQL RPC packets
+
+    /* TFTP Detection (2 features) */
+    uint64_t tftp_rrq_packets;          // TFTP Read Request packets
+    uint64_t tftp_wrq_packets;          // TFTP Write Request packets
+    /* ============================================================================== */
+
     /* DPDK Performance */
     uint64_t rx_bursts_empty;
     uint64_t rx_bursts_total;
@@ -154,6 +196,48 @@ struct detection_stats {
     uint64_t total_bytes;
     uint64_t baseline_bytes;
     uint64_t attack_bytes;
+
+    /* ========== Protocol-Specific Features for CIC-DDoS-2019 (26 features) ========== */
+    /* NTP Amplification Detection */
+    uint64_t ntp_monlist_queries;
+    uint64_t ntp_responses;
+    uint64_t ntp_response_size_sum;
+
+    /* DNS Amplification Detection */
+    uint64_t dns_any_queries;
+    uint64_t dns_txt_queries;
+    uint64_t dns_responses;
+    uint64_t dns_response_size_sum;
+
+    /* SNMP Amplification Detection */
+    uint64_t snmp_getbulk_requests;
+    uint64_t snmp_responses;
+    uint64_t snmp_response_size_sum;
+
+    /* SSDP Amplification Detection */
+    uint64_t ssdp_msearch_packets;
+    uint64_t ssdp_responses;
+
+    /* PortMapper/RPC Detection */
+    uint64_t portmap_getport_calls;
+    uint64_t portmap_dump_calls;
+
+    /* NetBIOS Detection */
+    uint64_t netbios_name_queries;
+    uint64_t netbios_dgram_packets;
+
+    /* LDAP Detection */
+    uint64_t ldap_bind_requests;
+    uint64_t ldap_search_requests;
+
+    /* MSSQL Detection */
+    uint64_t mssql_sqlbatch_packets;
+    uint64_t mssql_rpc_packets;
+
+    /* TFTP Detection */
+    uint64_t tftp_rrq_packets;
+    uint64_t tftp_wrq_packets;
+    /* ============================================================================== */
 
     /* Detection metrics */
     uint64_t udp_flood_detections;
@@ -538,6 +622,31 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     g_stats.rx_bursts_total = 0;
     g_stats.rx_bursts_empty = 0;
 
+    /* ========== Protocol-Specific Stats Reset ========== */
+    g_stats.ntp_monlist_queries = 0;
+    g_stats.ntp_responses = 0;
+    g_stats.ntp_response_size_sum = 0;
+    g_stats.dns_any_queries = 0;
+    g_stats.dns_txt_queries = 0;
+    g_stats.dns_responses = 0;
+    g_stats.dns_response_size_sum = 0;
+    g_stats.snmp_getbulk_requests = 0;
+    g_stats.snmp_responses = 0;
+    g_stats.snmp_response_size_sum = 0;
+    g_stats.ssdp_msearch_packets = 0;
+    g_stats.ssdp_responses = 0;
+    g_stats.portmap_getport_calls = 0;
+    g_stats.portmap_dump_calls = 0;
+    g_stats.netbios_name_queries = 0;
+    g_stats.netbios_dgram_packets = 0;
+    g_stats.ldap_bind_requests = 0;
+    g_stats.ldap_search_requests = 0;
+    g_stats.mssql_sqlbatch_packets = 0;
+    g_stats.mssql_rpc_packets = 0;
+    g_stats.tftp_rrq_packets = 0;
+    g_stats.tftp_wrq_packets = 0;
+    /* ================================================== */
+
     for (int i = 0; i < NUM_RX_QUEUES; i++) {
         g_stats.total_packets += g_worker_stats[i].total_packets;
         g_stats.baseline_packets += g_worker_stats[i].baseline_packets;
@@ -554,6 +663,31 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         g_stats.attack_bytes += g_worker_stats[i].attack_bytes;
         g_stats.rx_bursts_total += g_worker_stats[i].rx_bursts_total;
         g_stats.rx_bursts_empty += g_worker_stats[i].rx_bursts_empty;
+
+        /* ========== Protocol-Specific Stats Aggregation ========== */
+        g_stats.ntp_monlist_queries += g_worker_stats[i].ntp_monlist_queries;
+        g_stats.ntp_responses += g_worker_stats[i].ntp_responses;
+        g_stats.ntp_response_size_sum += g_worker_stats[i].ntp_response_size_sum;
+        g_stats.dns_any_queries += g_worker_stats[i].dns_any_queries;
+        g_stats.dns_txt_queries += g_worker_stats[i].dns_txt_queries;
+        g_stats.dns_responses += g_worker_stats[i].dns_responses;
+        g_stats.dns_response_size_sum += g_worker_stats[i].dns_response_size_sum;
+        g_stats.snmp_getbulk_requests += g_worker_stats[i].snmp_getbulk_requests;
+        g_stats.snmp_responses += g_worker_stats[i].snmp_responses;
+        g_stats.snmp_response_size_sum += g_worker_stats[i].snmp_response_size_sum;
+        g_stats.ssdp_msearch_packets += g_worker_stats[i].ssdp_msearch_packets;
+        g_stats.ssdp_responses += g_worker_stats[i].ssdp_responses;
+        g_stats.portmap_getport_calls += g_worker_stats[i].portmap_getport_calls;
+        g_stats.portmap_dump_calls += g_worker_stats[i].portmap_dump_calls;
+        g_stats.netbios_name_queries += g_worker_stats[i].netbios_name_queries;
+        g_stats.netbios_dgram_packets += g_worker_stats[i].netbios_dgram_packets;
+        g_stats.ldap_bind_requests += g_worker_stats[i].ldap_bind_requests;
+        g_stats.ldap_search_requests += g_worker_stats[i].ldap_search_requests;
+        g_stats.mssql_sqlbatch_packets += g_worker_stats[i].mssql_sqlbatch_packets;
+        g_stats.mssql_rpc_packets += g_worker_stats[i].mssql_rpc_packets;
+        g_stats.tftp_rrq_packets += g_worker_stats[i].tftp_rrq_packets;
+        g_stats.tftp_wrq_packets += g_worker_stats[i].tftp_wrq_packets;
+        /* ======================================================== */
     }
 
     double window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
@@ -664,6 +798,54 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         syn_pkts, syn_ack_pkts,
         syn_ack_pkts > 0 ? (double)syn_pkts / syn_ack_pkts : 0.0,
         http_reqs, dns_qs);
+
+    /* Calculate average response sizes */
+    uint32_t avg_ntp_resp_size = g_stats.ntp_responses > 0 ?
+        (uint32_t)(g_stats.ntp_response_size_sum / g_stats.ntp_responses) : 0;
+    uint32_t avg_dns_resp_size = g_stats.dns_responses > 0 ?
+        (uint32_t)(g_stats.dns_response_size_sum / g_stats.dns_responses) : 0;
+    uint32_t avg_snmp_resp_size = g_stats.snmp_responses > 0 ?
+        (uint32_t)(g_stats.snmp_response_size_sum / g_stats.snmp_responses) : 0;
+
+    len += snprintf(buffer + len, sizeof(buffer) - len,
+        "[PROTOCOL-SPECIFIC COUNTERS - CIC-DDoS-2019 Features]\n"
+        "  NTP Amplification:\n"
+        "    Monlist queries:  %" PRIu64 "\n"
+        "    Responses:        %" PRIu64 "  (avg size: %u bytes)\n"
+        "  DNS Amplification:\n"
+        "    ANY queries:      %" PRIu64 "\n"
+        "    TXT queries:      %" PRIu64 "\n"
+        "    Responses:        %" PRIu64 "  (avg size: %u bytes)\n"
+        "  SNMP Amplification:\n"
+        "    GetBulk requests: %" PRIu64 "\n"
+        "    Responses:        %" PRIu64 "  (avg size: %u bytes)\n"
+        "  SSDP:\n"
+        "    M-SEARCH packets: %" PRIu64 "\n"
+        "    Responses:        %" PRIu64 "\n"
+        "  PortMapper:\n"
+        "    GETPORT calls:    %" PRIu64 "\n"
+        "    DUMP calls:       %" PRIu64 "\n"
+        "  NetBIOS:\n"
+        "    Name queries:     %" PRIu64 "\n"
+        "    Datagram packets: %" PRIu64 "\n"
+        "  LDAP:\n"
+        "    Bind requests:    %" PRIu64 "\n"
+        "    Search requests:  %" PRIu64 "\n"
+        "  MSSQL:\n"
+        "    SQLBatch packets: %" PRIu64 "\n"
+        "    RPC packets:      %" PRIu64 "\n"
+        "  TFTP:\n"
+        "    RRQ (read) pkts:  %" PRIu64 "\n"
+        "    WRQ (write) pkts: %" PRIu64 "\n\n",
+        g_stats.ntp_monlist_queries, g_stats.ntp_responses, avg_ntp_resp_size,
+        g_stats.dns_any_queries, g_stats.dns_txt_queries, g_stats.dns_responses, avg_dns_resp_size,
+        g_stats.snmp_getbulk_requests, g_stats.snmp_responses, avg_snmp_resp_size,
+        g_stats.ssdp_msearch_packets, g_stats.ssdp_responses,
+        g_stats.portmap_getport_calls, g_stats.portmap_dump_calls,
+        g_stats.netbios_name_queries, g_stats.netbios_dgram_packets,
+        g_stats.ldap_bind_requests, g_stats.ldap_search_requests,
+        g_stats.mssql_sqlbatch_packets, g_stats.mssql_rpc_packets,
+        g_stats.tftp_rrq_packets, g_stats.tftp_wrq_packets);
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[ATTACK DETECTIONS - Cumulative Events]\n"
@@ -882,6 +1064,18 @@ static int worker_thread(void *arg)
     uint64_t local_bursts_total = 0, local_bursts_empty = 0;
     uint64_t local_cycles = 0;
 
+    /* ========== Protocol-Specific Local Counters for CIC-DDoS-2019 ========== */
+    uint64_t local_ntp_monlist = 0, local_ntp_responses = 0, local_ntp_resp_size_sum = 0;
+    uint64_t local_dns_any = 0, local_dns_txt = 0, local_dns_responses = 0, local_dns_resp_size_sum = 0;
+    uint64_t local_snmp_getbulk = 0, local_snmp_responses = 0, local_snmp_resp_size_sum = 0;
+    uint64_t local_ssdp_msearch = 0, local_ssdp_responses = 0;
+    uint64_t local_portmap_getport = 0, local_portmap_dump = 0;
+    uint64_t local_netbios_name = 0, local_netbios_dgram = 0;
+    uint64_t local_ldap_bind = 0, local_ldap_search = 0;
+    uint64_t local_mssql_sqlbatch = 0, local_mssql_rpc = 0;
+    uint64_t local_tftp_rrq = 0, local_tftp_wrq = 0;
+    /* ======================================================================= */
+
     /* Per-worker sketch (local, no atomics) */
     struct octosketch *my_sketch = &g_worker_sketch_attack[queue_id];
 
@@ -957,24 +1151,110 @@ static int worker_thread(void *arg)
 
                 /* Combine flag checks and port check in minimal branches */
                 uint8_t tcp_flags = tcp_hdr->tcp_flags;
-                uint16_t dst_port_raw = tcp_hdr->dst_port;
+                uint16_t tcp_dst_port = rte_be_to_cpu_16(tcp_hdr->dst_port);
 
-                /* SYN detection - single branch */
+                /* SYN Flood detection */
                 if (unlikely(tcp_flags & RTE_TCP_SYN_FLAG)) {
                     local_syn_pkts++;
                     local_syn_ack_pkts += (tcp_flags & RTE_TCP_ACK_FLAG) ? 1 : 0;
                 }
 
-                /* HTTP detection - use raw port (avoid byte swap if possible) */
-                local_http_reqs += (dst_port_raw == rte_cpu_to_be_16(80)) ? 1 : 0;
+                /* WebDDoS / HTTP detection (ports 80, 443) */
+                if (tcp_dst_port == 80 || tcp_dst_port == 443) {
+                    local_http_reqs++;
+                }
+                /* LDAP TCP detection (ports 389, 636) */
+                else if (tcp_dst_port == 389 || tcp_dst_port == 636) {
+                    local_ldap_bind++;
+                }
+                /* MSSQL TCP detection (port 1433) */
+                else if (tcp_dst_port == 1433) {
+                    local_mssql_sqlbatch++;
+                }
+                /* PortMapper TCP detection (port 111) */
+                else if (tcp_dst_port == 111) {
+                    local_portmap_getport++;
+                }
             }
             else if (proto == IPPROTO_UDP) {
                 local_udp_pkts++;
                 struct rte_udp_hdr *udp_hdr = (struct rte_udp_hdr *)((uint8_t *)ip_hdr + sizeof(struct rte_ipv4_hdr));
+                uint16_t udp_dst_port = rte_be_to_cpu_16(udp_hdr->dst_port);
+                uint16_t udp_src_port = rte_be_to_cpu_16(udp_hdr->src_port);
+                uint16_t udp_payload_len = rte_be_to_cpu_16(udp_hdr->dgram_len) - sizeof(struct rte_udp_hdr);
+                uint8_t *udp_payload = (uint8_t *)udp_hdr + sizeof(struct rte_udp_hdr);
 
-                /* DNS detection - check both ports at once */
-                uint16_t dns_port = rte_cpu_to_be_16(53);
-                local_dns_queries += ((udp_hdr->dst_port == dns_port) | (udp_hdr->src_port == dns_port)) ? 1 : 0;
+                /* DNS detection (port 53) */
+                if (udp_dst_port == 53 || udp_src_port == 53) {
+                    local_dns_queries++;
+                    if (udp_src_port == 53) {
+                        local_dns_responses++;
+                        local_dns_resp_size_sum += pkt_len;
+                    }
+                    if (udp_dst_port == 53 && udp_payload_len > 50) {
+                        local_dns_any++;  // Large queries often ANY/TXT
+                    }
+                }
+                /* NTP detection (port 123) */
+                else if (udp_dst_port == 123 || udp_src_port == 123) {
+                    if (udp_payload_len >= 8) {
+                        uint8_t ntp_mode = (udp_payload[0] >> 0) & 0x07;
+                        if (ntp_mode == 7 && udp_dst_port == 123) {
+                            local_ntp_monlist++;  // Mode 7 = Private/Monlist
+                        }
+                    }
+                    if (udp_src_port == 123) {
+                        local_ntp_responses++;
+                        local_ntp_resp_size_sum += pkt_len;
+                    }
+                }
+                /* SNMP detection (port 161) */
+                else if (udp_dst_port == 161 || udp_src_port == 161) {
+                    if (udp_dst_port == 161 && pkt_len > 200) {
+                        local_snmp_getbulk++;  // GetBulkRequest heuristic
+                    }
+                    if (udp_src_port == 161) {
+                        local_snmp_responses++;
+                        local_snmp_resp_size_sum += pkt_len;
+                    }
+                }
+                /* SSDP detection (port 1900) */
+                else if (udp_dst_port == 1900 || udp_src_port == 1900) {
+                    if (udp_payload_len >= 8 && memcmp(udp_payload, "M-SEARCH", 8) == 0) {
+                        local_ssdp_msearch++;
+                    }
+                    if (udp_src_port == 1900) {
+                        local_ssdp_responses++;
+                    }
+                }
+                /* PortMapper UDP detection (port 111) */
+                else if (udp_dst_port == 111) {
+                    local_portmap_getport++;
+                }
+                /* NetBIOS detection (ports 137, 138) */
+                else if (udp_dst_port == 137) {
+                    local_netbios_name++;
+                }
+                else if (udp_dst_port == 138) {
+                    local_netbios_dgram++;
+                }
+                /* TFTP detection (port 69) */
+                else if (udp_dst_port == 69 && udp_payload_len >= 2) {
+                    uint16_t tftp_opcode = (udp_payload[0] << 8) | udp_payload[1];
+                    if (tftp_opcode == 1) {
+                        local_tftp_rrq++;
+                    } else if (tftp_opcode == 2) {
+                        local_tftp_wrq++;
+                    }
+                }
+                /* MSSQL UDP detection (port 1434) */
+                else if (udp_dst_port == 1434) {
+                    local_mssql_sqlbatch++;
+                }
+                /* CLDAP/LDAP UDP detection (port 389) */
+                else if (udp_dst_port == 389) {
+                    local_ldap_search++;
+                }
             }
             else if (proto == IPPROTO_ICMP) {
                 local_icmp_pkts++;
@@ -1011,6 +1291,31 @@ static int worker_thread(void *arg)
         ws->rx_bursts_total += local_bursts_total;
         ws->rx_bursts_empty += local_bursts_empty;
 
+        /* ========== Protocol-Specific Stats Update ========== */
+        ws->ntp_monlist_queries += local_ntp_monlist;
+        ws->ntp_responses += local_ntp_responses;
+        ws->ntp_response_size_sum += local_ntp_resp_size_sum;
+        ws->dns_any_queries += local_dns_any;
+        ws->dns_txt_queries += local_dns_txt;
+        ws->dns_responses += local_dns_responses;
+        ws->dns_response_size_sum += local_dns_resp_size_sum;
+        ws->snmp_getbulk_requests += local_snmp_getbulk;
+        ws->snmp_responses += local_snmp_responses;
+        ws->snmp_response_size_sum += local_snmp_resp_size_sum;
+        ws->ssdp_msearch_packets += local_ssdp_msearch;
+        ws->ssdp_responses += local_ssdp_responses;
+        ws->portmap_getport_calls += local_portmap_getport;
+        ws->portmap_dump_calls += local_portmap_dump;
+        ws->netbios_name_queries += local_netbios_name;
+        ws->netbios_dgram_packets += local_netbios_dgram;
+        ws->ldap_bind_requests += local_ldap_bind;
+        ws->ldap_search_requests += local_ldap_search;
+        ws->mssql_sqlbatch_packets += local_mssql_sqlbatch;
+        ws->mssql_rpc_packets += local_mssql_rpc;
+        ws->tftp_rrq_packets += local_tftp_rrq;
+        ws->tftp_wrq_packets += local_tftp_wrq;
+        /* ==================================================== */
+
         /* Update window stats */
         window_baseline_pkts[queue_id] += local_baseline_pkts;
         window_baseline_bytes[queue_id] += local_baseline_bytes;
@@ -1025,6 +1330,18 @@ static int worker_thread(void *arg)
         local_http_reqs = local_dns_queries = 0;
         local_baseline_bytes = local_attack_bytes = 0;
         local_bursts_total = local_bursts_empty = 0;
+
+        /* ========== Reset Protocol-Specific Counters ========== */
+        local_ntp_monlist = local_ntp_responses = local_ntp_resp_size_sum = 0;
+        local_dns_any = local_dns_txt = local_dns_responses = local_dns_resp_size_sum = 0;
+        local_snmp_getbulk = local_snmp_responses = local_snmp_resp_size_sum = 0;
+        local_ssdp_msearch = local_ssdp_responses = 0;
+        local_portmap_getport = local_portmap_dump = 0;
+        local_netbios_name = local_netbios_dgram = 0;
+        local_ldap_bind = local_ldap_search = 0;
+        local_mssql_sqlbatch = local_mssql_rpc = 0;
+        local_tftp_rrq = local_tftp_wrq = 0;
+        /* ====================================================== */
     }
 
     /* Final update before exit */
@@ -1040,6 +1357,31 @@ static int worker_thread(void *arg)
     ws->syn_ack_packets += local_syn_ack_pkts;
     ws->http_requests += local_http_reqs;
     ws->dns_queries += local_dns_queries;
+
+    /* ========== Final Protocol-Specific Stats Update ========== */
+    ws->ntp_monlist_queries += local_ntp_monlist;
+    ws->ntp_responses += local_ntp_responses;
+    ws->ntp_response_size_sum += local_ntp_resp_size_sum;
+    ws->dns_any_queries += local_dns_any;
+    ws->dns_txt_queries += local_dns_txt;
+    ws->dns_responses += local_dns_responses;
+    ws->dns_response_size_sum += local_dns_resp_size_sum;
+    ws->snmp_getbulk_requests += local_snmp_getbulk;
+    ws->snmp_responses += local_snmp_responses;
+    ws->snmp_response_size_sum += local_snmp_resp_size_sum;
+    ws->ssdp_msearch_packets += local_ssdp_msearch;
+    ws->ssdp_responses += local_ssdp_responses;
+    ws->portmap_getport_calls += local_portmap_getport;
+    ws->portmap_dump_calls += local_portmap_dump;
+    ws->netbios_name_queries += local_netbios_name;
+    ws->netbios_dgram_packets += local_netbios_dgram;
+    ws->ldap_bind_requests += local_ldap_bind;
+    ws->ldap_search_requests += local_ldap_search;
+    ws->mssql_sqlbatch_packets += local_mssql_sqlbatch;
+    ws->mssql_rpc_packets += local_mssql_rpc;
+    ws->tftp_rrq_packets += local_tftp_rrq;
+    ws->tftp_wrq_packets += local_tftp_wrq;
+    /* ========================================================= */
 
     return 0;
 }

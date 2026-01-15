@@ -381,7 +381,7 @@ ls -lh mira_ddos_detector
 # Benign sender
 cd /local/dpdk_100g/mira/benign_sender
 make -f Makefile_v2 clean
-make -f Makefile_v2
+sudo make -f Makefile_v2
 
 # Attack sender
 cd /local/dpdk_100g/mira/attack_sender
