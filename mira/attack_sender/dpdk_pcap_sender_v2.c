@@ -682,6 +682,32 @@ static void create_default_attack_phases(void)
     printf("\n");
 }
 
+/* Comparator function for qsort - alphanumeric sorting for CIC-DDoS-2019 PCAPs */
+/* Sorts files like SAT-01-12-2018_0001.pcap, SAT-01-12-2018_0002.pcap, ... SAT-01-12-2018_0818.pcap */
+static int compare_pcap_files(const void *a, const void *b)
+{
+    const char *file_a = *(const char **)a;
+    const char *file_b = *(const char **)b;
+
+    /* Extract numeric portion after last underscore: SAT-01-12-2018_NNNN.pcap */
+    const char *num_a = strrchr(file_a, '_');
+    const char *num_b = strrchr(file_b, '_');
+
+    if (num_a && num_b) {
+        /* Skip underscore and compare numerically */
+        int num_val_a = atoi(num_a + 1);
+        int num_val_b = atoi(num_b + 1);
+
+        if (num_val_a != num_val_b) {
+            return num_val_a - num_val_b;
+        }
+        /* If numeric parts are equal, fall through to string comparison */
+    }
+
+    /* Fallback to alphabetical string comparison */
+    return strcmp(file_a, file_b);
+}
+
 /* NEW: Scan directory for .pcap files */
 static int scan_pcap_directory(const char *dir_path)
 {
@@ -740,10 +766,20 @@ static int scan_pcap_directory(const char *dir_path)
         return -1;
     }
 
-    printf("[MULTI-PCAP] Found %u PCAP files:\n", num_pcap_files);
-    for (uint32_t i = 0; i < num_pcap_files; i++) {
+    /* ========== NEW: Sort files numerically ========== */
+    /* For CIC-DDoS-2019 dataset with files like: SAT-01-12-2018_0001.pcap to SAT-01-12-2018_0818.pcap */
+    printf("[MULTI-PCAP] Sorting files numerically...\n");
+    qsort(pcap_file_list, num_pcap_files, sizeof(char *), compare_pcap_files);
+    /* ================================================= */
+
+    printf("[MULTI-PCAP] Found %u PCAP files (in order):\n", num_pcap_files);
+    for (uint32_t i = 0; i < num_pcap_files && i < 10; i++) {
         printf("  [%u] %s\n", i + 1, basename(pcap_file_list[i]));
     }
+    if (num_pcap_files > 10) {
+        printf("  ... (%u more files)\n", num_pcap_files - 10);
+    }
+    printf("  Last file: [%u] %s\n", num_pcap_files, basename(pcap_file_list[num_pcap_files - 1]));
     printf("\n");
 
     multi_pcap_mode = 1;

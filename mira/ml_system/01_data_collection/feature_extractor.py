@@ -11,15 +11,19 @@ import pandas as pd
 from typing import Dict, List, Optional
 import sys
 
-# Multi-class attack types (14 classes for CIC-DDoS-2019)
-ATTACK_TYPES = [
-    'benign',       # Normal traffic
+# Legacy 3-class labels (backward compatibility)
+LEGACY_LABELS = ['benign', 'attack', 'mixed']
+
+# Multi-class attack types (14+ classes for CIC-DDoS-2019)
+SPECIFIC_ATTACK_TYPES = [
     'portmap',      # RPC portmapper amplification
     'netbios',      # NetBIOS name service amplification
     'ldap',         # LDAP amplification
     'mssql',        # MSSQL amplification
+    'udp',          # Generic UDP flood (same as udp_flood)
     'udp_flood',    # Generic UDP flood
     'udp_lag',      # UDP with lag/delay
+    'syn',          # SYN flood attack (same as syn_flood)
     'syn_flood',    # SYN flood attack
     'ntp',          # NTP amplification
     'dns',          # DNS amplification
@@ -27,8 +31,11 @@ ATTACK_TYPES = [
     'ssdp',         # SSDP amplification
     'webddos',      # HTTP/HTTPS flood
     'tftp',         # TFTP amplification
-    'mixed'         # Multiple attack types simultaneously
+    'portscan',     # Port scanning attack
 ]
+
+# Combined: accept both legacy (3 classes) and specific attack types
+ALL_LABELS = LEGACY_LABELS + SPECIFIC_ATTACK_TYPES
 
 class LogParser:
     """Parses MIRA detector logs and extracts features"""
@@ -337,33 +344,27 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Extract benign traffic features
+  # LEGACY MODE (3 classes - all attacks mixed):
   python3 feature_extractor.py \\
       --input ../datasets/raw_logs/benign_baseline.log \\
       --output ../datasets/processed/benign_baseline.csv \\
       --label benign
 
-  # Extract NTP amplification attack features
+  python3 feature_extractor.py \\
+      --input ../datasets/raw_logs/attack_mixed.log \\
+      --output ../datasets/processed/attack_mixed.csv \\
+      --label attack    # <-- Generic attack (all types mixed)
+
+  # MULTI-CLASS MODE (specific attack types):
   python3 feature_extractor.py \\
       --input ../datasets/raw_logs/ntp_attack.log \\
       --output ../datasets/processed/ntp_attack.csv \\
-      --label ntp
+      --label ntp       # <-- Specific attack type
 
-  # Extract DNS amplification attack features
-  python3 feature_extractor.py \\
-      --input ../datasets/raw_logs/dns_attack.log \\
-      --output ../datasets/processed/dns_attack.csv \\
-      --label dns
-
-  # Extract SYN flood attack features
-  python3 feature_extractor.py \\
-      --input ../datasets/raw_logs/syn_flood.log \\
-      --output ../datasets/processed/syn_flood.csv \\
-      --label syn_flood
-
-Supported attack types (14 classes):
-  benign, portmap, netbios, ldap, mssql, udp_flood, udp_lag,
-  syn_flood, ntp, dns, snmp, ssdp, webddos, tftp, mixed
+Supported labels:
+  - Legacy (3 classes): benign, attack, mixed
+  - CIC-DDoS-2019 (specific): portmap, netbios, ldap, mssql, udp, udp_lag,
+    syn, ntp, dns, snmp, ssdp, webddos, tftp, portscan
         """
     )
 
@@ -372,8 +373,8 @@ Supported attack types (14 classes):
     parser.add_argument('--output', type=str, required=True,
                        help='Output CSV file path')
     parser.add_argument('--label', type=str, required=True,
-                       choices=ATTACK_TYPES,
-                       help='Traffic label (one of 14 attack types)')
+                       choices=ALL_LABELS,
+                       help='Traffic label (benign/attack/mixed OR specific attack type)')
 
     args = parser.parse_args()
 

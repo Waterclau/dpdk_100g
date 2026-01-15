@@ -259,7 +259,7 @@ sudo python3 generate_benign_traffic_v2_parallel.py \
     --clients 500
 
 # Verify IPs are correct
-tcpdump -r ../benign_25M.pcap -n 'src net 10.10.2.0/24' -c 10
+tcpdump -r ../benign_20M.pcap -n 'src net 10.10.2.0/24' -c 10
 # Should show source IPs in 10.10.2.x range
 ```
 
@@ -1129,22 +1129,82 @@ The ML-enhanced MIRA detector is **production-ready** with:
 
 ---
 
-## 🚀 NEW: Multi-Class DDoS Detection with CIC-DDoS-2019 Features (v3.0)
+## 🚀 NEW: Enhanced DDoS Detection with Anti-Overfitting (v3.0)
 
 ### Overview
 
-This section describes **major enhancements** implemented to address overfitting and enable multi-class attack detection for the CIC-DDoS-2019 dataset.
+This section describes **major enhancements** implemented to address overfitting and optionally enable multi-class attack detection.
 
 **Key Problems Solved:**
 - ❌ 100% validation accuracy with 630 samples → **SEVERE OVERFITTING**
-- ❌ Only 3 classes (benign/attack/mixed) → Cannot identify specific attack types
-- ❌ Only 14 features → Insufficient for distinguishing 13+ attack types
+- ❌ Only 14 features → Insufficient for complex attack patterns
+- ❌ Model memorized training data instead of learning patterns
 
 **New Capabilities:**
 - ✅ **46 total features** (14 original + 26 protocol-specific + 6 derived ratios)
-- ✅ **14 attack classes** (benign + 13 DDoS attack types)
 - ✅ **Anti-overfitting hyperparameters** for small datasets
 - ✅ **Expected accuracy: 85-96%** (realistic vs 100% overfitted)
+- ✅ **Flexible labeling**: 3-class (benign/attack/mixed) OR 14-class (specific attack types)
+
+---
+
+### 🎯 Two Collection Strategies
+
+You can choose between **simple** (3 classes) or **advanced** (multi-class) based on your needs:
+
+| Strategy | Classes | Time | Complexity | Attack Type ID |
+|----------|---------|------|------------|----------------|
+| **Simple (Recommended)** | 3 | 4.5 hours | Low | ❌ No |
+| **Advanced (Research)** | 14 | 8-15 hours | High | ✅ Yes |
+
+#### Strategy 1: Simple (3 Classes - Mixed PCAPs) ⭐ RECOMMENDED
+
+**Best for:**
+- Quick validation that anti-overfitting works
+- You send all attack PCAPs mixed together (current setup)
+- You don't need to identify specific attack types
+
+**Workflow:**
+1. Send ALL attack PCAPs mixed → label as `attack`
+2. Extract 46 features (protocol-specific features still help!)
+3. Train with anti-overfitting hyperparameters
+4. Get 85-95% accuracy (realistic)
+
+**See:** `ml_system/DATASET_STRATEGY.md` → "Opción 1: Sistema de 3 Clases"
+
+#### Strategy 2: Advanced (14 Classes - Separated PCAPs)
+
+**Best for:**
+- Research requiring specific attack type identification
+- You can organize PCAPs by attack type
+- You have time for extended data collection
+
+**Workflow:**
+1. Organize PCAPs into folders by attack type
+2. Send each attack type separately → label as `ntp`, `dns`, etc.
+3. Extract 46 features with specific labels
+4. Train with 14 classes
+5. Model can identify NTP vs DNS vs SNMP attacks
+
+**See:** `ml_system/DATASET_STRATEGY.md` → "Opción 2: Multi-Class Real"
+
+---
+
+### 🚦 Quick Start: Which Strategy Should I Use?
+
+**Use Strategy 1 (3 classes) if:**
+- ✅ You want to start quickly (4.5 hours vs 8-15 hours)
+- ✅ You already send attack PCAPs mixed together
+- ✅ You just need to detect "attack" vs "benign"
+- ✅ You want to validate anti-overfitting fixes first
+
+**Use Strategy 2 (14 classes) if:**
+- ✅ You need to identify specific attack types (NTP, DNS, SNMP, etc.)
+- ✅ You have time to organize PCAPs by type
+- ✅ Your research requires granular attack classification
+- ✅ Strategy 1 worked well and you want more detail
+
+**Recommendation:** Start with Strategy 1, then optionally move to Strategy 2 if needed.
 
 ---
 
@@ -1274,141 +1334,143 @@ early_stopping_rounds = 10       # Reduced from 30 (aggressive early stop)
 
 ---
 
-### NEW Data Collection Strategy for Multi-Class
+### Data Collection: Choose Your Strategy
 
-#### Training Set (Day 1 - 7 attack types × 3 runs)
+**📋 Complete workflows in:** `ml_system/DATASET_STRATEGY.md`
 
-Collect **~5100 samples** across 7 attack types:
+#### Strategy 1: Simple (3 Classes) - RECOMMENDED FOR YOUR SETUP
 
+**Your current setup:**
+- You have PCAPs in `/proj/softmeasure-PG0/CICD/remapped/`
+- You send ALL PCAPs mixed with `--pcap-dir` (contains NTP, DNS, SNMP, etc. all together)
+- You want to start quickly and validate anti-overfitting works
+
+**Workflow Summary:**
 ```bash
-# Day 1: Training data collection (8.5 hours total)
+# 1. Collect data (3 classes × 3 runs = 9 runs × 30 min = 4.5 hours)
+# - benign: 3 runs → label: benign
+# - attack (all PCAPs mixed): 3 runs → label: attack
+# - mixed (benign + attack): 3 runs → label: mixed
 
-# 1. Benign baseline (3 runs × 30 min = 90 min)
-for i in 1 2 3; do
-    python3 feature_extractor.py \
-        --input benign_run${i}.log \
-        --output benign_run${i}.csv \
-        --label benign
-done
+# 2. Extract features
+python3 feature_extractor.py --label benign   # Works!
+python3 feature_extractor.py --label attack   # Works! (all attacks mixed)
+python3 feature_extractor.py --label mixed    # Works!
 
-# 2. PortMap attack (3 runs × 20 min = 60 min)
-for i in 1 2 3; do
-    python3 feature_extractor.py \
-        --input portmap_run${i}.log \
-        --output portmap_run${i}.csv \
-        --label portmap
-done
+# 3. Train with anti-overfitting
+# Automatically uses: max_depth=3, num_leaves=7 for <1000 samples
 
-# 3. NetBIOS attack (3 runs × 20 min = 60 min)
-for i in 1 2 3; do
-    python3 feature_extractor.py \
-        --input netbios_run${i}.log \
-        --output netbios_run${i}.csv \
-        --label netbios
-done
-
-# 4. LDAP attack (3 runs × 20 min = 60 min)
-for i in 1 2 3; do
-    python3 feature_extractor.py \
-        --input ldap_run${i}.log \
-        --output ldap_run${i}.csv \
-        --label ldap
-done
-
-# 5. MSSQL attack (3 runs × 20 min = 60 min)
-for i in 1 2 3; do
-    python3 feature_extractor.py \
-        --input mssql_run${i}.log \
-        --output mssql_run${i}.csv \
-        --label mssql
-done
-
-# 6. UDP flood (3 runs × 20 min = 60 min)
-for i in 1 2 3; do
-    python3 feature_extractor.py \
-        --input udp_flood_run${i}.log \
-        --output udp_flood_run${i}.csv \
-        --label udp_flood
-done
-
-# 7. UDP-Lag (3 runs × 20 min = 60 min)
-for i in 1 2 3; do
-    python3 feature_extractor.py \
-        --input udp_lag_run${i}.log \
-        --output udp_lag_run${i}.csv \
-        --label udp_lag
-done
-
-# 8. SYN flood (3 runs × 20 min = 60 min)
-for i in 1 2 3; do
-    python3 feature_extractor.py \
-        --input syn_flood_run${i}.log \
-        --output syn_flood_run${i}.csv \
-        --label syn_flood
-done
+# 4. Result
+# Classes: ['benign', 'attack', 'mixed']
+# Features: 46 (protocol-specific features still help!)
+# Accuracy: 85-95% (realistic, not 100%)
 ```
 
-**Expected samples:** ~5100 total (90 min × 3 benign + 7 × 60 min attacks)
+**✅ Advantages for you:**
+- Works with your current PCAP sending method (no changes needed)
+- Fastest option (4.5 hours total)
+- Protocol-specific features (46 total) still improve detection even without specific labels
+- Validates anti-overfitting fixes work correctly
 
-#### Test Set (Day 2 - 13 attack types including 6 NEW)
-
-Collect **~3900 samples** including unseen attack types:
-
-```bash
-# Day 2: Test data (6.5 hours total)
-# IMPORTANT: Include NEW attack types NOT in training set
-
-# NEW attack types (not in training):
-- NTP amplification (30 min → ~300 samples)
-- DNS amplification (30 min → ~300 samples)
-- SNMP amplification (30 min → ~300 samples)
-- SSDP amplification (30 min → ~300 samples)
-- WebDDoS (30 min → ~300 samples)
-- TFTP amplification (30 min → ~300 samples)
-
-# Plus re-run of training types for test set
-- benign, portmap, netbios, ldap, mssql, udp_flood, udp_lag, syn_flood
-  (each 30 min → ~300 samples × 8 = ~2400 samples)
-
-# Total test samples: 6 × 300 + 2400 = ~3900 samples
-```
+**📖 Full instructions:** See `DATASET_STRATEGY.md` → "Opción 1: Sistema de 3 Clases"
 
 ---
 
-### Updated Feature Extraction (Multi-Class)
+#### Strategy 2: Advanced (14 Classes) - OPTIONAL FOR DETAILED RESEARCH
+
+**Requirements:**
+- Need to organize PCAPs by attack type (separate folders for NTP, DNS, SNMP, etc.)
+- Send each attack type separately
+- More time (8-15 hours data collection)
+
+**Workflow Summary:**
+```bash
+# 1. Organize PCAPs (one-time setup)
+mkdir -p /proj/.../organized/{ntp,dns,snmp,ssdp,portmap,netbios,ldap,mssql,udp,syn}
+# Move/copy PCAPs to respective folders based on filename
+
+# 2. Collect data (8 attack types × 3 runs × 20 min = 8.5 hours)
+# Send each attack type separately → label with specific type
+
+# 3. Extract features
+python3 feature_extractor.py --label ntp      # Specific!
+python3 feature_extractor.py --label dns      # Specific!
+python3 feature_extractor.py --label snmp     # Specific!
+
+# 4. Train with 14 classes
+# Model learns to identify: benign, ntp, dns, snmp, ssdp, portmap, netbios, ldap, mssql, udp, syn, webddos, tftp, mixed
+
+# 5. Result
+# Can identify specific attack types (NTP vs DNS vs SNMP)
+# Better for research requiring granular classification
+```
+
+**📖 Full instructions:** See `DATASET_STRATEGY.md` → "Opción 2: Multi-Class Real"
+
+---
+
+### Feature Extraction (Backward Compatible)
+
+The feature extractor now supports **both** 3-class and multi-class labeling:
 
 ```bash
 cd /local/dpdk_100g/mira/ml_system/01_data_collection
 
-# Extract features from log with attack type label
+# ========== STRATEGY 1: 3 CLASSES (Your current setup) ==========
 python3 feature_extractor.py \
-    --input ../datasets/raw_logs/ntp_attack_run1.log \
-    --output ../datasets/processed/ntp_attack_run1.csv \
-    --label ntp    # <-- NEW: Use specific attack type
+    --input ../datasets/raw_logs/benign_run1.log \
+    --output ../datasets/processed/benign_run1.csv \
+    --label benign
 
-# Supported labels: benign, portmap, netbios, ldap, mssql, udp_flood,
-#                   udp_lag, syn_flood, ntp, dns, snmp, ssdp, webddos, tftp, mixed
+python3 feature_extractor.py \
+    --input ../datasets/raw_logs/attack_run1.log \
+    --output ../datasets/processed/attack_run1.csv \
+    --label attack    # <-- All attacks mixed (NTP+DNS+SNMP+...)
+
+python3 feature_extractor.py \
+    --input ../datasets/raw_logs/mixed_run1.log \
+    --output ../datasets/processed/mixed_run1.csv \
+    --label mixed
+
+# ========== STRATEGY 2: MULTI-CLASS (Separated by type) ==========
+python3 feature_extractor.py \
+    --input ../datasets/raw_logs/ntp_run1.log \
+    --output ../datasets/processed/ntp_run1.csv \
+    --label ntp       # <-- Specific attack type
+
+python3 feature_extractor.py \
+    --input ../datasets/raw_logs/dns_run1.log \
+    --output ../datasets/processed/dns_run1.csv \
+    --label dns
+
+# Supported labels:
+# - Legacy (3 classes): benign, attack, mixed
+# - Specific (14+ classes): ntp, dns, snmp, ssdp, portmap, netbios,
+#   ldap, mssql, udp, udp_lag, syn, webddos, tftp, portscan
 ```
 
-**Expected output:**
+**Expected output (with 46 features):**
 ```
-[SUCCESS] Saved 240 records to ntp_attack_run1.csv
+[SUCCESS] Saved 240 records to attack_run1.csv
 
 [SUMMARY STATISTICS]
   Total records:     240
-  Label:             ntp
+  Label:             attack    # <-- Generic label (all types mixed)
   Avg packets/win:   2850
 
-[PROTOCOL-SPECIFIC FEATURES]
-  NTP queries:       1250    <-- NEW: Protocol-specific detection
-  DNS ANY/TXT:       0
-  SNMP GetBulk:      0
-  SSDP M-SEARCH:     0
-  PortMapper:        0
-  NetBIOS:           0
-  LDAP:              0
-  MSSQL:             0
-  TFTP:              0
+[PROTOCOL-SPECIFIC FEATURES]    # <-- Still extracted!
+  NTP queries:       450
+  DNS ANY/TXT:       380
+  SNMP GetBulk:      290
+  SSDP M-SEARCH:     210
+  PortMapper:        180
+  NetBIOS:           150
+  LDAP:              120
+  MSSQL:             95
+  TFTP:              75
+
+# Even with generic "attack" label, the 46 features are extracted
+# The model will learn patterns (e.g., high NTP queries correlate with attacks)
 ```
 
 ---
