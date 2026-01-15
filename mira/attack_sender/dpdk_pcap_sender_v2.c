@@ -40,7 +40,7 @@
 #define BURST_SIZE 256
 #define MAX_PCAP_PACKETS 10000000
 #define MAX_PCAP_FILES 1024
-#define MAX_PKT_LEN 4096
+#define MAX_PKT_LEN 16384      /* 16KB - supports jumbo frames from CIC-DDoS-2019 */
 
 /* Target transmission rate for non-timed mode */
 #define TARGET_GBPS 12.0
