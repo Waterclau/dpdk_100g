@@ -1686,6 +1686,155 @@ static void send_loop_multi_pcap(void)
     printf("\n🛑 Multi-PCAP replay terminated.\n");
 }
 
+/* NEW: Multi-PCAP with timestamp-based replay (respects original timing) */
+static void send_loop_multi_pcap_timed(void)
+{
+    uint16_t nb_tx;
+    uint64_t hz = rte_get_tsc_hz();
+    uint64_t last_stats_tsc = 0;
+
+    struct timeval prev_timestamp = {0, 0};
+    uint8_t first_packet_in_pcap = 1;
+
+    printf("\n╔══════════════════════════════════════════════════════════════════╗\n");
+    printf("║    DPDK PCAP SENDER v2.0 - MULTI-PCAP TIMED REPLAY MODE         ║\n");
+    printf("╚══════════════════════════════════════════════════════════════════╝\n\n");
+    printf("📁 Multi-PCAP Mode: ENABLED (%u files in queue)\n", num_pcap_files);
+    printf("⏱️  Timestamp Mode: RESPECTING original PCAP timestamps\n");
+    printf("🔁 Loop Mode: INFINITE (will cycle through all PCAP files continuously)\n");
+    printf("⚡ Speedup: %lux (use --speedup to change)\n", replay_cfg.speedup_factor);
+    printf("🎯 Jitter: ±%.1f%%\n", replay_cfg.jitter_pct);
+    printf("🛑 Press Ctrl+C to stop\n\n");
+
+    start_tsc = rte_rdtsc();
+    last_stats_tsc = start_tsc;
+    last_window_tsc = start_tsc;
+    last_window_packets = 0;
+    last_window_bytes = 0;
+
+    srand(time(NULL));  // Initialize random for jitter
+
+    while (!force_quit) {
+        /* Multi-PCAP mode - Check if we need to load next file */
+        if (current_packet_idx >= num_pcap_packets) {
+            printf("\n[MULTI-PCAP] Finished PCAP [%u/%u]: %s\n",
+                   current_pcap_file_idx + 1, num_pcap_files,
+                   basename(pcap_file_list[current_pcap_file_idx]));
+
+            /* Move to next PCAP file */
+            current_pcap_file_idx = (current_pcap_file_idx + 1) % num_pcap_files;
+
+            printf("[MULTI-PCAP] Loading next PCAP [%u/%u]: %s\n",
+                   current_pcap_file_idx + 1, num_pcap_files,
+                   basename(pcap_file_list[current_pcap_file_idx]));
+
+            /* Free current PCAP data */
+            free_current_pcap_data();
+
+            /* Load next PCAP */
+            if (load_pcap(pcap_file_list[current_pcap_file_idx]) != 0) {
+                printf("Error: Failed to load next PCAP file, stopping\n");
+                break;
+            }
+
+            printf("[MULTI-PCAP] Successfully loaded %u packets\n", num_pcap_packets);
+            printf("[MULTI-PCAP] First timestamp: %ld.%06ld\n",
+                   pcap_packets[0].timestamp.tv_sec,
+                   pcap_packets[0].timestamp.tv_usec);
+            printf("[MULTI-PCAP] Resuming timestamp-based replay...\n\n");
+
+            /* Reset timestamp tracking for new PCAP */
+            first_packet_in_pcap = 1;
+        }
+
+        struct packet_data *pkt_data = &pcap_packets[current_packet_idx];
+
+        /* Calculate delay based on timestamp difference */
+        if (!first_packet_in_pcap) {
+            uint64_t delta_us = timeval_diff_us(&prev_timestamp, &pkt_data->timestamp);
+
+            /* Apply speedup factor */
+            delta_us = delta_us / replay_cfg.speedup_factor;
+
+            /* Apply jitter if configured */
+            if (replay_cfg.jitter_pct > 0) {
+                double jitter_mult = get_jitter_multiplier(replay_cfg.jitter_pct);
+                delta_us = (uint64_t)(delta_us * jitter_mult);
+            }
+
+            /* Wait for the calculated time */
+            if (delta_us > 0 && delta_us < 10000000) {  // Sanity check: < 10s
+                rte_delay_us_block(delta_us);
+            }
+        }
+
+        prev_timestamp = pkt_data->timestamp;
+        first_packet_in_pcap = 0;
+
+        /* Allocate mbuf */
+        struct rte_mbuf *pkt = rte_pktmbuf_alloc(mbuf_pool);
+        if (pkt == NULL) {
+            rte_delay_us_block(100);
+            continue;
+        }
+
+        /* Copy packet data */
+        char *pkt_buf = rte_pktmbuf_mtod(pkt, char *);
+        rte_memcpy(pkt_buf, pkt_data->data, pkt_data->len);
+        pkt->data_len = pkt_data->len;
+        pkt->pkt_len = pkt_data->len;
+
+        /* Send single packet */
+        nb_tx = rte_eth_tx_burst(port_id, 0, &pkt, 1);
+
+        if (nb_tx == 1) {
+            total_packets_sent++;
+            total_bytes_sent += pkt->pkt_len;
+        } else {
+            rte_pktmbuf_free(pkt);
+        }
+
+        current_packet_idx++;
+
+        /* Print statistics every 5 seconds */
+        uint64_t cur_tsc = rte_rdtsc();
+        if (cur_tsc - last_stats_tsc >= hz * 5) {
+            double elapsed = (double)(cur_tsc - start_tsc) / hz;
+            double gbps_cumulative = (total_bytes_sent * 8.0) / (elapsed * 1e9);
+            double mpps_cumulative = (total_packets_sent / elapsed) / 1e6;
+
+            double window_duration = (double)(cur_tsc - last_window_tsc) / hz;
+            uint64_t window_packets = total_packets_sent - last_window_packets;
+            uint64_t window_bytes = total_bytes_sent - last_window_bytes;
+            double gbps_instant = (window_bytes * 8.0) / (window_duration * 1e9);
+
+            printf("[%.1fs] PCAP [%u/%u] | %lu pkts (%.2f Mpps) | Avg: %.2f Gbps | Inst: %.2f Gbps\n",
+                   elapsed, current_pcap_file_idx + 1, num_pcap_files,
+                   total_packets_sent, mpps_cumulative, gbps_cumulative, gbps_instant);
+
+            last_window_packets = total_packets_sent;
+            last_window_bytes = total_bytes_sent;
+            last_window_tsc = cur_tsc;
+            last_stats_tsc = cur_tsc;
+        }
+    }
+
+    printf("\n╔══════════════════════════════════════════════════════════════════╗\n");
+    printf("║         MULTI-PCAP TIMED REPLAY COMPLETE - FINAL STATS          ║\n");
+    printf("╚══════════════════════════════════════════════════════════════════╝\n\n");
+
+    double elapsed = (double)(rte_rdtsc() - start_tsc) / hz;
+    double gbps = (total_bytes_sent * 8.0) / (elapsed * 1e9);
+    double mpps = (total_packets_sent / elapsed) / 1e6;
+
+    printf("Total packets sent:  %lu\n", total_packets_sent);
+    printf("Total bytes sent:    %lu\n", total_bytes_sent);
+    printf("Duration:            %.2f seconds\n", elapsed);
+    printf("Average throughput:  %.2f Gbps\n", gbps);
+    printf("Average pps:         %.2f Mpps\n", mpps);
+    printf("\n🛑 Multi-PCAP timed replay terminated.\n");
+}
+
 /* NEW: Adaptive ATTACK mode - High-speed continuous attack with phase-based distribution */
 static void send_loop_adaptive_attack(void)
 {
@@ -2040,11 +2189,14 @@ static void print_usage(const char *prgname)
     printf("  %s -l 0-7 -- attack_mirai_10M_v2.pcap --adaptive-attack --rate-gbps 10 --loop\n\n", prgname);
     printf("  # 🔥 ATTACK MODE: DDoS with custom phases, jitter, 300s duration:\n");
     printf("  %s -l 0-7 -- attack.pcap --adaptive-attack --attack-phases phases_attack.json --jitter 15 --duration 300\n\n", prgname);
-    printf("  # 🔥🔁 MULTI-PCAP MODE: Auto-load all PCAPs from directory (infinite loop, direct replay):\n");
+    printf("  # 🔥🔁 MULTI-PCAP MODE: Auto-load all PCAPs from directory (infinite loop, fixed rate):\n");
     printf("  %s -l 0-7 -- --pcap-dir /proj/softmeasure-PG0/CICD/remapped/ --rate-gbps 10\n\n", prgname);
+    printf("  # 🔥🔁⏱️  MULTI-PCAP TIMED MODE: Respect original timestamps (CIC-DDoS-2019):\n");
+    printf("  %s -l 0-7 -- --pcap-dir /proj/softmeasure-PG0/CICD/remapped/ --pcap-timed --speedup 100\n\n", prgname);
     printf("  # 🔥🔁 MULTI-PCAP MODE: Use default directory with 12 Gbps:\n");
     printf("  %s -l 0-7 -- --pcap-dir --rate-gbps 12\n\n", prgname);
-    printf("  # Note: --adaptive-attack and --attack-phases are IGNORED in multi-PCAP mode\n\n");
+    printf("  # Note: --adaptive-attack and --attack-phases are IGNORED in multi-PCAP mode\n");
+    printf("  #       Use --pcap-timed to see attacks at their original time windows\n\n");
     printf("\nPHASE FILE FORMAT (BENIGN - JSON):\n");
     printf("  [{\"duration\": 30, \"http\": 0.60, \"dns\": 0.20, \"ssh\": 0.10, \"udp\": 0.10},\n");
     printf("   {\"duration\": 15, \"http\": 0.30, \"dns\": 0.50, \"ssh\": 0.10, \"udp\": 0.10}]\n");
@@ -2262,19 +2414,40 @@ int main(int argc, char *argv[])
 
     /* NEW: Choose sending loop based on configuration */
     if (multi_pcap_mode) {
-        /* NEW: Multi-PCAP mode - Sequential direct replay (no classification) */
-        printf("\n╔═══════════════════════════════════════════════════════════════════╗\n");
-        printf("║          🔁🔁🔁 LAUNCHING MULTI-PCAP REPLAY MODE 🔁🔁🔁         ║\n");
-        printf("╚═══════════════════════════════════════════════════════════════════╝\n\n");
-        printf("⚠️  WARNING: Attack traffic will be generated from multiple PCAPs\n");
-        printf("⚠️  CRITICAL: Use ONLY CloudLab INTERNAL network!\n");
-        printf("    ✅ ALLOWED:  10.10.1.x (benign) and 10.10.2.x (attack)\n");
-        printf("    ✅ NIC:      ens1f0 (PCI 0000:41:00.0)\n");
-        printf("    ❌ FORBIDDEN: 192.168.x.x (control network - experiment will be TERMINATED!)\n");
-        printf("    ❌ FORBIDDEN: eno33 (control interface)\n");
-        printf("⚠️  Mode: Direct sequential replay (NO adaptive phases)\n");
-        printf("⚠️  Press Ctrl+C to stop\n\n");
-        send_loop_multi_pcap();
+        /* NEW: Multi-PCAP mode - Check if timestamp-based or rate-limited */
+        if (replay_cfg.pcap_timed) {
+            /* Multi-PCAP with timestamp-based replay (CIC-DDoS-2019 temporal replay) */
+            printf("\n╔═══════════════════════════════════════════════════════════════════╗\n");
+            printf("║      🔁⏱️  LAUNCHING MULTI-PCAP TIMED REPLAY MODE ⏱️🔁          ║\n");
+            printf("╚═══════════════════════════════════════════════════════════════════╝\n\n");
+            printf("⚠️  WARNING: Attack traffic will be replayed from multiple PCAPs\n");
+            printf("⚠️  CRITICAL: Use ONLY CloudLab INTERNAL network!\n");
+            printf("    ✅ ALLOWED:  10.10.1.x (benign) and 10.10.3.x (attack)\n");
+            printf("    ✅ NIC:      ens1f0 (PCI 0000:41:00.0)\n");
+            printf("    ❌ FORBIDDEN: 192.168.x.x (control network - experiment will be TERMINATED!)\n");
+            printf("    ❌ FORBIDDEN: eno33 (control interface)\n");
+            printf("⚠️  Mode: Timestamp-based replay (respecting original PCAP timing)\n");
+            printf("    → Attacks will appear at their original time windows\n");
+            printf("    → Example: PortMap (9:43-9:51), NetBIOS (10:00-10:09), etc.\n");
+            printf("⚠️  Press Ctrl+C to stop\n\n");
+            send_loop_multi_pcap_timed();
+        } else {
+            /* Multi-PCAP with rate limiting (fast continuous replay) */
+            printf("\n╔═══════════════════════════════════════════════════════════════════╗\n");
+            printf("║          🔁🔁🔁 LAUNCHING MULTI-PCAP REPLAY MODE 🔁🔁🔁         ║\n");
+            printf("╚═══════════════════════════════════════════════════════════════════╝\n\n");
+            printf("⚠️  WARNING: Attack traffic will be generated from multiple PCAPs\n");
+            printf("⚠️  CRITICAL: Use ONLY CloudLab INTERNAL network!\n");
+            printf("    ✅ ALLOWED:  10.10.1.x (benign) and 10.10.3.x (attack)\n");
+            printf("    ✅ NIC:      ens1f0 (PCI 0000:41:00.0)\n");
+            printf("    ❌ FORBIDDEN: 192.168.x.x (control network - experiment will be TERMINATED!)\n");
+            printf("    ❌ FORBIDDEN: eno33 (control interface)\n");
+            printf("⚠️  Mode: Direct sequential replay at fixed rate (NO timestamp respect)\n");
+            printf("    → All attacks blended together\n");
+            printf("    → Use --pcap-timed to see individual attack phases\n");
+            printf("⚠️  Press Ctrl+C to stop\n\n");
+            send_loop_multi_pcap();
+        }
     } else if (attack_cfg.enabled) {
         /* NEW: Adaptive-attack mode with phase-based DDoS attack distribution */
         printf("\n╔═══════════════════════════════════════════════════════════════════╗\n");

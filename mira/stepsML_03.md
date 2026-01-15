@@ -593,49 +593,140 @@ sleep 30
 
 ---
 
-### Step 2.2: Attack Sender Details (NEW Enhanced Version)
+### Step 2.2: Attack Sender Modes (CHOOSE ONE)
 
-When you start the attack sender on node-tg, it will:
+You have **TWO options** for sending CIC-DDoS-2019 attack traffic:
+
+---
+
+#### ⚡ **Option A: Fast Mode (Fixed Rate)** - For Quick Data Collection
+
+Use this if you want to collect data **quickly** (all attacks blended together):
 
 ```bash
 # SSH to node-tg
 ssh node-tg
-
 cd /local/dpdk_100g/mira/attack_sender
 
-# Send ALL CIC-DDoS-2019 PCAPs in numerical order
+# Send at fixed 12 Gbps (all attacks mixed)
 sudo timeout 1795 ./dpdk_pcap_sender_v2 \
     -l 0-7 -n 4 -w 0000:41:00.0 -- \
     --pcap-dir /proj/softmeasure-PG0/CICD/remapped/ \
     --rate-gbps 12
 ```
 
+**Behavior:**
+- ⚡ **Fast**: Sends at constant 12 Gbps
+- ❌ **No temporal separation**: All attack types blended together
+- 📊 **Detector shows**: Continuous "UDP FLOOD" or generic attack
+- ⏱️ **30 min run**: Covers hundreds of PCAPs quickly
+- ✅ **Use for**: Training data collection (label all as "attack")
+
+---
+
+#### ⏱️ **Option B: Temporal Mode (Respect Timestamps)** - To See Specific Attacks
+
+Use this if you want to **see individual attack types** (PortMap, NetBIOS, LDAP, etc.):
+
+```bash
+# SSH to node-tg
+ssh node-tg
+cd /local/dpdk_100g/mira/attack_sender
+
+# Send respecting original timestamps (100x speedup for faster replay)
+sudo timeout 1795 ./dpdk_pcap_sender_v2 \
+    -l 0-7 -n 4 -w 0000:41:00.0 -- \
+    --pcap-dir /proj/softmeasure-PG0/CICD/remapped/ \
+    --pcap-timed \
+    --speedup 100
+```
+
+**Behavior:**
+- ⏱️ **Temporal**: Respects original PCAP timestamps
+- ✅ **Attack separation**: PortMap (9:43-9:51), NetBIOS (10:00-10:09), LDAP (10:21-10:30), etc.
+- 📊 **Detector shows**:
+  ```
+  PortMapper:
+    GETPORT calls:    42523   ← PortMap attack detected!
+
+  NetBIOS:
+    Name queries:     18234   ← NetBIOS attack detected!
+  ```
+- ⚡ **Speedup 100x**: Original dataset = ~8 hours → With speedup = ~5 minutes
+- ✅ **Use for**: Debugging, visualizing attacks, understanding dataset structure
+
 **Expected output:**
 ```
-[MULTI-PCAP] Scanning directory: /proj/softmeasure-PG0/CICD/remapped/
+╔═══════════════════════════════════════════════════════════╗
+║    🔁⏱️  LAUNCHING MULTI-PCAP TIMED REPLAY MODE ⏱️🔁      ║
+╚═══════════════════════════════════════════════════════════╝
+
+📁 Multi-PCAP Mode: ENABLED (818 files in queue)
+⏱️  Timestamp Mode: RESPECTING original PCAP timestamps
+⚡ Speedup: 100x (use --speedup to change)
+🎯 Attacks will appear at their original time windows
+   → PortMap (9:43-9:51), NetBIOS (10:00-10:09), etc.
+
 [MULTI-PCAP] Sorting files numerically...
 [MULTI-PCAP] Found 818 PCAP files (in order):
   [1] SAT-01-12-2018_0001.pcap
   [2] SAT-01-12-2018_0002.pcap
-  [3] SAT-01-12-2018_0003.pcap
   ...
-  [10] SAT-01-12-2018_0010.pcap
-  ... (808 more files)
-  Last file: [818] SAT-01-12-2018_0818.pcap
+  [818] SAT-01-12-2018_0818.pcap
 
 [MULTI-PCAP] Loading: SAT-01-12-2018_0001.pcap
-[TX] Sending at 12.00 Gbps...
+[MULTI-PCAP] First timestamp: 1515747780.123456
+[MULTI-PCAP] Replaying with 100x speedup...
 ```
 
-**What happens:**
-1. Sender scans directory → finds 818 PCAPs
-2. **Sorts numerically** (0001→0818) using new `compare_pcap_files()` function
-3. Sends PCAP 0001 until finished
-4. Moves to PCAP 0002, then 0003, etc.
-5. When reaching 0818, **loops back to 0001** automatically
-6. Continues until timeout (1795 seconds)
+---
 
-**This ensures attacks appear in the correct temporal order as they were captured in the original dataset!**
+### Step 2.2.1: Verification - See Specific Attacks (Option B Only)
+
+If using **Option B (--pcap-timed)**, you should see specific attack patterns in the detector output:
+
+```bash
+# On node-monitor, watch the detector output in real-time:
+tail -f ../ml_system/datasets/raw_logs/attack_cic_run1.log
+
+# You should see attacks change over time:
+# At 9:43-9:51 (compressed to ~1-2 min with speedup 100):
+PortMapper:
+  GETPORT calls:    42523   ← PortMap attack!
+  DUMP calls:       15234
+
+# At 10:00-10:09:
+NetBIOS:
+  Name queries:     18234   ← NetBIOS attack!
+  Dgm packets:      8492
+
+# At 10:21-10:30:
+LDAP:
+  Search requests:  32145   ← LDAP attack!
+  Responses:        31892
+```
+
+---
+
+### ⚙️ Recommendation
+
+**For Phase 2 data collection:**
+- ✅ **Use Option A (--rate-gbps 12)**: Faster data collection, label all as "attack"
+- ⏱️ Dataset coverage: ~30 min covers hundreds of PCAPs
+
+**For understanding the dataset or debugging:**
+- ✅ **Use Option B (--pcap-timed --speedup 100)**: See individual attack phases
+- ⏱️ With speedup 100x: Full 818 PCAPs replay in ~5 minutes
+
+---
+
+### What Both Options Do Correctly
+
+1. Sender scans directory → finds 818 PCAPs
+2. **Sorts numerically** (0001→0818) using `compare_pcap_files()` function
+3. Sends PCAP 0001, then 0002, then 0003, etc.
+4. When reaching 0818, **loops back to 0001** automatically
+5. Continues until timeout (1795 seconds)
 
 ---
 
@@ -1375,7 +1466,57 @@ make clean && make
 
 ---
 
-### Issue 3: Feature Extraction Fails
+### Issue 3: Detector Only Shows "UDP FLOOD" (No Specific Attacks)
+
+**Symptom:** Detector continuously shows generic alerts like "UDP FLOOD detected" but doesn't show specific attack types (PortMap, NetBIOS, LDAP, etc.)
+
+**Example of what you see:**
+```
+[ALERT STATUS]
+  Alert level:        HIGH
+  Reason:             UDP FLOOD detected: 12756283 UDP pps
+```
+
+**Cause:** Attack sender using `--rate-gbps` mode (fixed rate) which blends all attacks together
+
+**Solution:** Switch to temporal mode to see individual attack phases:
+
+```bash
+# STOP current attack sender (Ctrl+C)
+
+# START with temporal mode:
+cd /local/dpdk_100g/mira/attack_sender
+sudo timeout 1795 ./dpdk_pcap_sender_v2 \
+    -l 0-7 -n 4 -w 0000:41:00.0 -- \
+    --pcap-dir /proj/softmeasure-PG0/CICD/remapped/ \
+    --pcap-timed \
+    --speedup 100
+
+# Now watch detector output:
+# You should see attacks change over time as PCAPs progress
+```
+
+**Verification:**
+```bash
+# On detector node, monitor real-time:
+tail -f /local/dpdk_100g/mira/ml_system/datasets/raw_logs/attack_cic_run1.log
+
+# You should see counters like:
+PortMapper:
+  GETPORT calls:    42523   ← PortMap attack visible!
+
+# A few minutes later:
+NetBIOS:
+  Name queries:     18234   ← NetBIOS attack visible!
+```
+
+**Why this happens:**
+- `--rate-gbps 12` → Sends all 818 PCAPs at constant 12 Gbps → All attacks blended
+- `--pcap-timed` → Respects original timestamps → Attacks appear in temporal windows
+
+---
+
+### Issue 4: Feature Extraction Fails
 
 **Symptom:** `feature_extractor.py` shows "No valid windows found"
 
@@ -1392,7 +1533,7 @@ grep "NTP Amplification" ../datasets/raw_logs/benign_run1.log | head -3
 
 ---
 
-### Issue 4: Model Accuracy Still 100% (Overfitting)
+### Issue 5: Model Accuracy Still 100% (Overfitting)
 
 **Symptom:** Despite anti-overfitting measures, accuracy is still 100%
 
@@ -1413,7 +1554,7 @@ python3 -c "import pandas as pd; df = pd.read_csv('../datasets/combined_dataset.
 
 ---
 
-### Issue 5: NIC Not Found
+### Issue 6: NIC Not Found
 
 **Symptom:** "Error: Cannot find NIC 0000:41:00.0"
 
@@ -1465,10 +1606,16 @@ sudo dpdk-devbind.py -b vfio-pci 0000:41:00.0
    - Shallow trees (max_depth: 3, num_leaves: 7)
    - Expected accuracy: 85-96% (realistic vs 100% overfitted)
 
-3. **CIC-DDoS-2019 Dataset Integration**
-   - Attack sender sorts 818 PCAPs numerically (0001→0818)
-   - Temporal attack progression matches original dataset
-   - Automatic looping when reaching last PCAP
+3. **CIC-DDoS-2019 Dataset Integration with Dual-Mode Attack Sender**
+   - ✅ **Numerical sorting**: 818 PCAPs sent in order (0001→0818)
+   - ✅ **Fast mode** (`--rate-gbps`): Fixed-rate replay for quick data collection
+   - ✅ **Temporal mode** (`--pcap-timed`): Respects original timestamps to see individual attack phases
+     - PortMap appears at 9:43-9:51
+     - NetBIOS appears at 10:00-10:09
+     - LDAP appears at 10:21-10:30
+     - etc. (13 different attack types in temporal order)
+   - ✅ **Speedup support**: `--speedup 100` accelerates 8-hour dataset to ~5 minutes
+   - ✅ **Automatic looping**: Cycles through all 818 PCAPs infinitely
 
 4. **Flexible Labeling**
    - 3-class mode: benign/attack/mixed (RECOMMENDED)
