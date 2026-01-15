@@ -38,7 +38,7 @@
 #define NUM_MBUFS 262144
 #define MBUF_CACHE_SIZE 512
 #define BURST_SIZE 256
-#define MAX_PCAP_PACKETS 10000000
+#define MAX_PCAP_PACKETS 500000    /* 500K packets per PCAP file - sufficient for CIC-DDoS-2019 */
 #define MAX_PCAP_FILES 1024
 #define MAX_PKT_LEN 16384      /* 16KB - supports jumbo frames from CIC-DDoS-2019 */
 
