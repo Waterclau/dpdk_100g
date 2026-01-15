@@ -1,33 +1,16 @@
 #!/usr/bin/env python3
 """
-MIRA CIC-DDoS-2019 Attack Generator v4.0 (Multiprocessing)
-
-Generates all attack types from the CIC-DDoS-2019 dataset:
-- PortMap (UDP 111) - RPC portmapper amplification
-- NetBIOS (UDP 137/138) - NetBIOS name service amplification
-- LDAP (TCP/UDP 389) - CLDAP amplification
-- MSSQL (UDP 1434) - SQL Server resolution amplification
-- UDP Flood - Generic UDP flood
-- UDP-Lag - UDP flood with larger packets (lag attack)
-- SYN Flood - TCP SYN flood
-- NTP (UDP 123) - NTP monlist amplification
-- DNS (UDP 53) - DNS ANY query amplification
-- SNMP (UDP 161) - SNMP GetBulk amplification
-- SSDP (UDP 1900) - SSDP M-SEARCH amplification
-- WebDDoS (TCP 80/443) - HTTP GET/POST flood
-- TFTP (UDP 69) - TFTP read request flood
+MIRA CIC-DDoS-2019 Attack Generator v5.0 (Memory-Efficient Multiprocessing)
 
 Features:
-- MULTIPROCESSING: Parallel packet generation with multiple workers
-- CloudLab internal network IPs (10.10.3.x for attackers)
-- Configurable attack phases and intensity
-- Timestamp compression for high-speed replay
-- Compatible with dpdk_pcap_sender_v2 for 12 Gbps replay
+- MEMORY EFFICIENT: Each worker writes directly to temp file (no RAM accumulation)
+- MULTIPROCESSING: Parallel packet generation with progress display
+- All 13 CIC-DDoS-2019 attack types supported
 
 Usage:
-    python3 generate_cicdos2019_attacks.py --output attack.pcap --packets 10000000 --workers 8
+    python3 generate_cicdos2019_attacks.py -n 20000000 -w 8 -o attack.pcap
 
-Author: MIRA Project - CIC-DDoS-2019 Attack Generation
+Author: MIRA Project
 """
 
 import argparse
@@ -35,13 +18,19 @@ import random
 import struct
 import time
 import os
-import multiprocessing as mp
-from multiprocessing import Pool, Manager
-from functools import partial
-from scapy.all import *
-from scapy.layers.inet import IP, TCP, UDP, ICMP
-from scapy.layers.l2 import Ether
-from scapy.layers.dns import DNS, DNSQR
+import sys
+import tempfile
+import subprocess
+import shutil
+import threading
+from multiprocessing import Process, Queue, Value, Array
+from ctypes import c_uint64, c_bool
+
+# Disable Scapy warnings
+import logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+
+from scapy.all import wrpcap, PcapWriter, PcapReader, Ether, IP, TCP, UDP, Raw, DNS, DNSQR
 
 # ============================================================================
 # Attack Type Definitions
@@ -53,30 +42,24 @@ ATTACK_TYPES = [
 ]
 
 # ============================================================================
-# Attack Packet Generation Functions
+# Attack Packet Generation Functions (return raw bytes for efficiency)
 # ============================================================================
 
 def generate_portmap_attack(src_ip, dst_ip, src_mac, dst_mac):
-    """PortMap/RPC amplification attack (UDP port 111)"""
-    rpc_call = struct.pack('>I', random.randint(1, 0xFFFFFFFF))  # XID
-    rpc_call += struct.pack('>I', 0)  # Call
-    rpc_call += struct.pack('>I', 2)  # RPC version 2
-    rpc_call += struct.pack('>I', 100000)  # Portmapper program
-    rpc_call += struct.pack('>I', 2)  # Version 2
-    rpc_call += struct.pack('>I', random.choice([3, 4]))  # GETPORT/DUMP
-    rpc_call += struct.pack('>I', 0) * 4  # Auth
-
-    pkt = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
-          UDP(sport=random.randint(1024, 65535), dport=111) / \
-          Raw(load=rpc_call)
+    rpc_call = struct.pack('>I', random.randint(1, 0xFFFFFFFF))
+    rpc_call += struct.pack('>I', 0)
+    rpc_call += struct.pack('>I', 2)
+    rpc_call += struct.pack('>I', 100000)
+    rpc_call += struct.pack('>I', 2)
+    rpc_call += struct.pack('>I', random.choice([3, 4]))
+    rpc_call += struct.pack('>I', 0) * 4
+    pkt = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
+          UDP(sport=random.randint(1024, 65535), dport=111) / Raw(load=rpc_call)
     return [pkt]
 
 
 def generate_netbios_attack(src_ip, dst_ip, src_mac, dst_mac):
-    """NetBIOS amplification attack (UDP ports 137/138)"""
     port = random.choice([137, 138])
-
     if port == 137:
         nbns_query = struct.pack('>H', random.randint(1, 0xFFFF))
         nbns_query += struct.pack('>H', 0x0000)
@@ -87,16 +70,12 @@ def generate_netbios_attack(src_ip, dst_ip, src_mac, dst_mac):
         nbns_query += struct.pack('>H', 0x0001)
     else:
         nbns_query = bytes([random.randint(0, 255) for _ in range(64)])
-
-    pkt = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
-          UDP(sport=random.randint(1024, 65535), dport=port) / \
-          Raw(load=nbns_query)
+    pkt = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
+          UDP(sport=random.randint(1024, 65535), dport=port) / Raw(load=nbns_query)
     return [pkt]
 
 
 def generate_ldap_attack(src_ip, dst_ip, src_mac, dst_mac):
-    """CLDAP amplification attack (UDP port 389)"""
     ldap_search = bytes([
         0x30, 0x25, 0x02, 0x01, 0x01, 0x63, 0x20, 0x04, 0x00,
         0x0a, 0x01, 0x00, 0x0a, 0x01, 0x00, 0x02, 0x01, 0x00,
@@ -104,324 +83,257 @@ def generate_ldap_attack(src_ip, dst_ip, src_mac, dst_mac):
         0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x63, 0x6c, 0x61, 0x73, 0x73,
         0x30, 0x00
     ])
-
-    pkt = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
-          UDP(sport=random.randint(1024, 65535), dport=389) / \
-          Raw(load=ldap_search)
+    pkt = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
+          UDP(sport=random.randint(1024, 65535), dport=389) / Raw(load=ldap_search)
     return [pkt]
 
 
 def generate_mssql_attack(src_ip, dst_ip, src_mac, dst_mac):
-    """MSSQL amplification attack (UDP port 1434)"""
-    pkt = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
-          UDP(sport=random.randint(1024, 65535), dport=1434) / \
-          Raw(load=b'\x02')
+    pkt = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
+          UDP(sport=random.randint(1024, 65535), dport=1434) / Raw(load=b'\x02')
     return [pkt]
 
 
 def generate_udp_flood(src_ip, dst_ip, src_mac, dst_mac):
-    """Generic UDP flood attack"""
     payload = bytes([random.randint(0, 255) for _ in range(random.randint(64, 512))])
-    pkt = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
-          UDP(sport=random.randint(1024, 65535), dport=random.randint(1, 65535)) / \
-          Raw(load=payload)
+    pkt = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
+          UDP(sport=random.randint(1024, 65535), dport=random.randint(1, 65535)) / Raw(load=payload)
     return [pkt]
 
 
 def generate_udp_lag(src_ip, dst_ip, src_mac, dst_mac):
-    """UDP-Lag attack (larger packets)"""
     payload = bytes([random.randint(0, 255) for _ in range(random.randint(1000, 1400))])
-    pkt = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
-          UDP(sport=random.randint(1024, 65535), dport=random.randint(1, 65535)) / \
-          Raw(load=payload)
+    pkt = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
+          UDP(sport=random.randint(1024, 65535), dport=random.randint(1, 65535)) / Raw(load=payload)
     return [pkt]
 
 
 def generate_syn_flood(src_ip, dst_ip, src_mac, dst_mac):
-    """TCP SYN flood attack"""
     target_ports = [80, 443, 22, 21, 25, 53, 110, 143, 3306, 5432, 8080, 8443]
-    pkt = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
-          TCP(sport=random.randint(1024, 65535),
-              dport=random.choice(target_ports),
-              flags='S',
-              seq=random.randint(1000, 4000000000),
+    pkt = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
+          TCP(sport=random.randint(1024, 65535), dport=random.choice(target_ports),
+              flags='S', seq=random.randint(1000, 4000000000),
               window=random.choice([1024, 2048, 4096, 8192, 16384, 65535]))
     return [pkt]
 
 
 def generate_ntp_attack(src_ip, dst_ip, src_mac, dst_mac):
-    """NTP amplification attack (UDP port 123)"""
-    ntp_monlist = bytes([0x17, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x00, 0x00])
-    ntp_monlist += b'\x00' * 40
-
-    pkt = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
-          UDP(sport=random.randint(1024, 65535), dport=123) / \
-          Raw(load=ntp_monlist)
+    ntp_monlist = bytes([0x17, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x00, 0x00]) + b'\x00' * 40
+    pkt = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
+          UDP(sport=random.randint(1024, 65535), dport=123) / Raw(load=ntp_monlist)
     return [pkt]
 
 
 def generate_dns_attack(src_ip, dst_ip, src_mac, dst_mac):
-    """DNS amplification attack (UDP port 53)"""
-    domains = ['google.com', 'facebook.com', 'amazon.com', 'microsoft.com',
-               'cloudflare.com', 'akamai.com', 'netflix.com', 'apple.com']
-    pkt = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
+    domains = ['google.com', 'facebook.com', 'amazon.com', 'microsoft.com']
+    pkt = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
           UDP(sport=random.randint(1024, 65535), dport=53) / \
           DNS(rd=1, qd=DNSQR(qname=random.choice(domains), qtype=255))
     return [pkt]
 
 
 def generate_snmp_attack(src_ip, dst_ip, src_mac, dst_mac):
-    """SNMP amplification attack (UDP port 161)"""
     snmp_request = bytes([
-        0x30, 0x26, 0x02, 0x01, 0x01,
-        0x04, 0x06, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63,
-        0xa5, 0x19, 0x02, 0x04, 0x00, 0x00, 0x00, 0x01,
-        0x02, 0x01, 0x00, 0x02, 0x02, 0x07, 0xd0,
-        0x30, 0x0a, 0x30, 0x08,
+        0x30, 0x26, 0x02, 0x01, 0x01, 0x04, 0x06, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63,
+        0xa5, 0x19, 0x02, 0x04, 0x00, 0x00, 0x00, 0x01, 0x02, 0x01, 0x00,
+        0x02, 0x02, 0x07, 0xd0, 0x30, 0x0a, 0x30, 0x08,
         0x06, 0x04, 0x2b, 0x06, 0x01, 0x02, 0x05, 0x00
     ])
-
-    pkt = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
-          UDP(sport=random.randint(1024, 65535), dport=161) / \
-          Raw(load=snmp_request)
+    pkt = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
+          UDP(sport=random.randint(1024, 65535), dport=161) / Raw(load=snmp_request)
     return [pkt]
 
 
 def generate_ssdp_attack(src_ip, dst_ip, src_mac, dst_mac):
-    """SSDP amplification attack (UDP port 1900)"""
-    ssdp_msearch = (
-        b"M-SEARCH * HTTP/1.1\r\n"
-        b"HOST: 239.255.255.250:1900\r\n"
-        b"MAN: \"ssdp:discover\"\r\n"
-        b"MX: 2\r\n"
-        b"ST: ssdp:all\r\n\r\n"
-    )
-
-    pkt = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
-          UDP(sport=random.randint(1024, 65535), dport=1900) / \
-          Raw(load=ssdp_msearch)
+    ssdp_msearch = b"M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ssdp:discover\"\r\nMX: 2\r\nST: ssdp:all\r\n\r\n"
+    pkt = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
+          UDP(sport=random.randint(1024, 65535), dport=1900) / Raw(load=ssdp_msearch)
     return [pkt]
 
 
 def generate_webddos_attack(src_ip, dst_ip, src_mac, dst_mac):
-    """WebDDoS attack (TCP ports 80/443)"""
     sport = random.randint(49152, 65535)
     dport = random.choice([80, 443])
     seq = random.randint(1000, 4000000000)
-
-    http_requests = [
-        b"GET / HTTP/1.1\r\nHost: target\r\nUser-Agent: Mozilla/5.0\r\nConnection: keep-alive\r\n\r\n",
-        b"GET /index.html HTTP/1.1\r\nHost: target\r\nUser-Agent: Mozilla/5.0\r\n\r\n",
+    http_req = random.choice([
+        b"GET / HTTP/1.1\r\nHost: target\r\nUser-Agent: Mozilla/5.0\r\n\r\n",
         b"POST / HTTP/1.1\r\nHost: target\r\nContent-Length: 0\r\n\r\n",
-    ]
-
-    syn = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
+    ])
+    syn = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
           TCP(sport=sport, dport=dport, flags='S', seq=seq)
-
-    http_req = Ether(src=src_mac, dst=dst_mac) / \
-               IP(src=src_ip, dst=dst_ip) / \
-               TCP(sport=sport, dport=dport, flags='PA', seq=seq+1, ack=1) / \
-               Raw(load=random.choice(http_requests))
-
-    return [syn, http_req]
+    http = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
+           TCP(sport=sport, dport=dport, flags='PA', seq=seq+1, ack=1) / Raw(load=http_req)
+    return [syn, http]
 
 
 def generate_tftp_attack(src_ip, dst_ip, src_mac, dst_mac):
-    """TFTP attack (UDP port 69)"""
     filenames = [b'test.txt', b'config.cfg', b'boot.bin', b'firmware.img']
     tftp_rrq = struct.pack('>H', 1) + random.choice(filenames) + b'\x00octet\x00'
-
-    pkt = Ether(src=src_mac, dst=dst_mac) / \
-          IP(src=src_ip, dst=dst_ip) / \
-          UDP(sport=random.randint(1024, 65535), dport=69) / \
-          Raw(load=tftp_rrq)
+    pkt = Ether(src=src_mac, dst=dst_mac) / IP(src=src_ip, dst=dst_ip) / \
+          UDP(sport=random.randint(1024, 65535), dport=69) / Raw(load=tftp_rrq)
     return [pkt]
 
 
-# Attack generator dispatch table
 ATTACK_GENERATORS = {
-    'portmap': generate_portmap_attack,
-    'netbios': generate_netbios_attack,
-    'ldap': generate_ldap_attack,
-    'mssql': generate_mssql_attack,
-    'udp': generate_udp_flood,
-    'udp_lag': generate_udp_lag,
-    'syn': generate_syn_flood,
-    'ntp': generate_ntp_attack,
-    'dns': generate_dns_attack,
-    'snmp': generate_snmp_attack,
-    'ssdp': generate_ssdp_attack,
-    'webddos': generate_webddos_attack,
+    'portmap': generate_portmap_attack, 'netbios': generate_netbios_attack,
+    'ldap': generate_ldap_attack, 'mssql': generate_mssql_attack,
+    'udp': generate_udp_flood, 'udp_lag': generate_udp_lag,
+    'syn': generate_syn_flood, 'ntp': generate_ntp_attack,
+    'dns': generate_dns_attack, 'snmp': generate_snmp_attack,
+    'ssdp': generate_ssdp_attack, 'webddos': generate_webddos_attack,
     'tftp': generate_tftp_attack,
 }
 
-# ============================================================================
-# Attack Phase Configuration (CIC-DDoS-2019 style)
-# ============================================================================
-
 ATTACK_PHASES = [
-    # Phase 1: Amplification attacks (30%)
-    {
-        'name': "Amplification Wave",
-        'duration_pct': 30,
-        'attack_weights': {
-            'ntp': 15, 'dns': 15, 'snmp': 10, 'ssdp': 10,
-            'portmap': 10, 'netbios': 10, 'ldap': 10, 'mssql': 10, 'tftp': 10
-        },
-        'intensity': 3.0,
-        'jitter_ms': 10
-    },
-    # Phase 2: Volumetric flood (40%)
-    {
-        'name': "Volumetric Flood",
-        'duration_pct': 40,
-        'attack_weights': {
-            'syn': 30, 'udp': 25, 'udp_lag': 20, 'webddos': 15, 'dns': 5, 'ntp': 5
-        },
-        'intensity': 5.0,
-        'jitter_ms': 5
-    },
-    # Phase 3: Mixed attack (30%)
-    {
-        'name': "Mixed Attack",
-        'duration_pct': 30,
-        'attack_weights': {
-            'syn': 15, 'udp': 10, 'udp_lag': 10, 'webddos': 10,
-            'ntp': 10, 'dns': 10, 'snmp': 5, 'ssdp': 5,
-            'portmap': 5, 'netbios': 5, 'ldap': 5, 'mssql': 5, 'tftp': 5
-        },
-        'intensity': 4.0,
-        'jitter_ms': 20
-    },
+    {'name': "Amplification", 'duration_pct': 30,
+     'attacks': ['ntp', 'dns', 'snmp', 'ssdp', 'portmap', 'netbios', 'ldap', 'mssql', 'tftp']},
+    {'name': "Volumetric", 'duration_pct': 40,
+     'attacks': ['syn', 'syn', 'udp', 'udp', 'udp_lag', 'webddos']},
+    {'name': "Mixed", 'duration_pct': 30,
+     'attacks': list(ATTACK_GENERATORS.keys())},
 ]
 
 
-def get_weighted_attacks(attack_weights):
-    """Return weighted list of attack types"""
-    attacks = []
-    for attack_type, weight in attack_weights.items():
-        attacks.extend([attack_type] * weight)
-    return attacks
-
-
 # ============================================================================
-# Worker Function for Multiprocessing
+# Worker Process (writes directly to temp file)
 # ============================================================================
 
-def worker_generate_packets(worker_id, num_packets, attack_type, intensity,
-                            src_mac, dst_mac, attacker_ips, target_ip,
-                            base_timestamp, base_interval):
-    """
-    Worker function that generates a portion of packets.
-    Each worker generates num_packets packets independently.
-    """
+def worker_process(worker_id, num_packets, attack_type, intensity,
+                   src_mac, dst_mac, attacker_ips, target_ip,
+                   output_file, progress_array, done_flags):
+    """Worker process that writes packets directly to a temp PCAP file."""
+
     random.seed(worker_id + int(time.time() * 1000) % 10000)
 
-    packets = []
+    # Open PCAP writer
+    writer = PcapWriter(output_file, append=False, sync=True)
+
+    current_timestamp = time.time() + (worker_id * 0.001)
+    base_interval = 0.000001 / intensity
+
     attack_stats = {at: 0 for at in ATTACK_GENERATORS.keys()}
-    current_timestamp = base_timestamp + (worker_id * num_packets * base_interval / intensity)
+    packets_written = 0
+
+    # Progress update interval
+    update_interval = max(1, num_packets // 100)
 
     if attack_type == 'mixed':
-        # Calculate packets per phase
-        phase_idx = 0
-        packets_generated = 0
-
+        # Mixed attack with phases
         for phase in ATTACK_PHASES:
             phase_packets = int(num_packets * phase['duration_pct'] / 100)
-            phase_attacks = get_weighted_attacks(phase['attack_weights'])
-            phase_intensity = phase['intensity']
-            jitter_ms = phase['jitter_ms']
+            phase_attacks = phase['attacks']
 
             for _ in range(phase_packets):
-                if packets_generated >= num_packets:
+                if packets_written >= num_packets:
                     break
 
                 attacker_ip = random.choice(attacker_ips)
                 selected_attack = random.choice(phase_attacks)
-                generator = ATTACK_GENERATORS.get(selected_attack, generate_syn_flood)
-                flow_packets = generator(attacker_ip, target_ip, src_mac, dst_mac)
+                generator = ATTACK_GENERATORS[selected_attack]
+                pkts = generator(attacker_ip, target_ip, src_mac, dst_mac)
 
-                for pkt in flow_packets:
-                    jitter = (random.random() - 0.5) * (jitter_ms / 1000.0)
-                    interval = base_interval / (phase_intensity * intensity)
-                    current_timestamp += interval + jitter
+                for pkt in pkts:
                     pkt.time = current_timestamp
+                    current_timestamp += base_interval + (random.random() - 0.5) * 0.0001
+                    writer.write(pkt)
+                    packets_written += 1
 
-                packets.extend(flow_packets)
-                attack_stats[selected_attack] += len(flow_packets)
-                packets_generated += len(flow_packets)
+                attack_stats[selected_attack] += len(pkts)
+
+                # Update progress
+                if packets_written % update_interval == 0:
+                    progress_array[worker_id] = packets_written
     else:
         # Single attack type
         generator = ATTACK_GENERATORS.get(attack_type, generate_syn_flood)
 
-        for _ in range(num_packets):
+        for i in range(num_packets):
             attacker_ip = random.choice(attacker_ips)
-            flow_packets = generator(attacker_ip, target_ip, src_mac, dst_mac)
+            pkts = generator(attacker_ip, target_ip, src_mac, dst_mac)
 
-            for pkt in flow_packets:
-                jitter = (random.random() - 0.5) * 0.001
-                interval = base_interval / intensity
-                current_timestamp += interval + jitter
+            for pkt in pkts:
                 pkt.time = current_timestamp
+                current_timestamp += base_interval + (random.random() - 0.5) * 0.0001
+                writer.write(pkt)
+                packets_written += 1
 
-            packets.extend(flow_packets)
-            attack_stats[attack_type] += len(flow_packets)
+            attack_stats[attack_type] += len(pkts)
 
-    # Trim to exact count
-    packets = packets[:num_packets]
+            if i % update_interval == 0:
+                progress_array[worker_id] = packets_written
 
-    return worker_id, packets, attack_stats
+    writer.close()
+    progress_array[worker_id] = packets_written
+    done_flags[worker_id] = True
 
 
-def worker_wrapper(args):
-    """Wrapper for multiprocessing Pool.map"""
-    return worker_generate_packets(*args)
+def display_progress(num_workers, progress_array, done_flags, total_packets, start_time, worker_packet_counts):
+    """Display progress for all workers."""
+    while not all(done_flags):
+        time.sleep(0.5)
+
+        elapsed = time.time() - start_time
+        total_done = sum(progress_array)
+        pct = total_done * 100 // total_packets if total_packets > 0 else 0
+        rate = total_done / elapsed if elapsed > 0 else 0
+
+        # Build progress display
+        sys.stdout.write('\r' + ' ' * 120 + '\r')  # Clear line
+
+        worker_status = []
+        for w in range(num_workers):
+            if done_flags[w]:
+                worker_status.append(f"W{w}:DONE")
+            else:
+                denom = worker_packet_counts[w]
+                wpct = progress_array[w] * 100 // denom if denom > 0 else 0
+                worker_status.append(f"W{w}:{progress_array[w]:,}/{denom:,}({wpct}%)")
+
+        status_line = f"Progress: {total_done:,}/{total_packets:,} ({pct}%) | {rate:,.0f} pkt/s | {' '.join(worker_status)}"
+
+        sys.stdout.write(status_line)
+        sys.stdout.flush()
+
+    # Final update
+    elapsed = time.time() - start_time
+    total_done = sum(progress_array)
+    rate = total_done / elapsed if elapsed > 0 else 0
+    sys.stdout.write('\r' + ' ' * 120 + '\r')
+    print(f"Generation complete: {total_done:,} packets in {elapsed:.1f}s ({rate:,.0f} pkt/s)")
 
 
 # ============================================================================
-# Main Generation Function with Multiprocessing
+# Main Generation Function
 # ============================================================================
 
-def generate_cicdos2019_attacks_parallel(output_file, num_packets, attack_type, intensity,
-                                         src_mac, dst_mac, attacker_range, target_ip,
-                                         num_attackers=200, speedup=1, num_workers=8):
-    """
-    Generate CIC-DDoS-2019 style attack traffic using multiprocessing
-    """
+def generate_cicdos2019_attacks(output_file, num_packets, attack_type, intensity,
+                                 src_mac, dst_mac, attacker_range, target_ip,
+                                 num_attackers=200, speedup=1, num_workers=8,
+                                 worker_batch=0):
 
     print("=" * 80)
-    print("MIRA CIC-DDoS-2019 Attack Generator v4.0 (MULTIPROCESSING)")
+    print("MIRA CIC-DDoS-2019 Attack Generator v5.0 (Memory-Efficient)")
     print("=" * 80)
     print(f"Attack type:      {attack_type.upper()}")
     print(f"Intensity:        {intensity}x")
     print(f"Total packets:    {num_packets:,}")
     print(f"Output file:      {output_file}")
     print(f"Workers:          {num_workers}")
-    print(f"Attacker range:   {attacker_range} (10.10.3.x = attack traffic)")
+    if worker_batch and worker_batch > 0 and worker_batch < num_workers:
+        print(f"Worker batch:     {worker_batch}")
+    print(f"Attacker range:   {attacker_range}")
     print(f"Target IP:        {target_ip}")
     print(f"Source MAC:       {src_mac}")
     print(f"Dest MAC:         {dst_mac}")
-    print(f"Botnet size:      {num_attackers} IPs")
     print(f"Speedup:          {speedup}x")
     print("")
 
-    # Parse attacker IP range
+    # Generate attacker IPs
     base_ip = attacker_range.split('/')[0]
     ip_parts = base_ip.split('.')
     base_ip_int = (int(ip_parts[0]) << 24) | (int(ip_parts[1]) << 16) | \
                   (int(ip_parts[2]) << 8) | int(ip_parts[3])
 
-    # Generate attacker IPs
     attacker_ips = []
     for i in range(num_attackers):
         attacker_ip_int = base_ip_int + (i % 256)
@@ -432,107 +344,122 @@ def generate_cicdos2019_attacks_parallel(output_file, num_packets, attack_type, 
     # Calculate packets per worker
     packets_per_worker = num_packets // num_workers
     remainder = num_packets % num_workers
-
-    base_timestamp = time.time()
-    base_interval = 0.000001  # 1 microsecond
-
-    # Prepare worker arguments
-    worker_args = []
+    worker_packet_counts = []
     for w in range(num_workers):
-        worker_packets = packets_per_worker + (1 if w < remainder else 0)
-        worker_args.append((
-            w, worker_packets, attack_type, intensity,
-            src_mac, dst_mac, attacker_ips, target_ip,
-            base_timestamp, base_interval
-        ))
+        worker_packet_counts.append(packets_per_worker + (1 if w < remainder else 0))
 
-    print(f"Distributing {num_packets:,} packets across {num_workers} workers...")
-    print(f"  Packets per worker: ~{packets_per_worker:,}")
+    # Create temp directory for worker files
+    temp_dir = tempfile.mkdtemp(prefix='mira_attack_')
+    temp_files = [os.path.join(temp_dir, f'worker_{w}.pcap') for w in range(num_workers)]
+
+    print(f"Temp directory: {temp_dir}")
+    print(f"Packets per worker: ~{packets_per_worker:,}")
     print("")
 
-    # Launch workers
-    start_time = time.time()
+    # Shared progress tracking
+    progress_array = Array(c_uint64, num_workers)
+    done_flags = Array(c_bool, num_workers)
 
+    for i in range(num_workers):
+        progress_array[i] = 0
+        done_flags[i] = False
+
+    # Start workers
+    start_time = time.time()
     print(f"Starting {num_workers} worker processes...")
-    with Pool(processes=num_workers) as pool:
-        results = pool.map(worker_wrapper, worker_args)
+    print("")
+
+    progress_thread = threading.Thread(
+        target=display_progress,
+        args=(num_workers, progress_array, done_flags, num_packets, start_time, worker_packet_counts),
+        daemon=True,
+    )
+    progress_thread.start()
+
+    batch_size = num_workers if not worker_batch or worker_batch <= 0 else min(worker_batch, num_workers)
+    for batch_start in range(0, num_workers, batch_size):
+        processes = []
+        for w in range(batch_start, min(batch_start + batch_size, num_workers)):
+            worker_packets = worker_packet_counts[w]
+            p = Process(target=worker_process, args=(
+                w, worker_packets, attack_type, intensity,
+                src_mac, dst_mac, attacker_ips, target_ip,
+                temp_files[w], progress_array, done_flags
+            ))
+            p.start()
+            processes.append(p)
+
+        for p in processes:
+            p.join()
+
+    progress_thread.join()
 
     generation_time = time.time() - start_time
-    print(f"\nPacket generation completed in {generation_time:.2f} seconds")
-    print(f"  Generation rate: {num_packets / generation_time:,.0f} pkt/s")
 
-    # Merge results
-    print("\nMerging packets from all workers...")
-    all_packets = []
-    total_stats = {at: 0 for at in ATTACK_GENERATORS.keys()}
+    # Merge PCAP files
+    print(f"\nMerging {num_workers} PCAP files...")
+    merge_start = time.time()
 
-    for worker_id, packets, stats in sorted(results, key=lambda x: x[0]):
-        all_packets.extend(packets)
-        for attack, count in stats.items():
-            total_stats[attack] += count
-        print(f"  Worker {worker_id}: {len(packets):,} packets")
+    # Check if mergecap is available
+    mergecap_path = shutil.which('mergecap')
+    has_mergecap = bool(mergecap_path)
 
-    # Sort by timestamp to interleave packets from different workers
-    print("\nSorting packets by timestamp...")
-    all_packets.sort(key=lambda p: p.time)
+    if has_mergecap:
+        # Use mergecap (faster)
+        cmd = [mergecap_path, '-w', output_file] + temp_files
+        subprocess.run(cmd, check=True)
+    else:
+        # Manual merge with Scapy
+        print("  (mergecap not found, using Python merge - slower)")
+        with PcapWriter(output_file, append=False, sync=True) as writer:
+            for i, temp_file in enumerate(temp_files):
+                print(f"  Reading worker {i} file...")
+                with PcapReader(temp_file) as reader:
+                    for pkt in reader:
+                        writer.write(pkt)
 
-    # Trim to exact packet count
-    all_packets = all_packets[:num_packets]
+    merge_time = time.time() - merge_start
 
-    print(f"\nTotal packets: {len(all_packets):,}")
-
-    # Normalize timestamps (start from 0)
-    print("\nNormalizing timestamps...")
-    if all_packets:
-        first_time = all_packets[0].time
-        for pkt in all_packets:
-            pkt.time = pkt.time - first_time
-
-    # Apply timestamp compression
+    # Apply timestamp normalization and speedup
     if speedup > 1:
-        print(f"Applying {speedup}x timestamp compression...")
-        for pkt in all_packets:
-            pkt.time = pkt.time / speedup
+        print(f"\nApplying {speedup}x timestamp compression...")
+        first_time = None
+        with PcapReader(output_file) as reader:
+            for pkt in reader:
+                if first_time is None or pkt.time < first_time:
+                    first_time = pkt.time
 
-        if all_packets:
-            duration = all_packets[-1].time - all_packets[0].time
+        if first_time is not None:
+            temp_output = output_file + ".tmp_speed"
+            max_time = None
+            with PcapReader(output_file) as reader, PcapWriter(temp_output, append=False, sync=True) as writer:
+                for pkt in reader:
+                    pkt.time = (pkt.time - first_time) / speedup
+                    max_time = pkt.time if max_time is None or pkt.time > max_time else max_time
+                    writer.write(pkt)
+            os.replace(temp_output, output_file)
+            duration = max_time if max_time is not None else 0
             print(f"  Compressed duration: {duration:.2f} seconds")
 
-    # Write PCAP
-    print(f"\nWriting to {output_file}...")
-    write_start = time.time()
-    wrpcap(output_file, all_packets)
-    write_time = time.time() - write_start
+    # Cleanup temp files
+    print("\nCleaning up temp files...")
+    for temp_file in temp_files:
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
+    os.rmdir(temp_dir)
 
+    # Statistics
     file_size = os.path.getsize(output_file)
-    print(f"  File size: {file_size / (1024*1024):.2f} MB")
-    print(f"  Write time: {write_time:.2f} seconds")
-    print(f"  Write rate: {file_size / write_time / (1024*1024):.2f} MB/s")
-
-    # Print statistics
-    print("\n" + "=" * 80)
-    print("Attack Distribution:")
-    print("=" * 80)
-
-    port_info = {
-        'portmap': 'UDP 111', 'netbios': 'UDP 137/138', 'ldap': 'UDP 389',
-        'mssql': 'UDP 1434', 'udp': 'UDP random', 'udp_lag': 'UDP random (large)',
-        'syn': 'TCP SYN', 'ntp': 'UDP 123', 'dns': 'UDP 53', 'snmp': 'UDP 161',
-        'ssdp': 'UDP 1900', 'webddos': 'TCP 80/443', 'tftp': 'UDP 69',
-    }
-
-    for attack, count in sorted(total_stats.items(), key=lambda x: -x[1]):
-        if count > 0:
-            pct = count * 100 // len(all_packets) if all_packets else 0
-            print(f"  {attack.upper():12s} ({port_info.get(attack, '')}): {count:10,} pkts ({pct:2d}%)")
-
     total_time = time.time() - start_time
+
     print("\n" + "=" * 80)
     print("Generation Summary:")
     print("=" * 80)
-    print(f"  Total packets:     {len(all_packets):,}")
-    print(f"  Total time:        {total_time:.2f} seconds")
-    print(f"  Overall rate:      {len(all_packets) / total_time:,.0f} pkt/s")
+    print(f"  Total packets:     {sum(progress_array):,}")
+    print(f"  Generation time:   {generation_time:.1f} seconds")
+    print(f"  Merge time:        {merge_time:.1f} seconds")
+    print(f"  Total time:        {total_time:.1f} seconds")
+    print(f"  Generation rate:   {sum(progress_array) / generation_time:,.0f} pkt/s")
     print(f"  File size:         {file_size / (1024*1024):.2f} MB")
     print(f"  Workers used:      {num_workers}")
     print("")
@@ -541,87 +468,42 @@ def generate_cicdos2019_attacks_parallel(output_file, num_packets, attack_type, 
     print(f"      --pcap-dir <dir> --rate-gbps 12")
     print("")
 
-    return len(all_packets)
+    return sum(progress_array)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Generate CIC-DDoS-2019 style attack traffic (Multiprocessing)',
+        description='Generate CIC-DDoS-2019 attack traffic (Memory-Efficient)',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Supported Attack Types:
-  portmap  - RPC Portmapper amplification (UDP 111)
-  netbios  - NetBIOS amplification (UDP 137/138)
-  ldap     - CLDAP amplification (UDP 389)
-  mssql    - MSSQL amplification (UDP 1434)
-  udp      - Generic UDP flood
-  udp_lag  - UDP flood with large packets
-  syn      - TCP SYN flood
-  ntp      - NTP monlist amplification (UDP 123)
-  dns      - DNS ANY query amplification (UDP 53)
-  snmp     - SNMP GetBulk amplification (UDP 161)
-  ssdp     - SSDP M-SEARCH amplification (UDP 1900)
-  webddos  - HTTP GET/POST flood (TCP 80/443)
-  tftp     - TFTP read request flood (UDP 69)
-  mixed    - All attack types (phased)
+Attack Types: portmap, netbios, ldap, mssql, udp, udp_lag, syn, ntp, dns, snmp, ssdp, webddos, tftp, mixed
 
 Examples:
-  # Mixed attack with 8 workers (recommended):
-  python3 generate_cicdos2019_attacks.py -n 10000000 -w 8 -o attack_mixed.pcap
-
-  # NTP amplification with 4 workers:
-  python3 generate_cicdos2019_attacks.py -t ntp -n 5000000 -w 4 -o attack_ntp.pcap
-
-  # High intensity SYN flood with speedup:
-  python3 generate_cicdos2019_attacks.py -t syn -i 5.0 -s 100 -w 8 -n 10000000 -o attack_syn.pcap
+  python3 generate_cicdos2019_attacks.py -n 10000000 -w 8 -o attack.pcap
+  python3 generate_cicdos2019_attacks.py -t syn -n 5000000 -w 4 -i 3.0 -o syn_flood.pcap
         """
     )
 
-    parser.add_argument('--output', '-o', default='attack_cicdos2019.pcap',
-                       help='Output PCAP file')
-    parser.add_argument('--packets', '-n', type=int, default=10000000,
-                       help='Number of packets (default: 10000000)')
-    parser.add_argument('--attack-type', '-t', choices=ATTACK_TYPES, default='mixed',
-                       help='Attack type (default: mixed)')
-    parser.add_argument('--intensity', '-i', type=float, default=1.0,
-                       help='Intensity multiplier 1.0-5.0 (default: 1.0)')
-    parser.add_argument('--workers', '-w', type=int, default=8,
-                       help='Number of worker processes (default: 8)')
-    parser.add_argument('--src-mac', default='00:00:00:00:00:02',
-                       help='Source MAC (default: 00:00:00:00:00:02)')
-    parser.add_argument('--dst-mac', default='0c:42:a1:dd:57:90',
-                       help='Destination MAC - detector NIC (default: 0c:42:a1:dd:57:90)')
-    parser.add_argument('--attacker-range', default='10.10.3.0/24',
-                       help='Attacker IP range (default: 10.10.3.0/24)')
-    parser.add_argument('--target-ip', default='10.10.1.2',
-                       help='Target IP (default: 10.10.1.2)')
-    parser.add_argument('--attackers', type=int, default=200,
-                       help='Number of attacker IPs (default: 200)')
-    parser.add_argument('--speedup', '-s', type=float, default=1.0,
-                       help='Timestamp compression factor (default: 1.0)')
+    parser.add_argument('--output', '-o', default='attack_cicdos2019.pcap')
+    parser.add_argument('--packets', '-n', type=int, default=10000000)
+    parser.add_argument('--attack-type', '-t', choices=ATTACK_TYPES, default='mixed')
+    parser.add_argument('--intensity', '-i', type=float, default=1.0)
+    parser.add_argument('--workers', '-w', type=int, default=8)
+    parser.add_argument('--src-mac', default='00:00:00:00:00:02')
+    parser.add_argument('--dst-mac', default='0c:42:a1:dd:57:90')
+    parser.add_argument('--attacker-range', default='10.10.3.0/24')
+    parser.add_argument('--target-ip', default='10.10.1.2')
+    parser.add_argument('--attackers', type=int, default=200)
+    parser.add_argument('--speedup', '-s', type=float, default=1.0)
+    parser.add_argument('--worker-batch', type=int, default=0,
+                        help='Max workers running at once (0 = all at once)')
 
     args = parser.parse_args()
 
-    if args.intensity < 1.0 or args.intensity > 5.0:
-        print("Error: intensity must be between 1.0 and 5.0")
-        return 1
-
-    if args.workers < 1 or args.workers > 64:
-        print("Error: workers must be between 1 and 64")
-        return 1
-
-    generate_cicdos2019_attacks_parallel(
-        args.output,
-        args.packets,
-        args.attack_type,
-        args.intensity,
-        args.src_mac,
-        args.dst_mac,
-        args.attacker_range,
-        args.target_ip,
-        args.attackers,
-        args.speedup,
-        args.workers
+    generate_cicdos2019_attacks(
+        args.output, args.packets, args.attack_type, args.intensity,
+        args.src_mac, args.dst_mac, args.attacker_range, args.target_ip,
+        args.attackers, args.speedup, args.workers, args.worker_batch
     )
 
     return 0
