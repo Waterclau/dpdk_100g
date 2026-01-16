@@ -256,7 +256,7 @@ sudo timeout 1800 stdbuf -oL ./detectorML \
       -n 20000000 \
       -w 16 \
       -i 3.0 \
-      -s 100 \
+      -s 1 \
       -o attack_mixed_12gbps.pcap
 
  sudo python3 generate_cicdos2019_attacks.py \
@@ -269,6 +269,10 @@ sudo timeout 1800 stdbuf -oL ./detectorML \
 
     sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- --pcap-dir /local/dpdk_100g/mira/attack_generator --rate-gbps 12 
     sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- /local/dpdk_100g/mira/attack_generator/attack_mixed_test.pcap --rate-gbps 12
+    TMPDIR=/proj/softmeasure-PG0/CICD/tmp sudo -E python3 generate_cicdos2019_attacks.py -t mixed -n 20000000 -w 16 -i 3.0 -s 1 -o /proj/softmeasure-PG0/CICD/attack_mixed_12gbps_2.pcap
+                                                                                                           
+    sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/softmeasure-PG0/CICD/attack_mixed_12gbps.pcap --rate-gbps 12 --loop
+                                                 
 
 
 ### Recommendation
