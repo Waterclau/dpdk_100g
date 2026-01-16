@@ -4,7 +4,8 @@
  * MIRA DDoS Detector - MULTI-CORE + OCTOSKETCH VERSION
  *
  * Multi-attack DDoS detector with multi-core processing + OctoSketch for line-rate detection
- * Detects: UDP Flood, SYN Flood, HTTP Flood, ICMP Flood, DNS/NTP Amp, ACK Flood
+ * Detects: UDP Flood, UDP-Lag, SYN Flood, HTTP Flood, ICMP Flood,
+ *          DNS/NTP/SNMP Amp, SSDP, PortMap, NetBIOS, LDAP, MSSQL, TFTP
  *
  * Architecture:
  * - 14 Worker threads (lcores 1-14): RX processing with RSS + OctoSketch updates
@@ -64,6 +65,15 @@
 
 #define DNS_AMP_THRESHOLD 2000
 #define NTP_AMP_THRESHOLD 1500
+#define SNMP_AMP_THRESHOLD 1500
+#define SSDP_THRESHOLD 1500
+#define PORTMAP_THRESHOLD 1500
+#define NETBIOS_THRESHOLD 1500
+#define LDAP_THRESHOLD 1500
+#define MSSQL_THRESHOLD 1500
+#define TFTP_THRESHOLD 1000
+#define UDP_LAG_PPS_THRESHOLD 15000
+#define UDP_LAG_AVG_PKT_BYTES 900
 #define ACK_FLOOD_THRESHOLD 4000
 #define FRAG_THRESHOLD 1000
 
@@ -241,12 +251,20 @@ struct detection_stats {
 
     /* Detection metrics */
     uint64_t udp_flood_detections;
+    uint64_t udp_lag_detections;
     uint64_t syn_flood_detections;
     uint64_t http_flood_detections;
     uint64_t icmp_flood_detections;
     uint64_t total_flood_detections;
     uint64_t dns_amp_detections;
     uint64_t ntp_amp_detections;
+    uint64_t snmp_amp_detections;
+    uint64_t ssdp_amp_detections;
+    uint64_t portmap_detections;
+    uint64_t netbios_detections;
+    uint64_t ldap_detections;
+    uint64_t mssql_detections;
+    uint64_t tftp_detections;
     uint64_t ack_flood_detections;
     uint64_t frag_attack_detections;
 
@@ -390,6 +408,22 @@ static struct ip_stats* get_ip_stats(uint32_t ip_addr)
 /* Attack detection logic - COORDINATOR ONLY - AGGREGATE MODE */
 static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 {
+    static bool window_totals_init = false;
+    static uint64_t window_ntp_monlist_start = 0;
+    static uint64_t window_dns_any_start = 0;
+    static uint64_t window_dns_txt_start = 0;
+    static uint64_t window_snmp_getbulk_start = 0;
+    static uint64_t window_ssdp_msearch_start = 0;
+    static uint64_t window_portmap_calls_start = 0;
+    static uint64_t window_netbios_name_start = 0;
+    static uint64_t window_netbios_dgram_start = 0;
+    static uint64_t window_ldap_bind_start = 0;
+    static uint64_t window_ldap_search_start = 0;
+    static uint64_t window_mssql_sqlbatch_start = 0;
+    static uint64_t window_mssql_rpc_start = 0;
+    static uint64_t window_tftp_rrq_start = 0;
+    static uint64_t window_tftp_wrq_start = 0;
+
     double elapsed = (double)(cur_tsc - g_stats.last_fast_detection_tsc) / hz;
 
     if (elapsed >= FAST_DETECTION_INTERVAL) {
@@ -408,6 +442,20 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         uint64_t window_base_pkts = 0, window_att_pkts = 0;
         uint64_t window_syn_pkts = 0, window_udp_pkts = 0, window_icmp_pkts = 0;
         uint64_t window_http_reqs = 0, window_dns_queries = 0;
+        uint64_t total_ntp_monlist = 0;
+        uint64_t total_dns_any = 0;
+        uint64_t total_dns_txt = 0;
+        uint64_t total_snmp_getbulk = 0;
+        uint64_t total_ssdp_msearch = 0;
+        uint64_t total_portmap_calls = 0;
+        uint64_t total_netbios_name = 0;
+        uint64_t total_netbios_dgram = 0;
+        uint64_t total_ldap_bind = 0;
+        uint64_t total_ldap_search = 0;
+        uint64_t total_mssql_sqlbatch = 0;
+        uint64_t total_mssql_rpc = 0;
+        uint64_t total_tftp_rrq = 0;
+        uint64_t total_tftp_wrq = 0;
 
         for (int i = 0; i < NUM_RX_QUEUES; i++) {
             window_base_pkts += window_baseline_pkts[i];
@@ -421,7 +469,54 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             window_icmp_pkts += g_worker_stats[i].icmp_packets;
             window_http_reqs += g_worker_stats[i].http_requests;
             window_dns_queries += g_worker_stats[i].dns_queries;
+            total_ntp_monlist += g_worker_stats[i].ntp_monlist_queries;
+            total_dns_any += g_worker_stats[i].dns_any_queries;
+            total_dns_txt += g_worker_stats[i].dns_txt_queries;
+            total_snmp_getbulk += g_worker_stats[i].snmp_getbulk_requests;
+            total_ssdp_msearch += g_worker_stats[i].ssdp_msearch_packets;
+            total_portmap_calls += g_worker_stats[i].portmap_getport_calls;
+            total_netbios_name += g_worker_stats[i].netbios_name_queries;
+            total_netbios_dgram += g_worker_stats[i].netbios_dgram_packets;
+            total_ldap_bind += g_worker_stats[i].ldap_bind_requests;
+            total_ldap_search += g_worker_stats[i].ldap_search_requests;
+            total_mssql_sqlbatch += g_worker_stats[i].mssql_sqlbatch_packets;
+            total_mssql_rpc += g_worker_stats[i].mssql_rpc_packets;
+            total_tftp_rrq += g_worker_stats[i].tftp_rrq_packets;
+            total_tftp_wrq += g_worker_stats[i].tftp_wrq_packets;
         }
+
+        if (!window_totals_init) {
+            window_ntp_monlist_start = total_ntp_monlist;
+            window_dns_any_start = total_dns_any;
+            window_dns_txt_start = total_dns_txt;
+            window_snmp_getbulk_start = total_snmp_getbulk;
+            window_ssdp_msearch_start = total_ssdp_msearch;
+            window_portmap_calls_start = total_portmap_calls;
+            window_netbios_name_start = total_netbios_name;
+            window_netbios_dgram_start = total_netbios_dgram;
+            window_ldap_bind_start = total_ldap_bind;
+            window_ldap_search_start = total_ldap_search;
+            window_mssql_sqlbatch_start = total_mssql_sqlbatch;
+            window_mssql_rpc_start = total_mssql_rpc;
+            window_tftp_rrq_start = total_tftp_rrq;
+            window_tftp_wrq_start = total_tftp_wrq;
+            window_totals_init = true;
+        }
+
+        uint64_t window_ntp_monlist = total_ntp_monlist - window_ntp_monlist_start;
+        uint64_t window_dns_any = total_dns_any - window_dns_any_start;
+        uint64_t window_dns_txt = total_dns_txt - window_dns_txt_start;
+        uint64_t window_snmp_getbulk = total_snmp_getbulk - window_snmp_getbulk_start;
+        uint64_t window_ssdp_msearch = total_ssdp_msearch - window_ssdp_msearch_start;
+        uint64_t window_portmap_calls = total_portmap_calls - window_portmap_calls_start;
+        uint64_t window_netbios_name = total_netbios_name - window_netbios_name_start;
+        uint64_t window_netbios_dgram = total_netbios_dgram - window_netbios_dgram_start;
+        uint64_t window_ldap_bind = total_ldap_bind - window_ldap_bind_start;
+        uint64_t window_ldap_search = total_ldap_search - window_ldap_search_start;
+        uint64_t window_mssql_sqlbatch = total_mssql_sqlbatch - window_mssql_sqlbatch_start;
+        uint64_t window_mssql_rpc = total_mssql_rpc - window_mssql_rpc_start;
+        uint64_t window_tftp_rrq = total_tftp_rrq - window_tftp_rrq_start;
+        uint64_t window_tftp_wrq = total_tftp_wrq - window_tftp_wrq_start;
 
         /* Calculate PPS rates */
         double attack_pps = (double)window_att_pkts / window_sec;
@@ -430,6 +525,15 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         double udp_pps = (double)window_udp_pkts / window_sec;
         double icmp_pps = (double)window_icmp_pkts / window_sec;
         double http_pps = (double)window_http_reqs / window_sec;
+        double dns_amp_pps = (double)(window_dns_any + window_dns_txt) / window_sec;
+        double ntp_amp_pps = (double)window_ntp_monlist / window_sec;
+        double snmp_amp_pps = (double)window_snmp_getbulk / window_sec;
+        double ssdp_pps = (double)window_ssdp_msearch / window_sec;
+        double portmap_pps = (double)window_portmap_calls / window_sec;
+        double netbios_pps = (double)(window_netbios_name + window_netbios_dgram) / window_sec;
+        double ldap_pps = (double)(window_ldap_bind + window_ldap_search) / window_sec;
+        double mssql_pps = (double)(window_mssql_sqlbatch + window_mssql_rpc) / window_sec;
+        double tftp_pps = (double)(window_tftp_rrq + window_tftp_wrq) / window_sec;
 
         /* DETECTION LOGIC - Aggregate based on 10.10.3.x traffic */
 
@@ -476,6 +580,118 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
                         "HTTP FLOOD detected: %.0f HTTP rps | ", http_pps);
+                attack_detected = true;
+            }
+
+            /* UDP-Lag Detection (large UDP packets) */
+            if (udp_pps > UDP_LAG_PPS_THRESHOLD) {
+                double avg_pkt_size = 0.0;
+                if (window_att_pkts > 0) {
+                    double window_bytes = 0.0;
+                    for (int i = 0; i < NUM_RX_QUEUES; i++) {
+                        window_bytes += (double)window_attack_bytes[i];
+                    }
+                    avg_pkt_size = window_bytes / window_att_pkts;
+                }
+                if (avg_pkt_size > UDP_LAG_AVG_PKT_BYTES) {
+                    g_stats.udp_lag_detections++;
+                    if (g_stats.alert_level < ALERT_HIGH)
+                        g_stats.alert_level = ALERT_HIGH;
+                    snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                            sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                            "UDP-LAG detected: %.0f UDP pps | ", udp_pps);
+                    attack_detected = true;
+                }
+            }
+
+            /* Amplification / protocol-specific detections */
+            if (dns_amp_pps > DNS_AMP_THRESHOLD) {
+                g_stats.dns_amp_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "DNS AMP detected: %.0f qps | ", dns_amp_pps);
+                attack_detected = true;
+            }
+
+            if (ntp_amp_pps > NTP_AMP_THRESHOLD) {
+                g_stats.ntp_amp_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "NTP AMP detected: %.0f qps | ", ntp_amp_pps);
+                attack_detected = true;
+            }
+
+            if (snmp_amp_pps > SNMP_AMP_THRESHOLD) {
+                g_stats.snmp_amp_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "SNMP AMP detected: %.0f qps | ", snmp_amp_pps);
+                attack_detected = true;
+            }
+
+            if (ssdp_pps > SSDP_THRESHOLD) {
+                g_stats.ssdp_amp_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "SSDP detected: %.0f pps | ", ssdp_pps);
+                attack_detected = true;
+            }
+
+            if (portmap_pps > PORTMAP_THRESHOLD) {
+                g_stats.portmap_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "PORTMAP detected: %.0f pps | ", portmap_pps);
+                attack_detected = true;
+            }
+
+            if (netbios_pps > NETBIOS_THRESHOLD) {
+                g_stats.netbios_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "NETBIOS detected: %.0f pps | ", netbios_pps);
+                attack_detected = true;
+            }
+
+            if (ldap_pps > LDAP_THRESHOLD) {
+                g_stats.ldap_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "LDAP detected: %.0f pps | ", ldap_pps);
+                attack_detected = true;
+            }
+
+            if (mssql_pps > MSSQL_THRESHOLD) {
+                g_stats.mssql_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "MSSQL detected: %.0f pps | ", mssql_pps);
+                attack_detected = true;
+            }
+
+            if (tftp_pps > TFTP_THRESHOLD) {
+                g_stats.tftp_detections++;
+                if (g_stats.alert_level < ALERT_HIGH)
+                    g_stats.alert_level = ALERT_HIGH;
+                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                        "TFTP detected: %.0f pps | ", tftp_pps);
                 attack_detected = true;
             }
 
@@ -577,6 +793,21 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             for (int i = 0; i < NUM_RX_QUEUES; i++) {
                 octosketch_reset(&g_worker_sketch_attack[i]);
             }
+
+            window_ntp_monlist_start = total_ntp_monlist;
+            window_dns_any_start = total_dns_any;
+            window_dns_txt_start = total_dns_txt;
+            window_snmp_getbulk_start = total_snmp_getbulk;
+            window_ssdp_msearch_start = total_ssdp_msearch;
+            window_portmap_calls_start = total_portmap_calls;
+            window_netbios_name_start = total_netbios_name;
+            window_netbios_dgram_start = total_netbios_dgram;
+            window_ldap_bind_start = total_ldap_bind;
+            window_ldap_search_start = total_ldap_search;
+            window_mssql_sqlbatch_start = total_mssql_sqlbatch;
+            window_mssql_rpc_start = total_mssql_rpc;
+            window_tftp_rrq_start = total_tftp_rrq;
+            window_tftp_wrq_start = total_tftp_wrq;
         }
     }
 }
@@ -850,21 +1081,37 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[ATTACK DETECTIONS - Cumulative Events]\n"
         "  UDP flood events:   %" PRIu64 "\n"
+        "  UDP-lag events:     %" PRIu64 "\n"
         "  SYN flood events:   %" PRIu64 "\n"
         "  HTTP flood events:  %" PRIu64 "\n"
         "  ICMP flood events:  %" PRIu64 "\n"
         "  DNS amp events:     %" PRIu64 "\n"
         "  NTP amp events:     %" PRIu64 "\n"
+        "  SNMP amp events:    %" PRIu64 "\n"
+        "  SSDP events:        %" PRIu64 "\n"
+        "  PortMap events:     %" PRIu64 "\n"
+        "  NetBIOS events:     %" PRIu64 "\n"
+        "  LDAP events:        %" PRIu64 "\n"
+        "  MSSQL events:       %" PRIu64 "\n"
+        "  TFTP events:        %" PRIu64 "\n"
         "  ACK flood events:   %" PRIu64 "\n"
         "  Frag attack events: %" PRIu64 "\n"
         "  Packet flood events:%" PRIu64 "\n"
         "  (Note: Events count IPs exceeding thresholds per 50ms window)\n\n",
         g_stats.udp_flood_detections,
+        g_stats.udp_lag_detections,
         g_stats.syn_flood_detections,
         g_stats.http_flood_detections,
         g_stats.icmp_flood_detections,
         g_stats.dns_amp_detections,
         g_stats.ntp_amp_detections,
+        g_stats.snmp_amp_detections,
+        g_stats.ssdp_amp_detections,
+        g_stats.portmap_detections,
+        g_stats.netbios_detections,
+        g_stats.ldap_detections,
+        g_stats.mssql_detections,
+        g_stats.tftp_detections,
         g_stats.ack_flood_detections,
         g_stats.frag_attack_detections,
         g_stats.total_flood_detections);
