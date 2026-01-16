@@ -23,6 +23,7 @@ import tempfile
 import subprocess
 import shutil
 import threading
+import queue as py_queue
 from multiprocessing import Process, Queue, Value, Array
 from ctypes import c_uint64, c_bool
 
@@ -40,6 +41,28 @@ ATTACK_TYPES = [
     'portmap', 'netbios', 'ldap', 'mssql', 'udp', 'udp_lag',
     'syn', 'ntp', 'dns', 'snmp', 'ssdp', 'webddos', 'tftp', 'mixed'
 ]
+
+# Mixed (sequential) weighted distribution, total 100%.
+MIXED_WEIGHTED_ORDER = [
+    'portmap', 'netbios', 'ldap', 'mssql', 'udp', 'udp_lag',
+    'syn', 'ntp', 'dns', 'snmp', 'ssdp', 'webddos', 'tftp'
+]
+
+MIXED_WEIGHTED_PCTS = {
+    'udp': 20,
+    'syn': 15,
+    'dns': 10,
+    'ntp': 8,
+    'snmp': 8,
+    'ssdp': 6,
+    'webddos': 8,
+    'udp_lag': 8,
+    'portmap': 5,
+    'netbios': 5,
+    'ldap': 5,
+    'mssql': 5,
+    'tftp': 5,
+}
 
 # ============================================================================
 # Attack Packet Generation Functions (return raw bytes for efficiency)
@@ -200,7 +223,7 @@ ATTACK_PHASES = [
 
 def worker_process(worker_id, num_packets, attack_type, intensity,
                    src_mac, dst_mac, attacker_ips, target_ip,
-                   output_file, progress_array, done_flags):
+                   output_file, progress_array, done_flags, stats_queue):
     """Worker process that writes packets directly to a temp PCAP file."""
 
     random.seed(worker_id + int(time.time() * 1000) % 10000)
@@ -218,18 +241,23 @@ def worker_process(worker_id, num_packets, attack_type, intensity,
     update_interval = max(1, num_packets // 100)
 
     if attack_type == 'mixed':
-        # Mixed attack with phases
-        for phase in ATTACK_PHASES:
-            phase_packets = int(num_packets * phase['duration_pct'] / 100)
-            phase_attacks = phase['attacks']
+        # Mixed attack, sequential and weighted by type.
+        remaining_packets = num_packets
+        attack_targets = {}
+        for name in MIXED_WEIGHTED_ORDER:
+            pct = MIXED_WEIGHTED_PCTS.get(name, 0)
+            attack_targets[name] = int(num_packets * pct / 100)
+            remaining_packets -= attack_targets[name]
+        if remaining_packets > 0:
+            attack_targets[MIXED_WEIGHTED_ORDER[-1]] += remaining_packets
 
-            for _ in range(phase_packets):
-                if packets_written >= num_packets:
-                    break
+        for selected_attack in MIXED_WEIGHTED_ORDER:
+            generator = ATTACK_GENERATORS[selected_attack]
+            target_packets = attack_targets[selected_attack]
+            generated = 0
 
+            while generated < target_packets and packets_written < num_packets:
                 attacker_ip = random.choice(attacker_ips)
-                selected_attack = random.choice(phase_attacks)
-                generator = ATTACK_GENERATORS[selected_attack]
                 pkts = generator(attacker_ip, target_ip, src_mac, dst_mac)
 
                 for pkt in pkts:
@@ -237,10 +265,12 @@ def worker_process(worker_id, num_packets, attack_type, intensity,
                     current_timestamp += base_interval + (random.random() - 0.5) * 0.0001
                     writer.write(pkt)
                     packets_written += 1
+                    generated += 1
+                    if generated >= target_packets or packets_written >= num_packets:
+                        break
 
                 attack_stats[selected_attack] += len(pkts)
 
-                # Update progress
                 if packets_written % update_interval == 0:
                     progress_array[worker_id] = packets_written
     else:
@@ -265,6 +295,7 @@ def worker_process(worker_id, num_packets, attack_type, intensity,
     writer.close()
     progress_array[worker_id] = packets_written
     done_flags[worker_id] = True
+    stats_queue.put(attack_stats)
 
 
 def display_progress(num_workers, progress_array, done_flags, total_packets, start_time, worker_packet_counts):
@@ -359,6 +390,7 @@ def generate_cicdos2019_attacks(output_file, num_packets, attack_type, intensity
     # Shared progress tracking
     progress_array = Array(c_uint64, num_workers)
     done_flags = Array(c_bool, num_workers)
+    stats_queue = Queue()
 
     for i in range(num_workers):
         progress_array[i] = 0
@@ -384,7 +416,7 @@ def generate_cicdos2019_attacks(output_file, num_packets, attack_type, intensity
             p = Process(target=worker_process, args=(
                 w, worker_packets, attack_type, intensity,
                 src_mac, dst_mac, attacker_ips, target_ip,
-                temp_files[w], progress_array, done_flags
+                temp_files[w], progress_array, done_flags, stats_queue
             ))
             p.start()
             processes.append(p)
@@ -395,6 +427,14 @@ def generate_cicdos2019_attacks(output_file, num_packets, attack_type, intensity
     progress_thread.join()
 
     generation_time = time.time() - start_time
+    total_attack_stats = {at: 0 for at in ATTACK_GENERATORS.keys()}
+    for _ in range(num_workers):
+        try:
+            worker_stats = stats_queue.get(timeout=5)
+        except py_queue.Empty:
+            break
+        for attack_name, count in worker_stats.items():
+            total_attack_stats[attack_name] = total_attack_stats.get(attack_name, 0) + count
 
     # Merge PCAP files
     print(f"\nMerging {num_workers} PCAP files...")
@@ -462,6 +502,14 @@ def generate_cicdos2019_attacks(output_file, num_packets, attack_type, intensity
     print(f"  Generation rate:   {sum(progress_array) / generation_time:,.0f} pkt/s")
     print(f"  File size:         {file_size / (1024*1024):.2f} MB")
     print(f"  Workers used:      {num_workers}")
+    total_stat_packets = sum(total_attack_stats.values())
+    if total_stat_packets > 0:
+        print("  Attack distribution:")
+        for attack_name in sorted(total_attack_stats.keys()):
+            count = total_attack_stats[attack_name]
+            if count:
+                pct = (count * 100.0) / total_stat_packets
+                print(f"    - {attack_name}: {count:,} ({pct:.1f}%)")
     print("")
     print("Replay command:")
     print(f"  sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w <PCI> -- \\")

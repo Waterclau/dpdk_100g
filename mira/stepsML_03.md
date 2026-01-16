@@ -251,13 +251,25 @@ sudo timeout 1800 stdbuf -oL ./detectorML \
       -o attack_ntp.pcap
 
   # Alta intensidad con todos los parámetros:
-  python3 generate_cicdos2019_attacks.py \
+ sudo python3 generate_cicdos2019_attacks.py \
       -t mixed \
-      -n 10000000 \
-      -w 8 \
+      -n 20000000 \
+      -w 16 \
       -i 3.0 \
       -s 100 \
       -o attack_mixed_12gbps.pcap
+
+ sudo python3 generate_cicdos2019_attacks.py \
+      -t mixed \
+      -n 20000 \
+      -w 24 \
+      -i 3.0 \
+      -s 100 \
+      -o attack_mixed_test.pcap
+
+    sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- --pcap-dir /local/dpdk_100g/mira/attack_generator --rate-gbps 12 
+    sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- /local/dpdk_100g/mira/attack_generator/attack_mixed_test.pcap --rate-gbps 12
+
 
 ### Recommendation
 
