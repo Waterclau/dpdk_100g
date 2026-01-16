@@ -127,6 +127,7 @@ static struct adaptive_attack_config attack_cfg = {
 struct replay_config {
     uint8_t pcap_timed;       // Enable timestamp-based replay
     uint8_t phase_mode;       // Adaptive phase-based pacing (deprecated, use adaptive_cfg)
+    uint8_t loop_mode;        // Loop indefinitely for timed replay
     float jitter_pct;         // Jitter percentage (0-100)
     uint64_t speedup_factor;  // Speedup factor (1 = realtime, 10 = 10x faster)
 };
@@ -134,6 +135,7 @@ struct replay_config {
 static struct replay_config replay_cfg = {
     .pcap_timed = 0,
     .phase_mode = 0,
+    .loop_mode = 0,
     .jitter_pct = 0.0f,
     .speedup_factor = 1
 };
@@ -2327,6 +2329,7 @@ int main(int argc, char *argv[])
         case 'l':
             adaptive_cfg.loop_mode = 1;
             attack_cfg.loop_mode = 1;  // Apply to attack mode too
+            replay_cfg.loop_mode = 1;
             printf("[CONFIG] Loop mode enabled (infinite)\n");
             break;
         case 'd':
