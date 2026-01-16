@@ -1109,6 +1109,7 @@ static void send_loop_timed(void)
     uint16_t nb_tx;
     uint64_t hz = rte_get_tsc_hz();
     uint64_t last_stats_tsc = 0;
+    uint64_t loop_count = 0;
 
     struct timeval prev_timestamp = {0, 0};
     uint8_t first_packet = 1;
@@ -1129,7 +1130,20 @@ static void send_loop_timed(void)
 
     srand(time(NULL));  // Initialize random for jitter
 
-    while (!force_quit && current_packet_idx < num_pcap_packets) {
+    while (!force_quit) {
+        if (current_packet_idx >= num_pcap_packets) {
+            if (!replay_cfg.loop_mode) {
+                break;
+            }
+            loop_count++;
+            current_packet_idx = 0;
+            first_packet = 1;
+            prev_timestamp.tv_sec = 0;
+            prev_timestamp.tv_usec = 0;
+            printf("\n[TIMED MODE] Loop %lu complete, restarting...\n", loop_count);
+            continue;
+        }
+
         struct packet_data *pkt_data = &pcap_packets[current_packet_idx];
 
         /* Calculate delay based on timestamp difference */
