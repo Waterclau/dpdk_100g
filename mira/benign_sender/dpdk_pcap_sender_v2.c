@@ -36,7 +36,7 @@
 #define NUM_MBUFS 262144
 #define MBUF_CACHE_SIZE 512
 #define BURST_SIZE 256
-#define MAX_PCAP_PACKETS 10000000
+#define MAX_PCAP_PACKETS 25000000
 
 /* Target transmission rate for non-timed mode */
 #define TARGET_GBPS 12.0
