@@ -14,6 +14,7 @@ import pandas as pd
 import numpy as np
 import lightgbm as lgb
 from sklearn.preprocessing import LabelEncoder
+import joblib
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     confusion_matrix, classification_report
@@ -42,17 +43,37 @@ def evaluate_model(model_path: str, test_csv: str):
     X_test = df[feature_cols].values
     y_test_labels = df['label'].values
 
-    # Encode labels
+    # Load label mapping from training
+    model_dir = Path(model_path).parent
+    mapping_file = model_dir / 'label_mapping.json'
+    if not mapping_file.exists():
+        print(f"[ERROR] Label mapping not found: {mapping_file}")
+        return
+    with open(mapping_file, 'r') as f:
+        mapping = json.load(f)
+
+    inv_mapping = {v: int(k) for k, v in mapping.items()}
+    y_test = np.array([inv_mapping[label] for label in y_test_labels])
+
+    # Label encoder for reporting only (ordered by mapping)
     label_encoder = LabelEncoder()
-    y_test = label_encoder.fit_transform(y_test_labels)
+    ordered_labels = [label for _, label in sorted((int(k), v) for k, v in mapping.items())]
+    label_encoder.fit(ordered_labels)
 
     print(f"[INFO] Test samples: {len(X_test)}")
     print(f"[INFO] Features: {len(feature_cols)}")
     print(f"[INFO] Classes: {list(label_encoder.classes_)}")
 
-    # Load model
+    # Load model and scaler
     print(f"\n[INFO] Loading model: {model_path}")
     model = lgb.Booster(model_file=model_path)
+    scaler_path = model_dir / 'feature_scaler.pkl'
+    if scaler_path.exists():
+        print(f"[INFO] Loading scaler: {scaler_path}")
+        scaler = joblib.load(scaler_path)
+        X_test = scaler.transform(X_test)
+    else:
+        print(f"[WARNING] Scaler not found: {scaler_path} (using raw features)")
 
     # Make predictions
     print("\n[INFO] Making predictions...")
@@ -133,17 +154,10 @@ def evaluate_model(model_path: str, test_csv: str):
 
         print(f"{i:<8} {true_label:<15} {pred_label:<15} {confidence:<12.3f} {correct:<10}")
 
-    # Check for label mapping file
-    model_dir = Path(model_path).parent
-    mapping_file = model_dir / 'label_mapping.json'
-
-    if mapping_file.exists():
-        print(f"\n[INFO] Label mapping found: {mapping_file}")
-        with open(mapping_file, 'r') as f:
-            mapping = json.load(f)
-        print("[INFO] Label mapping:")
-        for idx, label in mapping.items():
-            print(f"  {idx}: {label}")
+    print(f"\n[INFO] Label mapping found: {mapping_file}")
+    print("[INFO] Label mapping:")
+    for idx, label in mapping.items():
+        print(f"  {idx}: {label}")
 
     # Performance summary
     print("\n" + "="*70)

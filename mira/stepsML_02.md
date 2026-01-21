@@ -806,6 +806,9 @@ cd /local/dpdk_100g/mira/ml_system/02_training
 python3 evaluate_model.py \
     --model ../../detector_system_ml/lightgbm_model.txt \
     --test ../datasets/splits/test.csv
+
+# NOTE: evaluate_model.py applies feature_scaler.pkl and uses label_mapping.json
+# to keep class order aligned with training.
 ```
 
 **Expected test results:**
