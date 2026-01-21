@@ -1153,15 +1153,6 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
             g_stats.bytes_until_detection,
             g_stats.bytes_until_detection / (1024.0 * 1024.0));
 
-        len += snprintf(buffer + len, sizeof(buffer) - len,
-            "  DPDK + OctoSketch Advantages:\n"
-            "    ✓ Real-time detection (50ms granularity)\n"
-            "    ✓ No training required (vs ML models)\n"
-            "    ✓ Line-rate processing (multi-core DPDK)\n"
-            "    ✓ O(1) memory (sketch-based, constant size)\n"
-            "    ✓ Lock-free updates (atomic operations)\n"
-            "    ✓ Heavy-hitter detection (Top-K IPs)\n\n");
-
         /* OctoSketch Metrics - Per-worker + Sampling */
         size_t sketch_total_memory = octosketch_memory_size() * NUM_RX_QUEUES;
         uint64_t total_sketch_updates = octosketch_get_total(&g_merged_sketch_attack);
