@@ -956,10 +956,22 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         g_stats.cycles_per_packet = 0;
     }
 
-    char buffer[4096];
-    int len = 0;
+    char buffer[16384];
+    size_t len = 0;
 
-    len += snprintf(buffer + len, sizeof(buffer) - len,
+    #define APPEND(fmt, ...) do { \
+        if (len < sizeof(buffer)) { \
+            int n = snprintf(buffer + len, sizeof(buffer) - len, fmt, __VA_ARGS__); \
+            if (n > 0) { \
+                len += (size_t)n; \
+                if (len > sizeof(buffer)) { \
+                    len = sizeof(buffer); \
+                } \
+            } \
+        } \
+    } while (0)
+
+    APPEND(
         "\n╔═══════════════════════════════════════════════════════════════════════╗\n"
         "║          MIRA DDoS DETECTOR - STATISTICS (MULTI-CORE)                ║\n"
         "╚═══════════════════════════════════════════════════════════════════════╝\n\n");
@@ -967,7 +979,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     double inst_baseline_pct = window_total_pkts > 0 ? (double)window_base_pkts * 100.0 / window_total_pkts : 0.0;
     double inst_attack_pct = window_total_pkts > 0 ? (double)window_att_pkts * 100.0 / window_total_pkts : 0.0;
 
-    len += snprintf(buffer + len, sizeof(buffer) - len,
+    APPEND(
         "[PACKET COUNTERS - GLOBAL]\n"
         "  Total packets:      %" PRIu64 "\n"
         "  Baseline (10.10.2.x): %" PRIu64 " (%.1f%%)\n"
@@ -984,7 +996,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
 
     double avg_pkt_size = window_total_pkts > 0 ? (double)window_total_bytes / window_total_pkts : 0.0;
 
-    len += snprintf(buffer + len, sizeof(buffer) - len,
+    APPEND(
         "[INSTANTANEOUS TRAFFIC - Last %.1f seconds]\n"
         "  Baseline (10.10.2.x): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
         "  Attack (10.10.3.x): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
@@ -1008,7 +1020,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         }
     }
 
-    len += snprintf(buffer + len, sizeof(buffer) - len,
+    APPEND(
         "[CUMULATIVE TRAFFIC - Since first packet (%.1fs)]\n"
         "  Total received:     %" PRIu64 " pkts (%.2f Mpps) | %.2f Gbps | %" PRIu64 " bytes\n\n",
         cumulative_duration,
@@ -1019,7 +1031,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     uint64_t http_reqs = g_stats.http_requests;
     uint64_t dns_qs = g_stats.dns_queries;
 
-    len += snprintf(buffer + len, sizeof(buffer) - len,
+    APPEND(
         "[ATTACK-SPECIFIC COUNTERS]\n"
         "  SYN packets:        %" PRIu64 "\n"
         "  SYN-ACK packets:    %" PRIu64 "\n"
@@ -1038,7 +1050,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     uint32_t avg_snmp_resp_size = g_stats.snmp_responses > 0 ?
         (uint32_t)(g_stats.snmp_response_size_sum / g_stats.snmp_responses) : 0;
 
-    len += snprintf(buffer + len, sizeof(buffer) - len,
+    APPEND(
         "[PROTOCOL-SPECIFIC COUNTERS - CIC-DDoS-2019 Features]\n"
         "  NTP Amplification:\n"
         "    Monlist queries:  %" PRIu64 "\n"
@@ -1078,7 +1090,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         g_stats.mssql_sqlbatch_packets, g_stats.mssql_rpc_packets,
         g_stats.tftp_rrq_packets, g_stats.tftp_wrq_packets);
 
-    len += snprintf(buffer + len, sizeof(buffer) - len,
+    APPEND(
         "[ATTACK DETECTIONS - Cumulative Events]\n"
         "  UDP flood events:   %" PRIu64 "\n"
         "  UDP-lag events:     %" PRIu64 "\n"
@@ -1130,7 +1142,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         alert_text = "LOW";
     }
 
-    len += snprintf(buffer + len, sizeof(buffer) - len,
+    APPEND(
         "[ALERT STATUS]\n"
         "  Alert level:        %s%s%s\n"
         "  Reason:             %s%s%s\n\n",
@@ -1140,7 +1152,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         strlen(g_stats.alert_reason) > 0 ? COLOR_RESET : "");
 
     if (g_stats.detection_triggered) {
-        len += snprintf(buffer + len, sizeof(buffer) - len,
+        APPEND(
             "[MULTI-LF (2025) COMPARISON]\n"
             "=== Detection Performance vs ML-Based System ===\n\n"
             "  First Detection Latency:   %.2f ms (vs MULTI-LF: 866 ms)\n"
@@ -1157,7 +1169,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         size_t sketch_total_memory = octosketch_memory_size() * NUM_RX_QUEUES;
         uint64_t total_sketch_updates = octosketch_get_total(&g_merged_sketch_attack);
 
-        len += snprintf(buffer + len, sizeof(buffer) - len,
+        APPEND(
             "[OCTOSKETCH METRICS - Optimized Architecture]\n"
             "=== Per-Worker Sketches + Sampling (1/%d packets) ===\n\n"
             "  Architecture:              Per-worker (NO atomics, NO contention)\n"
@@ -1183,7 +1195,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         if (g_stats.total_detection_events > 1) {
             double avg_latency = g_stats.sum_detection_latencies_ms / g_stats.total_detection_events;
 
-            len += snprintf(buffer + len, sizeof(buffer) - len,
+            APPEND(
                 "[MULTIPLE DETECTION STATISTICS]\n"
                 "=== Aggregate Detection Analysis ===\n\n"
                 "  Total detection events:    %" PRIu64 "\n"
@@ -1204,7 +1216,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
             double pct_40_50 = (double)g_stats.detections_40_50ms * 100.0 / g_stats.total_detection_events;
             double pct_over_50 = (double)g_stats.detections_over_50ms * 100.0 / g_stats.total_detection_events;
 
-            len += snprintf(buffer + len, sizeof(buffer) - len,
+            APPEND(
                 "  Detection Latency Histogram:\n"
                 "    < 20 ms:  %" PRIu64 " detections (%.1f%%)\n"
                 "    20-30 ms: %" PRIu64 " detections (%.1f%%)\n"
@@ -1222,7 +1234,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     double pps_current = (window_total_pkts > 0 && window_duration > 0.001) ?
                          (double)window_total_pkts / window_duration : 0.0;
 
-    len += snprintf(buffer + len, sizeof(buffer) - len,
+    APPEND(
         "[PERFORMANCE METRICS]\n"
         "  Throughput:         %.2f Gbps (%.2f Mpps)\n"
         "  Cycles available:   %.0f cycles/pkt (lower = higher load)\n"
@@ -1252,7 +1264,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     if (drop_rate > 10.0) drop_color = COLOR_RED;
     else if (drop_rate > 1.0) drop_color = COLOR_YELLOW;
 
-    len += snprintf(buffer + len, sizeof(buffer) - len,
+    APPEND(
         "[DPDK NIC STATISTICS]\n"
         "  RX packets (NIC):   %" PRIu64 "\n"
         "  RX dropped (HW):    %s%" PRIu64 "%s (imissed)\n"
@@ -1269,6 +1281,8 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         rx_bursts_total, empty_burst_rate,
         g_stats.total_packets,
         rx_pkts_nic > 0 ? (double)g_stats.total_packets * 100.0 / rx_pkts_nic : 0.0);
+
+    #undef APPEND
 
     printf("%s", buffer);
     fflush(stdout);  /* Force immediate write to stdout (no buffering) */
