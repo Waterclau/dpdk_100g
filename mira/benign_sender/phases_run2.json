@@ -1,0 +1,5 @@
+[
+  {"duration": 30, "http": 0.50, "dns": 0.25, "ssh": 0.15, "udp": 0.10},
+  {"duration": 20, "http": 0.35, "dns": 0.45, "ssh": 0.10, "udp": 0.10},
+  {"duration": 40, "http": 0.55, "dns": 0.15, "ssh": 0.20, "udp": 0.10}
+]
