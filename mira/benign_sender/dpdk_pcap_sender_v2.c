@@ -153,6 +153,19 @@ static inline double get_jitter_multiplier(float jitter_pct)
     return 1.0 + jitter;
 }
 
+/* Fast RNG for adaptive selection (xorshift32) */
+static uint32_t g_rng_state = 0x12345678;
+
+static inline uint32_t fast_rand_u32(void)
+{
+    uint32_t x = g_rng_state;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    g_rng_state = x;
+    return x;
+}
+
 /* NEW: Calculate time difference in microseconds */
 static inline uint64_t timeval_diff_us(struct timeval *t1, struct timeval *t2)
 {
@@ -834,7 +847,7 @@ static void send_loop_adaptive(void)
     last_window_bytes = 0;
     phase_start_tsc = start_tsc;
 
-    srand(time(NULL));
+    g_rng_state ^= (uint32_t)time(NULL);
 
     // Initialize first phase
     if (adaptive_cfg.num_phases > 0) {
@@ -847,6 +860,10 @@ static void send_loop_adaptive(void)
                adaptive_cfg.phases[0].ssh_pct*100,
                adaptive_cfg.phases[0].udp_pct*100);
     }
+
+    int http_th = (int)(adaptive_cfg.phases[0].http_pct * 10000.0f);
+    int dns_th = http_th + (int)(adaptive_cfg.phases[0].dns_pct * 10000.0f);
+    int ssh_th = dns_th + (int)(adaptive_cfg.phases[0].ssh_pct * 10000.0f);
 
     uint64_t total_start_tsc = start_tsc;
     uint64_t total_duration_tsc = adaptive_cfg.duration_sec * hz;
@@ -876,6 +893,10 @@ static void send_loop_adaptive(void)
                    adaptive_cfg.phases[current_phase].dns_pct*100,
                    adaptive_cfg.phases[current_phase].ssh_pct*100,
                    adaptive_cfg.phases[current_phase].udp_pct*100);
+
+            http_th = (int)(adaptive_cfg.phases[current_phase].http_pct * 10000.0f);
+            dns_th = http_th + (int)(adaptive_cfg.phases[current_phase].dns_pct * 10000.0f);
+            ssh_th = dns_th + (int)(adaptive_cfg.phases[current_phase].ssh_pct * 10000.0f);
         }
 
         /* Allocate fresh mbufs */
@@ -889,28 +910,28 @@ static void send_loop_adaptive(void)
 
         for (i = 0; i < BURST_SIZE; i++) {
             uint32_t pkt_idx = 0;
-            float r = (float)rand() / RAND_MAX;
+            uint32_t r = fast_rand_u32() % 10000;
 
             // Select protocol based on phase percentages
-            if (r < phase->http_pct && num_http > 0) {
+            if (r < (uint32_t)http_th && num_http > 0) {
                 // HTTP packet
-                uint32_t idx = rand() % num_http;
+                uint32_t idx = fast_rand_u32() % num_http;
                 pkt_idx = http_packets[idx];
-            } else if (r < (phase->http_pct + phase->dns_pct) && num_dns > 0) {
+            } else if (r < (uint32_t)dns_th && num_dns > 0) {
                 // DNS packet
-                uint32_t idx = rand() % num_dns;
+                uint32_t idx = fast_rand_u32() % num_dns;
                 pkt_idx = dns_packets[idx];
-            } else if (r < (phase->http_pct + phase->dns_pct + phase->ssh_pct) && num_ssh > 0) {
+            } else if (r < (uint32_t)ssh_th && num_ssh > 0) {
                 // SSH packet
-                uint32_t idx = rand() % num_ssh;
+                uint32_t idx = fast_rand_u32() % num_ssh;
                 pkt_idx = ssh_packets[idx];
             } else if (num_udp > 0) {
                 // UDP packet
-                uint32_t idx = rand() % num_udp;
+                uint32_t idx = fast_rand_u32() % num_udp;
                 pkt_idx = udp_packets[idx];
             } else {
                 // Fallback to any random packet
-                pkt_idx = rand() % num_pcap_packets;
+                pkt_idx = fast_rand_u32() % num_pcap_packets;
             }
 
             struct packet_data *pkt_data = &pcap_packets[pkt_idx];
