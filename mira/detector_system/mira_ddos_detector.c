@@ -961,7 +961,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
 
     #define APPEND(fmt, ...) do { \
         if (len < sizeof(buffer)) { \
-            int n = snprintf(buffer + len, sizeof(buffer) - len, fmt, __VA_ARGS__); \
+            int n = snprintf(buffer + len, sizeof(buffer) - len, fmt, ##__VA_ARGS__); \
             if (n > 0) { \
                 len += (size_t)n; \
                 if (len > sizeof(buffer)) { \
