@@ -35,7 +35,7 @@
 #define TX_RING_SIZE 8192
 #define NUM_MBUFS 262144
 #define MBUF_CACHE_SIZE 512
-#define BURST_SIZE 256
+#define BURST_SIZE 512
 #define MAX_PCAP_PACKETS 25000000
 
 /* Target transmission rate for non-timed mode */
@@ -864,6 +864,10 @@ static void send_loop_adaptive(void)
     int http_th = (int)(adaptive_cfg.phases[0].http_pct * 10000.0f);
     int dns_th = http_th + (int)(adaptive_cfg.phases[0].dns_pct * 10000.0f);
     int ssh_th = dns_th + (int)(adaptive_cfg.phases[0].ssh_pct * 10000.0f);
+    uint32_t http_pos = 0;
+    uint32_t dns_pos = 0;
+    uint32_t ssh_pos = 0;
+    uint32_t udp_pos = 0;
 
     uint64_t total_start_tsc = start_tsc;
     uint64_t total_duration_tsc = adaptive_cfg.duration_sec * hz;
@@ -915,20 +919,28 @@ static void send_loop_adaptive(void)
             // Select protocol based on phase percentages
             if (r < (uint32_t)http_th && num_http > 0) {
                 // HTTP packet
-                uint32_t idx = fast_rand_u32() % num_http;
-                pkt_idx = http_packets[idx];
+                if (http_pos >= num_http) {
+                    http_pos = 0;
+                }
+                pkt_idx = http_packets[http_pos++];
             } else if (r < (uint32_t)dns_th && num_dns > 0) {
                 // DNS packet
-                uint32_t idx = fast_rand_u32() % num_dns;
-                pkt_idx = dns_packets[idx];
+                if (dns_pos >= num_dns) {
+                    dns_pos = 0;
+                }
+                pkt_idx = dns_packets[dns_pos++];
             } else if (r < (uint32_t)ssh_th && num_ssh > 0) {
                 // SSH packet
-                uint32_t idx = fast_rand_u32() % num_ssh;
-                pkt_idx = ssh_packets[idx];
+                if (ssh_pos >= num_ssh) {
+                    ssh_pos = 0;
+                }
+                pkt_idx = ssh_packets[ssh_pos++];
             } else if (num_udp > 0) {
                 // UDP packet
-                uint32_t idx = fast_rand_u32() % num_udp;
-                pkt_idx = udp_packets[idx];
+                if (udp_pos >= num_udp) {
+                    udp_pos = 0;
+                }
+                pkt_idx = udp_packets[udp_pos++];
             } else {
                 // Fallback to any random packet
                 pkt_idx = fast_rand_u32() % num_pcap_packets;
