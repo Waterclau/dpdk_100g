@@ -1,5 +1,8 @@
 [
-  {"duration": 25, "http": 0.65, "dns": 0.15, "ssh": 0.10, "udp": 0.10},
-  {"duration": 20, "http": 0.40, "dns": 0.40, "ssh": 0.10, "udp": 0.10},
-  {"duration": 50, "http": 0.45, "dns": 0.15, "ssh": 0.30, "udp": 0.10}
+  {"duration": 100, "http": 0.65, "dns": 0.15, "ssh": 0.10, "udp": 0.10},
+  {"duration": 90, "http": 0.40, "dns": 0.40, "ssh": 0.10, "udp": 0.10},
+  {"duration": 120, "http": 0.45, "dns": 0.15, "ssh": 0.30, "udp": 0.10},
+  {"duration": 80, "http": 0.55, "dns": 0.20, "ssh": 0.15, "udp": 0.10},
+  {"duration": 140, "http": 0.48, "dns": 0.22, "ssh": 0.20, "udp": 0.10},
+  {"duration": 110, "http": 0.42, "dns": 0.28, "ssh": 0.20, "udp": 0.10}
 ]
