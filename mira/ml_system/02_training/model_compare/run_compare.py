@@ -43,10 +43,32 @@ def load_split(path):
     return df, feature_cols
 
 
+def _print_report(title, y_true, y_pred, labels):
+    print(f"\n{title}")
+    print("-" * 70)
+    print(classification_report(y_true, y_pred, target_names=labels, zero_division=0))
+    print("CONFUSION MATRIX")
+    print(confusion_matrix(y_true, y_pred))
+
+
+def _print_sample_preds(y_true, y_pred, y_proba, labels, count=10):
+    print("\nSAMPLE PREDICTIONS (First 10)")
+    print("Index    True Label      Predicted       Confidence   Correct")
+    print("-" * 70)
+    for i in range(min(count, len(y_true))):
+        true_lbl = labels[y_true[i]]
+        pred_lbl = labels[y_pred[i]]
+        conf = np.max(y_proba[i]) if y_proba is not None else 0.0
+        correct = "YES" if y_true[i] == y_pred[i] else "NO"
+        print(f"{i:<8d} {true_lbl:<14s} {pred_lbl:<14s} {conf:>9.3f}   {correct}")
+
+
 def eval_model(name, model, X_val, y_val, X_test, y_test, labels):
     results = {}
     y_val_pred = model.predict(X_val)
     y_test_pred = model.predict(X_test)
+    y_val_proba = model.predict_proba(X_val) if hasattr(model, "predict_proba") else None
+    y_test_proba = model.predict_proba(X_test) if hasattr(model, "predict_proba") else None
 
     results['val_accuracy'] = float(accuracy_score(y_val, y_val_pred))
     results['test_accuracy'] = float(accuracy_score(y_test, y_test_pred))
@@ -62,6 +84,10 @@ def eval_model(name, model, X_val, y_val, X_test, y_test, labels):
     print(f"\n[{name}]")
     print(f"  Val accuracy:  {results['val_accuracy']*100:.2f}%")
     print(f"  Test accuracy: {results['test_accuracy']*100:.2f}%")
+
+    _print_report("VALIDATION RESULTS", y_val, y_val_pred, labels)
+    _print_report("TEST RESULTS", y_test, y_test_pred, labels)
+    _print_sample_preds(y_test, y_test_pred, y_test_proba, labels)
     return results
 
 
