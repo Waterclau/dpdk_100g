@@ -21,7 +21,7 @@
   - node-controller (sender benigno): `10.10.1.5`
   - node-tg (sender ataque): `10.10.1.1`
 - **Clientes benignos simulados:** `10.10.2.0/24` (500 IPs)
-- **Atacantes simulados:** `10.10.3.0/24` (200 IPs)
+- **Atacantes simulados:** `10.10.3.0/24` (200 IPs, red interna CloudLab)
 
 ---
 
@@ -181,7 +181,7 @@ cd /local/dpdk_100g/mira/benign_generator
 # - 10% ICMP (ping)
 # - 5% UDP background (NTP, SNMP)
 # --cores 0 = usa todos los cores disponibles (8-16× más rápido)
-# IMPORTANTE: Usar 10.10.2.0/24 para clientes benignos
+# IMPORTANTE: Usar 10.10.2.0/24 para clientes (red interna CloudLab)
 sudo python3 generate_benign_traffic_v2_parallel.py \
     --output ../benign_25M.pcap \
     --packets 25000000 \
@@ -211,7 +211,7 @@ tcpdump -r ../benign_test.pcap -c 10
 ```
 
 **Notas importantes:**
-- **Rango de IPs clientes:** `10.10.2.0/24`
+- **Rango de IPs clientes:** `10.10.2.0/24` (red interna CloudLab para simular tráfico benigno)
 - **IP servidor:** `10.10.1.2` (node-monitor)
 - **MAC destino:** `0c:42:a1:dd:57:90` (ens1f0 del node-monitor)
 - El parámetro `--cores 0` usa todos los cores disponibles para generación paralela (8-16× más rápido)
@@ -357,7 +357,7 @@ sudo apt-get install -y tcpreplay tshark parallel pv
 #### Paso 6: Remapear IPs y MACs (CRÍTICO)
 
 **Parámetros de remapeo:**
-- **IPs origen (atacantes):** `0.0.0.0/0` → `10.10.3.0/24`
+- **IPs origen (atacantes):** `0.0.0.0/0` → `10.10.3.0/24` (red interna CloudLab)
 - **IP destino (víctima):** `0.0.0.0/0` → `10.10.1.2` (node-monitor)
 - **MAC origen:** `00:00:00:00:00:02` (genérica para ataques)
 - **MAC destino:** `0c:42:a1:dd:57:90` (ens1f0 del node-monitor)
@@ -431,7 +431,7 @@ sudo tcpdump -r SAT-01-12-2018_0500.pcap -e -n -c 20
 - **Dst IP:** `10.10.1.2` (IP del node-monitor)
 - **Dst MAC:** `0c:42:a1:dd:57:90` (debe coincidir con tu node-monitor actual)
 
-**Si las IPs o MACs no coinciden (especialmente si tienes 10.10.3.x en lugar de 10.10.2.x):**
+**Si las IPs o MACs no coinciden:**
 ```bash
 # Necesitarás volver a remapear con los parámetros correctos
 cd /proj/softmeasure-PG0/CICD
@@ -439,7 +439,6 @@ sudo rm -rf remapped
 mkdir remapped
 # Ejecutar de nuevo el Paso 6 con:
 #   --srcipmap=0.0.0.0/0:10.10.3.0/24
-#   --dstipmap=0.0.0.0/0:10.10.1.2
 #   --enet-dmac=0c:42:a1:dd:57:90
 ```
 
@@ -495,7 +494,7 @@ cd /local/dpdk_100g/mira/attack_generator
 # - SYN Flood: TCP SYN a puertos 80/443/22
 # - ICMP Flood: ping packets estándar
 # NOTA: Este generador NO es paralelo (sin --cores), tardará más tiempo
-# IMPORTANTE: IP atacantes: 10.10.3.0/24
+# IP atacantes: 10.10.3.0/24 (red interna CloudLab)
 # MAC destino: 0c:42:a1:dd:57:90 (ens1f0 del monitor)
 sudo python3 generate_mirai_attacks_v2.py \
     --output ../attack_mixed_10M.pcap \
@@ -512,7 +511,7 @@ tcpdump -r ../attack_mixed_10M.pcap -c 10
 ```
 
 **Notas importantes:**
-- **Rango de IPs atacantes:** `10.10.3.0/24`
+- **Rango de IPs atacantes:** `10.10.3.0/24` (red interna CloudLab)
 - **IP objetivo:** `10.10.1.2` (node-monitor)
 - **MAC destino:** `0c:42:a1:dd:57:90` (ens1f0 del node-monitor)
 - **Patrones:** Basados en CICDDoS2019 dataset - UDP flood con 516-byte payloads (característico de Mirai)
@@ -662,6 +661,7 @@ sleep 125
 
 # Enviar UN PCAP de prueba (ejemplo)
 sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/softmeasure-PG0/CICD/remapped/SAT-01-12-2018_0500.pcap
+sudo ./dpdk_pcap_sender -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/softmeasure-PG0/CICD/remapped/SAT-01-12-2018_0500.pcap
 
 # O enviar VARIOS PCAPs en secuencia (opcional)
 sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/softmeasure-PG0/CICD/remapped/SAT-01-12-2018_0500.pcap
@@ -768,8 +768,8 @@ echo 2048 | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
    - **node-tg** (ens1f0): `0c:42:a1:dd:5a:48`
 
    **Rangos de IP simulados:**
-   - **Tráfico benigno:** `10.10.1.0/24` → `10.10.1.2` (el detector espera 10.10.1.x para baseline)
-   - **Tráfico de ataque:** `10.10.2.0/24` → `10.10.1.2` (el detector espera 10.10.2.x para ataques)
+   - **Tráfico benigno:** `10.10.2.0/24` → `10.10.1.2`
+   - **Tráfico de ataque:** `10.10.3.0/24` → `10.10.1.2`
 
    **IMPORTANTE:** La MAC `0c:42:a1:dd:57:90` del monitor debe usarse como `--dst-mac` en TODOS los PCAPs generados.
 
@@ -802,7 +802,7 @@ echo 2048 | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
 
 ### node-controller (tráfico benigno):
 - [ ] PCAP benigno generado (`benign_10M.pcap` o `benign_25M.pcap`)
-  - Con `--client-range 10.10.1.0/24` (**CRÍTICO:** detector espera 10.10.1.x)
+  - Con `--client-range 10.10.2.0/24`
   - Con `--dst-mac 0c:42:a1:dd:57:90`
 - [ ] DPDK sender compilado (`benign_sender/build/dpdk_pcap_sender`)
 
@@ -810,11 +810,11 @@ echo 2048 | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
 - [ ] **Opción A:** PCAPs del dataset CICDDoS2019 descargados y remapeados
   - Dataset descargado en `/proj/softmeasure-PG0/CICD/pcaps`
   - PCAPs remapeados en `/proj/softmeasure-PG0/CICD/remapped/` ✅
-  - IPs remapeadas: `10.10.2.0/24` → `10.10.1.2` (**CRÍTICO:** detector espera 10.10.2.x para ataques)
+  - IPs remapeadas: `10.10.3.0/24` → `10.10.1.2`
   - MACs remapeadas: dst-mac `0c:42:a1:dd:57:90`
   - Verificado con: `tshark -r <pcap> -T fields -e eth.dst -e ip.src -e ip.dst`
 - [ ] **Opción B:** PCAP sintético generado (`attack_mixed_10M.pcap`)
-  - Con `--attacker-range 10.10.2.0/24` (**CRÍTICO:** detector espera 10.10.2.x)
+  - Con `--attacker-range 10.10.3.0/24`
   - Con `--dst-mac 0c:42:a1:dd:57:90`
 - [ ] DPDK sender compilado (`attack_sender/dpdk_pcap_sender_v2` - el binario principal a usar)
 - [ ] Herramientas instaladas: `tcpreplay`, `tshark`, `parallel`, `pv`
@@ -845,24 +845,24 @@ Este experimento usa **PCAPs reales** del dataset CICDDoS2019 (Opción A recomen
 
 **Procesamiento aplicado:**
 1. Descarga y descompresión de PCAPs
-2. Remapeo de IPs: `0.0.0.0/0` → `10.10.2.0/24` (atacantes - **CRÍTICO: 10.10.2.x, NO 10.10.3.x**), `10.10.1.2` (víctima)
+2. Remapeo de IPs: `0.0.0.0/0` → `10.10.3.0/24` (atacantes), `10.10.1.2` (víctima)
 3. Remapeo de MACs: dst-mac → `0c:42:a1:dd:57:90` (node-monitor)
 4. Fix checksums y Ethernet DLT
 
 **Ejemplo de PCAP remapeado:**
 - Original: `SAT-01-12-2018_0500.pcap` (IPs/MACs originales del dataset)
-- Remapeado: `SAT-01-12-2018_0500.pcap` (IPs: 10.10.2.x → 10.10.1.2, MAC: 0c:42:a1:dd:57:90)
+- Remapeado: `SAT-01-12-2018_0500.pcap` (IPs: 10.10.3.x → 10.10.1.2, MAC: 0c:42:a1:dd:57:90)
 
 #### Opción B: Tráfico Sintético
 
-**Tráfico benigno (10.10.1.0/24 → 10.10.1.2):**
+**Tráfico benigno (10.10.2.0/24 → 10.10.1.2):**
 - 50% HTTP (GET requests + responses)
 - 20% DNS (queries + responses)
 - 15% SSH (sesiones encriptadas)
 - 10% ICMP (echo request/reply)
 - 5% UDP background (NTP, SNMP, etc.)
 
-**Tráfico de ataque Mirai (10.10.2.0/24 → 10.10.1.2):**
+**Tráfico de ataque Mirai (10.10.3.0/24 → 10.10.1.2):**
 - 50% SYN Flood (TCP SYN a puertos 80/443/22)
 - 40% UDP Flood (516-byte payloads, característico de Mirai en CICDDoS2019)
 - 10% ICMP Flood (ping packets)

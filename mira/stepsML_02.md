@@ -611,7 +611,7 @@ echo "========================================="
 # Extract benign runs
 for run in {1..3}; do
     echo "Extracting benign run $run..."
-    python3 feature_extractor.py \
+    sudo python3 feature_extractor.py \
         --input ../datasets/raw_logs/benign_baseline_run${run}.log \
         --output ../datasets/processed/benign_baseline_run${run}.csv \
         --label benign
@@ -620,7 +620,7 @@ done
 # Extract attack runs
 for run in {1..3}; do
     echo "Extracting attack run $run..."
-    python3 feature_extractor.py \
+    sudo python3 feature_extractor.py \
         --input ../datasets/raw_logs/attack_cic_run${run}.log \
         --output ../datasets/processed/attack_cic_run${run}.csv \
         --label attack
@@ -629,7 +629,7 @@ done
 # Extract mixed runs
 for run in {1..3}; do
     echo "Extracting mixed run $run..."
-    python3 feature_extractor.py \
+    sudo python3 feature_extractor.py \
         --input ../datasets/raw_logs/mixed_traffic_run${run}.log \
         --output ../datasets/processed/mixed_traffic_run${run}.csv \
         --label mixed
@@ -803,7 +803,7 @@ weighted avg       0.97      0.97      0.97       486
 ```bash
 cd /local/dpdk_100g/mira/ml_system/02_training
 
-python3 evaluate_model.py \
+sudo python3 evaluate_model.py \
     --model ../../detector_system_ml/lightgbm_model.txt \
     --test ../datasets/splits/test.csv
 

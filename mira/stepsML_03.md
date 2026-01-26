@@ -271,7 +271,13 @@ sudo timeout 1800 stdbuf -oL ./detectorML \
     sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- /local/dpdk_100g/mira/attack_generator/attack_mixed_test.pcap --rate-gbps 12
     TMPDIR=/proj/softmeasure-PG0/CICD/tmp sudo -E python3 generate_cicdos2019_attacks.py -t mixed -n 20000000 -w 16 -i 3.0 -s 1 -o /proj/softmeasure-PG0/CICD/attack_mixed_12gbps_2.pcap
                                                                                                            
-    sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/softmeasure-PG0/CICD/attack_mixed_12gbps.pcap --rate-gbps 12 --loop
+    sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/softmeasure-PG0/CICD/attack_mixed_12gbps.pcap --rate-gbps 3 --loop
+    sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/softmeasure-PG0/CICD/attack_mixed_12gbps_2.pcap --pcap-timed --loop
+    sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/softmeasure-PG0/CICD/attack_mixed_12gbps_2.pcap --adaptive-attack --rate-gbps 3 --loop
+    sudo ./dpdk_pcap_sender_v2 -l 0-7 -n 4 -w 0000:41:00.0 -- /proj/softmeasure-PG0/CICD/attack_mixed_12gbps_2.pcap --pcap-timed --speedup 50 --loop
+
+
+
                                                  
 
 
