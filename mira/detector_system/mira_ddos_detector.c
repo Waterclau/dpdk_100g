@@ -1438,13 +1438,43 @@ static int worker_thread(void *arg)
 
                 /* DNS detection (port 53) */
                 if (udp_dst_port == 53 || udp_src_port == 53) {
-                    local_dns_queries++;
-                    if (udp_src_port == 53) {
-                        local_dns_responses++;
-                        local_dns_resp_size_sum += pkt_len;
-                    }
-                    if (udp_dst_port == 53 && udp_payload_len > 50) {
-                        local_dns_any++;  // Large queries often ANY/TXT
+                    if (udp_payload_len >= 12) {
+                        uint16_t dns_flags = (uint16_t)(udp_payload[2] << 8) | udp_payload[3];
+                        uint16_t dns_qdcount = (uint16_t)(udp_payload[4] << 8) | udp_payload[5];
+                        bool dns_is_response = (dns_flags & 0x8000) != 0;
+
+                        if (dns_is_response) {
+                            local_dns_responses++;
+                            local_dns_resp_size_sum += pkt_len;
+                        } else {
+                            local_dns_queries++;
+                        }
+
+                        if (!dns_is_response && dns_qdcount > 0) {
+                            /* Parse QNAME (variable length), then read QTYPE */
+                            uint16_t idx = 12;
+                            while (idx < udp_payload_len) {
+                                uint8_t len = udp_payload[idx];
+                                if (len == 0) {
+                                    idx += 1;
+                                    break;
+                                }
+                                if ((len & 0xC0) == 0xC0) {
+                                    /* Name compression pointer */
+                                    idx += 2;
+                                    break;
+                                }
+                                idx += 1 + len;
+                            }
+                            if (idx + 3 < udp_payload_len) {
+                                uint16_t qtype = (uint16_t)(udp_payload[idx] << 8) | udp_payload[idx + 1];
+                                if (qtype == 255) {
+                                    local_dns_any++;
+                                } else if (qtype == 16) {
+                                    local_dns_txt++;
+                                }
+                            }
+                        }
                     }
                 }
                 /* NTP detection (port 123) */
