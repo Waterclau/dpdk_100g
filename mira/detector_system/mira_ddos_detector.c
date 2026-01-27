@@ -344,6 +344,76 @@ static struct octosketch g_merged_sketch_attack __rte_cache_aligned;  /* Merged 
 
 /* Function declarations */
 static int worker_thread(void *arg);
+
+static inline bool ber_read_len(const uint8_t *buf, uint16_t len, uint16_t *idx, uint32_t *out_len)
+{
+    if (*idx >= len) {
+        return false;
+    }
+    uint8_t l = buf[*idx];
+    (*idx)++;
+    if ((l & 0x80) == 0) {
+        *out_len = l;
+        return true;
+    }
+    uint8_t n = l & 0x7F;
+    if (n == 0 || n > 2 || (uint32_t)(*idx + n) > len) {
+        return false;
+    }
+    uint32_t val = 0;
+    for (uint8_t i = 0; i < n; i++) {
+        val = (val << 8) | buf[*idx + i];
+    }
+    *idx += n;
+    *out_len = val;
+    return true;
+}
+
+static inline bool ber_skip_tlv(const uint8_t *buf, uint16_t len, uint16_t *idx)
+{
+    if (*idx >= len) {
+        return false;
+    }
+    (*idx)++;
+    uint32_t l = 0;
+    if (!ber_read_len(buf, len, idx, &l)) {
+        return false;
+    }
+    if ((uint32_t)(*idx) + l > len) {
+        return false;
+    }
+    *idx += (uint16_t)l;
+    return true;
+}
+
+static inline int snmp_get_pdu_tag(const uint8_t *buf, uint16_t len)
+{
+    uint16_t idx = 0;
+    uint32_t seq_len = 0;
+    if (len < 2 || buf[idx] != 0x30) {
+        return -1;
+    }
+    idx++;
+    if (!ber_read_len(buf, len, &idx, &seq_len)) {
+        return -1;
+    }
+    if (idx >= len || buf[idx] != 0x02) {
+        return -1;
+    }
+    if (!ber_skip_tlv(buf, len, &idx)) {
+        return -1;
+    }
+    if (idx >= len || buf[idx] != 0x04) {
+        return -1;
+    }
+    if (!ber_skip_tlv(buf, len, &idx)) {
+        return -1;
+    }
+    if (idx >= len) {
+        return -1;
+    }
+    return buf[idx];
+}
 static int coordinator_thread(void *arg);
 static void signal_handler(int signum);
 static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz);
@@ -1492,12 +1562,14 @@ static int worker_thread(void *arg)
                 }
                 /* SNMP detection (port 161) */
                 else if (udp_dst_port == 161 || udp_src_port == 161) {
-                    if (udp_dst_port == 161 && pkt_len > 200) {
-                        local_snmp_getbulk++;  // GetBulkRequest heuristic
-                    }
                     if (udp_src_port == 161) {
                         local_snmp_responses++;
                         local_snmp_resp_size_sum += pkt_len;
+                    } else if (udp_dst_port == 161 && udp_payload_len >= 16) {
+                        int pdu_tag = snmp_get_pdu_tag(udp_payload, udp_payload_len);
+                        if (pdu_tag == 0xA5) {
+                            local_snmp_getbulk++;
+                        }
                     }
                 }
                 /* SSDP detection (port 1900) */
