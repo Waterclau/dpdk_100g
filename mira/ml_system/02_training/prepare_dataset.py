@@ -26,7 +26,15 @@ from sklearn.model_selection import train_test_split
 import glob
 
 
-def load_and_combine_datasets(input_files) -> pd.DataFrame:
+def _infer_run_id(path: str) -> str:
+    stem = Path(path).stem
+    parts = stem.split('_run')
+    if len(parts) >= 2:
+        return f"run{parts[-1]}"
+    return "run_unknown"
+
+
+def load_and_combine_datasets(input_files, drop_labels=None) -> pd.DataFrame:
     """Load multiple CSV files and combine them"""
 
     # Handle both list of files and glob pattern
@@ -47,10 +55,13 @@ def load_and_combine_datasets(input_files) -> pd.DataFrame:
     dataframes = []
     for csv_file in csv_files:
         df = pd.read_csv(csv_file)
+        df['run_id'] = _infer_run_id(csv_file)
         print(f"\n[INFO] Loaded {csv_file}:")
         print(f"  Rows: {len(df)}")
         print(f"  Label distribution:")
         print(df['label'].value_counts())
+        if drop_labels:
+            df = df[~df['label'].isin(drop_labels)]
         dataframes.append(df)
 
     # Combine all dataframes
@@ -97,6 +108,36 @@ def split_dataset(df: pd.DataFrame, train_ratio: float, val_ratio: float, test_r
         random_state=42,
         stratify=temp_df['label']
     )
+
+    print(f"\n[INFO] Split results:")
+    print(f"  Train set: {len(train_df)} rows")
+    print(f"  Val set:   {len(val_df)} rows")
+    print(f"  Test set:  {len(test_df)} rows")
+
+    # Verify label distribution
+    print(f"\n[INFO] Train set label distribution:")
+    print(train_df['label'].value_counts())
+    print(f"\n[INFO] Val set label distribution:")
+    print(val_df['label'].value_counts())
+    print(f"\n[INFO] Test set label distribution:")
+    print(test_df['label'].value_counts())
+
+    return train_df, val_df, test_df
+
+
+def split_by_run(df: pd.DataFrame, train_runs, val_runs, test_runs):
+    """Split dataset by run_id lists"""
+    if 'run_id' not in df.columns:
+        raise ValueError("run_id column missing; cannot split by run")
+
+    train_df = df[df['run_id'].isin(train_runs)].copy()
+    val_df = df[df['run_id'].isin(val_runs)].copy()
+    test_df = df[df['run_id'].isin(test_runs)].copy()
+
+    print(f"\n[INFO] Split by run_id:")
+    print(f"  Train runs: {train_runs}")
+    print(f"  Val runs:   {val_runs}")
+    print(f"  Test runs:  {test_runs}")
 
     print(f"\n[INFO] Split results:")
     print(f"  Train set: {len(train_df)} rows")
@@ -173,11 +214,21 @@ Examples:
                        help='Validation set ratio (default: 0.15)')
     parser.add_argument('--test-ratio', type=float, default=0.15,
                        help='Test set ratio (default: 0.15)')
+    parser.add_argument('--exclude-label', action='append', default=[],
+                       help='Exclude label(s) from dataset (repeatable)')
+    parser.add_argument('--split-by-run', action='store_true',
+                       help='Split by run_id inferred from filename')
+    parser.add_argument('--train-runs', type=str, default='',
+                       help='Comma-separated run_ids for train (e.g., run1,run2)')
+    parser.add_argument('--val-runs', type=str, default='',
+                       help='Comma-separated run_ids for val (e.g., run3)')
+    parser.add_argument('--test-runs', type=str, default='',
+                       help='Comma-separated run_ids for test (e.g., run4)')
 
     args = parser.parse_args()
 
     # Load and combine datasets
-    combined_df = load_and_combine_datasets(args.input)
+    combined_df = load_and_combine_datasets(args.input, drop_labels=args.exclude_label)
 
     # Check for missing values
     if combined_df.isnull().any().any():
@@ -187,12 +238,20 @@ Examples:
         combined_df = combined_df.fillna(0)
 
     # Split dataset
-    train_df, val_df, test_df = split_dataset(
-        combined_df,
-        args.train_ratio,
-        args.val_ratio,
-        args.test_ratio
-    )
+    if args.split_by_run:
+        train_runs = [r.strip() for r in args.train_runs.split(',') if r.strip()]
+        val_runs = [r.strip() for r in args.val_runs.split(',') if r.strip()]
+        test_runs = [r.strip() for r in args.test_runs.split(',') if r.strip()]
+        if not train_runs or not val_runs or not test_runs:
+            raise ValueError("split-by-run requires --train-runs, --val-runs, --test-runs")
+        train_df, val_df, test_df = split_by_run(combined_df, train_runs, val_runs, test_runs)
+    else:
+        train_df, val_df, test_df = split_dataset(
+            combined_df,
+            args.train_ratio,
+            args.val_ratio,
+            args.test_ratio
+        )
 
     # Save splits
     save_splits(train_df, val_df, test_df, args.output)
