@@ -34,10 +34,12 @@ def evaluate_model(model_path: str, test_csv: str):
     print(f"\n[INFO] Loading test data: {test_csv}")
     df = pd.read_csv(test_csv)
 
-    # Prepare features (exclude 'label' and 'timestamp' if present)
+    # Prepare features (exclude non-feature columns)
     exclude_cols = ['label']
     if 'timestamp' in df.columns:
         exclude_cols.append('timestamp')
+    if 'run_id' in df.columns:
+        exclude_cols.append('run_id')
 
     feature_cols = [col for col in df.columns if col not in exclude_cols]
     X_test = df[feature_cols].values

@@ -34,7 +34,7 @@ def _infer_run_id(path: str) -> str:
     return "run_unknown"
 
 
-def load_and_combine_datasets(input_files, drop_labels=None) -> pd.DataFrame:
+def load_and_combine_datasets(input_files, drop_labels=None, add_run_id=False) -> pd.DataFrame:
     """Load multiple CSV files and combine them"""
 
     # Handle both list of files and glob pattern
@@ -55,7 +55,8 @@ def load_and_combine_datasets(input_files, drop_labels=None) -> pd.DataFrame:
     dataframes = []
     for csv_file in csv_files:
         df = pd.read_csv(csv_file)
-        df['run_id'] = _infer_run_id(csv_file)
+        if add_run_id:
+            df['run_id'] = _infer_run_id(csv_file)
         print(f"\n[INFO] Loaded {csv_file}:")
         print(f"  Rows: {len(df)}")
         print(f"  Label distribution:")
@@ -228,7 +229,11 @@ Examples:
     args = parser.parse_args()
 
     # Load and combine datasets
-    combined_df = load_and_combine_datasets(args.input, drop_labels=args.exclude_label)
+    combined_df = load_and_combine_datasets(
+        args.input,
+        drop_labels=args.exclude_label,
+        add_run_id=args.split_by_run,
+    )
 
     # Check for missing values
     if combined_df.isnull().any().any():
@@ -252,6 +257,12 @@ Examples:
             args.val_ratio,
             args.test_ratio
         )
+        if 'run_id' in train_df.columns:
+            train_df = train_df.drop(columns=['run_id'])
+        if 'run_id' in val_df.columns:
+            val_df = val_df.drop(columns=['run_id'])
+        if 'run_id' in test_df.columns:
+            test_df = test_df.drop(columns=['run_id'])
 
     # Save splits
     save_splits(train_df, val_df, test_df, args.output)

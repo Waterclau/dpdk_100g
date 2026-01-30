@@ -40,6 +40,8 @@ def train_and_export(train_csv, val_csv, output_path):
     exclude_cols = ['label']
     if 'timestamp' in df_train.columns:
         exclude_cols.append('timestamp')
+    if 'run_id' in df_train.columns:
+        exclude_cols.append('run_id')
 
     feature_cols = [col for col in df_train.columns if col not in exclude_cols]
 
