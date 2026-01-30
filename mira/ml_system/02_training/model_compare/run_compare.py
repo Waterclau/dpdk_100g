@@ -15,6 +15,7 @@ import json
 import pickle
 from pathlib import Path
 import subprocess
+import sys
 
 import numpy as np
 import pandas as pd
@@ -233,7 +234,7 @@ def main():
     if args.sequence_models:
         seq_script = Path(__file__).parent / "sequence_models.py"
         cmd = [
-            "python3",
+            sys.executable,
             str(seq_script),
             "--train", args.train,
             "--val", args.val,
