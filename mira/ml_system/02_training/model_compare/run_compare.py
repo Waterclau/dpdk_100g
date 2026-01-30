@@ -39,6 +39,8 @@ def load_split(path):
     exclude_cols = ['label']
     if 'timestamp' in df.columns:
         exclude_cols.append('timestamp')
+    if 'run_id' in df.columns:
+        exclude_cols.append('run_id')
     feature_cols = [c for c in df.columns if c not in exclude_cols]
     return df, feature_cols
 
