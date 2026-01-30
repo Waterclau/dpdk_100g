@@ -14,6 +14,7 @@ import argparse
 import json
 import pickle
 from pathlib import Path
+import subprocess
 
 import numpy as np
 import pandas as pd
@@ -99,6 +100,16 @@ def main():
     parser.add_argument('--val', required=True, help='Validation CSV')
     parser.add_argument('--test', required=True, help='Test CSV')
     parser.add_argument('--output-dir', required=True, help='Output directory')
+    parser.add_argument('--sequence-models', action='store_true',
+                        help='Also run LSTM/Transformer sequence models')
+    parser.add_argument('--seq-len', type=int, default=12,
+                        help='Sequence length for LSTM/Transformer')
+    parser.add_argument('--stride', type=int, default=6,
+                        help='Stride for sequence windows')
+    parser.add_argument('--epochs', type=int, default=10,
+                        help='Epochs for LSTM/Transformer')
+    parser.add_argument('--seq-output-dir', default='../../../detector_system_ml/alt_model_sequence',
+                        help='Output directory for sequence models')
     args = parser.parse_args()
 
     print("=" * 70)
@@ -218,6 +229,23 @@ def main():
     print("MODEL COMPARISON COMPLETE")
     print("=" * 70)
     print(f"Saved results under: {output_root}")
+
+    if args.sequence_models:
+        seq_script = Path(__file__).parent / "sequence_models.py"
+        cmd = [
+            "python3",
+            str(seq_script),
+            "--train", args.train,
+            "--val", args.val,
+            "--test", args.test,
+            "--model", "both",
+            "--seq-len", str(args.seq_len),
+            "--stride", str(args.stride),
+            "--epochs", str(args.epochs),
+            "--output-dir", args.seq_output_dir,
+        ]
+        print("\nRunning sequence models (LSTM/Transformer)...")
+        subprocess.run(cmd, check=True)
 
 
 if __name__ == '__main__':
