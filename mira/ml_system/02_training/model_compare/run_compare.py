@@ -14,6 +14,7 @@ import argparse
 import json
 import pickle
 from pathlib import Path
+import os
 import subprocess
 import sys
 
@@ -245,8 +246,17 @@ def main():
             "--epochs", str(args.epochs),
             "--output-dir", args.seq_output_dir,
         ]
+        env = os.environ.copy()
+        extra_paths = [
+            "/usr/local/lib/python3.8/dist-packages",
+            "/users/cesteban/.local/lib/python3.8/site-packages",
+        ]
+        existing = env.get("PYTHONPATH", "")
+        merged = ":".join([p for p in extra_paths if p] + ([existing] if existing else []))
+        env["PYTHONPATH"] = merged
+
         print("\nRunning sequence models (LSTM/Transformer)...")
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, env=env)
 
 
 if __name__ == '__main__':

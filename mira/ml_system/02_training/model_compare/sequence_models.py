@@ -223,6 +223,7 @@ def main():
         torch, nn = _to_torch()
         _ = torch.tensor([0.0])
     except Exception as exc:
+        print(f"[ERROR] PyTorch import failed: {exc}")
         raise SystemExit(
             "PyTorch is required. Install with: pip3 install --user torch"
         ) from exc
