@@ -1,0 +1,119 @@
+LightGBM Summary
+================
+Overall accuracy: 99.14%
+Weighted precision: 0.992
+Weighted recall: 0.991
+Weighted F1: 0.992
+
+Per-class metrics (F1 / Recall / Precision)
+===========================================
+benign      F1=0.974  R=0.950  P=1.000
+dns         F1=1.000  R=1.000  P=1.000
+ldap        F1=0.994  R=0.988  P=1.000
+mixed       F1=0.988  R=0.992  P=0.985
+mssql       F1=0.994  R=0.988  P=1.000
+netbios     F1=1.000  R=1.000  P=1.000
+ntp         F1=1.000  R=1.000  P=1.000
+portmap     F1=0.994  R=0.988  P=1.000
+snmp        F1=1.000  R=1.000  P=1.000
+ssdp        F1=1.000  R=1.000  P=1.000
+syn         F1=0.994  R=0.988  P=1.000
+tftp        F1=1.000  R=1.000  P=1.000
+udp         F1=0.994  R=0.988  P=1.000
+webddos     F1=0.947  R=1.000  P=0.900
+
+Model Compare (Val/Test accuracy)
+================================
+  0   0   0   0   0   0   0   0   0   0   0   0   0  72  val=None  test=None
+  0   0   0   0   0   0   0   0   0   0   0   0  80   0  val=None  test=None
+  0   0   0   0   0   0   0   0   0   0   0   0  80   1  val=None  test=None
+  0   0   0   0   0   0   0   0   0   0   0  79   0   2  val=None  test=None
+  0   0   0   0   0   0   0   0   0   0   0  80   0   0  val=None  test=None
+  0   0   0   0   0   0   0   0   0   0  79   0   0   1  val=None  test=None
+  0   0   0   0   0   0   0   0   0   0  80   0   0   1  val=None  test=None
+  0   0   0   0   0   0   0   0   0  79   0   0   0   2  val=None  test=None
+  0   0   0   0   0   0   0   0   0  80   0   0   0   0  val=None  test=None
+  0   0   0   0   0   0   0   0  78   0   0   0   0   2  val=None  test=None
+  0   0   0   0   0   0   0   0  81   0   0   0   0   0  val=None  test=None
+  0   0   0   0   0   0   0  79   0   0   0   0   0   1  val=None  test=None
+  0   0   0   0   0   0   0  80   0   0   0   0   0   1  val=None  test=None
+  0   0   0   0   0   0  79   0   0   0   0   0   0   2  val=None  test=None
+  0   0   0   0   0   0  81   0   0   0   0   0   0   0  val=None  test=None
+  0   0   0   0   0  80   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0   0   0   0  80   0   0   0   0   0   0   0   1  val=None  test=None
+  0   0   0   0   1   0   0   0   0   0   0   0   0  71  val=None  test=None
+  0   0   0   0   1   0   0   0   0   0   0   0  80   0  val=None  test=None
+  0   0   0   0   1   0   0   0   0   0   0  79   0   0  val=None  test=None
+  0   0   0   0   1   0   0   0   0   0  79   0   0   0  val=None  test=None
+  0   0   0   0   1   0   0   0   0   0  80   0   0   0  val=None  test=None
+  0   0   0   0   1   0   0  79   0   0   0   0   0   0  val=None  test=None
+  0   0   0   0   1   0   0  80   0   0   0   0   0   0  val=None  test=None
+  0   0   0   0   1  80   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0   0   0   2   0   0   0   0  79   0   0   0   0  val=None  test=None
+  0   0   0   0   2   0   0   0  78   0   0   0   0   0  val=None  test=None
+  0   0   0   0   2   0  79   0   0   0   0   0   0   0  val=None  test=None
+  0   0   0   0   5   0   0   0   0   0   0  76   0   0  val=None  test=None
+  0   0   0   0  78   0   0   0   0   0   0   0   0   2  val=None  test=None
+  0   0   0   0  80   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0   0   0  80   0   0   0   0   0   0   0   0   1  val=None  test=None
+  0   0   0   0  81   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0   0   1   0   0   0   0   0   0   0   0   0  71  val=None  test=None
+  0   0   0   1   0   0   0   0   0   0   0   0  80   0  val=None  test=None
+  0   0   0   1   0   0   0   0   0   0  79   0   0   0  val=None  test=None
+  0   0   0   1   0   0   0   0   0   0  80   0   0   0  val=None  test=None
+  0   0   0   1   0   0   0  79   0   0   0   0   0   0  val=None  test=None
+  0   0   0   1   0   0   0  80   0   0   0   0   0   0  val=None  test=None
+  0   0   0   1   0  80   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0   0   1  80   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0   0   2   0   0   0   0   0   0   0  79   0   0  val=None  test=None
+  0   0   0   2   0   0   0   0   0  79   0   0   0   0  val=None  test=None
+  0   0   0   2   0   0   0   0  78   0   0   0   0   0  val=None  test=None
+  0   0   0   2   0   0  79   0   0   0   0   0   0   0  val=None  test=None
+  0   0   0   2  78   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0   0 128   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0   0 128   0   0   0   0   0   0   0   0   0   1  val=None  test=None
+  0   0   0 128   1   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0   0 129   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0   1   1   0   0   0  78   0   0   0   0   0   0  val=None  test=None
+  0   0  79   0   0   0   0   0   0   0   0   0   0   1  val=None  test=None
+  0   0  79   0   1   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0  79   1   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0  80   0   0   0   0   0   1   0   0   0   0   0  val=None  test=None
+  0   0  80   0   0   1   0   0   0   0   0   0   0   0  val=None  test=None
+  0   0  81   0   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   1   0   0   0   0   0   0   0   0   0   0   0  71  val=None  test=None
+  0   1   0   0   0   0   0   0   0   0   0   0  80   0  val=None  test=None
+  0   1   0   0   0   0   0   0   0   0  79   0   0   0  val=None  test=None
+  0   1   0   0   0   0   0   0   0   0  80   0   0   0  val=None  test=None
+  0   1   0   0   0   0   0  78   1   0   0   0   0   0  val=None  test=None
+  0   1   0   0   0   0   0  79   1   0   0   0   0   0  val=None  test=None
+  0   1   0   0   0  80   0   0   0   0   0   0   0   0  val=None  test=None
+  0   1   0   0  80   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   1   0 128   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   1  79   0   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0   2   0   0   0   0   0   0   0   0   0  79   0   0  val=None  test=None
+  0   2   0   0   0   0   0   0   0  79   0   0   0   0  val=None  test=None
+  0   2   0   0   0   0   0   0  78   0   0   0   0   0  val=None  test=None
+  0   2   0   0   0   0  79   0   0   0   0   0   0   0  val=None  test=None
+  0   2   0   0  78   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0  77   0   0   2   0   0   1   0   0   0   0   0   0  val=None  test=None
+  0  78   0   0   0   0   0   0   0   0   0   0   0   2  val=None  test=None
+  0  78   0   2   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0  80   0   0   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+  0  81   0   0   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+  1   0   0 127   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+ 76   0   0   2   0   0   0   0   0   0   0   0   0   2  val=None  test=None
+ 76   0   0   4   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+ 77   0   0   3   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+ 78   0   0   0   2   0   0   0   0   0   0   0   0   0  val=None  test=None
+ 78   0   0   3   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+ 78   2   0   0   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+ 79   0   0   1   0   0   0   0   0   0   0   0   0   1  val=None  test=None
+ 80   0   0   0   1   0   0   0   0   0   0   0   0   0  val=None  test=None
+ 80   1   0   0   0   0   0   0   0   0   0   0   0   0  val=None  test=None
+HistGradientBoosting    val=98.46  test=99.14
+KNN                     val=98.2  test=99.23
+MLP                     val=98.46  test=99.14
+RandomForest            val=98.37  test=99.14
+SGDClassifier           val=98.2  test=99.23
+XGBoost                 val=98.37  test=99.14

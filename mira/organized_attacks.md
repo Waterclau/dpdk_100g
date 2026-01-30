@@ -130,6 +130,7 @@ Recomendacion: 2 o 3 runs por tipo (run1, run2, run3).
 
 ## 4) Extraer features con etiqueta especifica
 
+
 Desde el nodo monitor:
 
 ```bash
