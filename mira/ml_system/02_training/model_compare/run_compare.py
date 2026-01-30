@@ -254,6 +254,13 @@ def main():
         existing = env.get("PYTHONPATH", "")
         merged = ":".join([p for p in extra_paths if p] + ([existing] if existing else []))
         env["PYTHONPATH"] = merged
+        torch_lib_paths = [
+            "/usr/local/lib/python3.8/dist-packages/torch/lib",
+            "/users/cesteban/.local/lib/python3.8/site-packages/torch/lib",
+        ]
+        ld_existing = env.get("LD_LIBRARY_PATH", "")
+        ld_merged = ":".join([p for p in torch_lib_paths if p] + ([ld_existing] if ld_existing else []))
+        env["LD_LIBRARY_PATH"] = ld_merged
 
         print("\nRunning sequence models (LSTM/Transformer)...")
         subprocess.run(cmd, check=True, env=env)

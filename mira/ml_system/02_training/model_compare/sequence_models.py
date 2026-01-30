@@ -16,6 +16,7 @@ Usage:
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -218,6 +219,14 @@ def main():
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--output-dir", required=True)
     args = parser.parse_args()
+
+    torch_lib_paths = [
+        "/usr/local/lib/python3.8/dist-packages/torch/lib",
+        "/users/cesteban/.local/lib/python3.8/site-packages/torch/lib",
+    ]
+    ld_path = os.environ.get("LD_LIBRARY_PATH", "")
+    merged_ld = ":".join([p for p in torch_lib_paths if p] + ([ld_path] if ld_path else []))
+    os.environ["LD_LIBRARY_PATH"] = merged_ld
 
     try:
         torch, nn = _to_torch()
