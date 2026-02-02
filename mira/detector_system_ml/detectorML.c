@@ -22,6 +22,7 @@
 #include <inttypes.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <signal.h>
 #include <time.h>
@@ -42,6 +43,30 @@
 
 #include "octosketch.h"
 #include "ml_inference.h"  /* ========== ML INTEGRATION ========== */
+
+static int safe_snprintf(char *buf, size_t size, const char *fmt, ...)
+{
+    va_list args;
+    int ret;
+
+    if (size == 0) {
+        return 0;
+    }
+
+    va_start(args, fmt);
+    ret = vsnprintf(buf, size, fmt, args);
+    va_end(args);
+
+    if (ret < 0) {
+        return 0;
+    }
+
+    if ((size_t)ret >= size) {
+        return (int)size - 1;
+    }
+
+    return ret;
+}
 
 #define RX_RING_SIZE 32768       /* Max for uint16_t compatibility (must be power of 2) */
 #define TX_RING_SIZE 4096
@@ -958,8 +983,9 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         g_stats.cycles_per_packet = 0;
     }
 
-    char buffer[4096];
+    char buffer[65536];
     int len = 0;
+#define snprintf(...) safe_snprintf(__VA_ARGS__)
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "\n╔═══════════════════════════════════════════════════════════════════════╗\n"
@@ -1280,6 +1306,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     memset(window_baseline_bytes, 0, sizeof(window_baseline_bytes));
     memset(window_attack_bytes, 0, sizeof(window_attack_bytes));
     last_window_reset_tsc = cur_tsc;
+#undef snprintf
 }
 
 /* Worker thread - RX processing */
