@@ -324,6 +324,54 @@ static uint64_t window_attack_bytes[NUM_RX_QUEUES];
 static uint64_t last_window_reset_tsc = 0;
 static uint64_t g_start_tsc = 0;  /* Global start timestamp for cumulative throughput */
 
+/* Binary log record structure for ML training (compact format) */
+#define BINARY_LOG_MAGIC 0x4D495241  /* "MIRA" */
+#define BINARY_LOG_VERSION 1
+
+struct __attribute__((packed)) binary_log_record {
+    uint32_t magic;              /* 0x4D495241 = "MIRA" */
+    uint32_t version;            /* Format version */
+    uint64_t timestamp_ns;       /* Nanoseconds since start */
+
+    /* Core counters (10 fields) */
+    uint64_t total_packets;
+    uint64_t total_bytes;
+    uint64_t tcp_packets;
+    uint64_t udp_packets;
+    uint64_t icmp_packets;
+    uint64_t syn_packets;
+    uint64_t syn_ack_packets;
+    uint64_t http_requests;
+    uint64_t dns_queries;
+    uint64_t baseline_packets;
+    uint64_t attack_packets;
+
+    /* Protocol-specific counters (22 fields) */
+    uint64_t ntp_monlist_queries;
+    uint64_t ntp_responses;
+    uint64_t ntp_response_size_sum;
+    uint64_t dns_any_queries;
+    uint64_t dns_txt_queries;
+    uint64_t dns_responses;
+    uint64_t dns_response_size_sum;
+    uint64_t snmp_getbulk_requests;
+    uint64_t snmp_responses;
+    uint64_t snmp_response_size_sum;
+    uint64_t ssdp_msearch_packets;
+    uint64_t ssdp_responses;
+    uint64_t portmap_getport_calls;
+    uint64_t portmap_dump_calls;
+    uint64_t netbios_name_queries;
+    uint64_t netbios_dgram_packets;
+    uint64_t ldap_bind_requests;
+    uint64_t ldap_search_requests;
+    uint64_t mssql_sqlbatch_packets;
+    uint64_t mssql_rpc_packets;
+    uint64_t tftp_rrq_packets;
+    uint64_t tftp_wrq_packets;
+};
+/* Total size: 4 + 4 + 8 + (11*8) + (22*8) = 280 bytes per record */
+
 /* Global variables */
 static volatile bool force_quit = false;
 static struct ip_stats g_ip_table[MAX_IPS];
@@ -331,6 +379,8 @@ static rte_atomic32_t g_ip_count;
 static struct detection_stats g_stats;
 static struct worker_stats g_worker_stats[NUM_RX_QUEUES] __rte_cache_aligned;
 static FILE *g_log_file = NULL;
+static FILE *g_binary_log_file = NULL;  /* Binary log for ML training */
+static bool g_binary_log_enabled = false;
 static struct rte_hash *ip_hash = NULL;
 
 /* OctoSketch - Per-worker sketches (NO atomics, NO contention) */
@@ -1362,6 +1412,60 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         fflush(g_log_file);
     }
 
+    /* Write binary log record for ML training */
+    if (g_binary_log_enabled && g_binary_log_file) {
+        struct binary_log_record record;
+        memset(&record, 0, sizeof(record));
+
+        record.magic = BINARY_LOG_MAGIC;
+        record.version = BINARY_LOG_VERSION;
+
+        /* Timestamp in nanoseconds since start */
+        uint64_t elapsed_cycles = cur_tsc - g_start_tsc;
+        double elapsed_ns = (double)elapsed_cycles * 1e9 / (double)rte_get_tsc_hz();
+        record.timestamp_ns = (uint64_t)elapsed_ns;
+
+        /* Core counters */
+        record.total_packets = g_stats.total_packets;
+        record.total_bytes = g_stats.total_bytes;
+        record.tcp_packets = g_stats.tcp_packets;
+        record.udp_packets = g_stats.udp_packets;
+        record.icmp_packets = g_stats.icmp_packets;
+        record.syn_packets = g_stats.syn_packets;
+        record.syn_ack_packets = g_stats.syn_ack_packets;
+        record.http_requests = g_stats.http_requests;
+        record.dns_queries = g_stats.dns_queries;
+        record.baseline_packets = g_stats.baseline_packets;
+        record.attack_packets = g_stats.attack_packets;
+
+        /* Protocol-specific counters */
+        record.ntp_monlist_queries = g_stats.ntp_monlist_queries;
+        record.ntp_responses = g_stats.ntp_responses;
+        record.ntp_response_size_sum = g_stats.ntp_response_size_sum;
+        record.dns_any_queries = g_stats.dns_any_queries;
+        record.dns_txt_queries = g_stats.dns_txt_queries;
+        record.dns_responses = g_stats.dns_responses;
+        record.dns_response_size_sum = g_stats.dns_response_size_sum;
+        record.snmp_getbulk_requests = g_stats.snmp_getbulk_requests;
+        record.snmp_responses = g_stats.snmp_responses;
+        record.snmp_response_size_sum = g_stats.snmp_response_size_sum;
+        record.ssdp_msearch_packets = g_stats.ssdp_msearch_packets;
+        record.ssdp_responses = g_stats.ssdp_responses;
+        record.portmap_getport_calls = g_stats.portmap_getport_calls;
+        record.portmap_dump_calls = g_stats.portmap_dump_calls;
+        record.netbios_name_queries = g_stats.netbios_name_queries;
+        record.netbios_dgram_packets = g_stats.netbios_dgram_packets;
+        record.ldap_bind_requests = g_stats.ldap_bind_requests;
+        record.ldap_search_requests = g_stats.ldap_search_requests;
+        record.mssql_sqlbatch_packets = g_stats.mssql_sqlbatch_packets;
+        record.mssql_rpc_packets = g_stats.mssql_rpc_packets;
+        record.tftp_rrq_packets = g_stats.tftp_rrq_packets;
+        record.tftp_wrq_packets = g_stats.tftp_wrq_packets;
+
+        fwrite(&record, sizeof(record), 1, g_binary_log_file);
+        fflush(g_binary_log_file);
+    }
+
     /* Reset instantaneous counters */
     memset(window_baseline_pkts, 0, sizeof(window_baseline_pkts));
     memset(window_attack_pkts, 0, sizeof(window_attack_pkts));
@@ -1853,6 +1957,21 @@ int main(int argc, char *argv[])
     argc -= ret;
     argv += ret;
 
+    /* Parse application arguments (after EAL args) */
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--binary-log") == 0) {
+            g_binary_log_enabled = true;
+            printf("Binary logging enabled (compact ML training format)\n");
+        } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
+            printf("Usage: %s [EAL options] -- [Application options]\n", argv[0]);
+            printf("\nApplication options:\n");
+            printf("  --binary-log    Enable binary logging for ML training\n");
+            printf("                  (writes to ../results/mira_detector_ml.bin)\n");
+            printf("  --help, -h      Show this help message\n");
+            return 0;
+        }
+    }
+
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
 
@@ -1889,6 +2008,17 @@ int main(int argc, char *argv[])
     g_log_file = fopen("../results/mira_detector_multicore.log", "w");
     if (!g_log_file)
         printf("Warning: Could not open log file\n");
+
+    /* Open binary log file if enabled */
+    if (g_binary_log_enabled) {
+        g_binary_log_file = fopen("../results/mira_detector_ml.bin", "wb");
+        if (!g_binary_log_file) {
+            printf("Warning: Could not open binary log file\n");
+            g_binary_log_enabled = false;
+        } else {
+            printf("Binary log file opened: ../results/mira_detector_ml.bin\n");
+        }
+    }
 
     /* Initialize atomics */
     memset(&g_stats, 0, sizeof(g_stats));
