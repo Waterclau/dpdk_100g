@@ -313,6 +313,7 @@ static struct ip_stats g_ip_table[MAX_IPS];
 static rte_atomic32_t g_ip_count;
 static struct detection_stats g_stats;
 static struct worker_stats g_worker_stats[NUM_RX_QUEUES] __rte_cache_aligned;
+static uint64_t last_ml_alert_tsc = 0;
 static FILE *g_log_file = NULL;
 static struct rte_hash *ip_hash = NULL;
 
@@ -698,6 +699,11 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         attack_detected = attack_detected || ml_alert;
 
         if (attack_detected && g_ml_model) {
+            double since_last_ml_alert = (last_ml_alert_tsc == 0)
+                ? 1e9
+                : (double)(cur_tsc - last_ml_alert_tsc) / hz;
+            bool should_log_ml = since_last_ml_alert >= 1.0;
+
             // Determine alert type based on agreement
             const char *alert_type = "UNKNOWN";
             if (original_attack_detected && ml_alert) {
@@ -709,15 +715,18 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             }
 
             // Log ML prediction details
-            printf("\n[%s ALERT] Threshold: %s | ML: %s (%.2f%%) | Class probs: ",
-                   alert_type,
-                   original_attack_detected ? "DETECT" : "NONE",
-                   ml_class_name, ml_confidence * 100);
+            if (should_log_ml) {
+                last_ml_alert_tsc = cur_tsc;
+                printf("\n[%s ALERT] Threshold: %s | ML: %s (%.2f%%) | Class probs: ",
+                       alert_type,
+                       original_attack_detected ? "DETECT" : "NONE",
+                       ml_class_name, ml_confidence * 100);
 
-            for (int i = 0; i < ML_NUM_CLASSES; i++) {
-                printf("%s:%.1f%% ", ml_get_class_name(i), ml_pred.probabilities[i] * 100);
+                for (int i = 0; i < ML_NUM_CLASSES; i++) {
+                    printf("%s:%.1f%% ", ml_get_class_name(i), ml_pred.probabilities[i] * 100);
+                }
+                printf("\n");
             }
-            printf("\n");
         }
         /* ========================================================== */
 
@@ -963,8 +972,8 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[PACKET COUNTERS - GLOBAL]\n"
         "  Total packets:      %" PRIu64 "\n"
-        "  Baseline (192.168.1): %" PRIu64 " (%.1f%%)\n"
-        "  Attack (192.168.2): %" PRIu64 " (%.1f%%)\n"
+        "  Baseline (10.10.2.x): %" PRIu64 " (%.1f%%)\n"
+        "  Attack (10.10.3.x): %" PRIu64 " (%.1f%%)\n"
         "  TCP packets:        %" PRIu64 "\n"
         "  UDP packets:        %" PRIu64 "\n"
         "  ICMP packets:       %" PRIu64 "\n\n",
@@ -979,8 +988,8 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
         "[INSTANTANEOUS TRAFFIC - Last %.1f seconds]\n"
-        "  Baseline (192.168.1): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
-        "  Attack (192.168.2): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
+        "  Baseline (10.10.2.x): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
+        "  Attack (10.10.3.x): %" PRIu64 " pkts (%.1f%%)  %" PRIu64 " bytes  %.2f Gbps\n"
         "  Total throughput:   %.2f Gbps  (avg pkt: %.0f bytes)\n\n",
         window_duration,
         window_base_pkts, inst_baseline_pct, window_base_bytes,
