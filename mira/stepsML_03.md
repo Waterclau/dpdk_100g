@@ -1632,3 +1632,33 @@ sudo ./detectorML -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0
 **Document Version:** 3.0
 **Last Updated:** 2026-01-14
 **Status:** ✅ Production Ready
+
+1. Extraer features a processed_2 (usa el script)
+
+  bash /local/dpdk_100g/mira/ml_system/01_data_collection/extract_all_logs_2.sh
+
+  2. Preparar splits en splits_2
+                                                                                                                                                                                                   
+  cd /local/dpdk_100g/mira/ml_system/02_training                                                                                                                                                   
+  python3 prepare_dataset.py \                                                                                                                                                                     
+    --input ../datasets/processed_2/*.csv \                                                                                                                                                        
+    --output ../datasets/splits_2/ \                                                                                                                                                               
+    --train-ratio 0.7 \                                                                                                                                                                            
+    --val-ratio 0.15 \                                                                                                                                                                             
+    --test-ratio 0.15                                                                                                                                                                              
+                                                                                                                                                                                                   
+  3. Entrenar y exportar modelo con _2                                                                                                                                                             
+                                                                                                                                                                                                   
+  cd /local/dpdk_100g/mira/ml_system/02_training                                                                                                                                                   
+  python3 export_lightgbm_model.py \                                                                                                                                                               
+    --train ../datasets/splits_2/train.csv \                                                                                                                                                       
+    --output ../../detector_system_ml/lightgbm_model_2.txt                                                                                                                                         
+                                                                                                                                                                                                   
+  mv ../../detector_system_ml/label_mapping.json ../../detector_system_ml/label_mapping_2.json                                                                                                     
+                                                                                                                                                                                                   
+  4. Evaluar modelo con _2                                                                                                                                                                         
+                                                                                                                                                                                                   
+  cd /local/dpdk_100g/mira/ml_system/02_training                                                                                                                                                   
+  python3 evaluate_model.py \                                                                                                                                                                      
+    --model ../../detector_system_ml/lightgbm_model_2.txt \                                                                                                                                        
+    --test ../datasets/splits_2/test.csv

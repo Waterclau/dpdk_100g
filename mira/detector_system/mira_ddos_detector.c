@@ -77,6 +77,10 @@
 #define ACK_FLOOD_THRESHOLD 4000
 #define FRAG_THRESHOLD 1000
 
+/* OctoSketch Heavy-Hitter Detection */
+#define HEAVY_HITTER_PPS_THRESHOLD 5000   /* Single IP exceeding 5K pps = heavy hitter */
+#define HEAVY_HITTER_TOP_K 5              /* Track top 5 attackers */
+
 /* Time windows */
 #define FAST_DETECTION_INTERVAL 0.05
 #define STATS_INTERVAL_SEC 5.0
@@ -267,6 +271,12 @@ struct detection_stats {
     uint64_t tftp_detections;
     uint64_t ack_flood_detections;
     uint64_t frag_attack_detections;
+
+    /* OctoSketch Heavy-Hitter Detection */
+    uint64_t heavy_hitter_detections;     /* Times a single IP exceeded threshold */
+    uint32_t top_attacker_ips[HEAVY_HITTER_TOP_K];    /* Current top attacker IPs */
+    uint32_t top_attacker_counts[HEAVY_HITTER_TOP_K]; /* Their packet counts */
+    uint32_t num_heavy_hitters;           /* IPs exceeding threshold this window */
 
     /* Timestamps */
     uint64_t window_start_tsc;
@@ -900,9 +910,41 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             }
             octosketch_merge(&g_merged_sketch_attack, worker_sketches, NUM_RX_QUEUES);
 
-            /* Heavy hitter analysis could go here (optional for reporting) */
-            /* struct heavy_hitter top_attackers[10]; */
-            /* octosketch_top_k(&g_merged_sketch_attack, 10, top_attackers); */
+            /* Heavy-Hitter Detection using OctoSketch */
+            struct heavy_hitter top_attackers[HEAVY_HITTER_TOP_K];
+            octosketch_top_k(&g_merged_sketch_attack, HEAVY_HITTER_TOP_K, top_attackers);
+
+            /* Store top attackers in stats and detect heavy-hitters */
+            g_stats.num_heavy_hitters = 0;
+            for (int i = 0; i < HEAVY_HITTER_TOP_K; i++) {
+                g_stats.top_attacker_ips[i] = top_attackers[i].ip;
+                g_stats.top_attacker_counts[i] = top_attackers[i].count;
+
+                /* Check if this IP exceeds heavy-hitter threshold */
+                if (top_attackers[i].count > 0) {
+                    double ip_pps = (double)top_attackers[i].count / window_sec;
+                    if (ip_pps > HEAVY_HITTER_PPS_THRESHOLD) {
+                        g_stats.num_heavy_hitters++;
+
+                        /* First heavy-hitter triggers alert */
+                        if (g_stats.num_heavy_hitters == 1) {
+                            g_stats.heavy_hitter_detections++;
+                            if (!attack_detected) {
+                                attack_detected = true;
+                                g_stats.alert_level = ALERT_HIGH;
+                            }
+                            snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                                    sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                                    "HEAVY-HITTER: %u.%u.%u.%u @ %.0f pps | ",
+                                    (top_attackers[i].ip >> 24) & 0xFF,
+                                    (top_attackers[i].ip >> 16) & 0xFF,
+                                    (top_attackers[i].ip >> 8) & 0xFF,
+                                    top_attackers[i].ip & 0xFF,
+                                    ip_pps);
+                        }
+                    }
+                }
+            }
         }
 
         /* Reset detection window */
@@ -1228,6 +1270,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         "  TFTP events:        %" PRIu64 "\n"
         "  ACK flood events:   %" PRIu64 "\n"
         "  Frag attack events: %" PRIu64 "\n"
+        "  Heavy-hitter events:%" PRIu64 " (OctoSketch per-IP detection)\n"
         "  Packet flood events:%" PRIu64 "\n"
         "  (Note: Events count IPs exceeding thresholds per 50ms window)\n\n",
         g_stats.udp_flood_detections,
@@ -1246,6 +1289,7 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         g_stats.tftp_detections,
         g_stats.ack_flood_detections,
         g_stats.frag_attack_detections,
+        g_stats.heavy_hitter_detections,
         g_stats.total_flood_detections);
 
     const char *alert_color = COLOR_RESET;
@@ -1310,6 +1354,36 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
             SKETCH_SAMPLE_RATE,
             (100.0 / SKETCH_SAMPLE_RATE) * 0.5,  /* ~0.5% per update */
             octosketch_memory_size() / 1024.0);
+
+        /* Heavy-Hitter Detection Results */
+        APPEND(
+            "[OCTOSKETCH HEAVY-HITTER DETECTION]\n"
+            "=== Top Attackers (per-IP tracking via Count-Min Sketch) ===\n\n"
+            "  Heavy-hitter threshold:    %d pps per IP\n"
+            "  Heavy-hitters detected:    %u IPs exceeding threshold\n"
+            "  Total HH detections:       %" PRIu64 " events\n\n"
+            "  Top %d Attackers (estimated counts, ×%d sampling):\n",
+            HEAVY_HITTER_PPS_THRESHOLD,
+            g_stats.num_heavy_hitters,
+            g_stats.heavy_hitter_detections,
+            HEAVY_HITTER_TOP_K,
+            SKETCH_SAMPLE_RATE);
+
+        for (int i = 0; i < HEAVY_HITTER_TOP_K; i++) {
+            if (g_stats.top_attacker_counts[i] > 0) {
+                uint32_t ip = g_stats.top_attacker_ips[i];
+                double est_pps = (double)g_stats.top_attacker_counts[i] / window_duration;
+                APPEND(
+                    "    #%d: %u.%u.%u.%u - %u pkts (%.0f pps)%s\n",
+                    i + 1,
+                    (ip >> 24) & 0xFF, (ip >> 16) & 0xFF,
+                    (ip >> 8) & 0xFF, ip & 0xFF,
+                    g_stats.top_attacker_counts[i],
+                    est_pps,
+                    est_pps > HEAVY_HITTER_PPS_THRESHOLD ? " [HEAVY-HITTER]" : "");
+            }
+        }
+        APPEND("\n");
 
         /* Multiple Detection Statistics - Aggregate Analysis */
         if (g_stats.total_detection_events > 1) {

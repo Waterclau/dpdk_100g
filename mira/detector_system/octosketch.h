@@ -54,7 +54,8 @@ struct octosketch {
     uint64_t total_bytes;
 
     /* Per-IP tracking for heavy hitters - LOCAL (no atomics) */
-    uint32_t ip_counts[65536];  /* Hash table for Top-K */
+    uint32_t ip_counts[65536];  /* Hash table for Top-K (counts) */
+    uint32_t ip_addrs[65536];   /* Actual IP addresses for each bucket */
 
     /* Metadata */
     char name[32];
@@ -97,6 +98,7 @@ static inline void octosketch_update_ip(struct octosketch *sketch, uint32_t ip, 
     uint32_t ip_idx = (ip >> 16) ^ (ip & 0xFFFF);  /* Simple hash */
     ip_idx = ip_idx % 65536;
     sketch->ip_counts[ip_idx] += increment;
+    sketch->ip_addrs[ip_idx] = ip;  /* Store actual IP for heavy-hitter reporting */
 
     /* Update statistics */
     sketch->total_updates += increment;
@@ -142,6 +144,7 @@ static inline void octosketch_merge(struct octosketch *dst, struct octosketch *s
     /* Zero out destination */
     memset(dst->counters, 0, sizeof(dst->counters));
     memset(dst->ip_counts, 0, sizeof(dst->ip_counts));
+    memset(dst->ip_addrs, 0, sizeof(dst->ip_addrs));
     dst->total_updates = 0;
     dst->total_bytes = 0;
 
@@ -153,9 +156,13 @@ static inline void octosketch_merge(struct octosketch *dst, struct octosketch *s
             }
         }
 
-        /* Merge IP counts */
+        /* Merge IP counts and addresses */
         for (int i = 0; i < 65536; i++) {
             dst->ip_counts[i] += src[s]->ip_counts[i];
+            /* Keep the IP address (last one seen, or from highest count worker) */
+            if (src[s]->ip_addrs[i] != 0) {
+                dst->ip_addrs[i] = src[s]->ip_addrs[i];
+            }
         }
 
         /* Sum statistics */
@@ -175,8 +182,9 @@ static inline void octosketch_top_k(struct octosketch *sketch, int k,
         uint32_t count = sketch->ip_counts[i];
         if (count == 0) continue;
 
-        /* Reconstruct approximate IP from hash index */
-        uint32_t approx_ip = (i << 16) | i;  /* Simplified reconstruction */
+        /* Use stored real IP address (not reconstructed) */
+        uint32_t real_ip = sketch->ip_addrs[i];
+        if (real_ip == 0) continue;  /* No IP stored for this bucket */
 
         /* Insert into Top-K if larger than smallest */
         for (int j = 0; j < k; j++) {
@@ -185,7 +193,7 @@ static inline void octosketch_top_k(struct octosketch *sketch, int k,
                 for (int l = k - 1; l > j; l--) {
                     results[l] = results[l - 1];
                 }
-                results[j].ip = approx_ip;
+                results[j].ip = real_ip;
                 results[j].count = count;
                 break;
             }
@@ -199,8 +207,9 @@ static inline void octosketch_reset(struct octosketch *sketch)
     /* Reset counters */
     memset(sketch->counters, 0, sizeof(sketch->counters));
 
-    /* Reset IP counts */
+    /* Reset IP counts and addresses */
     memset(sketch->ip_counts, 0, sizeof(sketch->ip_counts));
+    memset(sketch->ip_addrs, 0, sizeof(sketch->ip_addrs));
 
     /* Reset statistics */
     sketch->total_updates = 0;
