@@ -525,18 +525,159 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         }
 
         if (g_ml_model != NULL && window_total_pkts > 100) {
-            // Build features from window statistics
+            // Build features from cumulative statistics (matches non-ML logs)
             struct ml_features features;
-            uint64_t window_tcp_pkts = 0;
+            uint64_t ml_total_packets = 0;
+            uint64_t ml_total_bytes = 0;
+            uint64_t ml_udp_packets = 0;
+            uint64_t ml_tcp_packets = 0;
+            uint64_t ml_icmp_packets = 0;
+            uint64_t ml_syn_packets = 0;
+            uint64_t ml_syn_ack_packets = 0;
+            uint64_t ml_http_requests = 0;
+            uint64_t ml_dns_queries = 0;
+            uint64_t ml_baseline_packets = 0;
+            uint64_t ml_attack_packets = 0;
+
+            uint64_t ml_ntp_monlist_queries = 0;
+            uint64_t ml_ntp_responses = 0;
+            uint64_t ml_ntp_response_size_sum = 0;
+            uint64_t ml_dns_any_queries = 0;
+            uint64_t ml_dns_txt_queries = 0;
+            uint64_t ml_dns_responses = 0;
+            uint64_t ml_dns_response_size_sum = 0;
+            uint64_t ml_snmp_getbulk_requests = 0;
+            uint64_t ml_snmp_responses = 0;
+            uint64_t ml_snmp_response_size_sum = 0;
+            uint64_t ml_ssdp_msearch_packets = 0;
+            uint64_t ml_ssdp_responses = 0;
+            uint64_t ml_portmap_getport_calls = 0;
+            uint64_t ml_portmap_dump_calls = 0;
+            uint64_t ml_netbios_name_queries = 0;
+            uint64_t ml_netbios_dgram_packets = 0;
+            uint64_t ml_ldap_bind_requests = 0;
+            uint64_t ml_ldap_search_requests = 0;
+            uint64_t ml_mssql_sqlbatch_packets = 0;
+            uint64_t ml_mssql_rpc_packets = 0;
+            uint64_t ml_tftp_rrq_packets = 0;
+            uint64_t ml_tftp_wrq_packets = 0;
+
             for (int i = 0; i < NUM_RX_QUEUES; i++) {
-                window_tcp_pkts += g_worker_stats[i].tcp_packets;
+                struct worker_stats *ws = &g_worker_stats[i];
+                ml_total_packets += ws->total_packets;
+                ml_total_bytes += ws->total_bytes;
+                ml_udp_packets += ws->udp_packets;
+                ml_tcp_packets += ws->tcp_packets;
+                ml_icmp_packets += ws->icmp_packets;
+                ml_syn_packets += ws->syn_packets;
+                ml_syn_ack_packets += ws->syn_ack_packets;
+                ml_http_requests += ws->http_requests;
+                ml_dns_queries += ws->dns_queries;
+                ml_baseline_packets += ws->baseline_packets;
+                ml_attack_packets += ws->attack_packets;
+
+                ml_ntp_monlist_queries += ws->ntp_monlist_queries;
+                ml_ntp_responses += ws->ntp_responses;
+                ml_ntp_response_size_sum += ws->ntp_response_size_sum;
+                ml_dns_any_queries += ws->dns_any_queries;
+                ml_dns_txt_queries += ws->dns_txt_queries;
+                ml_dns_responses += ws->dns_responses;
+                ml_dns_response_size_sum += ws->dns_response_size_sum;
+                ml_snmp_getbulk_requests += ws->snmp_getbulk_requests;
+                ml_snmp_responses += ws->snmp_responses;
+                ml_snmp_response_size_sum += ws->snmp_response_size_sum;
+                ml_ssdp_msearch_packets += ws->ssdp_msearch_packets;
+                ml_ssdp_responses += ws->ssdp_responses;
+                ml_portmap_getport_calls += ws->portmap_getport_calls;
+                ml_portmap_dump_calls += ws->portmap_dump_calls;
+                ml_netbios_name_queries += ws->netbios_name_queries;
+                ml_netbios_dgram_packets += ws->netbios_dgram_packets;
+                ml_ldap_bind_requests += ws->ldap_bind_requests;
+                ml_ldap_search_requests += ws->ldap_search_requests;
+                ml_mssql_sqlbatch_packets += ws->mssql_sqlbatch_packets;
+                ml_mssql_rpc_packets += ws->mssql_rpc_packets;
+                ml_tftp_rrq_packets += ws->tftp_rrq_packets;
+                ml_tftp_wrq_packets += ws->tftp_wrq_packets;
             }
 
-            ml_build_features(&features,
-                window_total_pkts, window_total_bytes,
-                window_udp_pkts, window_tcp_pkts, window_icmp_pkts,
-                window_syn_pkts, window_http_reqs,
-                window_base_pkts, window_att_pkts);
+            float avg_ntp_response_size = (ml_ntp_responses > 0)
+                ? (float)ml_ntp_response_size_sum / (float)ml_ntp_responses
+                : 0.0f;
+            float avg_dns_response_size = (ml_dns_responses > 0)
+                ? (float)ml_dns_response_size_sum / (float)ml_dns_responses
+                : 0.0f;
+            float avg_snmp_response_size = (ml_snmp_responses > 0)
+                ? (float)ml_snmp_response_size_sum / (float)ml_snmp_responses
+                : 0.0f;
+
+            uint64_t total_queries = ml_ntp_monlist_queries + ml_dns_any_queries +
+                ml_dns_txt_queries + ml_snmp_getbulk_requests;
+            uint64_t total_responses = ml_ntp_responses + ml_dns_responses +
+                ml_snmp_responses;
+
+            features.total_packets = (float)ml_total_packets;
+            features.total_bytes = (float)ml_total_bytes;
+            features.udp_packets = (float)ml_udp_packets;
+            features.tcp_packets = (float)ml_tcp_packets;
+            features.icmp_packets = (float)ml_icmp_packets;
+            features.syn_packets = (float)ml_syn_packets;
+            features.http_requests = (float)ml_http_requests;
+            features.dns_queries = (float)ml_dns_queries;
+            features.baseline_packets = (float)ml_baseline_packets;
+            features.attack_packets = (float)ml_attack_packets;
+
+            features.udp_tcp_ratio = (ml_tcp_packets > 0)
+                ? (float)ml_udp_packets / (float)ml_tcp_packets
+                : 0.0f;
+            features.syn_total_ratio = (ml_total_packets > 0)
+                ? (float)ml_syn_packets / (float)ml_total_packets
+                : 0.0f;
+            features.baseline_attack_ratio = (ml_attack_packets > 0)
+                ? (float)ml_baseline_packets / (float)ml_attack_packets
+                : 999.0f;
+            features.bytes_per_packet = (ml_total_packets > 0)
+                ? (float)ml_total_bytes / (float)ml_total_packets
+                : 0.0f;
+
+            features.ntp_monlist_queries = (float)ml_ntp_monlist_queries;
+            features.ntp_responses = (float)ml_ntp_responses;
+            features.avg_ntp_response_size = avg_ntp_response_size;
+            features.dns_any_queries = (float)ml_dns_any_queries;
+            features.dns_txt_queries = (float)ml_dns_txt_queries;
+            features.dns_responses = (float)ml_dns_responses;
+            features.avg_dns_response_size = avg_dns_response_size;
+            features.snmp_getbulk_requests = (float)ml_snmp_getbulk_requests;
+            features.snmp_responses = (float)ml_snmp_responses;
+            features.avg_snmp_response_size = avg_snmp_response_size;
+            features.ssdp_msearch_packets = (float)ml_ssdp_msearch_packets;
+            features.ssdp_responses = (float)ml_ssdp_responses;
+            features.portmap_getport_calls = (float)ml_portmap_getport_calls;
+            features.portmap_dump_calls = (float)ml_portmap_dump_calls;
+            features.netbios_name_queries = (float)ml_netbios_name_queries;
+            features.netbios_dgram_packets = (float)ml_netbios_dgram_packets;
+            features.ldap_bind_requests = (float)ml_ldap_bind_requests;
+            features.ldap_search_requests = (float)ml_ldap_search_requests;
+            features.mssql_sqlbatch_packets = (float)ml_mssql_sqlbatch_packets;
+            features.mssql_rpc_packets = (float)ml_mssql_rpc_packets;
+            features.tftp_rrq_packets = (float)ml_tftp_rrq_packets;
+            features.tftp_wrq_packets = (float)ml_tftp_wrq_packets;
+
+            features.ntp_amplification_factor = (ml_ntp_monlist_queries > 0)
+                ? avg_ntp_response_size / 48.0f
+                : 0.0f;
+            features.dns_amplification_factor = (ml_dns_any_queries > 0 || ml_dns_txt_queries > 0)
+                ? avg_dns_response_size / 60.0f
+                : 0.0f;
+            features.snmp_amplification_factor = (ml_snmp_getbulk_requests > 0)
+                ? avg_snmp_response_size / 150.0f
+                : 0.0f;
+            features.query_response_ratio = (total_responses > 0)
+                ? (float)total_queries / (float)total_responses
+                : 0.0f;
+            features.fragmentation_ratio = 0.0f;
+            features.syn_ack_ratio = (ml_syn_ack_packets > 0)
+                ? (float)ml_syn_packets / (float)ml_syn_ack_packets
+                : 0.0f;
 
             // Run ML prediction (LOCAL, in-process)
             int ret = ml_predict(g_ml_model, &features, &ml_pred);
@@ -704,6 +845,31 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     g_stats.attack_bytes = 0;
     g_stats.rx_bursts_total = 0;
     g_stats.rx_bursts_empty = 0;
+
+    /* ========== Protocol-Specific Stats Reset ========== */
+    g_stats.ntp_monlist_queries = 0;
+    g_stats.ntp_responses = 0;
+    g_stats.ntp_response_size_sum = 0;
+    g_stats.dns_any_queries = 0;
+    g_stats.dns_txt_queries = 0;
+    g_stats.dns_responses = 0;
+    g_stats.dns_response_size_sum = 0;
+    g_stats.snmp_getbulk_requests = 0;
+    g_stats.snmp_responses = 0;
+    g_stats.snmp_response_size_sum = 0;
+    g_stats.ssdp_msearch_packets = 0;
+    g_stats.ssdp_responses = 0;
+    g_stats.portmap_getport_calls = 0;
+    g_stats.portmap_dump_calls = 0;
+    g_stats.netbios_name_queries = 0;
+    g_stats.netbios_dgram_packets = 0;
+    g_stats.ldap_bind_requests = 0;
+    g_stats.ldap_search_requests = 0;
+    g_stats.mssql_sqlbatch_packets = 0;
+    g_stats.mssql_rpc_packets = 0;
+    g_stats.tftp_rrq_packets = 0;
+    g_stats.tftp_wrq_packets = 0;
+    /* ================================================== */
 
     for (int i = 0; i < NUM_RX_QUEUES; i++) {
         g_stats.total_packets += g_worker_stats[i].total_packets;

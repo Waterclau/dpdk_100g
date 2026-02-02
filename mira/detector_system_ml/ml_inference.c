@@ -60,10 +60,21 @@ int ml_predict(ml_model_handle handle, const struct ml_features *features, struc
     double feature_array[ML_NUM_FEATURES] = {
         features->total_packets, features->total_bytes,
         features->udp_packets, features->tcp_packets, features->icmp_packets,
-        features->syn_packets, features->http_requests,
+        features->syn_packets, features->http_requests, features->dns_queries,
         features->baseline_packets, features->attack_packets,
         features->udp_tcp_ratio, features->syn_total_ratio,
-        features->baseline_attack_ratio, features->bytes_per_packet
+        features->baseline_attack_ratio, features->bytes_per_packet,
+        features->ntp_monlist_queries, features->ntp_responses, features->avg_ntp_response_size,
+        features->dns_any_queries, features->dns_txt_queries, features->dns_responses, features->avg_dns_response_size,
+        features->snmp_getbulk_requests, features->snmp_responses, features->avg_snmp_response_size,
+        features->ssdp_msearch_packets, features->ssdp_responses,
+        features->portmap_getport_calls, features->portmap_dump_calls,
+        features->netbios_name_queries, features->netbios_dgram_packets,
+        features->ldap_bind_requests, features->ldap_search_requests,
+        features->mssql_sqlbatch_packets, features->mssql_rpc_packets,
+        features->tftp_rrq_packets, features->tftp_wrq_packets,
+        features->ntp_amplification_factor, features->dns_amplification_factor, features->snmp_amplification_factor,
+        features->query_response_ratio, features->fragmentation_ratio, features->syn_ack_ratio
     };
 
     int64_t out_len;
@@ -115,29 +126,6 @@ void ml_cleanup(ml_model_handle handle)
         free(model);
         printf("[ML] Model cleaned up\n");
     }
-}
-
-void ml_build_features(struct ml_features *feat,
-                       uint64_t total_pkts, uint64_t total_bytes,
-                       uint64_t udp_pkts, uint64_t tcp_pkts, uint64_t icmp_pkts,
-                       uint64_t syn_pkts, uint64_t http_reqs,
-                       uint64_t baseline_pkts, uint64_t attack_pkts)
-{
-    feat->total_packets = (float)total_pkts;
-    feat->total_bytes = (float)total_bytes;
-    feat->udp_packets = (float)udp_pkts;
-    feat->tcp_packets = (float)tcp_pkts;
-    feat->icmp_packets = (float)icmp_pkts;
-    feat->syn_packets = (float)syn_pkts;
-    feat->http_requests = (float)http_reqs;
-    feat->baseline_packets = (float)baseline_pkts;
-    feat->attack_packets = (float)attack_pkts;
-
-    // Derived features
-    feat->udp_tcp_ratio = (tcp_pkts > 0) ? ((float)udp_pkts / tcp_pkts) : (float)udp_pkts;
-    feat->syn_total_ratio = (total_pkts > 0) ? ((float)syn_pkts / total_pkts) : 0.0f;
-    feat->baseline_attack_ratio = (attack_pkts > 0) ? ((float)baseline_pkts / attack_pkts) : (float)baseline_pkts;
-    feat->bytes_per_packet = (total_pkts > 0) ? ((float)total_bytes / total_pkts) : 0.0f;
 }
 
 const char* ml_get_class_name(int class_id)
