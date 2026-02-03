@@ -1329,17 +1329,10 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         /* Store detection result */
         current_window.threshold_detected = attack_detected ? 1 : 0;
 
-        /* Adaptive threshold detection (NEW!) */
-        float adaptive_thresh = current_window.adaptive_threshold;
-        if (attack_pps > adaptive_thresh && !attack_detected) {
-            attack_detected = true;
-            g_stats.alert_level = ALERT_MEDIUM;
-            snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
-                    sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                    "ADAPTIVE: %.0f pps > %.0f (3σ) | ", attack_pps, adaptive_thresh);
-        }
+        /* NOTE: Adaptive threshold feature is calculated for ML but NOT used for detection
+         * to avoid baseline contamination during attacks. Detection uses fixed thresholds. */
 
-        /* Trend detection (NEW!) - rising attack */
+        /* Trend detection - rising attack (uses delta from ring buffer) */
         if (current_window.delta_pps_5w > 10000 && current_window.delta_pps_10w > 20000) {
             if (!attack_detected) {
                 attack_detected = true;
@@ -1810,17 +1803,16 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         /* Ring Buffer and Multi-Scale Statistics */
         struct feature_window *latest = ring_buffer_get(-1);
         APPEND(
-            "[RING BUFFER + MULTI-SCALE DETECTION]\n"
+            "[RING BUFFER + MULTI-SCALE FEATURES]\n"
             "=== Temporal Analysis (last %d windows = %.1f sec) ===\n\n"
             "  Windows processed:         %" PRIu64 "\n"
             "  Buffer utilization:        %u/%d (%.1f%%)\n"
-            "  Adaptive threshold:        %.0f pps (3σ from baseline)\n"
-            "  Current baseline:          %.0f pps\n\n",
+            "  Running baseline (ML):     %.0f pps (for ML features only)\n"
+            "  Detection mode:            FIXED THRESHOLDS\n\n",
             RING_BUFFER_SIZE, RING_BUFFER_SIZE * 0.05,
             g_ring_buffer.total_windows,
             g_ring_buffer.count, RING_BUFFER_SIZE,
             (float)g_ring_buffer.count * 100.0f / RING_BUFFER_SIZE,
-            latest ? latest->adaptive_threshold : 0,
             latest ? latest->pps_baseline : 0);
 
         if (latest) {
