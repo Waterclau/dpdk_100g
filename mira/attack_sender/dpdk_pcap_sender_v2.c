@@ -1234,14 +1234,18 @@ static void send_loop_fast(void)
     uint64_t last_stats_tsc = 0;
 
     /* Rate limiting variables */
-    const uint64_t target_bytes_per_sec = (uint64_t)(TARGET_GBPS * 1e9 / 8.0);
+    float target_gbps = adaptive_cfg.target_gbps;
+    if (target_gbps <= 0.0f) {
+        target_gbps = TARGET_GBPS;
+    }
+    const uint64_t target_bytes_per_sec = (uint64_t)(target_gbps * 1e9 / 8.0);
     uint64_t bytes_sent_in_window = 0;
     uint64_t window_start_tsc = 0;
 
     printf("\n╔═══════════════════════════════════════════════════════════╗\n");
     printf("║      DPDK PCAP SENDER - %.1f Gbps baseline transmission     ║\n", TARGET_GBPS);
     printf("╚═══════════════════════════════════════════════════════════╝\n\n");
-    printf("Starting packet transmission at %.1f Gbps...\n", TARGET_GBPS);
+    printf("Starting packet transmission at %.1f Gbps...\n", target_gbps);
     printf("Press Ctrl+C to stop\n\n");
 
     start_tsc = rte_rdtsc();
@@ -1300,7 +1304,7 @@ static void send_loop_fast(void)
             /* Too fast, calculate sleep time */
             double bytes_expected = target_bytes_per_sec * elapsed_sec;
             double bytes_over = bytes_sent_in_window - bytes_expected;
-            uint64_t sleep_ns = (uint64_t)((bytes_over * 8.0 * 1e9) / (TARGET_GBPS * 1e9));
+            uint64_t sleep_ns = (uint64_t)((bytes_over * 8.0 * 1e9) / (target_gbps * 1e9));
 
             if (sleep_ns > 0 && sleep_ns < 100000) {
                 rte_delay_us_block(sleep_ns / 1000);
