@@ -59,6 +59,7 @@
 #define ANOMALY_SYN_THRESHOLD    2500000   /* 2.5M SYN pps (baseline max: 1.6M) */
 #define ANOMALY_HTTP_THRESHOLD   4000000   /* 4M HTTP rps (baseline max: 2.5M) */
 #define ANOMALY_ICMP_THRESHOLD    700000   /* 700K ICMP pps (baseline max: 450K) */
+#define ATTACK_TOTAL_PPS_THRESHOLD 7000000 /* Fallback total PPS until baseline is ready */
 
 /* Protocol-specific anomaly thresholds (scaled proportionally) */
 #define DNS_AMP_THRESHOLD   3000000   /* 3M DNS amp pps */
