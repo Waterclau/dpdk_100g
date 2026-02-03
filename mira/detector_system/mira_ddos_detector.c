@@ -51,32 +51,29 @@
 #define BURST_SIZE 2048          /* Larger bursts for max throughput - Phase 3 */
 #define NUM_RX_QUEUES 14         /* 14 workers for 17+ Gbps - CRITICAL */
 
-/* Detection thresholds */
-#define BASELINE_UDP_THRESHOLD 10000
-#define BASELINE_SYN_THRESHOLD 8000
-#define BASELINE_HTTP_THRESHOLD 10000
-#define BASELINE_ICMP_THRESHOLD 5000
-#define BASELINE_TOTAL_PPS_THRESHOLD 20000
+/* Anomaly detection thresholds (1.5x baseline maximum)
+ * NOTE: This detector only identifies ANOMALIES, not attack types.
+ *       Attack classification is done by the ML model.
+ */
+#define ANOMALY_UDP_THRESHOLD    7000000   /* 7M UDP pps (baseline max: 4.4M) */
+#define ANOMALY_SYN_THRESHOLD    2500000   /* 2.5M SYN pps (baseline max: 1.6M) */
+#define ANOMALY_HTTP_THRESHOLD   4000000   /* 4M HTTP rps (baseline max: 2.5M) */
+#define ANOMALY_ICMP_THRESHOLD    700000   /* 700K ICMP pps (baseline max: 450K) */
 
-#define ATTACK_UDP_THRESHOLD 5000
-#define ATTACK_SYN_THRESHOLD 3000
-#define ATTACK_HTTP_THRESHOLD 2500
-#define ATTACK_ICMP_THRESHOLD 3000
-#define ATTACK_TOTAL_PPS_THRESHOLD 8000
-
-#define DNS_AMP_THRESHOLD 2000
-#define NTP_AMP_THRESHOLD 1500
-#define SNMP_AMP_THRESHOLD 1500
-#define SSDP_THRESHOLD 1500
-#define PORTMAP_THRESHOLD 1500
-#define NETBIOS_THRESHOLD 1500
-#define LDAP_THRESHOLD 1500
-#define MSSQL_THRESHOLD 1500
-#define TFTP_THRESHOLD 1000
-#define UDP_LAG_PPS_THRESHOLD 15000
+/* Protocol-specific anomaly thresholds (scaled proportionally) */
+#define DNS_AMP_THRESHOLD   3000000   /* 3M DNS amp pps */
+#define NTP_AMP_THRESHOLD   2000000   /* 2M NTP amp pps */
+#define SNMP_AMP_THRESHOLD  2000000   /* 2M SNMP amp pps */
+#define SSDP_THRESHOLD      2000000   /* 2M SSDP pps */
+#define PORTMAP_THRESHOLD   2000000   /* 2M PortMap pps */
+#define NETBIOS_THRESHOLD   2000000   /* 2M NetBIOS pps */
+#define LDAP_THRESHOLD      2000000   /* 2M LDAP pps */
+#define MSSQL_THRESHOLD     2000000   /* 2M MSSQL pps */
+#define TFTP_THRESHOLD      1000000   /* 1M TFTP pps */
+#define UDP_LAG_PPS_THRESHOLD 7000000 /* Same as UDP threshold */
 #define UDP_LAG_AVG_PKT_BYTES 900
-#define ACK_FLOOD_THRESHOLD 4000
-#define FRAG_THRESHOLD 1000
+#define ACK_FLOOD_THRESHOLD 4000000   /* 4M ACK pps */
+#define FRAG_THRESHOLD      1000000   /* 1M fragmented pps */
 
 /* OctoSketch Heavy-Hitter Detection */
 #define HEAVY_HITTER_PPS_THRESHOLD 5000   /* Single IP exceeding 5K pps = heavy hitter */
@@ -1010,46 +1007,46 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         /* Removed condition: was only evaluating when attack traffic present (trampa) */
         /* Now evaluates all traffic to establish real thresholds */
         {
-            /* UDP Flood Detection */
-            if (udp_pps > 20000) {  /* 20K UDP pps */
+            /* UDP Anomaly Detection */
+            if (udp_pps > ANOMALY_UDP_THRESHOLD) {
                 g_stats.udp_flood_detections++;
                 g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "UDP FLOOD detected: %.0f UDP pps | ", udp_pps);
+                        "UDP ANOMALY: %.0f pps | ", udp_pps);
                 attack_detected = true;
             }
 
-            /* SYN Flood Detection */
-            if (syn_pps > 30000) {  /* 30K SYN pps */
+            /* SYN Anomaly Detection */
+            if (syn_pps > ANOMALY_SYN_THRESHOLD) {
                 g_stats.syn_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "SYN FLOOD detected: %.0f SYN pps | ", syn_pps);
+                        "SYN ANOMALY: %.0f pps | ", syn_pps);
                 attack_detected = true;
             }
 
-            /* ICMP Flood Detection */
-            if (icmp_pps > 10000) {  /* 10K ICMP pps */
+            /* ICMP Anomaly Detection */
+            if (icmp_pps > ANOMALY_ICMP_THRESHOLD) {
                 g_stats.icmp_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "ICMP FLOOD detected: %.0f ICMP pps | ", icmp_pps);
+                        "ICMP ANOMALY: %.0f pps | ", icmp_pps);
                 attack_detected = true;
             }
 
-            /* HTTP Flood Detection */
-            if (http_pps > 15000) {  /* 15K HTTP req/s */
+            /* HTTP Anomaly Detection */
+            if (http_pps > ANOMALY_HTTP_THRESHOLD) {
                 g_stats.http_flood_detections++;
                 if (g_stats.alert_level < ALERT_HIGH)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "HTTP FLOOD detected: %.0f HTTP rps | ", http_pps);
+                        "HTTP ANOMALY: %.0f rps | ", http_pps);
                 attack_detected = true;
             }
 
