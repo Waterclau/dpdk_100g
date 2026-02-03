@@ -258,3 +258,276 @@ All models show high confidence (>0.99) for most predictions, indicating well-se
 ## 9. Conclusion
 
 All evaluated models achieve strong performance (>99% test accuracy) on this 14-class DDoS classification task. LightGBM provides the best balance of accuracy, interpretability, and inference speed for production deployment. The main area for improvement is validation on held-out capture runs to ensure the model generalizes beyond the training distribution.
+
+Ring Buffer de Features - Explicación Completa                                                                                                                                                                                                                
+  
+  Concepto                                                                                                                                                                                                                                                         
+  En lugar de escribir cada ventana a disco, guardamos las últimas N ventanas en un array circular en memoria:                                                                                                                                                  
+  
+  ┌────────────────────────────────────────────────────────────────────────┐
+  │                         RING BUFFER (100 ventanas)                      │
+  │                                                                        │
+  │  Índice:    [0]   [1]   [2]   [3]  ...  [97]  [98]  [99]              │
+  │              │     │     │     │          │     │     │                │
+  │              ▼     ▼     ▼     ▼          ▼     ▼     ▼                │
+  │  Features:  F₀    F₁    F₂    F₃   ...   F₉₇   F₉₈   F₉₉              │
+  │             42    42    42    42         42    42    42    floats      │
+  │                                                 ▲                      │
+  │                                                 │                      │
+  │                                            write_idx                   │
+  │                                                                        │
+  │  Cuando write_idx llega a 100 → vuelve a 0 (sobrescribe el más viejo) │
+  └────────────────────────────────────────────────────────────────────────┘
+
+  Flujo Actual vs Propuesto
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  FLUJO ACTUAL                                                           │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │                                                                         │
+  │  Coordinator (cada 50ms)                                                │
+  │       │                                                                 │
+  │       ├── Agregar contadores de workers                                 │
+  │       ├── Calcular 42 features                                          │
+  │       ├── Detectar por thresholds                                       │
+  │       │                                                                 │
+  │       └── fprintf(log_file, ...) ──────► DISCO (.log)                  │
+  │                      │                        │                         │
+  │                 [BLOQUEANTE]            [I/O LENTO]                     │
+  │                                               │                         │
+  │                                               ▼                         │
+  │                                    Python lee .log                      │
+  │                                    Entrena modelo                       │
+  │                                    Exporta .model                       │
+  │                                               │                         │
+  │                                               ▼                         │
+  │                               Detector carga modelo (siguiente sesión)  │
+  │                                                                         │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  FLUJO PROPUESTO (Ring Buffer)                                          │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │                                                                         │
+  │  Coordinator (cada 50ms)                                                │
+  │       │                                                                 │
+  │       ├── Agregar contadores de workers                                 │
+  │       ├── Calcular 42 features                                          │
+  │       ├── Detectar por thresholds                                       │
+  │       │                                                                 │
+  │       ├── ring_buffer[idx++] = features ──► MEMORIA (0.001ms)          │
+  │       │              │                                                  │
+  │       │         [NO BLOQUEANTE]                                         │
+  │       │                                                                 │
+  │       └── ML inference sobre ring_buffer ──► Clasificación inmediata   │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  Estructura de Datos
+
+  /* ============== Ring Buffer para ML ============== */
+
+  #define RING_BUFFER_SIZE 100      /* Últimas 100 ventanas (5 segundos) */
+  #define ML_FEATURE_COUNT 42
+
+  /* Una entrada del ring buffer = 1 ventana de 50ms */
+  struct feature_window {
+      /* Timestamp */
+      uint64_t timestamp_tsc;       /* Ciclos de CPU */
+      uint64_t window_id;           /* Número de ventana secuencial */
+
+      /* 42 features (mismo formato que ML) */
+      float features[ML_FEATURE_COUNT];
+
+      /* Metadata para debugging */
+      uint8_t attack_detected;      /* 0=no, 1=sí (por thresholds) */
+      uint8_t attack_type;          /* Tipo detectado por thresholds */
+      uint8_t ml_prediction;        /* Predicción del modelo */
+      float ml_confidence;          /* Confianza del modelo */
+  } __attribute__((packed));        /* 42*4 + 8 + 8 + 4 = 188 bytes */
+
+  /* Ring buffer global */
+  struct feature_ring_buffer {
+      struct feature_window windows[RING_BUFFER_SIZE];
+      uint32_t write_idx;           /* Siguiente posición a escribir */
+      uint32_t count;               /* Ventanas válidas (hasta llenar) */
+      uint64_t total_windows;       /* Total histórico */
+
+      /* Estadísticas del buffer */
+      uint64_t overwrites;          /* Veces que sobrescribimos */
+  } __rte_cache_aligned;
+
+  static struct feature_ring_buffer g_ring_buffer;
+
+  Memoria total: 188 bytes × 100 ventanas = ~19 KB (vs MBs en disco)
+
+  Cómo cambia el Coordinator
+
+  /* Función para guardar ventana en ring buffer */
+  static inline void ring_buffer_push(const struct ml_features *features,
+                                       bool attack_detected,
+                                       uint8_t attack_type)
+  {
+      uint32_t idx = g_ring_buffer.write_idx;
+      struct feature_window *w = &g_ring_buffer.windows[idx];
+
+      /* Guardar timestamp */
+      w->timestamp_tsc = rte_rdtsc();
+      w->window_id = g_ring_buffer.total_windows++;
+
+      /* Copiar features */
+      memcpy(w->features, features, sizeof(float) * ML_FEATURE_COUNT);
+
+      /* Metadata */
+      w->attack_detected = attack_detected ? 1 : 0;
+      w->attack_type = attack_type;
+      w->ml_prediction = 0;    /* Se llenará después de inference */
+      w->ml_confidence = 0.0f;
+
+      /* Avanzar índice circular */
+      g_ring_buffer.write_idx = (idx + 1) % RING_BUFFER_SIZE;
+      if (g_ring_buffer.count < RING_BUFFER_SIZE) {
+          g_ring_buffer.count++;
+      } else {
+          g_ring_buffer.overwrites++;
+      }
+  }
+
+  /* En detect_attacks(), después de calcular features: */
+  static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
+  {
+      // ... código existente de detección ...
+
+      /* Construir vector de features */
+      struct ml_features features;
+      build_feature_vector(&features, ...);  /* Rellena las 42 features */
+
+      /* ========== CAMBIO: Ring buffer en vez de log ========== */
+      ring_buffer_push(&features, attack_detected, detected_attack_type);
+
+      /* ML inference INMEDIATO (sin I/O) */
+      if (g_ml_model != NULL) {
+          struct ml_prediction pred;
+          ml_predict(g_ml_model, &features, &pred);
+
+          /* Guardar predicción en el buffer */
+          uint32_t last_idx = (g_ring_buffer.write_idx + RING_BUFFER_SIZE - 1)
+                             % RING_BUFFER_SIZE;
+          g_ring_buffer.windows[last_idx].ml_prediction = pred.predicted_class;
+          g_ring_buffer.windows[last_idx].ml_confidence = pred.confidence;
+      }
+      /* ======================================================= */
+  }
+
+  Ventajas del Ring Buffer
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  COMPARACIÓN DE RENDIMIENTO                                             │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │                                                                         │
+  │  Operación          │  Log a Disco    │  Ring Buffer                   │
+  │  ───────────────────┼─────────────────┼────────────────────────────────│
+  │  Latencia escritura │  0.1 - 10 ms    │  < 0.001 ms (memcpy)           │
+  │  Bloqueante         │  SÍ (I/O)       │  NO                            │
+  │  Memoria usada      │  Crece sin fin  │  Fija (19 KB)                  │
+  │  Pierde datos       │  NO (persiste)  │  SÍ (sobrescribe viejos)       │
+  │  ML inference       │  Offline        │  INLINE (mismo ciclo)          │
+  │  Acceso histórico   │  5+ segundos    │  Inmediato (en RAM)            │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  Casos de Uso del Ring Buffer
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  1. ML INFERENCE EN TIEMPO REAL                                         │
+  │  ───────────────────────────────                                        │
+  │  Cada 50ms:                                                             │
+  │    features = ring_buffer[current]                                      │
+  │    prediction = ml_predict(model, features)                             │
+  │    → Clasificación en < 5ms                                             │
+  │                                                                         │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  2. DETECCIÓN DE TENDENCIAS (últimos 5 segundos)                        │
+  │  ──────────────────────────────────────────────                         │
+  │  Analizar últimas 100 ventanas:                                         │
+  │    avg_attack_pps = promedio(ring_buffer[*].features[ATTACK_PPS])       │
+  │    if (tendencia_creciente(avg_attack_pps))                             │
+  │        → "Ataque escalando"                                             │
+  │                                                                         │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  3. EXPORTAR PARA ENTRENAMIENTO (bajo demanda)                          │
+  │  ─────────────────────────────────────────────                          │
+  │  Cuando el usuario lo pida (SIGURS1 o comando):                         │
+  │    dump_ring_buffer_to_file("session_features.bin")                     │
+  │    → Solo escribe a disco cuando es necesario                           │
+  │                                                                         │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  4. DETECCIÓN DE ANOMALÍAS (comparación temporal)                       │
+  │  ────────────────────────────────────────────────                       │
+  │  current = ring_buffer[now]                                             │
+  │  historical_avg = promedio(ring_buffer[now-100 : now-1])                │
+  │  if (divergencia(current, historical_avg) > threshold)                  │
+  │      → "Comportamiento anómalo detectado"                               │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  Arquitectura Completa con Ring Buffer
+
+                           ┌────────────────────┐
+                           │        NIC         │
+                           └─────────┬──────────┘
+                                     │
+                           RSS (hash 5-tupla)
+                                     │
+          ┌──────────┬───────────────┼───────────────┬──────────┐
+          ▼          ▼               ▼               ▼          ▼
+     ┌─────────┐┌─────────┐    ┌─────────┐    ┌─────────┐┌─────────┐
+     │Worker 1 ││Worker 2 │    │Worker 3 │    │  ...    ││Worker 14│
+     │ +Sketch ││ +Sketch │    │ +Sketch │    │         ││ +Sketch │
+     └────┬────┘└────┬────┘    └────┬────┘    └────┬────┘└────┬────┘
+          │          │              │              │          │
+          └──────────┴──────────────┼──────────────┴──────────┘
+                                    │
+                           Cada 50ms (merge)
+                                    │
+                      ┌─────────────▼─────────────┐
+                      │       COORDINATOR          │
+                      │                            │
+                      │  1. Merge sketches         │
+                      │  2. Agregar contadores     │
+                      │  3. Calcular 42 features   │
+                      │  4. Threshold detection    │
+                      │           │                │
+                      │           ▼                │
+                      │  ┌─────────────────────┐   │
+                      │  │    RING BUFFER      │   │
+                      │  │  [w0][w1]...[w99]   │   │
+                      │  │      (19 KB)        │   │
+                      │  └──────────┬──────────┘   │
+                      │             │              │
+                      │             ▼              │
+                      │  5. ML Inference (1-3ms)   │
+                      │             │              │
+                      │             ▼              │
+                      │  6. Clasificación final    │
+                      │     (14 clases, 98.41%)    │
+                      │                            │
+                      └────────────────────────────┘
+                                    │
+                      ┌─────────────┴─────────────┐
+                      ▼                           ▼
+              [ALERT: SYN_FLOOD]          [Dump a disco]
+              (tiempo real)               (bajo demanda)
+
+  Implicaciones
+  ┌──────────────────┬───────────────────────────────────────────────────────────────────────────────┐
+  │     Aspecto      │                                  Implicación                                  │
+  ├──────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ Pérdida de datos │ Solo guardamos últimos 5s. Para training, necesitamos exportar periódicamente │
+  ├──────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ Persistencia     │ Si el detector muere, perdemos el buffer. Solución: dump cada N segundos      │
+  ├──────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ Entrenamiento    │ Ya no es automático. Hay que exportar explícitamente para reentrenar          │
+  ├──────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ Rendimiento      │ Eliminamos I/O completamente del fast-path                                    │
+  ├──────────────────┼───────────────────────────────────────────────────────────────────────────────┤
+  │ Complejidad      │ Código más complejo, pero mejor arquitectura                                  │
+  └──────────────────┴───────────────────────────────────────────────────────────────────────────────┘

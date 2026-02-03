@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <signal.h>
+#include <math.h>
 #include <time.h>
 
 #include <rte_eal.h>
@@ -80,6 +81,19 @@
 /* OctoSketch Heavy-Hitter Detection */
 #define HEAVY_HITTER_PPS_THRESHOLD 5000   /* Single IP exceeding 5K pps = heavy hitter */
 #define HEAVY_HITTER_TOP_K 5              /* Track top 5 attackers */
+
+/* ========== RING BUFFER + MULTI-SCALE DETECTION ========== */
+#define RING_BUFFER_SIZE 100              /* Last 100 windows (5 seconds at 50ms) */
+#define ML_EXTENDED_FEATURES 56           /* 42 base + 14 temporal/multi-scale */
+
+/* Multi-scale time windows */
+#define SCALE_1S_WINDOWS 20               /* 20 × 50ms = 1 second */
+#define SCALE_10S_WINDOWS 200             /* 200 × 50ms = 10 seconds */
+#define SCALE_1MIN_WINDOWS 1200           /* 1200 × 50ms = 1 minute */
+
+/* Adaptive threshold parameters */
+#define ADAPTIVE_SIGMA 3.0                /* 3-sigma for anomaly detection */
+#define MIN_BASELINE_SAMPLES 20           /* Minimum samples before adaptive threshold */
 
 /* Time windows */
 #define FAST_DETECTION_INTERVAL 0.05
@@ -326,6 +340,112 @@ struct detection_stats {
 #define COLOR_YELLOW  "\033[1;33m"
 #define COLOR_RED     "\033[1;31m"
 
+/* ========== RING BUFFER STRUCTURE ========== */
+struct feature_window {
+    uint64_t timestamp_tsc;               /* CPU cycles timestamp */
+    uint64_t window_id;                   /* Sequential window number */
+
+    /* Base features (42) - same as ML */
+    float total_packets;
+    float total_bytes;
+    float udp_packets;
+    float tcp_packets;
+    float icmp_packets;
+    float syn_packets;
+    float http_requests;
+    float dns_queries;
+    float baseline_packets;
+    float attack_packets;
+    float udp_tcp_ratio;
+    float syn_total_ratio;
+    float baseline_attack_ratio;
+    float bytes_per_packet;
+    float ntp_monlist_queries;
+    float ntp_responses;
+    float avg_ntp_response_size;
+    float dns_any_queries;
+    float dns_txt_queries;
+    float dns_responses;
+    float avg_dns_response_size;
+    float snmp_getbulk_requests;
+    float snmp_responses;
+    float avg_snmp_response_size;
+    float ssdp_msearch_packets;
+    float ssdp_responses;
+    float portmap_getport_calls;
+    float portmap_dump_calls;
+    float netbios_name_queries;
+    float netbios_dgram_packets;
+    float ldap_bind_requests;
+    float ldap_search_requests;
+    float mssql_sqlbatch_packets;
+    float mssql_rpc_packets;
+    float tftp_rrq_packets;
+    float tftp_wrq_packets;
+    float ntp_amplification_factor;
+    float dns_amplification_factor;
+    float snmp_amplification_factor;
+    float query_response_ratio;
+    float fragmentation_ratio;
+    float syn_ack_ratio;
+
+    /* Extended features (14) - temporal + multi-scale */
+    float delta_pps_5w;                   /* PPS change over 5 windows (250ms) */
+    float delta_pps_10w;                  /* PPS change over 10 windows (500ms) */
+    float pps_variance;                   /* Variance over last 20 windows */
+    float pps_baseline;                   /* Running average (adaptive baseline) */
+    float ratio_vs_baseline;              /* Current / baseline ratio */
+    float top_ip_pps_50ms;                /* Top attacker PPS (50ms scale) */
+    float top_ip_pps_1s;                  /* Top attacker PPS (1s scale) */
+    float top_ip_pps_1min;                /* Top attacker PPS (1min scale) */
+    float ratio_50ms_1min;                /* Burst ratio: 50ms / 1min */
+    float num_heavy_hitters;              /* IPs exceeding threshold */
+    float ip_concentration;               /* Top1 count / total count */
+    float new_ips_ratio;                  /* New IPs vs known IPs */
+    float attack_entropy;                 /* Distribution entropy */
+    float adaptive_threshold;             /* Current adaptive threshold */
+
+    /* Detection results */
+    uint8_t threshold_detected;           /* Detected by thresholds */
+    uint8_t ml_predicted_class;           /* ML prediction (0-13) */
+    float ml_confidence;                  /* ML confidence */
+} __attribute__((packed));
+
+/* Ring buffer for temporal analysis */
+struct ring_buffer {
+    struct feature_window windows[RING_BUFFER_SIZE];
+    uint32_t write_idx;                   /* Next write position */
+    uint32_t count;                       /* Valid entries (up to RING_BUFFER_SIZE) */
+    uint64_t total_windows;               /* Total windows processed */
+
+    /* Running statistics for adaptive thresholds */
+    double sum_pps;                       /* Sum of attack PPS */
+    double sum_pps_sq;                    /* Sum of squared PPS (for variance) */
+
+    /* Multi-scale aggregates */
+    float baseline_1s;                    /* 1-second baseline */
+    float baseline_10s;                   /* 10-second baseline */
+    float baseline_1min;                  /* 1-minute baseline */
+} __rte_cache_aligned;
+
+/* Multi-scale sketch structure */
+struct multiscale_sketches {
+    struct octosketch sketch_50ms;        /* Current window (reset every 50ms) */
+    struct octosketch sketch_1s;          /* 1-second accumulator */
+    struct octosketch sketch_10s;         /* 10-second accumulator */
+    struct octosketch sketch_1min;        /* 1-minute accumulator */
+
+    /* Reset counters */
+    uint32_t windows_since_1s_reset;
+    uint32_t windows_since_10s_reset;
+    uint32_t windows_since_1min_reset;
+} __rte_cache_aligned;
+
+/* Global ring buffer and multi-scale sketches */
+static struct ring_buffer g_ring_buffer __rte_cache_aligned;
+static struct multiscale_sketches g_multiscale[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct multiscale_sketches g_merged_multiscale __rte_cache_aligned;
+
 /* Instantaneous metrics - per-worker (lock-free) */
 static uint64_t window_baseline_pkts[NUM_RX_QUEUES];
 static uint64_t window_attack_pkts[NUM_RX_QUEUES];
@@ -534,6 +654,206 @@ static struct ip_stats* get_ip_stats(uint32_t ip_addr)
 
     return new_entry;
 }
+
+/* ========== RING BUFFER HELPER FUNCTIONS ========== */
+
+/* Get window at offset from current (0 = current, -1 = previous, etc.) */
+static inline struct feature_window* ring_buffer_get(int offset)
+{
+    if (g_ring_buffer.count == 0) return NULL;
+    int idx = (int)g_ring_buffer.write_idx + offset;
+    while (idx < 0) idx += RING_BUFFER_SIZE;
+    idx = idx % RING_BUFFER_SIZE;
+    if (offset < 0 && (uint32_t)(-offset) > g_ring_buffer.count) return NULL;
+    return &g_ring_buffer.windows[idx];
+}
+
+/* Calculate adaptive threshold based on historical data */
+static inline float calculate_adaptive_threshold(void)
+{
+    if (g_ring_buffer.count < MIN_BASELINE_SAMPLES) {
+        return ATTACK_TOTAL_PPS_THRESHOLD;  /* Use fixed threshold until enough samples */
+    }
+
+    double mean = g_ring_buffer.sum_pps / g_ring_buffer.count;
+    double variance = (g_ring_buffer.sum_pps_sq / g_ring_buffer.count) - (mean * mean);
+    double stddev = sqrt(variance > 0 ? variance : 0);
+
+    return (float)(mean + ADAPTIVE_SIGMA * stddev);
+}
+
+/* Calculate temporal features from ring buffer */
+static void calculate_temporal_features(struct feature_window *current)
+{
+    /* Delta PPS over 5 windows (250ms) */
+    struct feature_window *prev_5 = ring_buffer_get(-5);
+    if (prev_5) {
+        current->delta_pps_5w = current->attack_packets - prev_5->attack_packets;
+    } else {
+        current->delta_pps_5w = 0;
+    }
+
+    /* Delta PPS over 10 windows (500ms) */
+    struct feature_window *prev_10 = ring_buffer_get(-10);
+    if (prev_10) {
+        current->delta_pps_10w = current->attack_packets - prev_10->attack_packets;
+    } else {
+        current->delta_pps_10w = 0;
+    }
+
+    /* Variance over last 20 windows */
+    float sum = 0, sum_sq = 0;
+    int count = 0;
+    for (int i = -1; i >= -20 && i >= -(int)g_ring_buffer.count; i--) {
+        struct feature_window *w = ring_buffer_get(i);
+        if (w) {
+            sum += w->attack_packets;
+            sum_sq += w->attack_packets * w->attack_packets;
+            count++;
+        }
+    }
+    if (count > 1) {
+        float mean = sum / count;
+        current->pps_variance = (sum_sq / count) - (mean * mean);
+    } else {
+        current->pps_variance = 0;
+    }
+
+    /* Baseline (running average) */
+    current->pps_baseline = (g_ring_buffer.count > 0) ?
+        (float)(g_ring_buffer.sum_pps / g_ring_buffer.count) : 0;
+
+    /* Ratio vs baseline */
+    current->ratio_vs_baseline = (current->pps_baseline > 0) ?
+        current->attack_packets / current->pps_baseline : 1.0f;
+
+    /* Adaptive threshold */
+    current->adaptive_threshold = calculate_adaptive_threshold();
+}
+
+/* Calculate multi-scale features from merged sketches */
+static void calculate_multiscale_features(struct feature_window *current, double window_sec)
+{
+    /* Get top attacker from each scale */
+    struct heavy_hitter top_50ms[1], top_1s[1], top_1min[1];
+
+    octosketch_top_k(&g_merged_multiscale.sketch_50ms, 1, top_50ms);
+    octosketch_top_k(&g_merged_multiscale.sketch_1s, 1, top_1s);
+    octosketch_top_k(&g_merged_multiscale.sketch_1min, 1, top_1min);
+
+    /* Top IP PPS at each scale */
+    current->top_ip_pps_50ms = (window_sec > 0 && top_50ms[0].count > 0) ?
+        (float)top_50ms[0].count / window_sec : 0;
+    current->top_ip_pps_1s = (top_1s[0].count > 0) ?
+        (float)top_1s[0].count / 1.0f : 0;  /* 1 second scale */
+    current->top_ip_pps_1min = (top_1min[0].count > 0) ?
+        (float)top_1min[0].count / 60.0f : 0;  /* 1 minute scale */
+
+    /* Burst ratio: 50ms activity vs 1min baseline */
+    current->ratio_50ms_1min = (current->top_ip_pps_1min > 0) ?
+        current->top_ip_pps_50ms / current->top_ip_pps_1min : 1.0f;
+
+    /* Count heavy hitters (IPs exceeding threshold) */
+    struct heavy_hitter top_5[5];
+    octosketch_top_k(&g_merged_multiscale.sketch_50ms, 5, top_5);
+    int hh_count = 0;
+    for (int i = 0; i < 5; i++) {
+        if (top_5[i].count > 0) {
+            float ip_pps = (float)top_5[i].count / (window_sec > 0 ? window_sec : 0.05f);
+            if (ip_pps > HEAVY_HITTER_PPS_THRESHOLD) hh_count++;
+        }
+    }
+    current->num_heavy_hitters = (float)hh_count;
+
+    /* IP concentration: top1 / total */
+    uint64_t total = octosketch_get_total(&g_merged_multiscale.sketch_50ms);
+    current->ip_concentration = (total > 0) ?
+        (float)top_50ms[0].count / total : 0;
+
+    /* Simplified new IPs ratio and entropy (would need more tracking for accuracy) */
+    current->new_ips_ratio = 0;  /* TODO: Track unique IPs */
+    current->attack_entropy = 1.0f - current->ip_concentration;  /* Simplified entropy */
+}
+
+/* Push current features to ring buffer */
+static void ring_buffer_push(struct feature_window *window)
+{
+    uint32_t idx = g_ring_buffer.write_idx;
+
+    /* Copy to buffer */
+    memcpy(&g_ring_buffer.windows[idx], window, sizeof(struct feature_window));
+
+    /* Update running statistics for adaptive threshold */
+    if (g_ring_buffer.count >= RING_BUFFER_SIZE) {
+        /* Remove oldest from running stats */
+        struct feature_window *oldest = &g_ring_buffer.windows[(idx + 1) % RING_BUFFER_SIZE];
+        g_ring_buffer.sum_pps -= oldest->attack_packets;
+        g_ring_buffer.sum_pps_sq -= oldest->attack_packets * oldest->attack_packets;
+    }
+    g_ring_buffer.sum_pps += window->attack_packets;
+    g_ring_buffer.sum_pps_sq += window->attack_packets * window->attack_packets;
+
+    /* Advance index */
+    g_ring_buffer.write_idx = (idx + 1) % RING_BUFFER_SIZE;
+    if (g_ring_buffer.count < RING_BUFFER_SIZE) {
+        g_ring_buffer.count++;
+    }
+    g_ring_buffer.total_windows++;
+}
+
+/* Merge multi-scale sketches from all workers */
+static void merge_multiscale_sketches(void)
+{
+    struct octosketch *workers_50ms[NUM_RX_QUEUES];
+    struct octosketch *workers_1s[NUM_RX_QUEUES];
+    struct octosketch *workers_10s[NUM_RX_QUEUES];
+    struct octosketch *workers_1min[NUM_RX_QUEUES];
+
+    for (int i = 0; i < NUM_RX_QUEUES; i++) {
+        workers_50ms[i] = &g_multiscale[i].sketch_50ms;
+        workers_1s[i] = &g_multiscale[i].sketch_1s;
+        workers_10s[i] = &g_multiscale[i].sketch_10s;
+        workers_1min[i] = &g_multiscale[i].sketch_1min;
+    }
+
+    octosketch_merge(&g_merged_multiscale.sketch_50ms, workers_50ms, NUM_RX_QUEUES);
+    octosketch_merge(&g_merged_multiscale.sketch_1s, workers_1s, NUM_RX_QUEUES);
+    octosketch_merge(&g_merged_multiscale.sketch_10s, workers_10s, NUM_RX_QUEUES);
+    octosketch_merge(&g_merged_multiscale.sketch_1min, workers_1min, NUM_RX_QUEUES);
+}
+
+/* Reset multi-scale sketches based on time */
+static void reset_multiscale_sketches_if_needed(void)
+{
+    for (int i = 0; i < NUM_RX_QUEUES; i++) {
+        g_multiscale[i].windows_since_1s_reset++;
+        g_multiscale[i].windows_since_10s_reset++;
+        g_multiscale[i].windows_since_1min_reset++;
+
+        /* Reset 50ms sketch every window */
+        octosketch_reset(&g_multiscale[i].sketch_50ms);
+
+        /* Reset 1s sketch every 20 windows */
+        if (g_multiscale[i].windows_since_1s_reset >= SCALE_1S_WINDOWS) {
+            octosketch_reset(&g_multiscale[i].sketch_1s);
+            g_multiscale[i].windows_since_1s_reset = 0;
+        }
+
+        /* Reset 10s sketch every 200 windows */
+        if (g_multiscale[i].windows_since_10s_reset >= SCALE_10S_WINDOWS) {
+            octosketch_reset(&g_multiscale[i].sketch_10s);
+            g_multiscale[i].windows_since_10s_reset = 0;
+        }
+
+        /* Reset 1min sketch every 1200 windows */
+        if (g_multiscale[i].windows_since_1min_reset >= SCALE_1MIN_WINDOWS) {
+            octosketch_reset(&g_multiscale[i].sketch_1min);
+            g_multiscale[i].windows_since_1min_reset = 0;
+        }
+    }
+}
+
+/* ========== END RING BUFFER HELPER FUNCTIONS ========== */
 
 /* Attack detection logic - COORDINATOR ONLY - AGGREGATE MODE */
 static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
@@ -946,6 +1266,108 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                 }
             }
         }
+
+        /* ========== RING BUFFER + MULTI-SCALE INTEGRATION ========== */
+
+        /* Merge multi-scale sketches from all workers */
+        merge_multiscale_sketches();
+
+        /* Build feature window for ring buffer */
+        struct feature_window current_window;
+        memset(&current_window, 0, sizeof(current_window));
+
+        current_window.timestamp_tsc = cur_tsc;
+        current_window.window_id = g_ring_buffer.total_windows;
+
+        /* Base features (42) */
+        current_window.total_packets = (float)(window_base_pkts + window_att_pkts);
+        current_window.total_bytes = 0;
+        for (int i = 0; i < NUM_RX_QUEUES; i++) {
+            current_window.total_bytes += window_baseline_bytes[i] + window_attack_bytes[i];
+        }
+        current_window.udp_packets = (float)window_udp_pkts;
+        current_window.tcp_packets = (float)(window_syn_pkts);  /* Approximate */
+        current_window.icmp_packets = (float)window_icmp_pkts;
+        current_window.syn_packets = (float)window_syn_pkts;
+        current_window.http_requests = (float)window_http_reqs;
+        current_window.dns_queries = (float)window_dns_queries;
+        current_window.baseline_packets = (float)window_base_pkts;
+        current_window.attack_packets = (float)window_att_pkts;
+
+        /* Ratios */
+        current_window.udp_tcp_ratio = (window_syn_pkts > 0) ?
+            (float)window_udp_pkts / window_syn_pkts : 0;
+        current_window.syn_total_ratio = (current_window.total_packets > 0) ?
+            (float)window_syn_pkts / current_window.total_packets : 0;
+        current_window.baseline_attack_ratio = (window_att_pkts > 0) ?
+            (float)window_base_pkts / window_att_pkts : 0;
+        current_window.bytes_per_packet = (current_window.total_packets > 0) ?
+            current_window.total_bytes / current_window.total_packets : 0;
+
+        /* Protocol-specific features */
+        current_window.ntp_monlist_queries = (float)window_ntp_monlist;
+        current_window.dns_any_queries = (float)window_dns_any;
+        current_window.dns_txt_queries = (float)window_dns_txt;
+        current_window.snmp_getbulk_requests = (float)window_snmp_getbulk;
+        current_window.ssdp_msearch_packets = (float)window_ssdp_msearch;
+        current_window.portmap_getport_calls = (float)window_portmap_calls;
+        current_window.netbios_name_queries = (float)window_netbios_name;
+        current_window.netbios_dgram_packets = (float)window_netbios_dgram;
+        current_window.ldap_bind_requests = (float)window_ldap_bind;
+        current_window.ldap_search_requests = (float)window_ldap_search;
+        current_window.mssql_sqlbatch_packets = (float)window_mssql_sqlbatch;
+        current_window.mssql_rpc_packets = (float)window_mssql_rpc;
+        current_window.tftp_rrq_packets = (float)window_tftp_rrq;
+        current_window.tftp_wrq_packets = (float)window_tftp_wrq;
+
+        /* Calculate temporal features from ring buffer history */
+        calculate_temporal_features(&current_window);
+
+        /* Calculate multi-scale features from merged sketches */
+        calculate_multiscale_features(&current_window, window_sec);
+
+        /* Store detection result */
+        current_window.threshold_detected = attack_detected ? 1 : 0;
+
+        /* Adaptive threshold detection (NEW!) */
+        float adaptive_thresh = current_window.adaptive_threshold;
+        if (attack_pps > adaptive_thresh && !attack_detected) {
+            attack_detected = true;
+            g_stats.alert_level = ALERT_MEDIUM;
+            snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                    sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                    "ADAPTIVE: %.0f pps > %.0f (3σ) | ", attack_pps, adaptive_thresh);
+        }
+
+        /* Trend detection (NEW!) - rising attack */
+        if (current_window.delta_pps_5w > 10000 && current_window.delta_pps_10w > 20000) {
+            if (!attack_detected) {
+                attack_detected = true;
+                g_stats.alert_level = ALERT_MEDIUM;
+            }
+            snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                    sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                    "TREND: attack rising (+%.0f/250ms) | ", current_window.delta_pps_5w);
+        }
+
+        /* Burst detection (NEW!) - sudden spike vs baseline */
+        if (current_window.ratio_50ms_1min > 5.0 && current_window.top_ip_pps_50ms > 1000) {
+            if (!attack_detected) {
+                attack_detected = true;
+                g_stats.alert_level = ALERT_HIGH;
+            }
+            snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
+                    sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
+                    "BURST: %.1fx spike vs 1min baseline | ", current_window.ratio_50ms_1min);
+        }
+
+        /* Push to ring buffer */
+        ring_buffer_push(&current_window);
+
+        /* Reset multi-scale sketches based on their time windows */
+        reset_multiscale_sketches_if_needed();
+
+        /* ========== END RING BUFFER INTEGRATION ========== */
 
         /* Reset detection window */
         if (window_sec >= DETECTION_WINDOW_SEC) {
@@ -1385,6 +1807,46 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         }
         APPEND("\n");
 
+        /* Ring Buffer and Multi-Scale Statistics */
+        struct feature_window *latest = ring_buffer_get(-1);
+        APPEND(
+            "[RING BUFFER + MULTI-SCALE DETECTION]\n"
+            "=== Temporal Analysis (last %d windows = %.1f sec) ===\n\n"
+            "  Windows processed:         %" PRIu64 "\n"
+            "  Buffer utilization:        %u/%d (%.1f%%)\n"
+            "  Adaptive threshold:        %.0f pps (3σ from baseline)\n"
+            "  Current baseline:          %.0f pps\n\n",
+            RING_BUFFER_SIZE, RING_BUFFER_SIZE * 0.05,
+            g_ring_buffer.total_windows,
+            g_ring_buffer.count, RING_BUFFER_SIZE,
+            (float)g_ring_buffer.count * 100.0f / RING_BUFFER_SIZE,
+            latest ? latest->adaptive_threshold : 0,
+            latest ? latest->pps_baseline : 0);
+
+        if (latest) {
+            APPEND(
+                "  [Temporal Features - Last Window]\n"
+                "    Delta PPS (250ms):       %+.0f\n"
+                "    Delta PPS (500ms):       %+.0f\n"
+                "    PPS Variance:            %.0f\n"
+                "    Ratio vs Baseline:       %.2fx\n\n"
+                "  [Multi-Scale Features]\n"
+                "    Top IP (50ms):           %.0f pps\n"
+                "    Top IP (1s):             %.0f pps\n"
+                "    Top IP (1min):           %.0f pps\n"
+                "    Burst Ratio (50ms/1min): %.2fx\n"
+                "    IP Concentration:        %.1f%%\n\n",
+                latest->delta_pps_5w,
+                latest->delta_pps_10w,
+                latest->pps_variance,
+                latest->ratio_vs_baseline,
+                latest->top_ip_pps_50ms,
+                latest->top_ip_pps_1s,
+                latest->top_ip_pps_1min,
+                latest->ratio_50ms_1min,
+                latest->ip_concentration * 100.0f);
+        }
+
         /* Multiple Detection Statistics - Aggregate Analysis */
         if (g_stats.total_detection_events > 1) {
             double avg_latency = g_stats.sum_detection_latencies_ms / g_stats.total_detection_events;
@@ -1578,6 +2040,9 @@ static int worker_thread(void *arg)
 
     /* Per-worker sketch (local, no atomics) */
     struct octosketch *my_sketch = &g_worker_sketch_attack[queue_id];
+
+    /* Multi-scale sketches (local, no atomics) */
+    struct multiscale_sketches *my_multiscale = &g_multiscale[queue_id];
 
     /* Sampling counter for sketch updates */
     uint64_t sample_counter = 0;
@@ -1799,6 +2264,12 @@ static int worker_thread(void *arg)
                     /* Update per-worker sketch (LOCAL, no atomics, no contention) */
                     octosketch_update_ip(my_sketch, src_ip, SKETCH_SAMPLE_RATE);
                     octosketch_update_bytes(my_sketch, pkt_len * SKETCH_SAMPLE_RATE);
+
+                    /* Update multi-scale sketches (all scales simultaneously) */
+                    octosketch_update_ip(&my_multiscale->sketch_50ms, src_ip, SKETCH_SAMPLE_RATE);
+                    octosketch_update_ip(&my_multiscale->sketch_1s, src_ip, SKETCH_SAMPLE_RATE);
+                    octosketch_update_ip(&my_multiscale->sketch_10s, src_ip, SKETCH_SAMPLE_RATE);
+                    octosketch_update_ip(&my_multiscale->sketch_1min, src_ip, SKETCH_SAMPLE_RATE);
                 }
             }
 
@@ -2125,6 +2596,44 @@ int main(int argc, char *argv[])
     printf("  Sampling:                1 in %d packets (%.2f%% overhead)\n",
            SKETCH_SAMPLE_RATE, 100.0 / SKETCH_SAMPLE_RATE);
     printf("  Update policy:           Attack traffic only\n\n");
+
+    /* Initialize Ring Buffer for temporal analysis */
+    memset(&g_ring_buffer, 0, sizeof(g_ring_buffer));
+    printf("[Ring Buffer Initialized - Temporal Analysis]\n");
+    printf("  Buffer size:             %d windows (%.1f seconds)\n",
+           RING_BUFFER_SIZE, RING_BUFFER_SIZE * 0.05);
+    printf("  Memory:                  %.1f KB\n",
+           sizeof(struct ring_buffer) / 1024.0);
+    printf("  Features per window:     %d (42 base + 14 temporal)\n\n",
+           ML_EXTENDED_FEATURES);
+
+    /* Initialize Multi-Scale Sketches */
+    for (int i = 0; i < NUM_RX_QUEUES; i++) {
+        char name[32];
+        snprintf(name, sizeof(name), "MS-50ms-W%d", i);
+        octosketch_init(&g_multiscale[i].sketch_50ms, name);
+        snprintf(name, sizeof(name), "MS-1s-W%d", i);
+        octosketch_init(&g_multiscale[i].sketch_1s, name);
+        snprintf(name, sizeof(name), "MS-10s-W%d", i);
+        octosketch_init(&g_multiscale[i].sketch_10s, name);
+        snprintf(name, sizeof(name), "MS-1min-W%d", i);
+        octosketch_init(&g_multiscale[i].sketch_1min, name);
+        g_multiscale[i].windows_since_1s_reset = 0;
+        g_multiscale[i].windows_since_10s_reset = 0;
+        g_multiscale[i].windows_since_1min_reset = 0;
+    }
+    octosketch_init(&g_merged_multiscale.sketch_50ms, "MS-50ms-Merged");
+    octosketch_init(&g_merged_multiscale.sketch_1s, "MS-1s-Merged");
+    octosketch_init(&g_merged_multiscale.sketch_10s, "MS-10s-Merged");
+    octosketch_init(&g_merged_multiscale.sketch_1min, "MS-1min-Merged");
+
+    printf("[Multi-Scale Sketches Initialized]\n");
+    printf("  Scales:                  50ms, 1s, 10s, 1min\n");
+    printf("  Per-worker memory:       %.1f KB × 4 scales = %.1f KB\n",
+           octosketch_memory_size() / 1024.0,
+           (octosketch_memory_size() * 4) / 1024.0);
+    printf("  Total multi-scale mem:   %.1f KB\n\n",
+           (octosketch_memory_size() * 4 * (NUM_RX_QUEUES + 1)) / 1024.0);
 
     printf("╔═══════════════════════════════════════════════════════════════════════╗\n");
     printf("║  MIRA DDoS DETECTOR - DPDK + OCTOSKETCH (%d workers + 1 coord)       ║\n", NUM_RX_QUEUES);
