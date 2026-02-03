@@ -1005,11 +1005,11 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         double mssql_pps = (double)(window_mssql_sqlbatch + window_mssql_rpc) / window_sec;
         double tftp_pps = (double)(window_tftp_rrq + window_tftp_wrq) / window_sec;
 
-        /* DETECTION LOGIC - Aggregate based on 10.10.3.x traffic */
+        /* DETECTION LOGIC - Evaluate ALL traffic (no IP-based filtering) */
 
-        /* Attack traffic present AND exceeds baseline significantly */
-        if (window_att_pkts > 0 && attack_pps > 50000) {  /* 50K pps threshold */
-
+        /* Removed condition: was only evaluating when attack traffic present (trampa) */
+        /* Now evaluates all traffic to establish real thresholds */
+        {
             /* UDP Flood Detection */
             if (udp_pps > 20000) {  /* 20K UDP pps */
                 g_stats.udp_flood_detections++;
@@ -1056,12 +1056,13 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             /* UDP-Lag Detection (large UDP packets) */
             if (udp_pps > UDP_LAG_PPS_THRESHOLD) {
                 double avg_pkt_size = 0.0;
-                if (window_att_pkts > 0) {
+                uint64_t total_pkts = window_base_pkts + window_att_pkts;
+                if (total_pkts > 0) {
                     double window_bytes = 0.0;
                     for (int i = 0; i < NUM_RX_QUEUES; i++) {
-                        window_bytes += (double)window_attack_bytes[i];
+                        window_bytes += (double)(window_baseline_bytes[i] + window_attack_bytes[i]);
                     }
-                    avg_pkt_size = window_bytes / window_att_pkts;
+                    avg_pkt_size = window_bytes / total_pkts;
                 }
                 if (avg_pkt_size > UDP_LAG_AVG_PKT_BYTES) {
                     g_stats.udp_lag_detections++;
