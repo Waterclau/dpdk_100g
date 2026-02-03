@@ -1164,11 +1164,12 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                 attack_detected = true;
             }
 
-            /* Multi-attack detection */
+            /* Multi-attack detection (disabled in non-ML detector) */
+            /*
             int attack_types = 0;
-            if (udp_pps > 10000) attack_types++;
-            if (syn_pps > 10000) attack_types++;
-            if (icmp_pps > 5000) attack_types++;
+            if (udp_pps > ANOMALY_UDP_THRESHOLD) attack_types++;
+            if (syn_pps > ANOMALY_SYN_THRESHOLD) attack_types++;
+            if (icmp_pps > ANOMALY_ICMP_THRESHOLD) attack_types++;
 
             if (attack_types >= 2 && !attack_detected) {
                 g_stats.total_flood_detections++;
@@ -1176,10 +1177,11 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                     g_stats.alert_level = ALERT_HIGH;
                 snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
                         sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "MULTI-ATTACK detected: %.0f attack pps (%d attack types) | ",
+                        "MULTI-ANOMALY detected: %.0f pps (%d anomaly types) | ",
                         attack_pps, attack_types);
                 attack_detected = true;
             }
+            */
         }
 
         /* Detection timestamp tracking - EVERY detection */
