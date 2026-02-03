@@ -873,6 +873,12 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
     static uint64_t window_mssql_rpc_start = 0;
     static uint64_t window_tftp_rrq_start = 0;
     static uint64_t window_tftp_wrq_start = 0;
+    /* Basic protocol counters - window start values */
+    static uint64_t window_syn_start = 0;
+    static uint64_t window_udp_start = 0;
+    static uint64_t window_icmp_start = 0;
+    static uint64_t window_http_start = 0;
+    static uint64_t window_dns_start = 0;
 
     double elapsed = (double)(cur_tsc - g_stats.last_fast_detection_tsc) / hz;
 
@@ -890,8 +896,9 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
         /* AGGREGATE DETECTION - Use worker stats (exact counters) */
         uint64_t window_base_pkts = 0, window_att_pkts = 0;
-        uint64_t window_syn_pkts = 0, window_udp_pkts = 0, window_icmp_pkts = 0;
-        uint64_t window_http_reqs = 0, window_dns_queries = 0;
+        /* Total accumulators for basic protocols (will calculate window delta) */
+        uint64_t total_syn_pkts = 0, total_udp_pkts = 0, total_icmp_pkts = 0;
+        uint64_t total_http_reqs = 0, total_dns_queries = 0;
         uint64_t total_ntp_monlist = 0;
         uint64_t total_dns_any = 0;
         uint64_t total_dns_txt = 0;
@@ -914,11 +921,11 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
         /* Aggregate protocol stats from workers */
         for (int i = 0; i < NUM_RX_QUEUES; i++) {
-            window_syn_pkts += g_worker_stats[i].syn_packets;
-            window_udp_pkts += g_worker_stats[i].udp_packets;
-            window_icmp_pkts += g_worker_stats[i].icmp_packets;
-            window_http_reqs += g_worker_stats[i].http_requests;
-            window_dns_queries += g_worker_stats[i].dns_queries;
+            total_syn_pkts += g_worker_stats[i].syn_packets;
+            total_udp_pkts += g_worker_stats[i].udp_packets;
+            total_icmp_pkts += g_worker_stats[i].icmp_packets;
+            total_http_reqs += g_worker_stats[i].http_requests;
+            total_dns_queries += g_worker_stats[i].dns_queries;
             total_ntp_monlist += g_worker_stats[i].ntp_monlist_queries;
             total_dns_any += g_worker_stats[i].dns_any_queries;
             total_dns_txt += g_worker_stats[i].dns_txt_queries;
@@ -950,6 +957,12 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             window_mssql_rpc_start = total_mssql_rpc;
             window_tftp_rrq_start = total_tftp_rrq;
             window_tftp_wrq_start = total_tftp_wrq;
+            /* Basic protocol counters */
+            window_syn_start = total_syn_pkts;
+            window_udp_start = total_udp_pkts;
+            window_icmp_start = total_icmp_pkts;
+            window_http_start = total_http_reqs;
+            window_dns_start = total_dns_queries;
             window_totals_init = true;
         }
 
@@ -967,6 +980,13 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         uint64_t window_mssql_rpc = total_mssql_rpc - window_mssql_rpc_start;
         uint64_t window_tftp_rrq = total_tftp_rrq - window_tftp_rrq_start;
         uint64_t window_tftp_wrq = total_tftp_wrq - window_tftp_wrq_start;
+
+        /* Calculate window deltas for basic protocol counters */
+        uint64_t window_syn_pkts = total_syn_pkts - window_syn_start;
+        uint64_t window_udp_pkts = total_udp_pkts - window_udp_start;
+        uint64_t window_icmp_pkts = total_icmp_pkts - window_icmp_start;
+        uint64_t window_http_reqs = total_http_reqs - window_http_start;
+        uint64_t window_dns_queries = total_dns_queries - window_dns_start;
 
         /* Calculate PPS rates */
         double attack_pps = (double)window_att_pkts / window_sec;
@@ -1385,6 +1405,12 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             window_mssql_rpc_start = total_mssql_rpc;
             window_tftp_rrq_start = total_tftp_rrq;
             window_tftp_wrq_start = total_tftp_wrq;
+            /* Basic protocol counters */
+            window_syn_start = total_syn_pkts;
+            window_udp_start = total_udp_pkts;
+            window_icmp_start = total_icmp_pkts;
+            window_http_start = total_http_reqs;
+            window_dns_start = total_dns_queries;
         }
     }
 }
