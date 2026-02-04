@@ -1292,7 +1292,7 @@ static void send_loop_fast(void)
                 rte_pktmbuf_free(pkts[i]);
         }
 
-        /* Rate limiting */
+        /* Rate limiting - token bucket style */
         uint64_t cur_tsc = rte_rdtsc();
         double elapsed_sec = (double)(cur_tsc - window_start_tsc) / hz;
 
@@ -1301,13 +1301,20 @@ static void send_loop_fast(void)
             bytes_sent_in_window = 0;
             window_start_tsc = cur_tsc;
         } else if (bytes_sent_in_window > (uint64_t)(target_bytes_per_sec * elapsed_sec)) {
-            /* Too fast, calculate sleep time */
+            /* Too fast - wait until we're back on schedule */
             double bytes_expected = target_bytes_per_sec * elapsed_sec;
             double bytes_over = bytes_sent_in_window - bytes_expected;
-            uint64_t sleep_ns = (uint64_t)((bytes_over * 8.0 * 1e9) / (target_gbps * 1e9));
 
-            if (sleep_ns > 0 && sleep_ns < 100000) {
-                rte_delay_us_block(sleep_ns / 1000);
+            /* Calculate how long to wait for the excess bytes at target rate */
+            uint64_t sleep_us = (uint64_t)((bytes_over * 8.0) / (target_gbps * 1000.0));
+
+            /* Cap at 100ms to stay responsive to Ctrl+C, but allow real rate limiting */
+            if (sleep_us > 100000) {
+                sleep_us = 100000;
+            }
+
+            if (sleep_us > 0) {
+                rte_delay_us_block(sleep_us);
             }
         }
 
@@ -1493,7 +1500,7 @@ static void send_loop_adaptive(void)
                 rte_pktmbuf_free(pkts[i]);
         }
 
-        /* Rate limiting with jitter */
+        /* Rate limiting with jitter - token bucket style */
         cur_tsc = rte_rdtsc();
         double elapsed_sec = (double)(cur_tsc - window_start_tsc) / hz;
 
@@ -1502,19 +1509,24 @@ static void send_loop_adaptive(void)
             bytes_sent_in_window = 0;
             window_start_tsc = cur_tsc;
         } else if (bytes_sent_in_window > (uint64_t)(target_bytes_per_sec * elapsed_sec)) {
-            /* Too fast, calculate sleep time with jitter */
+            /* Too fast - wait until we're back on schedule */
             double bytes_expected = target_bytes_per_sec * elapsed_sec;
             double bytes_over = bytes_sent_in_window - bytes_expected;
-            uint64_t sleep_ns = (uint64_t)((bytes_over * 8.0 * 1e9) / (adaptive_cfg.target_gbps * 1e9));
+            uint64_t sleep_us = (uint64_t)((bytes_over * 8.0) / (adaptive_cfg.target_gbps * 1000.0));
 
             // Apply jitter to sleep time
             if (adaptive_cfg.jitter_pct > 0) {
                 double jitter_mult = get_jitter_multiplier(adaptive_cfg.jitter_pct);
-                sleep_ns = (uint64_t)(sleep_ns * jitter_mult);
+                sleep_us = (uint64_t)(sleep_us * jitter_mult);
             }
 
-            if (sleep_ns > 0 && sleep_ns < 100000) {
-                rte_delay_us_block(sleep_ns / 1000);
+            /* Cap at 100ms to stay responsive to Ctrl+C */
+            if (sleep_us > 100000) {
+                sleep_us = 100000;
+            }
+
+            if (sleep_us > 0) {
+                rte_delay_us_block(sleep_us);
             }
         }
 
@@ -1650,7 +1662,7 @@ static void send_loop_multi_pcap(void)
                 rte_pktmbuf_free(pkts[i]);
         }
 
-        /* Rate limiting */
+        /* Rate limiting - token bucket style */
         double elapsed_sec = (double)(cur_tsc - window_start_tsc) / hz;
 
         if (elapsed_sec >= 1.0) {
@@ -1658,13 +1670,18 @@ static void send_loop_multi_pcap(void)
             bytes_sent_in_window = 0;
             window_start_tsc = cur_tsc;
         } else if (bytes_sent_in_window > (uint64_t)(target_bytes_per_sec * elapsed_sec)) {
-            /* Too fast, calculate sleep time */
+            /* Too fast - wait until we're back on schedule */
             double bytes_expected = target_bytes_per_sec * elapsed_sec;
             double bytes_over = bytes_sent_in_window - bytes_expected;
-            uint64_t sleep_ns = (uint64_t)((bytes_over * 8.0 * 1e9) / (attack_cfg.target_gbps * 1e9));
+            uint64_t sleep_us = (uint64_t)((bytes_over * 8.0) / (attack_cfg.target_gbps * 1000.0));
 
-            if (sleep_ns > 0 && sleep_ns < 100000) {
-                rte_delay_us_block(sleep_ns / 1000);
+            /* Cap at 100ms to stay responsive to Ctrl+C */
+            if (sleep_us > 100000) {
+                sleep_us = 100000;
+            }
+
+            if (sleep_us > 0) {
+                rte_delay_us_block(sleep_us);
             }
         }
 
@@ -2075,7 +2092,7 @@ static void send_loop_adaptive_attack(void)
             }
         }
 
-        /* Rate limiting */
+        /* Rate limiting - token bucket style */
         double elapsed_sec = (double)(cur_tsc - window_start_tsc) / hz;
 
         if (elapsed_sec >= 1.0) {
@@ -2083,13 +2100,18 @@ static void send_loop_adaptive_attack(void)
             bytes_sent_in_window = 0;
             window_start_tsc = cur_tsc;
         } else if (bytes_sent_in_window > (uint64_t)(target_bytes_per_sec * elapsed_sec)) {
-            /* Too fast, calculate sleep time */
+            /* Too fast - wait until we're back on schedule */
             double bytes_expected = target_bytes_per_sec * elapsed_sec;
             double bytes_over = bytes_sent_in_window - bytes_expected;
-            uint64_t sleep_ns = (uint64_t)((bytes_over * 8.0 * 1e9) / (attack_cfg.target_gbps * 1e9));
+            uint64_t sleep_us = (uint64_t)((bytes_over * 8.0) / (attack_cfg.target_gbps * 1000.0));
 
-            if (sleep_ns > 0 && sleep_ns < 100000) {
-                rte_delay_us_block(sleep_ns / 1000);
+            /* Cap at 100ms to stay responsive to Ctrl+C */
+            if (sleep_us > 100000) {
+                sleep_us = 100000;
+            }
+
+            if (sleep_us > 0) {
+                rte_delay_us_block(sleep_us);
             }
         }
 

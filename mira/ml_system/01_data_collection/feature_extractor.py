@@ -2,7 +2,7 @@
 """
 Feature Extractor for MIRA Detector Logs (Multi-Class Version)
 Parses detector output logs and extracts ML features for CIC-DDoS-2019 multi-attack detection
-Supports 14 attack classes and 40+ features
+Supports 14 attack classes and 56 features (42 base + 14 temporal/multi-scale)
 """
 
 import re
@@ -268,6 +268,47 @@ class LogParser:
             if syn_ack_packets > 0 else 0.0
         )
 
+        # ========== NEW: 14 TEMPORAL & MULTI-SCALE FEATURES ==========
+        # Temporal Features (from Ring Buffer) - Features 43-47
+        match = re.search(r'Delta PPS \(250ms\):\s+([+-]?[\d.]+)', window_text)
+        features['delta_pps_5w'] = float(match.group(1)) if match else 0.0
+
+        match = re.search(r'Delta PPS \(500ms\):\s+([+-]?[\d.]+)', window_text)
+        features['delta_pps_10w'] = float(match.group(1)) if match else 0.0
+
+        match = re.search(r'PPS Variance:\s+([\d.]+)', window_text)
+        features['pps_variance'] = float(match.group(1)) if match else 0.0
+
+        match = re.search(r'Running baseline \(ML\):\s+([\d.]+) pps', window_text)
+        features['pps_baseline'] = float(match.group(1)) if match else 0.0
+
+        match = re.search(r'Ratio vs Baseline:\s+([\d.]+)x', window_text)
+        features['ratio_vs_baseline'] = float(match.group(1)) if match else 1.0
+
+        # Multi-Scale Features (from Sketches) - Features 48-56
+        match = re.search(r'Top IP \(50ms\):\s+([\d.]+) pps', window_text)
+        features['top_ip_pps_50ms'] = float(match.group(1)) if match else 0.0
+
+        match = re.search(r'Top IP \(1s\):\s+([\d.]+) pps', window_text)
+        features['top_ip_pps_1s'] = float(match.group(1)) if match else 0.0
+
+        match = re.search(r'Top IP \(1min\):\s+([\d.]+) pps', window_text)
+        features['top_ip_pps_1min'] = float(match.group(1)) if match else 0.0
+
+        match = re.search(r'Burst Ratio \(50ms/1min\):\s+([\d.]+)x', window_text)
+        features['ratio_50ms_1min'] = float(match.group(1)) if match else 1.0
+
+        match = re.search(r'Heavy-hitters detected:\s+(\d+)', window_text)
+        features['num_heavy_hitters'] = int(match.group(1)) if match else 0
+
+        match = re.search(r'IP Concentration:\s+([\d.]+)%', window_text)
+        features['ip_concentration'] = float(match.group(1)) / 100.0 if match else 0.0
+
+        # Derived features (placeholders for now)
+        features['new_ips_ratio'] = 0.0  # Would need unique IP tracking
+        features['attack_entropy'] = 1.0 - features['ip_concentration']
+        features['adaptive_threshold'] = 0.0  # Calculated but not used for detection
+
         # Label
         features['label'] = label
 
@@ -276,16 +317,16 @@ class LogParser:
     def save_to_csv(self, df: pd.DataFrame, output_path: str):
         """Save DataFrame to CSV file"""
 
-        # Define column order (46 features total: 14 original + 26 protocol + 6 derived)
+        # Define column order (56 features total: 42 base + 14 temporal/multi-scale)
         columns = [
-            # Original 14 features
+            # Original 14 features (1-14)
             'total_packets', 'total_bytes',
             'udp_packets', 'tcp_packets', 'icmp_packets',
             'syn_packets', 'http_requests', 'dns_queries',
             'baseline_packets', 'attack_packets',
             'udp_tcp_ratio', 'syn_total_ratio', 'baseline_attack_ratio',
             'bytes_per_packet',
-            # NEW: Protocol-specific features (26)
+            # Protocol-specific features (15-36)
             'ntp_monlist_queries', 'ntp_responses', 'avg_ntp_response_size',
             'dns_any_queries', 'dns_txt_queries', 'dns_responses', 'avg_dns_response_size',
             'snmp_getbulk_requests', 'snmp_responses', 'avg_snmp_response_size',
@@ -295,9 +336,16 @@ class LogParser:
             'ldap_bind_requests', 'ldap_search_requests',
             'mssql_sqlbatch_packets', 'mssql_rpc_packets',
             'tftp_rrq_packets', 'tftp_wrq_packets',
-            # NEW: Derived amplification features (6)
+            # Derived amplification features (37-42)
             'ntp_amplification_factor', 'dns_amplification_factor', 'snmp_amplification_factor',
             'query_response_ratio', 'fragmentation_ratio', 'syn_ack_ratio',
+            # NEW: Temporal features from Ring Buffer (43-47)
+            'delta_pps_5w', 'delta_pps_10w', 'pps_variance',
+            'pps_baseline', 'ratio_vs_baseline',
+            # NEW: Multi-scale features from Sketches (48-56)
+            'top_ip_pps_50ms', 'top_ip_pps_1s', 'top_ip_pps_1min',
+            'ratio_50ms_1min', 'num_heavy_hitters', 'ip_concentration',
+            'new_ips_ratio', 'attack_entropy', 'adaptive_threshold',
             # Label (must be last)
             'label'
         ]

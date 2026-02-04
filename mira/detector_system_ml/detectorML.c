@@ -75,28 +75,40 @@ static int safe_snprintf(char *buf, size_t size, const char *fmt, ...)
 #define BURST_SIZE 2048          /* Larger bursts for max throughput - Phase 3 */
 #define NUM_RX_QUEUES 14         /* 14 workers for 17+ Gbps - CRITICAL */
 
-/* Detection thresholds */
-#define BASELINE_UDP_THRESHOLD 10000
-#define BASELINE_SYN_THRESHOLD 8000
-#define BASELINE_HTTP_THRESHOLD 10000
-#define BASELINE_ICMP_THRESHOLD 5000
-#define BASELINE_TOTAL_PPS_THRESHOLD 20000
+/* Anomaly detection thresholds (1.5x baseline maximum)
+ * NOTE: ML model classifies the specific attack type.
+ *       Thresholds trigger anomaly detection, ML identifies the attack.
+ */
+#define ANOMALY_UDP_THRESHOLD    7000000   /* 7M UDP pps (baseline max: 4.4M) */
+#define ANOMALY_SYN_THRESHOLD    2500000   /* 2.5M SYN pps (baseline max: 1.6M) */
+#define ANOMALY_HTTP_THRESHOLD   4000000   /* 4M HTTP rps (baseline max: 2.5M) */
+#define ANOMALY_ICMP_THRESHOLD    700000   /* 700K ICMP pps (baseline max: 450K) */
 
-#define ATTACK_UDP_THRESHOLD 5000
-#define ATTACK_SYN_THRESHOLD 3000
-#define ATTACK_HTTP_THRESHOLD 2500
-#define ATTACK_ICMP_THRESHOLD 3000
-#define ATTACK_TOTAL_PPS_THRESHOLD 8000
-
-#define DNS_AMP_THRESHOLD 2000
-#define NTP_AMP_THRESHOLD 1500
-#define ACK_FLOOD_THRESHOLD 4000
-#define FRAG_THRESHOLD 1000
+/* Protocol-specific anomaly thresholds */
+#define DNS_AMP_THRESHOLD   3000000   /* 3M DNS amp pps */
+#define NTP_AMP_THRESHOLD   2000000   /* 2M NTP amp pps */
+#define SNMP_AMP_THRESHOLD  2000000   /* 2M SNMP amp pps */
+#define SSDP_THRESHOLD      2000000   /* 2M SSDP pps */
+#define PORTMAP_THRESHOLD   2000000   /* 2M PortMap pps */
+#define NETBIOS_THRESHOLD   2000000   /* 2M NetBIOS pps */
+#define LDAP_THRESHOLD      2000000   /* 2M LDAP pps */
+#define MSSQL_THRESHOLD     2000000   /* 2M MSSQL pps */
+#define TFTP_THRESHOLD      1000000   /* 1M TFTP pps */
+#define ACK_FLOOD_THRESHOLD 4000000   /* 4M ACK pps */
+#define FRAG_THRESHOLD      1000000   /* 1M fragmented pps */
 
 /* Time windows */
 #define FAST_DETECTION_INTERVAL 0.05
 #define STATS_INTERVAL_SEC 5.0
 #define DETECTION_WINDOW_SEC 5.0
+
+/* Ring Buffer for temporal features */
+#define RING_BUFFER_SIZE 100              /* Last 100 windows (5 seconds at 50ms) */
+
+/* Multi-scale time windows */
+#define SCALE_1S_WINDOWS 20               /* 20 × 50ms = 1 second */
+#define SCALE_10S_WINDOWS 200             /* 200 × 50ms = 10 seconds */
+#define SCALE_1MIN_WINDOWS 1200           /* 1200 × 50ms = 1 minute */
 
 /* IP tracking */
 #define MAX_IPS 65536
@@ -471,69 +483,41 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         double icmp_pps = (double)window_icmp_pkts / window_sec;
         double http_pps = (double)window_http_reqs / window_sec;
 
-        /* DETECTION LOGIC - Aggregate based on 192.168.2.x traffic */
+        /* DETECTION LOGIC - Threshold-based anomaly detection (ML classifies attack type)
+         * No IP-based filtering - evaluates ALL traffic */
+        {
+            /* Anomaly detection - triggers ML classification */
+            bool threshold_anomaly = false;
 
-        /* Attack traffic present AND exceeds baseline significantly */
-        if (window_att_pkts > 0 && attack_pps > 50000) {  /* 50K pps threshold */
-
-            /* UDP Flood Detection */
-            if (udp_pps > 20000) {  /* 20K UDP pps */
+            /* UDP Anomaly */
+            if (udp_pps > ANOMALY_UDP_THRESHOLD) {
                 g_stats.udp_flood_detections++;
-                g_stats.alert_level = ALERT_HIGH;
-                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
-                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "UDP FLOOD detected: %.0f UDP pps | ", udp_pps);
-                attack_detected = true;
+                threshold_anomaly = true;
             }
 
-            /* SYN Flood Detection */
-            if (syn_pps > 30000) {  /* 30K SYN pps */
+            /* SYN Anomaly */
+            if (syn_pps > ANOMALY_SYN_THRESHOLD) {
                 g_stats.syn_flood_detections++;
-                if (g_stats.alert_level < ALERT_HIGH)
-                    g_stats.alert_level = ALERT_HIGH;
-                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
-                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "SYN FLOOD detected: %.0f SYN pps | ", syn_pps);
-                attack_detected = true;
+                threshold_anomaly = true;
             }
 
-            /* ICMP Flood Detection */
-            if (icmp_pps > 10000) {  /* 10K ICMP pps */
+            /* ICMP Anomaly */
+            if (icmp_pps > ANOMALY_ICMP_THRESHOLD) {
                 g_stats.icmp_flood_detections++;
-                if (g_stats.alert_level < ALERT_HIGH)
-                    g_stats.alert_level = ALERT_HIGH;
-                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
-                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "ICMP FLOOD detected: %.0f ICMP pps | ", icmp_pps);
-                attack_detected = true;
+                threshold_anomaly = true;
             }
 
-            /* HTTP Flood Detection */
-            if (http_pps > 15000) {  /* 15K HTTP req/s */
+            /* HTTP Anomaly */
+            if (http_pps > ANOMALY_HTTP_THRESHOLD) {
                 g_stats.http_flood_detections++;
-                if (g_stats.alert_level < ALERT_HIGH)
-                    g_stats.alert_level = ALERT_HIGH;
-                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
-                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "HTTP FLOOD detected: %.0f HTTP rps | ", http_pps);
-                attack_detected = true;
+                threshold_anomaly = true;
             }
 
-            /* Multi-attack detection */
-            int attack_types = 0;
-            if (udp_pps > 10000) attack_types++;
-            if (syn_pps > 10000) attack_types++;
-            if (icmp_pps > 5000) attack_types++;
-
-            if (attack_types >= 2 && !attack_detected) {
-                g_stats.total_flood_detections++;
-                if (g_stats.alert_level < ALERT_HIGH)
-                    g_stats.alert_level = ALERT_HIGH;
-                snprintf(g_stats.alert_reason + strlen(g_stats.alert_reason),
-                        sizeof(g_stats.alert_reason) - strlen(g_stats.alert_reason),
-                        "MULTI-ATTACK detected: %.0f attack pps (%d attack types) | ",
-                        attack_pps, attack_types);
+            /* If any threshold exceeded, mark as anomaly for ML to classify */
+            if (threshold_anomaly) {
                 attack_detected = true;
+                g_stats.alert_level = ALERT_MEDIUM;
+                /* Don't set alert_reason here - ML will classify the specific attack type */
             }
         }
 
@@ -705,6 +689,28 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                 ? (float)ml_syn_packets / (float)ml_syn_ack_packets
                 : 0.0f;
 
+            /* NEW: Temporal features (43-47) - from Ring Buffer
+             * TODO: Implement ring buffer logic for accurate values
+             * For now, using simplified calculations */
+            features.delta_pps_5w = 0.0f;       /* Would need ring buffer history */
+            features.delta_pps_10w = 0.0f;      /* Would need ring buffer history */
+            features.pps_variance = 0.0f;       /* Would need ring buffer history */
+            features.pps_baseline = (float)ml_total_packets / window_sec;
+            features.ratio_vs_baseline = 1.0f;  /* Would need baseline tracking */
+
+            /* NEW: Multi-scale features (48-56) - from Sketches
+             * TODO: Implement multi-scale sketch merging for accurate values
+             * For now, using simplified calculations */
+            features.top_ip_pps_50ms = 0.0f;    /* Would need sketch analysis */
+            features.top_ip_pps_1s = 0.0f;      /* Would need sketch analysis */
+            features.top_ip_pps_1min = 0.0f;    /* Would need sketch analysis */
+            features.ratio_50ms_1min = 1.0f;    /* Would need multi-scale */
+            features.num_heavy_hitters = 0.0f;  /* Would need sketch analysis */
+            features.ip_concentration = 0.0f;   /* Would need sketch analysis */
+            features.new_ips_ratio = 0.0f;      /* Placeholder */
+            features.attack_entropy = 1.0f;     /* 1 - concentration */
+            features.adaptive_threshold = 0.0f; /* Not used for detection */
+
             // Run ML prediction (LOCAL, in-process)
             int ret = ml_predict(g_ml_model, &features, &ml_pred);
 
@@ -733,11 +739,18 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             const char *alert_type = "UNKNOWN";
             if (original_attack_detected && ml_alert) {
                 alert_type = "CRITICAL";  // Both agree: high confidence
+                g_stats.alert_level = ALERT_HIGH;
             } else if (original_attack_detected && !ml_alert) {
                 alert_type = "HIGH";      // Only thresholds
+                g_stats.alert_level = ALERT_MEDIUM;
             } else if (!original_attack_detected && ml_alert) {
                 alert_type = "ANOMALY";   // Only ML: subtle attack
+                g_stats.alert_level = ALERT_LOW;
             }
+
+            // Set alert_reason with ML classification
+            safe_snprintf(g_stats.alert_reason, sizeof(g_stats.alert_reason),
+                          "[%s] ML: %s (%.1f%%)", alert_type, ml_class_name, ml_confidence * 100);
 
             // Log ML prediction details
             if (should_log_ml) {
@@ -752,6 +765,10 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                 }
                 printf("\n");
             }
+        } else if (attack_detected && !g_ml_model) {
+            // No ML model loaded - set generic alert reason based on thresholds
+            safe_snprintf(g_stats.alert_reason, sizeof(g_stats.alert_reason),
+                          "[THRESHOLD] ANOMALY detected (no ML model)");
         }
         /* ========================================================== */
 
