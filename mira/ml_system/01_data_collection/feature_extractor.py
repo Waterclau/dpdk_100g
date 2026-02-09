@@ -7,6 +7,7 @@ Supports 14 attack classes and 56 features (42 base + 14 temporal/multi-scale)
 
 import re
 import argparse
+import math
 import pandas as pd
 from typing import Dict, List, Optional
 import sys
@@ -304,9 +305,44 @@ class LogParser:
         match = re.search(r'IP Concentration:\s+([\d.]+)%', window_text)
         features['ip_concentration'] = float(match.group(1)) / 100.0 if match else 0.0
 
-        # Derived features (placeholders for now)
-        features['new_ips_ratio'] = 0.0  # Would need unique IP tracking
-        features['attack_entropy'] = 1.0 - features['ip_concentration']
+        # Derived features (mix signature)
+        attack_signals = {
+            'ntp': features['ntp_monlist_queries'],
+            'dns': features['dns_any_queries'] + features['dns_txt_queries'],
+            'snmp': features['snmp_getbulk_requests'],
+            'ssdp': features['ssdp_msearch_packets'],
+            'portmap': features['portmap_getport_calls'],
+            'netbios': features['netbios_name_queries'],
+            'ldap': features['ldap_search_requests'],
+            'mssql': features['mssql_sqlbatch_packets'],
+            'tftp': features['tftp_rrq_packets'],
+            'syn': features['syn_packets'],
+            'web': features['http_requests'],
+        }
+        active_types = 0
+        total_signal = 0.0
+        for value in attack_signals.values():
+            if value > 0:
+                active_types += 1
+                total_signal += float(value)
+
+        if features['attack_packets'] == 0:
+            active_types = 0
+            total_signal = 0.0
+
+        if total_signal > 0.0:
+            entropy = 0.0
+            for value in attack_signals.values():
+                if value <= 0:
+                    continue
+                p = float(value) / total_signal
+                entropy -= p * math.log2(p)
+            max_entropy = math.log2(len(attack_signals))
+            features['attack_entropy'] = entropy / max_entropy if max_entropy > 0 else 0.0
+        else:
+            features['attack_entropy'] = 0.0
+
+        features['new_ips_ratio'] = active_types / float(len(attack_signals))
         features['adaptive_threshold'] = 0.0  # Calculated but not used for detection
 
         # Filter: for specific attack labels, drop windows without attack traffic
