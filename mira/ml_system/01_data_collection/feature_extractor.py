@@ -38,6 +38,8 @@ SPECIFIC_ATTACK_TYPES = [
 # Combined: accept both legacy (3 classes) and specific attack types
 ALL_LABELS = LEGACY_LABELS + SPECIFIC_ATTACK_TYPES
 
+MIXED_MIN_SHARE = 0.10
+
 class LogParser:
     """Parses MIRA detector logs and extracts features"""
 
@@ -323,12 +325,17 @@ class LogParser:
         total_signal = 0.0
         for value in attack_signals.values():
             if value > 0:
-                active_types += 1
                 total_signal += float(value)
 
         if features['attack_packets'] == 0:
             active_types = 0
             total_signal = 0.0
+
+        if total_signal > 0.0:
+            active_types = sum(
+                (float(value) / total_signal) >= MIXED_MIN_SHARE
+                for value in attack_signals.values()
+            )
 
         if total_signal > 0.0:
             entropy = 0.0
@@ -349,6 +356,18 @@ class LogParser:
         if label not in LEGACY_LABELS and label != 'mixed':
             if features['attack_packets'] == 0:
                 return None
+
+        if label == 'mixed':
+            if total_signal == 0.0:
+                return None
+            if active_types < 2:
+                dominant = max(attack_signals.items(), key=lambda item: item[1])[0]
+                if dominant == 'syn':
+                    label = 'syn_flood'
+                elif dominant == 'web':
+                    label = 'webddos'
+                else:
+                    label = dominant
 
         # Label
         features['label'] = label
