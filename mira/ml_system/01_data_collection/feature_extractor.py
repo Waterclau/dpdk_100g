@@ -309,6 +309,11 @@ class LogParser:
         features['attack_entropy'] = 1.0 - features['ip_concentration']
         features['adaptive_threshold'] = 0.0  # Calculated but not used for detection
 
+        # Filter: for specific attack labels, drop windows without attack traffic
+        if label not in LEGACY_LABELS and label != 'mixed':
+            if features['attack_packets'] == 0:
+                return None
+
         # Label
         features['label'] = label
 

@@ -355,3 +355,27 @@ sleep 300 && sudo timeout 595 ./attack_sender ... --rate 10000
 2. **Más features temporales** - Autocorrelación, FFT para patrones periódicos
 3. **Online learning** - Actualizar modelo ML en tiempo real
 4. **Exportar ring buffer** - Dump periódico para análisis offline
+
+Run1 (DNS + SYN + ICMP):                                                                                                                                                                         
+                                                                                                                                                                                                   
+  - DNS 50% (≥45.6%)                                                                                                                                                                               
+  - SYN 40% (≥38%)                                                                                                                                                                                 
+  - ICMP 10% (≥10.6% → pon 11% si quieres margen)                                                                                                                                                  
+                                                                                                                                                                                                   
+  Run2 (NTP + SNMP + SSDP):                                                                                                                                                                        
+                                                                                                                                                                                                   
+  - NTP 34%                                                                                                                                                                                        
+  - SNMP 33%                                                                                                                                                                                       
+  - SSDP 33%                                                                                                                                                                                       
+    (Todos ≥30.4%)                                                                                                                                                                                 
+                                                                                                                                                                                                   
+  Run3 (Portmap + NetBIOS + LDAP):                                                                                                                                                                 
+                                                                                                                                                                                                   
+  - Portmap 34%                                                                                                                                                                                    
+  - NetBIOS 33%                                                                                                                                                                                    
+  - LDAP 33%                                                                                                                                                                                       
+    (Todos ≥30.4%)                                                                                                                                                                                 
+                                                                                                                                                                                                   
+  Run4 (WebDDOS + TFTP + ICMP):                                                                                                                                                                    
+  - TFTP 20% (≥15.2%)
+  - ICMP 15% (≥10.6%)

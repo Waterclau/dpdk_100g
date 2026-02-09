@@ -531,3 +531,365 @@ Ring Buffer de Features - Explicación Completa
   ├──────────────────┼───────────────────────────────────────────────────────────────────────────────┤
   │ Complejidad      │ Código más complejo, pero mejor arquitectura                                  │
   └──────────────────┴───────────────────────────────────────────────────────────────────────────────┘
+
+  Resumen de Mejoras
+
+  ┌────────────────────────────────────────────────────────────┐
+  │  MEJORA                          │  VALOR                  │
+  ├──────────────────────────────────┼─────────────────────────┤
+  │  Latencia escritura              │  5ms → 0.0001ms (50000×)│
+  │  I/O a disco                     │  4.8 MB/min → 0         │
+  │  Memoria fija                    │  19 KB (constante)      │
+  │  Ciclos CPU por ventana          │  500K → 200 (2500×)     │
+  │  Coordinator bloqueado           │  Sí → No                │
+  │  ML inference posible inline     │  No → Sí                │
+  └────────────────────────────────────────────────────────────┘
+
+  Sí, hay varios enfoques más potentes que solo optimizar I/O. El ring buffer abre posibilidades que el log a disco NO permite:                                                                                                                                 
+  
+  ---                                                                                                                                                                                                                                                             1. Features Temporales (Secuencias)
+                                                                                                                                                                                                                                                                
+  Ahora: ML ve 1 ventana → predice
+
+  Mejora: ML ve últimas N ventanas → detecta patrones temporales
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  ANTES (1 ventana):                                                     │
+  │                                                                         │
+  │  [ventana_actual] → ML → "UDP_FLOOD"                                   │
+  │                                                                         │
+  │  Problema: No ve si el ataque está escalando o bajando                 │
+  │                                                                         │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  DESPUÉS (secuencia de 10 ventanas):                                    │
+  │                                                                         │
+  │  [w-9][w-8][w-7][w-6][w-5][w-4][w-3][w-2][w-1][w-0] → ML              │
+  │                                                                         │
+  │  Detecta:                                                               │
+  │  - Ataque escalando (pps subiendo)                                      │
+  │  - Ataque pulsante (on-off-on-off)                                      │
+  │  - Slow-rise attacks (incremento gradual bajo threshold)               │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  Nuevas features derivadas:
+  float delta_udp_pps = window[0].udp_pps - window[-5].udp_pps;  // Tendencia
+  float variance_pps = calcular_varianza(ultimas_10_ventanas);    // Estabilidad
+  float max_spike = max(ultimas_10) - avg(ultimas_10);            // Picos
+
+  ---
+  2. Thresholds Adaptativos
+
+  Ahora: Thresholds fijos (udp_pps > 20,000)
+
+  Mejora: Thresholds que se adaptan al baseline real
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  ANTES (threshold fijo):                                                │
+  │                                                                         │
+  │  if (udp_pps > 20000) → ATAQUE                                         │
+  │                                                                         │
+  │  Problema: ¿Y si el tráfico normal es 18,000? ¿O 500?                  │
+  │                                                                         │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  DESPUÉS (threshold adaptativo):                                        │
+  │                                                                         │
+  │  baseline_udp = promedio(ring_buffer, últimos 5 segundos)              │
+  │  stddev_udp = desviación_estándar(ring_buffer)                         │
+  │                                                                         │
+  │  threshold = baseline_udp + 3 * stddev_udp   // 3-sigma                │
+  │                                                                         │
+  │  if (udp_pps > threshold) → ATAQUE                                     │
+  │                                                                         │
+  │  Ventaja: Se adapta automáticamente al tráfico real                    │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ---
+  3. Detección de Anomalías (sin thresholds)
+
+  Ahora: Reglas fijas → fácil de evadir
+
+  Mejora: Detectar cualquier desviación del comportamiento normal
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  ENFOQUE: Comparar ventana actual vs histórico                          │
+  │                                                                         │
+  │  historical_profile = promedio(ring_buffer[0:90])   // 90 ventanas     │
+  │  current = ring_buffer[99]                          // Ventana actual   │
+  │                                                                         │
+  │  distancia = euclidean_distance(current, historical_profile)           │
+  │                                                                         │
+  │  if (distancia > anomaly_threshold)                                    │
+  │      → "ANOMALÍA: comportamiento inusual detectado"                    │
+  │                                                                         │
+  │  Detecta: Ataques NUEVOS que no conocemos (zero-day)                   │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ---
+  4. Online Learning (Aprendizaje Continuo)
+
+  Ahora: Modelo fijo, entrenado offline
+
+  Mejora: Modelo que aprende mientras detecta
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  FLUJO:                                                                 │
+  │                                                                         │
+  │  1. ML predice: "UDP_FLOOD" (90% confianza)                            │
+  │                                                                         │
+  │  2. Humano confirma/corrige (feedback)                                  │
+  │     └─ Opción A: "Correcto" → refuerza                                 │
+  │     └─ Opción B: "Era DNS_AMP" → corrige                               │
+  │                                                                         │
+  │  3. Modelo se actualiza incrementalmente                                │
+  │     └─ No necesita reentrenar desde cero                               │
+  │                                                                         │
+  │  Ventaja: El modelo mejora con el tiempo                               │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ---
+  5. Multi-Escala Temporal
+
+  Ahora: Una ventana de 50ms
+
+  Mejora: Múltiples escalas simultáneas
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │                                                                         │
+  │  Ring Buffer 50ms   [····················] → Ráfagas cortas            │
+  │                            ↓                                            │
+  │  Agregado 1s        [····]                 → Ataques normales           │
+  │                            ↓                                            │
+  │  Agregado 10s       [·]                    → Slow attacks               │
+  │                            ↓                                            │
+  │  Agregado 1min      [·]                    → Tendencias                 │
+  │                                                                         │
+  │  ML recibe features de TODAS las escalas                               │
+  │                                                                         │
+  │  Detecta:                                                               │
+  │  - Ráfaga de 100ms que satura                                          │
+  │  - Ataque sostenido de 30 segundos                                      │
+  │  - Slow-rise attack de 5 minutos                                       │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ---
+  Resumen de Enfoques
+  ┌────────────────────────┬───────────────────────────────┬─────────────┐
+  │        Enfoque         │       Qué detecta mejor       │ Complejidad │
+  ├────────────────────────┼───────────────────────────────┼─────────────┤
+  │ Features temporales    │ Ataques escalando, pulsantes  │ Media       │
+  ├────────────────────────┼───────────────────────────────┼─────────────┤
+  │ Thresholds adaptativos │ Variaciones del baseline      │ Baja        │
+  ├────────────────────────┼───────────────────────────────┼─────────────┤
+  │ Detección anomalías    │ Ataques zero-day              │ Media       │
+  ├────────────────────────┼───────────────────────────────┼─────────────┤
+  │ Online learning        │ Mejora con el tiempo          │ Alta        │
+  ├────────────────────────┼───────────────────────────────┼─────────────┤
+  │ Multi-escala           │ Ataques de cualquier duración │ Media       │
+  └────────────────────────┴───────────────────────────────┴─────────────┘
+  ---
+  Para tu TFM - Recomendación
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  IMPLEMENTAR (aporta valor real):                                       │
+  │                                                                         │
+  │  1. Features temporales (delta, tendencia) → +2-3% accuracy            │
+  │  2. Thresholds adaptativos → elimina falsos positivos                  │
+  │                                                                         │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │  MENCIONAR COMO TRABAJO FUTURO:                                         │
+  │                                                                         │
+  │  3. Detección de anomalías                                              │
+  │  4. Online learning                                                     │
+  │  5. Multi-escala temporal                                               │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ¿Quieres que implemente las features temporales o los thresholds adaptativos?
+
+✻ Churned for 38s      
+
+❯ Y usando el ring buffer o sketches alguna de estas ?                                                                                                                                                                                                                                                                 
+● Sí, todas se pueden implementar con ring buffer y/o sketches. Te muestro cómo:                                                                                                                                                                                
+  
+  ---                                                                                                                                                                                                                                                             Mapeo: Enfoque → Estructura de Datos
+  ┌────────────────────────┬─────────────┬────────┬──────────────────┐                                                                                                                                                                                          
+  │        Enfoque         │ Ring Buffer │ Sketch │   Combinación    │       
+  ├────────────────────────┼─────────────┼────────┼──────────────────┤
+  │ Features temporales    │     ✅      │   ❌   │ Ring buffer solo │
+  ├────────────────────────┼─────────────┼────────┼──────────────────┤
+  │ Thresholds adaptativos │     ✅      │   ❌   │ Ring buffer solo │
+  ├────────────────────────┼─────────────┼────────┼──────────────────┤
+  │ Detección anomalías    │     ✅      │   ✅   │      Ambos       │
+  ├────────────────────────┼─────────────┼────────┼──────────────────┤
+  │ Multi-escala temporal  │     ✅      │   ✅   │  Ambos (ideal)   │
+  └────────────────────────┴─────────────┴────────┴──────────────────┘
+  ---
+  1. Features Temporales → Ring Buffer
+
+  /* Ring buffer permite acceder a ventanas anteriores */
+  struct feature_window *current = &ring_buffer[idx];
+  struct feature_window *prev_5  = &ring_buffer[(idx - 5 + SIZE) % SIZE];
+  struct feature_window *prev_10 = &ring_buffer[(idx - 10 + SIZE) % SIZE];
+
+  /* Nuevas features derivadas */
+  float delta_5 = current->udp_pps - prev_5->udp_pps;   // Cambio en 250ms
+  float delta_10 = current->udp_pps - prev_10->udp_pps; // Cambio en 500ms
+  float trend = (delta_5 > 0 && delta_10 > 0) ? 1.0 : 0.0; // Tendencia
+
+  Resultado: 42 features → 50+ features (con temporales)
+
+  ---
+  2. Thresholds Adaptativos → Ring Buffer
+
+  /* Calcular baseline de últimas 100 ventanas */
+  float sum = 0, sum_sq = 0;
+  for (int i = 0; i < 100; i++) {
+      float val = ring_buffer[i].udp_pps;
+      sum += val;
+      sum_sq += val * val;
+  }
+  float baseline = sum / 100;
+  float variance = (sum_sq / 100) - (baseline * baseline);
+  float stddev = sqrt(variance);
+
+  /* Threshold adaptativo: 3-sigma */
+  float adaptive_threshold = baseline + 3 * stddev;
+
+  /* Detección */
+  if (current_udp_pps > adaptive_threshold) {
+      // ATAQUE (desviación significativa del baseline)
+  }
+
+  ---
+  3. Multi-Escala → Sketches Jerárquicos
+
+  /* Múltiples sketches a diferentes escalas */
+  struct {
+      struct octosketch sketch_50ms;   // Ventana actual
+      struct octosketch sketch_1s;     // Acumulado 1 segundo
+      struct octosketch sketch_10s;    // Acumulado 10 segundos
+      struct octosketch sketch_1min;   // Acumulado 1 minuto
+  } g_temporal_sketches;
+
+  /* Cada 50ms: actualizar todos */
+  octosketch_update_ip(&sketch_50ms, ip, 1);
+  octosketch_update_ip(&sketch_1s, ip, 1);
+  octosketch_update_ip(&sketch_10s, ip, 1);
+  octosketch_update_ip(&sketch_1min, ip, 1);
+
+  /* Cada 1s: reset sketch_1s */
+  /* Cada 10s: reset sketch_10s */
+  /* Cada 1min: reset sketch_1min */
+
+  Detección multi-escala:
+  uint32_t count_50ms = octosketch_query_ip(&sketch_50ms, ip);
+  uint32_t count_1s   = octosketch_query_ip(&sketch_1s, ip);
+  uint32_t count_1min = octosketch_query_ip(&sketch_1min, ip);
+
+  /* IP que aparece mucho en 50ms pero no en 1min = ráfaga nueva */
+  if (count_50ms > 1000 && count_1min < 5000) {
+      // ATAQUE: Ráfaga repentina
+  }
+
+  /* IP consistente en todas las escalas = atacante persistente */
+  if (count_50ms > 500 && count_1s > 5000 && count_1min > 50000) {
+      // ATAQUE: Heavy-hitter sostenido
+  }
+
+  ---
+  4. Arquitectura Combinada (Ring Buffer + Multi-Sketch)
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │                    ARQUITECTURA PROPUESTA                               │
+  ├─────────────────────────────────────────────────────────────────────────┤
+  │                                                                         │
+  │  WORKERS (14 cores)                                                     │
+  │  ┌─────────────────────────────────────────────────────────────────┐   │
+  │  │  Por cada paquete:                                               │   │
+  │  │    - Contadores locales (como ahora)                             │   │
+  │  │    - sketch_50ms.update(ip)                                      │   │
+  │  │    - sketch_1s.update(ip)     ← NUEVO                           │   │
+  │  │    - sketch_1min.update(ip)   ← NUEVO                           │   │
+  │  └─────────────────────────────────────────────────────────────────┘   │
+  │                              │                                          │
+  │                              ▼                                          │
+  │  COORDINATOR (cada 50ms)                                                │
+  │  ┌─────────────────────────────────────────────────────────────────┐   │
+  │  │                                                                   │   │
+  │  │  1. Merge sketches (todas las escalas)                           │   │
+  │  │                                                                   │   │
+  │  │  2. Calcular features base (42)                                  │   │
+  │  │           +                                                       │   │
+  │  │     Features temporales del ring_buffer (8)                      │   │
+  │  │           +                                                       │   │
+  │  │     Features multi-escala de sketches (6)                        │   │
+  │  │           =                                                       │   │
+  │  │     56 features totales                                          │   │
+  │  │                                                                   │   │
+  │  │  3. Guardar en ring_buffer[idx++]                                │   │
+  │  │                                                                   │   │
+  │  │  4. Threshold adaptativo (baseline de ring_buffer)               │   │
+  │  │                                                                   │   │
+  │  │  5. Heavy-hitter multi-escala (sketches)                         │   │
+  │  │                                                                   │   │
+  │  │  6. ML predict(56 features) → clasificación                      │   │
+  │  │                                                                   │   │
+  │  └─────────────────────────────────────────────────────────────────┘   │
+  │                                                                         │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  ---
+  Nuevas Features (de 42 → 56)
+  ┌──────┬────────────────────────┬─────────────────────────────────────┐
+  │  #   │        Feature         │               Fuente                │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 1-42 │ Features actuales      │ Contadores                          │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 43   │ delta_pps_5w           │ Ring buffer (tendencia 250ms)       │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 44   │ delta_pps_10w          │ Ring buffer (tendencia 500ms)       │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 45   │ variance_pps           │ Ring buffer (estabilidad)           │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 46   │ baseline_pps           │ Ring buffer (promedio histórico)    │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 47   │ ratio_vs_baseline      │ Ring buffer (current/baseline)      │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 48   │ top_ip_count_50ms      │ Sketch 50ms                         │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 49   │ top_ip_count_1s        │ Sketch 1s                           │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 50   │ top_ip_count_1min      │ Sketch 1min                         │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 51   │ ratio_50ms_1min        │ Sketch (ráfaga vs sostenido)        │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 52   │ num_heavy_hitters_50ms │ Sketch 50ms                         │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 53   │ num_heavy_hitters_1s   │ Sketch 1s                           │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 54   │ ip_concentration       │ Sketch (top1 / total)               │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 55   │ new_ips_ratio          │ Sketch (IPs nuevas vs conocidas)    │
+  ├──────┼────────────────────────┼─────────────────────────────────────┤
+  │ 56   │ attack_scale           │ Sketch (distribuido vs concentrado) │
+  └──────┴────────────────────────┴─────────────────────────────────────┘
+  ---
+  Resumen: ¿Qué aporta cada estructura?
+  ┌─────────────┬──────────────────────────────────────────────────────┐
+  │ Estructura  │                        Aporta                        │
+  ├─────────────┼──────────────────────────────────────────────────────┤
+  │ Ring Buffer │ Historial temporal → tendencias, baseline adaptativo │
+  ├─────────────┼──────────────────────────────────────────────────────┤
+  │ Sketch 50ms │ Heavy-hitters instantáneos                           │
+  ├─────────────┼──────────────────────────────────────────────────────┤
+  │ Sketch 1s   │ Ataques de ráfaga corta                              │
+  ├─────────────┼──────────────────────────────────────────────────────┤
+  │ Sketch 1min │ Baseline de IPs, ataques sostenidos                  │
+  ├─────────────┼──────────────────────────────────────────────────────┤
+  │ Combinación │ Detecta ataques de cualquier duración y escala       │
+  └─────────────┴──────────────────────────────────────────────────────┘
