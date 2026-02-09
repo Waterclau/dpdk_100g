@@ -305,7 +305,7 @@ class LogParser:
         match = re.search(r'IP Concentration:\s+([\d.]+)%', window_text)
         features['ip_concentration'] = float(match.group(1)) / 100.0 if match else 0.0
 
-        # Derived features (mix signature)
+        # Derived features (mix signature) - helps mixed class separation
         attack_signals = {
             'ntp': features['ntp_monlist_queries'],
             'dns': features['dns_any_queries'] + features['dns_txt_queries'],
