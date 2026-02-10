@@ -2,7 +2,9 @@
 """
 Sketch Feature Definitions
 
-14 features from OctoSketch multi-scale + Ring Buffer temporal analysis.
+14 base features from OctoSketch multi-scale + Ring Buffer temporal analysis.
++ 50 optional SKETCH-ADV features (48 per-protocol + 2 packet size).
+Total: 64 features when --sketch-adv is enabled.
 """
 
 SKETCH_FEATURES = [
@@ -24,16 +26,38 @@ SKETCH_FEATURES = [
     'adaptive_threshold',    # Current adaptive threshold
 ]
 
+# Per-protocol sketch features (4 features × 12 protocols = 48)
+SKETCH_ADV_PROTOCOLS = [
+    'dns', 'ntp', 'snmp', 'ssdp', 'portmap', 'netbios',
+    'ldap', 'mssql', 'tftp', 'syn', 'http', 'udp_other',
+]
 
-def get_feature_columns():
+SKETCH_ADV_PER_PROTO = ['pps', 'heavy_hitters', 'ip_concentration', 'ratio_vs_total']
+
+SKETCH_ADV_FEATURES = []
+for proto in SKETCH_ADV_PROTOCOLS:
+    for feat in SKETCH_ADV_PER_PROTO:
+        SKETCH_ADV_FEATURES.append(f'{feat}_{proto}')
+
+# Packet size features (2)
+SKETCH_ADV_FEATURES += ['avg_packet_size', 'packet_size_variance']
+
+# Combined: 14 + 50 = 64
+SKETCH_FEATURES_ALL = SKETCH_FEATURES + SKETCH_ADV_FEATURES
+
+
+def get_feature_columns(include_adv=False):
     """Return sketch feature column names"""
+    if include_adv:
+        return list(SKETCH_FEATURES_ALL)
     return list(SKETCH_FEATURES)
 
 
-def filter_dataframe(df):
+def filter_dataframe(df, include_adv=False):
     """Filter DataFrame to keep only sketch features + label"""
-    available = [c for c in SKETCH_FEATURES if c in df.columns]
-    missing = [c for c in SKETCH_FEATURES if c not in df.columns]
+    features = SKETCH_FEATURES_ALL if include_adv else SKETCH_FEATURES
+    available = [c for c in features if c in df.columns]
+    missing = [c for c in features if c not in df.columns]
     if missing:
         print(f"[WARNING] Missing columns: {missing}")
     keep = available + ['label']

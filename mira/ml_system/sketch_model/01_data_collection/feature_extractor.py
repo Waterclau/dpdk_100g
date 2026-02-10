@@ -307,6 +307,56 @@ class LogParser:
         match = re.search(r'IP Concentration:\s+([\d.]+)%', window_text)
         features['ip_concentration'] = float(match.group(1)) / 100.0 if match else 0.0
 
+        # ========== SKETCH-ADV: Per-Protocol Features (50) ==========
+        sketch_adv_section = re.search(
+            r'\[SKETCH-ADV PER-PROTOCOL FEATURES\](.*)',
+            window_text, re.DOTALL)
+
+        if sketch_adv_section:
+            adv_text = sketch_adv_section.group(1)
+
+            # Protocol order must match C code and feature_groups.py
+            proto_map = {
+                'DNS':       'dns',
+                'NTP':       'ntp',
+                'SNMP':      'snmp',
+                'SSDP':      'ssdp',
+                'PortMap':   'portmap',
+                'NetBIOS':   'netbios',
+                'LDAP':      'ldap',
+                'MSSQL':     'mssql',
+                'TFTP':      'tftp',
+                'SYN':       'syn',
+                'HTTP':      'http',
+                'UDP-Other': 'udp_other',
+            }
+
+            for display_name, feat_name in proto_map.items():
+                # Match each protocol block
+                pattern = re.escape(f'[{display_name}') + r'[^\]]*\]\s*' \
+                    r'PPS:\s+([\d.]+)\s*' \
+                    r'Heavy-hitters:\s+(\d+)\s*' \
+                    r'IP Concentration:\s+([\d.]+)%\s*' \
+                    r'Ratio vs Total:\s+([\d.]+)'
+                m = re.search(pattern, adv_text)
+                if m:
+                    features[f'pps_{feat_name}'] = float(m.group(1))
+                    features[f'heavy_hitters_{feat_name}'] = int(m.group(2))
+                    features[f'ip_concentration_{feat_name}'] = float(m.group(3)) / 100.0
+                    features[f'ratio_vs_total_{feat_name}'] = float(m.group(4))
+                else:
+                    features[f'pps_{feat_name}'] = 0.0
+                    features[f'heavy_hitters_{feat_name}'] = 0
+                    features[f'ip_concentration_{feat_name}'] = 0.0
+                    features[f'ratio_vs_total_{feat_name}'] = 0.0
+
+            # Packet size features
+            m = re.search(r'Avg Packet Size:\s+([\d.]+)', adv_text)
+            features['avg_packet_size'] = float(m.group(1)) if m else 0.0
+
+            m = re.search(r'Packet Size Variance:\s+([\d.]+)', adv_text)
+            features['packet_size_variance'] = float(m.group(1)) if m else 0.0
+
         # Derived features (mix signature) - helps mixed class separation
         attack_signals = {
             'ntp': features['ntp_monlist_queries'],
@@ -406,11 +456,29 @@ class LogParser:
             'top_ip_pps_50ms', 'top_ip_pps_1s', 'top_ip_pps_1min',
             'ratio_50ms_1min', 'num_heavy_hitters', 'ip_concentration',
             'new_ips_ratio', 'attack_entropy', 'adaptive_threshold',
-            # Label (must be last)
-            'label'
         ]
 
-        # Reorder columns
+        # SKETCH-ADV: Add per-protocol features if present in data
+        sketch_adv_protocols = [
+            'dns', 'ntp', 'snmp', 'ssdp', 'portmap', 'netbios',
+            'ldap', 'mssql', 'tftp', 'syn', 'http', 'udp_other',
+        ]
+        sketch_adv_per_proto = ['pps', 'heavy_hitters', 'ip_concentration', 'ratio_vs_total']
+        sketch_adv_cols = []
+        for proto in sketch_adv_protocols:
+            for feat in sketch_adv_per_proto:
+                sketch_adv_cols.append(f'{feat}_{proto}')
+        sketch_adv_cols += ['avg_packet_size', 'packet_size_variance']
+
+        has_sketch_adv = 'pps_dns' in df.columns
+        if has_sketch_adv:
+            columns += sketch_adv_cols
+
+        # Label (must be last)
+        columns.append('label')
+
+        # Reorder columns (only keep those present)
+        columns = [c for c in columns if c in df.columns]
         df = df[columns]
 
         # Save to CSV
@@ -438,6 +506,17 @@ class LogParser:
         print(f"  LDAP:              {df['ldap_bind_requests'].sum()}")
         print(f"  MSSQL:             {df['mssql_sqlbatch_packets'].sum()}")
         print(f"  TFTP:              {df['tftp_rrq_packets'].sum()}")
+
+        # SKETCH-ADV summary
+        if has_sketch_adv:
+            total_features = len([c for c in df.columns if c != 'label'])
+            print(f"\n[SKETCH-ADV FEATURES] ({total_features} total features)")
+            print(f"  Avg packet size:   {df['avg_packet_size'].mean():.1f}")
+            print(f"  Pkt size variance: {df['packet_size_variance'].mean():.1f}")
+            for proto in sketch_adv_protocols:
+                avg_pps = df[f'pps_{proto}'].mean()
+                if avg_pps > 0:
+                    print(f"  {proto:12s} avg PPS: {avg_pps:.1f}")
 
         # Check for potential issues
         if len(df) < 10:

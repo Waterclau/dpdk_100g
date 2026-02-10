@@ -1,0 +1,739 @@
+======================================================================
+TRAINING LIGHTGBM MODEL WITH FEATURE NORMALIZATION
+======================================================================
+
+[INFO] Loading training data: ../datasets/splits/train.csv
+[INFO] Loading validation data: ../datasets/splits/val.csv
+
+[DATASET INFO]
+  Training samples: 5446
+  Validation samples: 1167
+  Features: 42
+  Classes: ['benign', 'dns', 'ldap', 'mixed', 'mssql', 'netbios', 'ntp', 'portmap', 'snmp', 'ssdp', 'syn', 'tftp', 'udp', 'webddos']
+
+[CLASS DISTRIBUTION]
+  benign    : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  dns       : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  ldap      : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  mixed     : Train= 600 ( 11.0%)  Val= 128 ( 11.0%)
+  mssql     : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  netbios   : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  ntp       : Train= 375 (  6.9%)  Val=  81 (  6.9%)
+  portmap   : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  snmp      : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  ssdp      : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  syn       : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  tftp      : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  udp       : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  webddos   : Train= 335 (  6.2%)  Val=  72 (  6.2%)
+
+[FEATURE NORMALIZATION]
+  Applying StandardScaler (mean=0, std=1)...
+
+  Feature statistics after scaling:
+    total_packets       : mean=  0.000, std=  1.000
+    total_bytes         : mean=  0.000, std=  1.000
+    udp_packets         : mean= -0.000, std=  1.000
+    tcp_packets         : mean=  0.000, std=  1.000
+    icmp_packets        : mean= -0.000, std=  1.000
+
+[INFO] Large dataset (5446 samples)
+
+[TRAINING CONFIGURATION]
+  Boosting rounds: 300
+  Max depth: 8
+  Num leaves: 63
+  Learning rate: 0.05
+  L1/L2 regularization: 0.5/0.5
+
+[TRAINING MODEL]
+  Early stopping rounds: 30 (aggressive for small datasets)
+Training until validation scores don't improve for 30 rounds
+[50]    train's multi_logloss: 0.063302 valid's multi_logloss: 0.0662604
+[100]   train's multi_logloss: 0.0460736        valid's multi_logloss: 0.0492394
+[150]   train's multi_logloss: 0.0451626        valid's multi_logloss: 0.0486301
+[200]   train's multi_logloss: 0.0448089        valid's multi_logloss: 0.048479
+Early stopping, best iteration is:
+[185]   train's multi_logloss: 0.0448944        valid's multi_logloss: 0.0479944
+
+[VALIDATION RESULTS]
+Validation Accuracy: 98.37%
+
+Per-Class Performance:
+              precision    recall  f1-score   support
+
+      benign       1.00      0.96      0.98        81
+         dns       1.00      0.97      0.99        80
+        ldap       0.99      1.00      0.99        81
+       mixed       0.98      1.00      0.99       128
+       mssql       1.00      0.97      0.99        80
+     netbios       1.00      0.99      0.99        81
+         ntp       1.00      0.98      0.99        81
+     portmap       1.00      0.99      0.99        80
+        snmp       1.00      0.97      0.99        80
+        ssdp       1.00      0.98      0.99        81
+         syn       1.00      0.99      0.99        81
+        tftp       1.00      0.96      0.98        81
+         udp       1.00      1.00      1.00        80
+     webddos       0.82      1.00      0.90        72
+
+    accuracy                           0.98      1167
+   macro avg       0.99      0.98      0.98      1167
+weighted avg       0.99      0.98      0.98      1167
+
+
+[EXPORT] Model saved: ../../detector_system_ml/lightgbm_model.txt
+[EXPORT] Label mapping saved: ../../detector_system_ml/label_mapping.json
+[EXPORT] Feature scaler saved: ../../detector_system_ml/feature_scaler.pkl
+
+[FEATURE IMPORTANCE] Top 10 features:
+  syn_total_ratio          :  29113.6
+  syn_ack_ratio            :  20920.7
+  dns_any_queries          :  16676.7
+  ntp_monlist_queries      :  16373.6
+  ssdp_msearch_packets     :  16045.6
+  avg_dns_response_size    :  15861.5
+  portmap_getport_calls    :  15375.3
+  mssql_sqlbatch_packets   :  15322.0
+  tftp_rrq_packets         :  15126.6
+  netbios_name_queries     :  14650.9
+
+======================================================================
+MODEL TRAINING COMPLETE
+======================================================================
+
+Final Validation Accuracy: 98.37%
+
+Files created:
+  1. ../../detector_system_ml/lightgbm_model.txt
+  2. ../../detector_system_ml/label_mapping.json
+  3. ../../detector_system_ml/feature_scaler.pkl
+
+[STATUS] Excellent performance (95-99%)! ✅
+cesteban@node-monitor:/local/dpdk_100g/mira/ml_system/02_training$ sudo python3 evaluate_model.py --model ../../detector_system_ml/lightgbm_model.txt --test ../datasets/splits/test.csv
+======================================================================
+LIGHTGBM MODEL EVALUATION
+======================================================================
+
+[INFO] Loading test data: ../datasets/splits/test.csv
+[INFO] Test samples: 1167
+[INFO] Features: 42
+[INFO] Classes: ['benign', 'dns', 'ldap', 'mixed', 'mssql', 'netbios', 'ntp', 'portmap', 'snmp', 'ssdp', 'syn', 'tftp', 'udp', 'webddos']
+
+[INFO] Loading model: ../../detector_system_ml/lightgbm_model.txt
+[INFO] Loading scaler: ../../detector_system_ml/feature_scaler.pkl
+
+[INFO] Making predictions...
+
+======================================================================
+EVALUATION METRICS
+======================================================================
+
+Overall Accuracy: 99.14%
+
+Per-Class Metrics:
+----------------------------------------------------------------------
+Class           Precision    Recall       F1-Score    
+----------------------------------------------------------------------
+benign          1.000        0.950        0.974       
+dns             1.000        1.000        1.000       
+ldap            1.000        0.988        0.994       
+mixed           0.985        0.992        0.988       
+mssql           1.000        0.988        0.994       
+netbios         1.000        1.000        1.000       
+ntp             1.000        1.000        1.000       
+portmap         1.000        0.988        0.994       
+snmp            1.000        1.000        1.000       
+ssdp            1.000        1.000        1.000       
+syn             1.000        0.988        0.994       
+tftp            1.000        1.000        1.000       
+udp             1.000        0.988        0.994       
+webddos         0.900        1.000        0.947       
+
+Weighted Averages:
+----------------------------------------------------------------------
+Precision: 0.992
+Recall:    0.991
+F1-Score:  0.992
+
+======================================================================
+CONFUSION MATRIX
+======================================================================
+True\Pred      benign      dns         ldap        mixed       mssql       netbios     ntp         portmap     snmp        ssdp        syn         tftp        udp         webddos     
+----------------------------------------------------------------------
+benign         76          0           0           2           0           0           0           0           0           0           0           0           0           2           
+dns            0           81          0           0           0           0           0           0           0           0           0           0           0           0           
+ldap           0           0           79          0           0           0           0           0           0           0           0           0           0           1           
+mixed          0           0           0           128         0           0           0           0           0           0           0           0           0           1           
+mssql          0           0           0           0           80          0           0           0           0           0           0           0           0           1           
+netbios        0           0           0           0           0           80          0           0           0           0           0           0           0           0           
+ntp            0           0           0           0           0           0           81          0           0           0           0           0           0           0           
+portmap        0           0           0           0           0           0           0           80          0           0           0           0           0           1           
+snmp           0           0           0           0           0           0           0           0           81          0           0           0           0           0           
+ssdp           0           0           0           0           0           0           0           0           0           80          0           0           0           0           
+syn            0           0           0           0           0           0           0           0           0           0           79          0           0           1           
+tftp           0           0           0           0           0           0           0           0           0           0           0           80          0           0           
+udp            0           0           0           0           0           0           0           0           0           0           0           0           80          1           
+webddos        0           0           0           0           0           0           0           0           0           0           0           0           0           72          
+
+======================================================================
+DETAILED CLASSIFICATION REPORT
+======================================================================
+              precision    recall  f1-score   support
+
+      benign       1.00      0.95      0.97        80
+         dns       1.00      1.00      1.00        81
+        ldap       1.00      0.99      0.99        80
+       mixed       0.98      0.99      0.99       129
+       mssql       1.00      0.99      0.99        81
+     netbios       1.00      1.00      1.00        80
+         ntp       1.00      1.00      1.00        81
+     portmap       1.00      0.99      0.99        81
+        snmp       1.00      1.00      1.00        81
+        ssdp       1.00      1.00      1.00        80
+         syn       1.00      0.99      0.99        80
+        tftp       1.00      1.00      1.00        80
+         udp       1.00      0.99      0.99        81
+     webddos       0.90      1.00      0.95        72
+
+    accuracy                           0.99      1167
+   macro avg       0.99      0.99      0.99      1167
+weighted avg       0.99      0.99      0.99      1167
+
+
+======================================================================
+SAMPLE PREDICTIONS (First 10)
+======================================================================
+Index    True Label      Predicted       Confidence   Correct   
+----------------------------------------------------------------------
+0        snmp            snmp            0.999        ✓         
+1        ntp             ntp             0.999        ✓         
+2        syn             syn             0.998        ✓         
+3        netbios         netbios         0.999        ✓         
+4        ldap            ldap            0.999        ✓         
+5        benign          benign          0.994        ✓         
+6        netbios         netbios         0.999        ✓         
+7        snmp            snmp            0.999        ✓         
+8        portmap         portmap         0.999        ✓         
+9        udp             udp             0.999        ✓         
+
+[INFO] Label mapping found: ../../detector_system_ml/label_mapping.json
+[INFO] Label mapping:
+  0: benign
+  1: dns
+  2: ldap
+  3: mixed
+  4: mssql
+  5: netbios
+  6: ntp
+  7: portmap
+  8: snmp
+  9: ssdp
+  10: syn
+  11: tftp
+  12: udp
+  13: webddos
+
+======================================================================
+PERFORMANCE SUMMARY
+======================================================================
+
+Model Performance: ✓ EXCELLENT
+Accuracy: 99.14%
+Weighted F1: 0.992
+
+======================================================================
+EVALUATION COMPLETE
+======================================================================
+TRAINING LIGHTGBM MODEL WITH FEATURE NORMALIZATION
+======================================================================
+
+[INFO] Loading training data: ../datasets/splits/train.csv
+[INFO] Loading validation data: ../datasets/splits/val.csv
+
+[DATASET INFO]
+  Training samples: 5446
+  Validation samples: 1167
+  Features: 42
+  Classes: ['benign', 'dns', 'ldap', 'mixed', 'mssql', 'netbios', 'ntp', 'portmap', 'snmp', 'ssdp', 'syn', 'tftp', 'udp', 'webddos']
+
+[CLASS DISTRIBUTION]
+  benign    : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  dns       : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  ldap      : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  mixed     : Train= 600 ( 11.0%)  Val= 128 ( 11.0%)
+  mssql     : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  netbios   : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  ntp       : Train= 375 (  6.9%)  Val=  81 (  6.9%)
+  portmap   : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  snmp      : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  ssdp      : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  syn       : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  tftp      : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  udp       : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  webddos   : Train= 335 (  6.2%)  Val=  72 (  6.2%)
+
+[FEATURE NORMALIZATION]
+  Applying StandardScaler (mean=0, std=1)...
+
+  Feature statistics after scaling:
+    total_packets       : mean=  0.000, std=  1.000
+    total_bytes         : mean=  0.000, std=  1.000
+    udp_packets         : mean= -0.000, std=  1.000
+    tcp_packets         : mean=  0.000, std=  1.000
+    icmp_packets        : mean= -0.000, std=  1.000
+
+[INFO] Large dataset (5446 samples)
+
+[TRAINING CONFIGURATION]
+  Boosting rounds: 300
+  Max depth: 8
+  Num leaves: 63
+  Learning rate: 0.05
+  L1/L2 regularization: 0.5/0.5
+
+[TRAINING MODEL]
+  Early stopping rounds: 30 (aggressive for small datasets)
+Training until validation scores don't improve for 30 rounds
+[50]    train's multi_logloss: 0.063302 valid's multi_logloss: 0.0662604
+[100]   train's multi_logloss: 0.0460736        valid's multi_logloss: 0.0492394
+[150]   train's multi_logloss: 0.0451626        valid's multi_logloss: 0.0486301
+[200]   train's multi_logloss: 0.0448089        valid's multi_logloss: 0.048479
+Early stopping, best iteration is:
+[185]   train's multi_logloss: 0.0448944        valid's multi_logloss: 0.0479944
+
+[VALIDATION RESULTS]
+Validation Accuracy: 98.37%
+
+Per-Class Performance:
+              precision    recall  f1-score   support
+
+      benign       1.00      0.96      0.98        81
+         dns       1.00      0.97      0.99        80
+        ldap       0.99      1.00      0.99        81
+       mixed       0.98      1.00      0.99       128
+       mssql       1.00      0.97      0.99        80
+     netbios       1.00      0.99      0.99        81
+         ntp       1.00      0.98      0.99        81
+     portmap       1.00      0.99      0.99        80
+        snmp       1.00      0.97      0.99        80
+        ssdp       1.00      0.98      0.99        81
+         syn       1.00      0.99      0.99        81
+        tftp       1.00      0.96      0.98        81
+         udp       1.00      1.00      1.00        80
+     webddos       0.82      1.00      0.90        72
+
+    accuracy                           0.98      1167
+   macro avg       0.99      0.98      0.98      1167
+weighted avg       0.99      0.98      0.98      1167
+
+
+[EXPORT] Model saved: ../../detector_system_ml/lightgbm_model.txt
+[EXPORT] Label mapping saved: ../../detector_system_ml/label_mapping.json
+[EXPORT] Feature scaler saved: ../../detector_system_ml/feature_scaler.pkl
+
+[FEATURE IMPORTANCE] Top 10 features:
+  syn_total_ratio          :  29113.6
+  syn_ack_ratio            :  20920.7
+  dns_any_queries          :  16676.7
+  ntp_monlist_queries      :  16373.6
+  ssdp_msearch_packets     :  16045.6
+  avg_dns_response_size    :  15861.5
+  portmap_getport_calls    :  15375.3
+  mssql_sqlbatch_packets   :  15322.0
+  tftp_rrq_packets         :  15126.6
+  netbios_name_queries     :  14650.9
+
+======================================================================
+MODEL TRAINING COMPLETE
+======================================================================
+
+Final Validation Accuracy: 98.37%
+
+Files created:
+  1. ../../detector_system_ml/lightgbm_model.txt
+  2. ../../detector_system_ml/label_mapping.json
+  3. ../../detector_system_ml/feature_scaler.pkl
+
+[STATUS] Excellent performance (95-99%)! ✅
+cesteban@node-monitor:/local/dpdk_100g/mira/ml_system/02_training$ sudo python3 evaluate_model.py --model ../../detector_system_ml/lightgbm_model.txt --test ../datasets/splits/test.csv
+======================================================================
+LIGHTGBM MODEL EVALUATION
+======================================================================
+
+[INFO] Loading test data: ../datasets/splits/test.csv
+[INFO] Test samples: 1167
+[INFO] Features: 42
+[INFO] Classes: ['benign', 'dns', 'ldap', 'mixed', 'mssql', 'netbios', 'ntp', 'portmap', 'snmp', 'ssdp', 'syn', 'tftp', 'udp', 'webddos']
+
+[INFO] Loading model: ../../detector_system_ml/lightgbm_model.txt
+[INFO] Loading scaler: ../../detector_system_ml/feature_scaler.pkl
+
+[INFO] Making predictions...
+
+======================================================================
+EVALUATION METRICS
+======================================================================
+
+Overall Accuracy: 99.14%
+
+Per-Class Metrics:
+----------------------------------------------------------------------
+Class           Precision    Recall       F1-Score    
+----------------------------------------------------------------------
+benign          1.000        0.950        0.974       
+dns             1.000        1.000        1.000       
+ldap            1.000        0.988        0.994       
+mixed           0.985        0.992        0.988       
+mssql           1.000        0.988        0.994       
+netbios         1.000        1.000        1.000       
+ntp             1.000        1.000        1.000       
+portmap         1.000        0.988        0.994       
+snmp            1.000        1.000        1.000       
+ssdp            1.000        1.000        1.000       
+syn             1.000        0.988        0.994       
+tftp            1.000        1.000        1.000       
+udp             1.000        0.988        0.994       
+webddos         0.900        1.000        0.947       
+
+Weighted Averages:
+----------------------------------------------------------------------
+Precision: 0.992
+Recall:    0.991
+F1-Score:  0.992
+
+======================================================================
+CONFUSION MATRIX
+======================================================================
+True\Pred      benign      dns         ldap        mixed       mssql       netbios     ntp         portmap     snmp        ssdp        syn         tftp        udp         webddos     
+----------------------------------------------------------------------
+benign         76          0           0           2           0           0           0           0           0           0           0           0           0           2           
+dns            0           81          0           0           0           0           0           0           0           0           0           0           0           0           
+ldap           0           0           79          0           0           0           0           0           0           0           0           0           0           1           
+mixed          0           0           0           128         0           0           0           0           0           0           0           0           0           1           
+mssql          0           0           0           0           80          0           0           0           0           0           0           0           0           1           
+netbios        0           0           0           0           0           80          0           0           0           0           0           0           0           0           
+ntp            0           0           0           0           0           0           81          0           0           0           0           0           0           0           
+portmap        0           0           0           0           0           0           0           80          0           0           0           0           0           1           
+snmp           0           0           0           0           0           0           0           0           81          0           0           0           0           0           
+ssdp           0           0           0           0           0           0           0           0           0           80          0           0           0           0           
+syn            0           0           0           0           0           0           0           0           0           0           79          0           0           1           
+tftp           0           0           0           0           0           0           0           0           0           0           0           80          0           0           
+udp            0           0           0           0           0           0           0           0           0           0           0           0           80          1           
+webddos        0           0           0           0           0           0           0           0           0           0           0           0           0           72          
+
+======================================================================
+DETAILED CLASSIFICATION REPORT
+======================================================================
+              precision    recall  f1-score   support
+
+      benign       1.00      0.95      0.97        80
+         dns       1.00      1.00      1.00        81
+        ldap       1.00      0.99      0.99        80
+       mixed       0.98      0.99      0.99       129
+       mssql       1.00      0.99      0.99        81
+     netbios       1.00      1.00      1.00        80
+         ntp       1.00      1.00      1.00        81
+     portmap       1.00      0.99      0.99        81
+        snmp       1.00      1.00      1.00        81
+        ssdp       1.00      1.00      1.00        80
+         syn       1.00      0.99      0.99        80
+        tftp       1.00      1.00      1.00        80
+         udp       1.00      0.99      0.99        81
+     webddos       0.90      1.00      0.95        72
+
+    accuracy                           0.99      1167
+   macro avg       0.99      0.99      0.99      1167
+weighted avg       0.99      0.99      0.99      1167
+
+
+======================================================================
+SAMPLE PREDICTIONS (First 10)
+======================================================================
+Index    True Label      Predicted       Confidence   Correct   
+----------------------------------------------------------------------
+0        snmp            snmp            0.999        ✓         
+1        ntp             ntp             0.999        ✓         
+2        syn             syn             0.998        ✓         
+3        netbios         netbios         0.999        ✓         
+4        ldap            ldap            0.999        ✓         
+5        benign          benign          0.994        ✓         
+6        netbios         netbios         0.999        ✓         
+7        snmp            snmp            0.999        ✓         
+8        portmap         portmap         0.999        ✓         
+9        udp             udp             0.999        ✓         
+
+[INFO] Label mapping found: ../../detector_system_ml/label_mapping.json
+[INFO] Label mapping:
+  0: benign
+  1: dns
+  2: ldap
+  3: mixed
+  4: mssql
+  5: netbios
+  6: ntp
+  7: portmap
+  8: snmp
+  9: ssdp
+  10: syn
+  11: tftp
+  12: udp
+  13: webddos
+
+======================================================================
+PERFORMANCE SUMMARY
+======================================================================
+
+Model Performance: ✓ EXCELLENT
+Accuracy: 99.14%
+Weighted F1: 0.992
+
+======================================================================
+EVALUATION COMPLETE
+======================================================================
+TRAINING LIGHTGBM MODEL WITH FEATURE NORMALIZATION
+======================================================================
+
+[INFO] Loading training data: ../datasets/splits/train.csv
+[INFO] Loading validation data: ../datasets/splits/val.csv
+
+[DATASET INFO]
+  Training samples: 5446
+  Validation samples: 1167
+  Features: 42
+  Classes: ['benign', 'dns', 'ldap', 'mixed', 'mssql', 'netbios', 'ntp', 'portmap', 'snmp', 'ssdp', 'syn', 'tftp', 'udp', 'webddos']
+
+[CLASS DISTRIBUTION]
+  benign    : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  dns       : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  ldap      : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  mixed     : Train= 600 ( 11.0%)  Val= 128 ( 11.0%)
+  mssql     : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  netbios   : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  ntp       : Train= 375 (  6.9%)  Val=  81 (  6.9%)
+  portmap   : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  snmp      : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  ssdp      : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  syn       : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  tftp      : Train= 376 (  6.9%)  Val=  81 (  6.9%)
+  udp       : Train= 376 (  6.9%)  Val=  80 (  6.9%)
+  webddos   : Train= 335 (  6.2%)  Val=  72 (  6.2%)
+
+[FEATURE NORMALIZATION]
+  Applying StandardScaler (mean=0, std=1)...
+
+  Feature statistics after scaling:
+    total_packets       : mean=  0.000, std=  1.000
+    total_bytes         : mean=  0.000, std=  1.000
+    udp_packets         : mean= -0.000, std=  1.000
+    tcp_packets         : mean=  0.000, std=  1.000
+    icmp_packets        : mean= -0.000, std=  1.000
+
+[INFO] Large dataset (5446 samples)
+
+[TRAINING CONFIGURATION]
+  Boosting rounds: 300
+  Max depth: 8
+  Num leaves: 63
+  Learning rate: 0.05
+  L1/L2 regularization: 0.5/0.5
+
+[TRAINING MODEL]
+  Early stopping rounds: 30 (aggressive for small datasets)
+Training until validation scores don't improve for 30 rounds
+[50]    train's multi_logloss: 0.063302 valid's multi_logloss: 0.0662604
+[100]   train's multi_logloss: 0.0460736        valid's multi_logloss: 0.0492394
+[150]   train's multi_logloss: 0.0451626        valid's multi_logloss: 0.0486301
+[200]   train's multi_logloss: 0.0448089        valid's multi_logloss: 0.048479
+Early stopping, best iteration is:
+[185]   train's multi_logloss: 0.0448944        valid's multi_logloss: 0.0479944
+
+[VALIDATION RESULTS]
+Validation Accuracy: 98.37%
+
+Per-Class Performance:
+              precision    recall  f1-score   support
+
+      benign       1.00      0.96      0.98        81
+         dns       1.00      0.97      0.99        80
+        ldap       0.99      1.00      0.99        81
+       mixed       0.98      1.00      0.99       128
+       mssql       1.00      0.97      0.99        80
+     netbios       1.00      0.99      0.99        81
+         ntp       1.00      0.98      0.99        81
+     portmap       1.00      0.99      0.99        80
+        snmp       1.00      0.97      0.99        80
+        ssdp       1.00      0.98      0.99        81
+         syn       1.00      0.99      0.99        81
+        tftp       1.00      0.96      0.98        81
+         udp       1.00      1.00      1.00        80
+     webddos       0.82      1.00      0.90        72
+
+    accuracy                           0.98      1167
+   macro avg       0.99      0.98      0.98      1167
+weighted avg       0.99      0.98      0.98      1167
+
+
+[EXPORT] Model saved: ../../detector_system_ml/lightgbm_model.txt
+[EXPORT] Label mapping saved: ../../detector_system_ml/label_mapping.json
+[EXPORT] Feature scaler saved: ../../detector_system_ml/feature_scaler.pkl
+
+[FEATURE IMPORTANCE] Top 10 features:
+  syn_total_ratio          :  29113.6
+  syn_ack_ratio            :  20920.7
+  dns_any_queries          :  16676.7
+  ntp_monlist_queries      :  16373.6
+  ssdp_msearch_packets     :  16045.6
+  avg_dns_response_size    :  15861.5
+  portmap_getport_calls    :  15375.3
+  mssql_sqlbatch_packets   :  15322.0
+  tftp_rrq_packets         :  15126.6
+  netbios_name_queries     :  14650.9
+
+======================================================================
+MODEL TRAINING COMPLETE
+======================================================================
+
+Final Validation Accuracy: 98.37%
+
+Files created:
+  1. ../../detector_system_ml/lightgbm_model.txt
+  2. ../../detector_system_ml/label_mapping.json
+  3. ../../detector_system_ml/feature_scaler.pkl
+
+[STATUS] Excellent performance (95-99%)! ✅
+cesteban@node-monitor:/local/dpdk_100g/mira/ml_system/02_training$ sudo python3 evaluate_model.py --model ../../detector_system_ml/lightgbm_model.txt --test ../datasets/splits/test.csv
+======================================================================
+LIGHTGBM MODEL EVALUATION
+======================================================================
+
+[INFO] Loading test data: ../datasets/splits/test.csv
+[INFO] Test samples: 1167
+[INFO] Features: 42
+[INFO] Classes: ['benign', 'dns', 'ldap', 'mixed', 'mssql', 'netbios', 'ntp', 'portmap', 'snmp', 'ssdp', 'syn', 'tftp', 'udp', 'webddos']
+
+[INFO] Loading model: ../../detector_system_ml/lightgbm_model.txt
+[INFO] Loading scaler: ../../detector_system_ml/feature_scaler.pkl
+
+[INFO] Making predictions...
+
+======================================================================
+EVALUATION METRICS
+======================================================================
+
+Overall Accuracy: 99.14%
+
+Per-Class Metrics:
+----------------------------------------------------------------------
+Class           Precision    Recall       F1-Score    
+----------------------------------------------------------------------
+benign          1.000        0.950        0.974       
+dns             1.000        1.000        1.000       
+ldap            1.000        0.988        0.994       
+mixed           0.985        0.992        0.988       
+mssql           1.000        0.988        0.994       
+netbios         1.000        1.000        1.000       
+ntp             1.000        1.000        1.000       
+portmap         1.000        0.988        0.994       
+snmp            1.000        1.000        1.000       
+ssdp            1.000        1.000        1.000       
+syn             1.000        0.988        0.994       
+tftp            1.000        1.000        1.000       
+udp             1.000        0.988        0.994       
+webddos         0.900        1.000        0.947       
+
+Weighted Averages:
+----------------------------------------------------------------------
+Precision: 0.992
+Recall:    0.991
+F1-Score:  0.992
+
+======================================================================
+CONFUSION MATRIX
+======================================================================
+True\Pred      benign      dns         ldap        mixed       mssql       netbios     ntp         portmap     snmp        ssdp        syn         tftp        udp         webddos     
+----------------------------------------------------------------------
+benign         76          0           0           2           0           0           0           0           0           0           0           0           0           2           
+dns            0           81          0           0           0           0           0           0           0           0           0           0           0           0           
+ldap           0           0           79          0           0           0           0           0           0           0           0           0           0           1           
+mixed          0           0           0           128         0           0           0           0           0           0           0           0           0           1           
+mssql          0           0           0           0           80          0           0           0           0           0           0           0           0           1           
+netbios        0           0           0           0           0           80          0           0           0           0           0           0           0           0           
+ntp            0           0           0           0           0           0           81          0           0           0           0           0           0           0           
+portmap        0           0           0           0           0           0           0           80          0           0           0           0           0           1           
+snmp           0           0           0           0           0           0           0           0           81          0           0           0           0           0           
+ssdp           0           0           0           0           0           0           0           0           0           80          0           0           0           0           
+syn            0           0           0           0           0           0           0           0           0           0           79          0           0           1           
+tftp           0           0           0           0           0           0           0           0           0           0           0           80          0           0           
+udp            0           0           0           0           0           0           0           0           0           0           0           0           80          1           
+webddos        0           0           0           0           0           0           0           0           0           0           0           0           0           72          
+
+======================================================================
+DETAILED CLASSIFICATION REPORT
+======================================================================
+              precision    recall  f1-score   support
+
+      benign       1.00      0.95      0.97        80
+         dns       1.00      1.00      1.00        81
+        ldap       1.00      0.99      0.99        80
+       mixed       0.98      0.99      0.99       129
+       mssql       1.00      0.99      0.99        81
+     netbios       1.00      1.00      1.00        80
+         ntp       1.00      1.00      1.00        81
+     portmap       1.00      0.99      0.99        81
+        snmp       1.00      1.00      1.00        81
+        ssdp       1.00      1.00      1.00        80
+         syn       1.00      0.99      0.99        80
+        tftp       1.00      1.00      1.00        80
+         udp       1.00      0.99      0.99        81
+     webddos       0.90      1.00      0.95        72
+
+    accuracy                           0.99      1167
+   macro avg       0.99      0.99      0.99      1167
+weighted avg       0.99      0.99      0.99      1167
+
+
+======================================================================
+SAMPLE PREDICTIONS (First 10)
+======================================================================
+Index    True Label      Predicted       Confidence   Correct   
+----------------------------------------------------------------------
+0        snmp            snmp            0.999        ✓         
+1        ntp             ntp             0.999        ✓         
+2        syn             syn             0.998        ✓         
+3        netbios         netbios         0.999        ✓         
+4        ldap            ldap            0.999        ✓         
+5        benign          benign          0.994        ✓         
+6        netbios         netbios         0.999        ✓         
+7        snmp            snmp            0.999        ✓         
+8        portmap         portmap         0.999        ✓         
+9        udp             udp             0.999        ✓         
+
+[INFO] Label mapping found: ../../detector_system_ml/label_mapping.json
+[INFO] Label mapping:
+  0: benign
+  1: dns
+  2: ldap
+  3: mixed
+  4: mssql
+  5: netbios
+  6: ntp
+  7: portmap
+  8: snmp
+  9: ssdp
+  10: syn
+  11: tftp
+  12: udp
+  13: webddos
+
+======================================================================
+PERFORMANCE SUMMARY
+======================================================================
+
+Model Performance: ✓ EXCELLENT
+Accuracy: 99.14%
+Weighted F1: 0.992
+
+======================================================================
+EVALUATION COMPLETE
+======================================================================

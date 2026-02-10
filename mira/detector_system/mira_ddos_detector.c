@@ -509,6 +509,7 @@ static struct worker_stats g_worker_stats[NUM_RX_QUEUES] __rte_cache_aligned;
 static FILE *g_log_file = NULL;
 static FILE *g_binary_log_file = NULL;  /* Binary log for ML training */
 static bool g_binary_log_enabled = false;
+static bool g_sketch_adv_enabled = false;
 static struct rte_hash *ip_hash = NULL;
 
 /* OctoSketch - Per-worker sketches (NO atomics, NO contention) */
@@ -516,6 +517,37 @@ static struct octosketch g_worker_sketch_attack[NUM_RX_QUEUES] __rte_cache_align
 
 /* OctoSketch - Coordinator merged sketches (for analysis) */
 static struct octosketch g_merged_sketch_attack __rte_cache_aligned;  /* Merged attack sketch */
+
+/* ========== SKETCH-ADV: Per-protocol sketches (12 protocols) ========== */
+static struct octosketch g_worker_sketch_dns[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_ntp[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_snmp[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_ssdp[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_portmap[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_netbios[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_ldap[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_mssql[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_tftp[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_syn[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_http[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_udp_other[NUM_RX_QUEUES] __rte_cache_aligned;
+
+static struct octosketch g_merged_sketch_dns __rte_cache_aligned;
+static struct octosketch g_merged_sketch_ntp __rte_cache_aligned;
+static struct octosketch g_merged_sketch_snmp __rte_cache_aligned;
+static struct octosketch g_merged_sketch_ssdp __rte_cache_aligned;
+static struct octosketch g_merged_sketch_portmap __rte_cache_aligned;
+static struct octosketch g_merged_sketch_netbios __rte_cache_aligned;
+static struct octosketch g_merged_sketch_ldap __rte_cache_aligned;
+static struct octosketch g_merged_sketch_mssql __rte_cache_aligned;
+static struct octosketch g_merged_sketch_tftp __rte_cache_aligned;
+static struct octosketch g_merged_sketch_syn __rte_cache_aligned;
+static struct octosketch g_merged_sketch_http __rte_cache_aligned;
+static struct octosketch g_merged_sketch_udp_other __rte_cache_aligned;
+
+/* Per-worker packet size sum-of-squares for variance calculation */
+static uint64_t g_worker_pktlen_sq_sum[NUM_RX_QUEUES] __rte_cache_aligned;
+/* ========== END SKETCH-ADV ========== */
 
 /* Sampling configuration */
 #define SKETCH_SAMPLE_RATE 32  /* Update sketch every N packets (1 in 32) */
@@ -818,6 +850,36 @@ static void merge_multiscale_sketches(void)
     octosketch_merge(&g_merged_multiscale.sketch_1s, workers_1s, NUM_RX_QUEUES);
     octosketch_merge(&g_merged_multiscale.sketch_10s, workers_10s, NUM_RX_QUEUES);
     octosketch_merge(&g_merged_multiscale.sketch_1min, workers_1min, NUM_RX_QUEUES);
+}
+
+/* Merge per-protocol sketches from all workers (SKETCH-ADV) */
+static void merge_protocol_sketches(void)
+{
+    struct {
+        struct octosketch (*workers)[NUM_RX_QUEUES];
+        struct octosketch *merged;
+    } protos[12] = {
+        { &g_worker_sketch_dns,       &g_merged_sketch_dns },
+        { &g_worker_sketch_ntp,       &g_merged_sketch_ntp },
+        { &g_worker_sketch_snmp,      &g_merged_sketch_snmp },
+        { &g_worker_sketch_ssdp,      &g_merged_sketch_ssdp },
+        { &g_worker_sketch_portmap,   &g_merged_sketch_portmap },
+        { &g_worker_sketch_netbios,   &g_merged_sketch_netbios },
+        { &g_worker_sketch_ldap,      &g_merged_sketch_ldap },
+        { &g_worker_sketch_mssql,     &g_merged_sketch_mssql },
+        { &g_worker_sketch_tftp,      &g_merged_sketch_tftp },
+        { &g_worker_sketch_syn,       &g_merged_sketch_syn },
+        { &g_worker_sketch_http,      &g_merged_sketch_http },
+        { &g_worker_sketch_udp_other, &g_merged_sketch_udp_other },
+    };
+
+    for (int p = 0; p < 12; p++) {
+        struct octosketch *src[NUM_RX_QUEUES];
+        for (int i = 0; i < NUM_RX_QUEUES; i++) {
+            src[i] = &(*protos[p].workers)[i];
+        }
+        octosketch_merge(protos[p].merged, src, NUM_RX_QUEUES);
+    }
 }
 
 /* Reset multi-scale sketches based on time */
@@ -1293,6 +1355,11 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         /* Merge multi-scale sketches from all workers */
         merge_multiscale_sketches();
 
+        /* Merge per-protocol sketches (SKETCH-ADV) */
+        if (g_sketch_adv_enabled) {
+            merge_protocol_sketches();
+        }
+
         /* Build feature window for ring buffer */
         struct feature_window current_window;
         memset(&current_window, 0, sizeof(current_window));
@@ -1390,6 +1457,25 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             /* Reset per-worker sketches (will be done by workers on next batch) */
             for (int i = 0; i < NUM_RX_QUEUES; i++) {
                 octosketch_reset(&g_worker_sketch_attack[i]);
+            }
+
+            /* Reset per-protocol sketches (SKETCH-ADV) */
+            if (g_sketch_adv_enabled) {
+                for (int i = 0; i < NUM_RX_QUEUES; i++) {
+                    octosketch_reset(&g_worker_sketch_dns[i]);
+                    octosketch_reset(&g_worker_sketch_ntp[i]);
+                    octosketch_reset(&g_worker_sketch_snmp[i]);
+                    octosketch_reset(&g_worker_sketch_ssdp[i]);
+                    octosketch_reset(&g_worker_sketch_portmap[i]);
+                    octosketch_reset(&g_worker_sketch_netbios[i]);
+                    octosketch_reset(&g_worker_sketch_ldap[i]);
+                    octosketch_reset(&g_worker_sketch_mssql[i]);
+                    octosketch_reset(&g_worker_sketch_tftp[i]);
+                    octosketch_reset(&g_worker_sketch_syn[i]);
+                    octosketch_reset(&g_worker_sketch_http[i]);
+                    octosketch_reset(&g_worker_sketch_udp_other[i]);
+                    g_worker_pktlen_sq_sum[i] = 0;
+                }
             }
 
             window_ntp_monlist_start = total_ntp_monlist;
@@ -1957,6 +2043,87 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         g_stats.total_packets,
         rx_pkts_nic > 0 ? (double)g_stats.total_packets * 100.0 / rx_pkts_nic : 0.0);
 
+    /* SKETCH-ADV: Per-protocol features log section */
+    if (g_sketch_adv_enabled) {
+        double win_sec = (window_duration > 0.001) ? window_duration : 1.0;
+        uint64_t global_total = octosketch_get_total(&g_merged_sketch_attack);
+        double global_pps = (win_sec > 0.001) ? (double)global_total / win_sec : 0.0;
+
+        APPEND("[SKETCH-ADV PER-PROTOCOL FEATURES]\n"
+               "=== Per-Protocol Sketch Analysis (12 sketches) ===\n\n");
+
+        struct {
+            const char *name;
+            const char *port_info;
+            struct octosketch *sketch;
+        } proto_list[12] = {
+            { "DNS",       "port 53",     &g_merged_sketch_dns },
+            { "NTP",       "port 123",    &g_merged_sketch_ntp },
+            { "SNMP",      "port 161",    &g_merged_sketch_snmp },
+            { "SSDP",      "port 1900",   &g_merged_sketch_ssdp },
+            { "PortMap",   "port 111",    &g_merged_sketch_portmap },
+            { "NetBIOS",   "port 137/138",&g_merged_sketch_netbios },
+            { "LDAP",      "port 389",    &g_merged_sketch_ldap },
+            { "MSSQL",     "port 1433/4", &g_merged_sketch_mssql },
+            { "TFTP",      "port 69",     &g_merged_sketch_tftp },
+            { "SYN",       "TCP SYN",     &g_merged_sketch_syn },
+            { "HTTP",      "port 80/443", &g_merged_sketch_http },
+            { "UDP-Other", "other UDP",   &g_merged_sketch_udp_other },
+        };
+
+        for (int p = 0; p < 12; p++) {
+            uint64_t total = octosketch_get_total(proto_list[p].sketch);
+            double pps = (double)total / win_sec;
+
+            /* Count heavy hitters for this protocol sketch */
+            int hh_count = 0;
+            double hh_threshold = HEAVY_HITTER_PPS_THRESHOLD * win_sec;
+            for (uint32_t idx = 0; idx < 65536; idx++) {
+                if (proto_list[p].sketch->ip_counts[idx] >= (uint32_t)hh_threshold &&
+                    proto_list[p].sketch->ip_addrs[idx] != 0) {
+                    hh_count++;
+                }
+            }
+
+            /* IP concentration: top1 / total */
+            struct heavy_hitter top1[1];
+            octosketch_top_k(proto_list[p].sketch, 1, top1);
+            double concentration = (total > 0) ? (double)top1[0].count * 100.0 / total : 0.0;
+
+            /* Ratio vs global */
+            double ratio = (global_pps > 0.0) ? pps / global_pps : 0.0;
+
+            APPEND("  [%s (%s)]\n"
+                   "    PPS:              %.1f\n"
+                   "    Heavy-hitters:    %d\n"
+                   "    IP Concentration: %.1f%%\n"
+                   "    Ratio vs Total:   %.2f\n\n",
+                   proto_list[p].name, proto_list[p].port_info,
+                   pps, hh_count, concentration, ratio);
+        }
+
+        /* Packet size features from global sketch */
+        uint64_t global_bytes = octosketch_get_bytes(&g_merged_sketch_attack);
+        double avg_pkt_size = (global_total > 0) ? (double)global_bytes / global_total : 0.0;
+
+        /* Compute variance from per-worker sum-of-squares */
+        uint64_t total_sq_sum = 0;
+        for (int i = 0; i < NUM_RX_QUEUES; i++) {
+            total_sq_sum += g_worker_pktlen_sq_sum[i];
+        }
+        double pkt_size_var = 0.0;
+        if (global_total > 0) {
+            double mean_sq = (double)total_sq_sum / global_total;
+            pkt_size_var = mean_sq - (avg_pkt_size * avg_pkt_size);
+            if (pkt_size_var < 0.0) pkt_size_var = 0.0;
+        }
+
+        APPEND("  [Packet Size]\n"
+               "    Avg Packet Size:      %.1f\n"
+               "    Packet Size Variance: %.1f\n\n",
+               avg_pkt_size, pkt_size_var);
+    }
+
     #undef APPEND
 
     printf("%s", buffer);
@@ -2289,6 +2456,63 @@ static int worker_thread(void *arg)
                     octosketch_update_ip(&my_multiscale->sketch_1s, src_ip, SKETCH_SAMPLE_RATE);
                     octosketch_update_ip(&my_multiscale->sketch_10s, src_ip, SKETCH_SAMPLE_RATE);
                     octosketch_update_ip(&my_multiscale->sketch_1min, src_ip, SKETCH_SAMPLE_RATE);
+
+                    /* SKETCH-ADV: Update per-protocol sketch */
+                    if (unlikely(g_sketch_adv_enabled)) {
+                        struct octosketch *proto_sketch = NULL;
+                        uint16_t dst_port = 0;
+                        uint8_t tcp_flags_local = 0;
+
+                        if (proto == IPPROTO_TCP) {
+                            struct rte_tcp_hdr *th = (struct rte_tcp_hdr *)((uint8_t *)ip_hdr + sizeof(struct rte_ipv4_hdr));
+                            dst_port = rte_be_to_cpu_16(th->dst_port);
+                            tcp_flags_local = th->tcp_flags;
+
+                            if (tcp_flags_local & RTE_TCP_SYN_FLAG) {
+                                proto_sketch = &g_worker_sketch_syn[queue_id];
+                            } else if (dst_port == 80 || dst_port == 443) {
+                                proto_sketch = &g_worker_sketch_http[queue_id];
+                            } else if (dst_port == 389 || dst_port == 636) {
+                                proto_sketch = &g_worker_sketch_ldap[queue_id];
+                            } else if (dst_port == 1433) {
+                                proto_sketch = &g_worker_sketch_mssql[queue_id];
+                            } else if (dst_port == 111) {
+                                proto_sketch = &g_worker_sketch_portmap[queue_id];
+                            }
+                        } else if (proto == IPPROTO_UDP) {
+                            struct rte_udp_hdr *uh = (struct rte_udp_hdr *)((uint8_t *)ip_hdr + sizeof(struct rte_ipv4_hdr));
+                            dst_port = rte_be_to_cpu_16(uh->dst_port);
+
+                            if (dst_port == 53) {
+                                proto_sketch = &g_worker_sketch_dns[queue_id];
+                            } else if (dst_port == 123) {
+                                proto_sketch = &g_worker_sketch_ntp[queue_id];
+                            } else if (dst_port == 161) {
+                                proto_sketch = &g_worker_sketch_snmp[queue_id];
+                            } else if (dst_port == 1900) {
+                                proto_sketch = &g_worker_sketch_ssdp[queue_id];
+                            } else if (dst_port == 111) {
+                                proto_sketch = &g_worker_sketch_portmap[queue_id];
+                            } else if (dst_port == 137 || dst_port == 138) {
+                                proto_sketch = &g_worker_sketch_netbios[queue_id];
+                            } else if (dst_port == 389) {
+                                proto_sketch = &g_worker_sketch_ldap[queue_id];
+                            } else if (dst_port == 1434) {
+                                proto_sketch = &g_worker_sketch_mssql[queue_id];
+                            } else if (dst_port == 69) {
+                                proto_sketch = &g_worker_sketch_tftp[queue_id];
+                            } else {
+                                proto_sketch = &g_worker_sketch_udp_other[queue_id];
+                            }
+                        }
+
+                        if (proto_sketch) {
+                            octosketch_update_ip(proto_sketch, src_ip, SKETCH_SAMPLE_RATE);
+                        }
+
+                        /* Track packet size squared for variance */
+                        g_worker_pktlen_sq_sum[queue_id] += (uint64_t)pkt_len * pkt_len * SKETCH_SAMPLE_RATE;
+                    }
                 }
             }
 
@@ -2526,11 +2750,15 @@ int main(int argc, char *argv[])
         if (strcmp(argv[i], "--binary-log") == 0) {
             g_binary_log_enabled = true;
             printf("Binary logging enabled (compact ML training format)\n");
+        } else if (strcmp(argv[i], "--sketch-adv") == 0) {
+            g_sketch_adv_enabled = true;
+            printf("Sketch-ADV enabled (per-protocol sketches for 64-feature ML)\n");
         } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             printf("Usage: %s [EAL options] -- [Application options]\n", argv[0]);
             printf("\nApplication options:\n");
             printf("  --binary-log    Enable binary logging for ML training\n");
             printf("                  (writes to ../results/mira_detector_ml.bin)\n");
+            printf("  --sketch-adv    Enable per-protocol sketches (64-feature ML)\n");
             printf("  --help, -h      Show this help message\n");
             return 0;
         }
@@ -2653,6 +2881,47 @@ int main(int argc, char *argv[])
            (octosketch_memory_size() * 4) / 1024.0);
     printf("  Total multi-scale mem:   %.1f KB\n\n",
            (octosketch_memory_size() * 4 * (NUM_RX_QUEUES + 1)) / 1024.0);
+
+    /* Initialize Sketch-ADV per-protocol sketches */
+    if (g_sketch_adv_enabled) {
+        const char *proto_names[12] = {
+            "DNS", "NTP", "SNMP", "SSDP", "PortMap", "NetBIOS",
+            "LDAP", "MSSQL", "TFTP", "SYN", "HTTP", "UDP-Other"
+        };
+        struct octosketch (*worker_arrays[12])[NUM_RX_QUEUES] = {
+            &g_worker_sketch_dns, &g_worker_sketch_ntp, &g_worker_sketch_snmp,
+            &g_worker_sketch_ssdp, &g_worker_sketch_portmap, &g_worker_sketch_netbios,
+            &g_worker_sketch_ldap, &g_worker_sketch_mssql, &g_worker_sketch_tftp,
+            &g_worker_sketch_syn, &g_worker_sketch_http, &g_worker_sketch_udp_other
+        };
+        struct octosketch *merged_array[12] = {
+            &g_merged_sketch_dns, &g_merged_sketch_ntp, &g_merged_sketch_snmp,
+            &g_merged_sketch_ssdp, &g_merged_sketch_portmap, &g_merged_sketch_netbios,
+            &g_merged_sketch_ldap, &g_merged_sketch_mssql, &g_merged_sketch_tftp,
+            &g_merged_sketch_syn, &g_merged_sketch_http, &g_merged_sketch_udp_other
+        };
+
+        for (int p = 0; p < 12; p++) {
+            for (int i = 0; i < NUM_RX_QUEUES; i++) {
+                char name[32];
+                snprintf(name, sizeof(name), "%s-W%d", proto_names[p], i);
+                octosketch_init(&(*worker_arrays[p])[i], name);
+            }
+            char mname[32];
+            snprintf(mname, sizeof(mname), "%s-Merged", proto_names[p]);
+            octosketch_init(merged_array[p], mname);
+        }
+        memset(g_worker_pktlen_sq_sum, 0, sizeof(g_worker_pktlen_sq_sum));
+
+        size_t adv_per_worker = octosketch_memory_size() * 12;
+        size_t adv_total = adv_per_worker * (NUM_RX_QUEUES + 1);
+        printf("[Sketch-ADV Per-Protocol Sketches Initialized]\n");
+        printf("  Protocols:               12 (DNS,NTP,SNMP,SSDP,PortMap,NetBIOS,LDAP,MSSQL,TFTP,SYN,HTTP,UDP-Other)\n");
+        printf("  Per-worker memory:       %.1f KB × 12 protocols = %.1f KB\n",
+               octosketch_memory_size() / 1024.0, adv_per_worker / 1024.0);
+        printf("  Total sketch-adv mem:    %.1f MB (%.1f KB)\n\n",
+               adv_total / (1024.0 * 1024.0), adv_total / 1024.0);
+    }
 
     printf("╔═══════════════════════════════════════════════════════════════════════╗\n");
     printf("║  MIRA DDoS DETECTOR - DPDK + OCTOSKETCH (%d workers + 1 coord)       ║\n", NUM_RX_QUEUES);
