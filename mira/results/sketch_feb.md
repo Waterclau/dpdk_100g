@@ -387,21 +387,70 @@ La propuesta es fundamentalmente un **Count-Min Sketch per-class**, donde la "cl
 
 ---
 
-## Plan de Implementacion: Flag --sketch-adv
+## Implementacion: Flag --sketch-adv
 
-La implementacion se realiza sin romper el detector actual. Se anade una flag `--sketch-adv` que activa el modo avanzado de sketches por protocolo. Sin la flag, el detector funciona exactamente igual que antes.
+**Estado: IMPLEMENTADO**
+
+La implementacion no rompe el detector actual. La flag `--sketch-adv` activa el modo avanzado de sketches por protocolo. Sin la flag, el detector funciona exactamente igual que antes.
+
+### Pipelines de datos
+
+```
+MODO NORMAL (DPI + sketch antiguo):
+  detector → .log (texto) → feature_extractor.py → .csv (56 features)
+
+MODO SKETCH-ADV (sketch nuevo, sin DPI):
+  detector → .bin (binario directo desde sketches) → sketch_adv_to_csv.py → .csv (64 features)
+```
+
+El modo sketch-adv escribe un fichero binario `../results/sketch_adv_features.bin` con los 64 features computados directamente de los sketches, sin pasar por logs de texto. Cada registro = 528 bytes (header + 64 doubles).
 
 ### Uso
 
 ```bash
-# Modo actual (sin cambios)
+# Modo actual (DPI + sketch antiguo) → guarda .log
 sudo timeout 900 ./mira_ddos_detector -l 0-15 -n 4 -w 0000:41:00.0 -- -p 0 \
     2>&1 | sudo tee ../ml_system/datasets/raw_logs/2/attack_dns_run1.log
 
-# Modo avanzado con sketches por protocolo
-sudo timeout 900 ./mira_ddos_detector -l 0-15 -n 4 -w 0000:41:00.0 -- --sketch-adv -p 0 \
-    2>&1 | sudo tee ../ml_system/datasets/raw_logs/2/attack_dns_run1.log
+# Modo sketch-adv → guarda .bin en la ruta indicada
+sudo timeout 900 ./mira_ddos_detector -l 0-15 -n 4 -w 0000:41:00.0 \
+    -- --sketch-adv ../ml_system/datasets/raw_logs/2/mixed_traffic_run4.bin -p 0
 ```
+
+### Formato binario (sketch_adv_record)
+
+```
+Offset  Size   Campo
+------  ----   -----
+0       4      magic (0x534B4156 = "SKAV")
+4       4      version (1)
+8       8      timestamp_ns (nanosegundos desde inicio)
+
+16      112    Bloque 1: 14 global sketch features (14 × double)
+               delta_pps_5w, delta_pps_10w, pps_variance, pps_baseline,
+               ratio_vs_baseline, top_ip_pps_50ms, top_ip_pps_1s,
+               top_ip_pps_1min, ratio_50ms_1min, num_heavy_hitters,
+               ip_concentration, new_ips_ratio, attack_entropy,
+               adaptive_threshold
+
+128     384    Bloque 2: 48 per-protocol features (4 × 12 × double)
+               Orden protocolos: dns, ntp, snmp, ssdp, portmap, netbios,
+                                 ldap, mssql, tftp, syn, http, udp_other
+               Por protocolo: pps, heavy_hitters, ip_concentration, ratio_vs_total
+
+512     16     Bloque 3: 2 packet size features (2 × double)
+               avg_packet_size, packet_size_variance
+
+TOTAL: 528 bytes por registro
+```
+
+### Comparacion de los 3 experimentos
+
+| Experimento | Pipeline | Features | Fichero de datos |
+|------------|----------|:--------:|-----------------|
+| DPI + sketch antiguo | .log → feature_extractor.py → .csv | 56 | .log |
+| Sketch antiguo solo | .log → feature_extractor.py → .csv (filtrado) | 14 | .log |
+| **Sketch nuevo (ADV)** | **.bin → sketch_adv_to_csv.py → .csv** | **64** | **.bin** |
 
 ### Cambios en el detector (mira_ddos_detector.c)
 
@@ -651,53 +700,65 @@ if (g_sketch_adv_enabled) {
 }
 ```
 
-### Cambios en el feature extractor
+### Conversor binario → CSV (POR IMPLEMENTAR)
 
-#### feature_extractor.py
-
-Anadir parsing de la nueva seccion `[SKETCH-ADV PER-PROTOCOL FEATURES]`:
+Script `sketch_adv_to_csv.py` que lee `sketch_adv_features.bin` y produce un `.csv` con 64 columnas:
 
 ```python
-# Nuevas features por protocolo (48 features)
-proto_names = ['dns', 'ntp', 'snmp', 'ssdp', 'portmap',
-               'netbios', 'ldap', 'mssql', 'tftp',
-               'syn', 'http', 'udp_other']
+import struct
+import pandas as pd
 
-for proto in proto_names:
-    pattern_pps = rf'\[{proto_display}\].*?PPS:\s+([\d.]+)'
-    # ... extraer pps, heavy_hitters, concentration, ratio
-    features[f'{proto}_pps'] = valor
-    features[f'{proto}_heavy_hitters'] = valor
-    features[f'{proto}_concentration'] = valor
-    features[f'{proto}_ratio'] = valor
+RECORD_SIZE = 528
+MAGIC = 0x534B4156
+PROTOS = ['dns','ntp','snmp','ssdp','portmap','netbios',
+          'ldap','mssql','tftp','syn','http','udp_other']
 
-# Packet size (2 features)
-features['avg_packet_size'] = valor
+def read_sketch_adv_bin(path, label):
+    records = []
+    with open(path, 'rb') as f:
+        while True:
+            data = f.read(RECORD_SIZE)
+            if len(data) < RECORD_SIZE:
+                break
+            magic, version, ts = struct.unpack_from('<IIQ', data, 0)
+            if magic != MAGIC:
+                continue
+            # 14 global features
+            global_feats = struct.unpack_from('<14d', data, 16)
+            # 48 per-proto features (4 arrays × 12)
+            pps = struct.unpack_from('<12d', data, 128)
+            hh = struct.unpack_from('<12d', data, 224)
+            conc = struct.unpack_from('<12d', data, 320)
+            ratio = struct.unpack_from('<12d', data, 416)
+            # 2 packet size
+            avg_sz, var_sz = struct.unpack_from('<2d', data, 512)
+
+            row = dict(zip(GLOBAL_NAMES, global_feats))
+            for i, p in enumerate(PROTOS):
+                row[f'pps_{p}'] = pps[i]
+                row[f'heavy_hitters_{p}'] = hh[i]
+                row[f'ip_concentration_{p}'] = conc[i]
+                row[f'ratio_vs_total_{p}'] = ratio[i]
+            row['avg_packet_size'] = avg_sz
+            row['packet_size_variance'] = var_sz
+            row['label'] = label
+            records.append(row)
+    return pd.DataFrame(records)
 ```
 
-#### feature_groups.py
-
-Actualizar la lista SKETCH_FEATURES para incluir las 64 features totales:
+### feature_groups.py (ACTUALIZADO)
 
 ```python
-SKETCH_FEATURES = [
-    # 14 features globales existentes
-    'delta_pps_5w', 'delta_pps_10w', 'pps_variance', ...
-
-    # 48 features por protocolo (4 x 12)
-    'dns_pps', 'dns_heavy_hitters', 'dns_concentration', 'dns_ratio',
-    'ntp_pps', 'ntp_heavy_hitters', 'ntp_concentration', 'ntp_ratio',
-    # ... los 12 protocolos ...
-
-    # 2 features de tamano de paquete
-    'avg_packet_size', 'pkt_size_variance',
-]
+SKETCH_FEATURES_ALL = SKETCH_FEATURES + SKETCH_ADV_FEATURES  # 14 + 50 = 64
 ```
+
+Las definiciones completas de `SKETCH_ADV_FEATURES` estan en `feature_groups.py`.
 
 ### Verificacion
 
 1. **Compilar**: `make` en detector_system/ (no hay ficheros nuevos)
 2. **Sin flag**: Ejecutar sin `--sketch-adv` → comportamiento identico al actual
-3. **Con flag**: Ejecutar con `--sketch-adv` → nueva seccion `[SKETCH-ADV PER-PROTOCOL FEATURES]` en la salida
-4. **Pipeline ML**: Extraer features → preparar dataset → entrenar con 64 features → evaluar accuracy
-5. **Memoria**: Verificar ~65 MB extra en el log de inicializacion
+3. **Con flag**: Ejecutar con `--sketch-adv` → escribe `../results/sketch_adv_features.bin` + seccion texto en stdout
+4. **Validar binario**: `ls -la ../results/sketch_adv_features.bin` → debe crecer 528 bytes cada 5 segundos
+5. **Pipeline ML**: `.bin` → `sketch_adv_to_csv.py` → `.csv` → entrenar con 64 features
+6. **Memoria**: Verificar ~65 MB extra en el log de inicializacion

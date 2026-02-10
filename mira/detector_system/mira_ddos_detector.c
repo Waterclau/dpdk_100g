@@ -500,6 +500,46 @@ struct __attribute__((packed)) binary_log_record {
 };
 /* Total size: 4 + 4 + 8 + (11*8) + (22*8) = 280 bytes per record */
 
+/* Sketch-ADV binary record: 64 features written directly from sketches */
+#define SKETCH_ADV_MAGIC   0x534B4156  /* "SKAV" */
+#define SKETCH_ADV_VERSION 1
+#define SKETCH_ADV_NUM_PROTOS 12
+#define SKETCH_ADV_FEATURES_TOTAL 64   /* 14 global + 48 per-proto + 2 pkt size */
+
+struct __attribute__((packed)) sketch_adv_record {
+    uint32_t magic;
+    uint32_t version;
+    uint64_t timestamp_ns;
+
+    /* Block 1: 14 global sketch features (from ring buffer + multi-scale) */
+    double delta_pps_5w;
+    double delta_pps_10w;
+    double pps_variance;
+    double pps_baseline;
+    double ratio_vs_baseline;
+    double top_ip_pps_50ms;
+    double top_ip_pps_1s;
+    double top_ip_pps_1min;
+    double ratio_50ms_1min;
+    double num_heavy_hitters;
+    double ip_concentration;
+    double new_ips_ratio;
+    double attack_entropy;
+    double adaptive_threshold;
+
+    /* Block 2: 48 per-protocol features (4 per protocol × 12 protocols) */
+    /* Order: dns, ntp, snmp, ssdp, portmap, netbios, ldap, mssql, tftp, syn, http, udp_other */
+    double pps_proto[SKETCH_ADV_NUM_PROTOS];
+    double heavy_hitters_proto[SKETCH_ADV_NUM_PROTOS];
+    double ip_concentration_proto[SKETCH_ADV_NUM_PROTOS];
+    double ratio_vs_total_proto[SKETCH_ADV_NUM_PROTOS];
+
+    /* Block 3: 2 packet size features */
+    double avg_packet_size;
+    double packet_size_variance;
+};
+/* Total size: 4 + 4 + 8 + 14*8 + 48*8 + 2*8 = 528 bytes per record */
+
 /* Global variables */
 static volatile bool force_quit = false;
 static struct ip_stats g_ip_table[MAX_IPS];
@@ -510,6 +550,8 @@ static FILE *g_log_file = NULL;
 static FILE *g_binary_log_file = NULL;  /* Binary log for ML training */
 static bool g_binary_log_enabled = false;
 static bool g_sketch_adv_enabled = false;
+static FILE *g_sketch_adv_file = NULL;     /* Binary output for sketch-adv ML training */
+static const char *g_sketch_adv_path = NULL;
 static struct rte_hash *ip_hash = NULL;
 
 /* OctoSketch - Per-worker sketches (NO atomics, NO contention) */
@@ -2122,6 +2164,75 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
                "    Avg Packet Size:      %.1f\n"
                "    Packet Size Variance: %.1f\n\n",
                avg_pkt_size, pkt_size_var);
+
+        /* Write binary record with all 64 features */
+        if (g_sketch_adv_file) {
+            struct sketch_adv_record rec;
+            memset(&rec, 0, sizeof(rec));
+
+            rec.magic = SKETCH_ADV_MAGIC;
+            rec.version = SKETCH_ADV_VERSION;
+
+            uint64_t elapsed_cycles = cur_tsc - g_start_tsc;
+            rec.timestamp_ns = (uint64_t)((double)elapsed_cycles * 1e9 / (double)rte_get_tsc_hz());
+
+            /* Block 1: 14 global sketch features from ring buffer */
+            if (latest) {
+                rec.delta_pps_5w = latest->delta_pps_5w;
+                rec.delta_pps_10w = latest->delta_pps_10w;
+                rec.pps_variance = latest->pps_variance;
+                rec.pps_baseline = latest->pps_baseline;
+                rec.ratio_vs_baseline = latest->ratio_vs_baseline;
+                rec.top_ip_pps_50ms = latest->top_ip_pps_50ms;
+                rec.top_ip_pps_1s = latest->top_ip_pps_1s;
+                rec.top_ip_pps_1min = latest->top_ip_pps_1min;
+                rec.ratio_50ms_1min = latest->ratio_50ms_1min;
+                rec.num_heavy_hitters = latest->num_heavy_hitters;
+                rec.ip_concentration = latest->ip_concentration;
+                rec.new_ips_ratio = latest->new_ips_ratio;
+                rec.attack_entropy = latest->attack_entropy;
+                rec.adaptive_threshold = latest->adaptive_threshold;
+            }
+
+            /* Block 2: 48 per-protocol features (recompute from merged sketches) */
+            struct octosketch *proto_sketches[12] = {
+                &g_merged_sketch_dns, &g_merged_sketch_ntp, &g_merged_sketch_snmp,
+                &g_merged_sketch_ssdp, &g_merged_sketch_portmap, &g_merged_sketch_netbios,
+                &g_merged_sketch_ldap, &g_merged_sketch_mssql, &g_merged_sketch_tftp,
+                &g_merged_sketch_syn, &g_merged_sketch_http, &g_merged_sketch_udp_other,
+            };
+
+            for (int p = 0; p < 12; p++) {
+                uint64_t ptotal = octosketch_get_total(proto_sketches[p]);
+                double ppps = (double)ptotal / win_sec;
+
+                int phh = 0;
+                double phh_thr = HEAVY_HITTER_PPS_THRESHOLD * win_sec;
+                for (uint32_t idx = 0; idx < 65536; idx++) {
+                    if (proto_sketches[p]->ip_counts[idx] >= (uint32_t)phh_thr &&
+                        proto_sketches[p]->ip_addrs[idx] != 0) {
+                        phh++;
+                    }
+                }
+
+                struct heavy_hitter ptop[1];
+                octosketch_top_k(proto_sketches[p], 1, ptop);
+                double pconc = (ptotal > 0) ? (double)ptop[0].count / ptotal : 0.0;
+                double pratio = (global_pps > 0.0) ? ppps / global_pps : 0.0;
+
+                rec.pps_proto[p] = ppps;
+                rec.heavy_hitters_proto[p] = (double)phh;
+                rec.ip_concentration_proto[p] = pconc;
+                rec.ratio_vs_total_proto[p] = pratio;
+            }
+
+            /* Block 3: packet size features */
+            rec.avg_packet_size = avg_pkt_size;
+            rec.packet_size_variance = pkt_size_var;
+
+            fwrite(&rec, sizeof(rec), 1, g_sketch_adv_file);
+            fflush(g_sketch_adv_file);
+        }
     }
 
     #undef APPEND
@@ -2751,15 +2862,24 @@ int main(int argc, char *argv[])
             g_binary_log_enabled = true;
             printf("Binary logging enabled (compact ML training format)\n");
         } else if (strcmp(argv[i], "--sketch-adv") == 0) {
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                g_sketch_adv_path = argv[i + 1];
+                i++;  /* Skip path argument */
+            } else {
+                printf("Error: --sketch-adv requires output file path\n");
+                printf("  Example: --sketch-adv ../results/dns_attack_run1.bin\n");
+                return 1;
+            }
             g_sketch_adv_enabled = true;
-            printf("Sketch-ADV enabled (per-protocol sketches for 64-feature ML)\n");
+            printf("Sketch-ADV enabled → %s\n", g_sketch_adv_path);
         } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             printf("Usage: %s [EAL options] -- [Application options]\n", argv[0]);
             printf("\nApplication options:\n");
-            printf("  --binary-log    Enable binary logging for ML training\n");
-            printf("                  (writes to ../results/mira_detector_ml.bin)\n");
-            printf("  --sketch-adv    Enable per-protocol sketches (64-feature ML)\n");
-            printf("  --help, -h      Show this help message\n");
+            printf("  --binary-log          Enable binary logging for ML training\n");
+            printf("                        (writes to ../results/mira_detector_ml.bin)\n");
+            printf("  --sketch-adv <path>   Enable per-protocol sketches (64-feature ML)\n");
+            printf("                        Writes binary features to <path>\n");
+            printf("  --help, -h            Show this help message\n");
             return 0;
         }
     }
@@ -2919,8 +3039,20 @@ int main(int argc, char *argv[])
         printf("  Protocols:               12 (DNS,NTP,SNMP,SSDP,PortMap,NetBIOS,LDAP,MSSQL,TFTP,SYN,HTTP,UDP-Other)\n");
         printf("  Per-worker memory:       %.1f KB × 12 protocols = %.1f KB\n",
                octosketch_memory_size() / 1024.0, adv_per_worker / 1024.0);
-        printf("  Total sketch-adv mem:    %.1f MB (%.1f KB)\n\n",
+        printf("  Total sketch-adv mem:    %.1f MB (%.1f KB)\n",
                adv_total / (1024.0 * 1024.0), adv_total / 1024.0);
+        printf("  Binary record size:      %zu bytes (%d features)\n",
+               sizeof(struct sketch_adv_record), SKETCH_ADV_FEATURES_TOTAL);
+
+        /* Open binary output file for sketch-adv features */
+        g_sketch_adv_file = fopen(g_sketch_adv_path, "wb");
+        if (!g_sketch_adv_file) {
+            printf("  [ERROR] Could not open sketch-adv output: %s\n", g_sketch_adv_path);
+            g_sketch_adv_enabled = false;
+        } else {
+            printf("  Binary output:           %s\n", g_sketch_adv_path);
+        }
+        printf("\n");
     }
 
     printf("╔═══════════════════════════════════════════════════════════════════════╗\n");
@@ -2970,6 +3102,11 @@ int main(int argc, char *argv[])
 
     if (g_log_file)
         fclose(g_log_file);
+
+    if (g_sketch_adv_file) {
+        fclose(g_sketch_adv_file);
+        printf("Sketch-ADV binary saved: %s\n", g_sketch_adv_path);
+    }
 
     rte_hash_free(ip_hash);
     printf("\nShutting down...\n");
