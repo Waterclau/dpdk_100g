@@ -2177,21 +2177,22 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
             rec.timestamp_ns = (uint64_t)((double)elapsed_cycles * 1e9 / (double)rte_get_tsc_hz());
 
             /* Block 1: 14 global sketch features from ring buffer */
-            if (latest) {
-                rec.delta_pps_5w = latest->delta_pps_5w;
-                rec.delta_pps_10w = latest->delta_pps_10w;
-                rec.pps_variance = latest->pps_variance;
-                rec.pps_baseline = latest->pps_baseline;
-                rec.ratio_vs_baseline = latest->ratio_vs_baseline;
-                rec.top_ip_pps_50ms = latest->top_ip_pps_50ms;
-                rec.top_ip_pps_1s = latest->top_ip_pps_1s;
-                rec.top_ip_pps_1min = latest->top_ip_pps_1min;
-                rec.ratio_50ms_1min = latest->ratio_50ms_1min;
-                rec.num_heavy_hitters = latest->num_heavy_hitters;
-                rec.ip_concentration = latest->ip_concentration;
-                rec.new_ips_ratio = latest->new_ips_ratio;
-                rec.attack_entropy = latest->attack_entropy;
-                rec.adaptive_threshold = latest->adaptive_threshold;
+            struct feature_window *latest_rb = ring_buffer_get(-1);
+            if (latest_rb) {
+                rec.delta_pps_5w = latest_rb->delta_pps_5w;
+                rec.delta_pps_10w = latest_rb->delta_pps_10w;
+                rec.pps_variance = latest_rb->pps_variance;
+                rec.pps_baseline = latest_rb->pps_baseline;
+                rec.ratio_vs_baseline = latest_rb->ratio_vs_baseline;
+                rec.top_ip_pps_50ms = latest_rb->top_ip_pps_50ms;
+                rec.top_ip_pps_1s = latest_rb->top_ip_pps_1s;
+                rec.top_ip_pps_1min = latest_rb->top_ip_pps_1min;
+                rec.ratio_50ms_1min = latest_rb->ratio_50ms_1min;
+                rec.num_heavy_hitters = latest_rb->num_heavy_hitters;
+                rec.ip_concentration = latest_rb->ip_concentration;
+                rec.new_ips_ratio = latest_rb->new_ips_ratio;
+                rec.attack_entropy = latest_rb->attack_entropy;
+                rec.adaptive_threshold = latest_rb->adaptive_threshold;
             }
 
             /* Block 2: 48 per-protocol features (recompute from merged sketches) */
