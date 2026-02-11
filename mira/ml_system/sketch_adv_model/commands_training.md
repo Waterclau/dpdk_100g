@@ -1,172 +1,40 @@
 # Comandos de entrenamiento y testing - Sketch-ADV (64 features)
 
 Ruta de los .bin: `/local/dpdk_100g/mira/ml_system/datasets/sketches/`
-Ruta de los .log: `/local/dpdk_100g/mira/ml_system/datasets/raw_logs/2/`
-
-## 0. Convertir .log a .bin (si solo tienes logs)
-
-```bash
-cd /local/dpdk_100g/mira/ml_system
-
-# Mixed traffic (4 runs)
-python3 datasets/log_to_sketch_bin.py \
-    --input datasets/raw_logs/2/mixed_traffic_run1.log \
-    --output datasets/sketches/mixed_sketch_adv_run1.bin
-
-python3 datasets/log_to_sketch_bin.py \
-    --input datasets/raw_logs/2/mixed_traffic_run2.log \
-    --output datasets/sketches/mixed_sketch_adv_run2.bin
-
-python3 datasets/log_to_sketch_bin.py \
-    --input datasets/raw_logs/2/mixed_traffic_run3.log \
-    --output datasets/sketches/mixed_sketch_adv_run3.bin
-
-python3 datasets/log_to_sketch_bin.py \
-    --input datasets/raw_logs/2/mixed_traffic_run4.log \
-    --output datasets/sketches/mixed_sketch_adv_run4.bin
-
-# O todos de golpe:
-python3 datasets/log_to_sketch_bin.py \
-    --input-dir datasets/raw_logs/2 \
-    --output-dir datasets/sketches \
-    --pattern "mixed_traffic_run*.log"
-
-# Tambien sirve para cualquier otro .log:
-python3 datasets/log_to_sketch_bin.py \
-    --input-dir datasets/raw_logs/2 \
-    --output-dir datasets/sketches \
-    --pattern "*.log"
-```
 
 ## 1. Convertir .bin a CSV
 
 ```bash
 cd /local/dpdk_100g/mira/ml_system/sketch_adv_model
 
-# DNS
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/dns_sketch_adv_run1.bin \
-    --output datasets/processed/dns_run1.csv \
-    --attack-type dns \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
+BINS="/local/dpdk_100g/mira/ml_system/datasets/sketches"
+PROC="datasets/processed"
+BIN2CSV="01_data_collection/bin_to_csv.py"
 
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/dns_sketch_adv_run2.bin \
-    --output datasets/processed/dns_run2.csv \
-    --attack-type dns \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
+mkdir -p "$PROC"
 
-# NTP
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/ntp_sketch_adv_run1.bin \
-    --output datasets/processed/ntp_run1.csv \
-    --attack-type ntp \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
+# Benign
+for f in $BINS/benign*sketch_adv*.bin; do
+    run=$(echo $f | grep -oP 'run\d+' || echo "run1")
+    python3 "$BIN2CSV" --input "$f" --output "$PROC/benign_${run}.csv" --label benign
+done
 
-# SNMP
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/snmp_sketch_adv_run1.bin \
-    --output datasets/processed/snmp_run1.csv \
-    --attack-type snmp \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
+# Ataques
+for attack in dns ldap mssql netbios ntp portmap snmp ssdp syn tftp udp webddos; do
+    for f in $BINS/${attack}*sketch_adv*.bin; do
+        run=$(echo $f | grep -oP 'run\d+' || echo "run1")
+        python3 "$BIN2CSV" --input "$f" --output "$PROC/${attack}_${run}.csv" --label ${attack}
+    done
+done
 
-# SSDP
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/ssdp_sketch_adv_run1.bin \
-    --output datasets/processed/ssdp_run1.csv \
-    --attack-type ssdp \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
-
-# PORTMAP
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/portmap_sketch_adv_run1.bin \
-    --output datasets/processed/portmap_run1.csv \
-    --attack-type portmap \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
-
-# NETBIOS
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/netbios_sketch_adv_run1.bin \
-    --output datasets/processed/netbios_run1.csv \
-    --attack-type netbios \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
-
-# LDAP
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/ldap_sketch_adv_run1.bin \
-    --output datasets/processed/ldap_run1.csv \
-    --attack-type ldap \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
-
-# MSSQL
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/mssql_sketch_adv_run1.bin \
-    --output datasets/processed/mssql_run1.csv \
-    --attack-type mssql \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
-
-# TFTP
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/tftp_sketch_adv_run1.bin \
-    --output datasets/processed/tftp_run1.csv \
-    --attack-type tftp \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
-
-# SYN
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/syn_sketch_adv_run1.bin \
-    --output datasets/processed/syn_run1.csv \
-    --attack-type syn \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
-
-# UDP
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/udp_sketch_adv_run1.bin \
-    --output datasets/processed/udp_run1.csv \
-    --attack-type udp \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
-
-# WEBDDOS
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/webddos_sketch_adv_run1.bin \
-    --output datasets/processed/webddos_run1.csv \
-    --attack-type webddos \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
-
-# MIXED (multiples ataques simultaneos)
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/mixed_sketch_adv_run1.bin \
-    --output datasets/processed/mixed_run1.csv \
-    --attack-type mixed \
-    --baseline-before 50 --attack-duration 100 --baseline-after 50
-
-# BENIGN (solo baseline, sin ataque)
-python3 01_data_collection/bin_to_csv.py \
-    --input /local/dpdk_100g/mira/ml_system/datasets/sketches/benign_sketch_adv_run1.bin \
-    --output datasets/processed/benign_run1.csv \
-    --attack-type benign \
-    --baseline-before 200 --attack-duration 0 --baseline-after 0
-```
-
-### Shortcut: convertir todos los .bin de golpe
-
-```bash
-cd /local/dpdk_100g/mira/ml_system/sketch_adv_model
-
-for f in /local/dpdk_100g/mira/ml_system/datasets/sketches/*.bin; do
-    fname=$(basename "$f" .bin)
-    attack=$(echo "$fname" | sed -E 's/^([a-z_]+)_sketch_adv.*/\1/')
-    run=$(echo "$fname" | grep -oP 'run\d+' || echo "run1")
-    echo "Converting: $fname -> ${attack}_${run}.csv"
-    python3 01_data_collection/bin_to_csv.py \
-        --input "$f" \
-        --output datasets/processed/${attack}_${run}.csv \
-        --attack-type "$attack" \
-        --baseline-before 50 --attack-duration 100 --baseline-after 50
+# Mixed
+for f in $BINS/mixed*sketch_adv*.bin; do
+    run=$(echo $f | grep -oP 'run\d+' || echo "run1")
+    python3 "$BIN2CSV" --input "$f" --output "$PROC/mixed_${run}.csv" --label mixed
 done
 ```
 
-## 2. Preparar dataset (split train/val/test)
+## 2. Preparar dataset (filtra a 64 features + split)
 
 ```bash
 python3 02_training/prepare_dataset.py \
@@ -219,6 +87,10 @@ python3 02_training/run_full_pipeline.py \
     --output 02_training/results/ \
     --lightgbm-only
 ```
+
+## Clases (14)
+
+benign, dns, ldap, mixed, mssql, netbios, ntp, portmap, snmp, ssdp, syn, tftp, udp, webddos
 
 ## Resumen de archivos generados
 

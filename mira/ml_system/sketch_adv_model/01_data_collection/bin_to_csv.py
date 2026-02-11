@@ -3,12 +3,15 @@
 Binary Sketch-ADV to CSV Converter
 
 Reads binary .bin files produced by detector_system (--sketch-adv mode)
-and converts them to CSV with time-based labeling for ML training.
+and converts them to labeled CSV for ML training.
+
+All records in the file get the same label (from --label argument),
+exactly like the log feature_extractor works.
 
 Binary record format (528 bytes, packed):
   - uint32  magic          (0x534B4156 = "SKAV")
   - uint32  version        (1)
-  - uint64  timestamp_ns   (nanoseconds since detector start)
+  - uint64  timestamp_ns
   - double[14]  global sketch features
   - double[12]  pps_proto
   - double[12]  heavy_hitters_proto
@@ -17,31 +20,17 @@ Binary record format (528 bytes, packed):
   - double  avg_packet_size
   - double  packet_size_variance
 
-Labeling (time-based, for structured experiments):
-  50s baseline -> 100s attack -> 50s baseline (200s total)
-  - 0-50s:    label = benign
-  - 50-150s:  label = <attack_type>
-  - 150-200s: label = benign
-
 Usage:
     python3 bin_to_csv.py \
-        --input /tmp/dns_sketch_adv_run1.bin \
+        --input /path/to/dns_sketch_adv_run1.bin \
         --output ../datasets/processed/dns_run1.csv \
-        --attack-type dns
-
-    # Custom timing
-    python3 bin_to_csv.py \
-        --input /tmp/experiment.bin \
-        --output ../datasets/processed/ntp_run1.csv \
-        --attack-type ntp \
-        --baseline-before 30 --attack-duration 120 --baseline-after 30
+        --label dns
 """
 
 import argparse
 import struct
 import sys
 import pandas as pd
-import numpy as np
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -74,7 +63,7 @@ def build_column_names():
 
 
 def read_binary_file(bin_path):
-    """Read all records from binary file, return list of (timestamp_ns, features[64])"""
+    """Read all records from binary file, return list of features[64]"""
     records = []
 
     with open(bin_path, 'rb') as f:
@@ -98,7 +87,6 @@ def read_binary_file(bin_path):
 
         magic = values[0]
         version = values[1]
-        timestamp_ns = values[2]
         features = values[3:]  # 64 doubles
 
         if magic != RECORD_MAGIC:
@@ -113,7 +101,7 @@ def read_binary_file(bin_path):
                 print(f"[WARNING] Record {i}: version {version} (expected {RECORD_VERSION})")
             continue
 
-        records.append((timestamp_ns, list(features)))
+        records.append(list(features))
 
     if errors > 3:
         print(f"[WARNING] {errors} total bad records skipped")
@@ -122,76 +110,23 @@ def read_binary_file(bin_path):
     return records
 
 
-def apply_time_labels(records, attack_type, baseline_before, attack_duration, baseline_after):
-    """Apply time-based labels to records"""
-    attack_start_ns = baseline_before * 1_000_000_000
-    attack_end_ns = (baseline_before + attack_duration) * 1_000_000_000
-    total_ns = (baseline_before + attack_duration + baseline_after) * 1_000_000_000
-
-    labeled = []
-    stats = {'benign': 0, 'attack': 0, 'dropped': 0}
-
-    for timestamp_ns, features in records:
-        if timestamp_ns > total_ns:
-            stats['dropped'] += 1
-            continue
-
-        if timestamp_ns < attack_start_ns:
-            label = 'benign'
-            stats['benign'] += 1
-        elif timestamp_ns < attack_end_ns:
-            label = attack_type
-            stats['attack'] += 1
-        else:
-            label = 'benign'
-            stats['benign'] += 1
-
-        labeled.append((features, label))
-
-    print(f"\n[LABELING] {baseline_before}s baseline -> "
-          f"{attack_duration}s attack -> {baseline_after}s baseline")
-    print(f"  Benign:  {stats['benign']}")
-    print(f"  Attack:  {stats['attack']} ({attack_type})")
-    if stats['dropped'] > 0:
-        print(f"  Dropped: {stats['dropped']}")
-
-    return labeled
-
-
-def to_dataframe(labeled_records, column_names):
-    """Convert labeled records to DataFrame"""
-    rows = []
-    for features, label in labeled_records:
-        row = dict(zip(column_names, features))
-        row['label'] = label
-        rows.append(row)
-
-    return pd.DataFrame(rows)
-
-
 def main():
     parser = argparse.ArgumentParser(
         description='Convert binary sketch-adv .bin to labeled CSV',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python3 bin_to_csv.py --input /tmp/dns_run1.bin --output ../datasets/processed/dns_run1.csv --attack-type dns
-  python3 bin_to_csv.py --input /tmp/ntp.bin --output ntp.csv --attack-type ntp --baseline-before 30 --attack-duration 120
+  python3 bin_to_csv.py --input /path/to/dns_run1.bin --output ../datasets/processed/dns_run1.csv --label dns
+  python3 bin_to_csv.py --input /path/to/benign_run1.bin --output ../datasets/processed/benign_run1.csv --label benign
 
-Supported attack types:
-  dns, ntp, snmp, ssdp, portmap, netbios, ldap, mssql, tftp, syn, udp, webddos, mixed
+Supported labels:
+  benign, dns, ntp, snmp, ssdp, portmap, netbios, ldap, mssql, tftp, syn, udp, webddos, mixed
         """
     )
 
     parser.add_argument('--input', required=True, help='Input binary .bin file')
     parser.add_argument('--output', required=True, help='Output CSV file')
-    parser.add_argument('--attack-type', required=True, help='Attack type label')
-    parser.add_argument('--baseline-before', type=float, default=50.0,
-                        help='Baseline before attack in seconds (default: 50)')
-    parser.add_argument('--attack-duration', type=float, default=100.0,
-                        help='Attack duration in seconds (default: 100)')
-    parser.add_argument('--baseline-after', type=float, default=50.0,
-                        help='Baseline after attack in seconds (default: 50)')
+    parser.add_argument('--label', required=True, help='Label for all records (benign, dns, ntp, ...)')
 
     args = parser.parse_args()
 
@@ -204,38 +139,30 @@ Supported attack types:
     print("=" * 60)
     print(f"  Input:  {args.input}")
     print(f"  Output: {args.output}")
-    print(f"  Attack: {args.attack_type}")
-    print(f"  Timing: {args.baseline_before}s + {args.attack_duration}s + {args.baseline_after}s")
+    print(f"  Label:  {args.label}")
 
     records = read_binary_file(args.input)
     if not records:
         print("[ERROR] No valid records")
         sys.exit(1)
 
-    ts_min = records[0][0] / 1e9
-    ts_max = records[-1][0] / 1e9
-    print(f"\n[INFO] Timestamp range: {ts_min:.1f}s - {ts_max:.1f}s ({ts_max - ts_min:.1f}s span)")
-
-    labeled = apply_time_labels(
-        records, args.attack_type,
-        args.baseline_before, args.attack_duration, args.baseline_after
-    )
-
-    if not labeled:
-        print("[ERROR] No records after labeling")
-        sys.exit(1)
-
     column_names = build_column_names()
-    df = to_dataframe(labeled, column_names)
+
+    # Build DataFrame: all records get the same label
+    rows = []
+    for features in records:
+        row = dict(zip(column_names, features))
+        row['label'] = args.label
+        rows.append(row)
+
+    df = pd.DataFrame(rows)
 
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(args.output, index=False)
 
     print(f"\n[SUCCESS] {len(df)} records -> {args.output}")
     print(f"  Features: {len(column_names)}")
-    print(f"  Labels:")
-    for label, count in df['label'].value_counts().items():
-        print(f"    {label:15s}: {count:5d} ({count/len(df)*100:.1f}%)")
+    print(f"  Label: {args.label} ({len(df)} records)")
 
     # Quick sanity check
     active = []
