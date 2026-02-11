@@ -1,0 +1,512 @@
+======================================================================
+MODEL COMPARISON - SKETCH-ADV FEATURES
+  64 features (14 global + 48 per-protocol + 2 pkt size)
+======================================================================
+
+[DATASET]
+  Train: 1892  Val: 946  Test: 946
+  Features: 64 (sketch_adv)  Classes: ['benign', 'dns', 'ldap', 'mixed', 'mssql', 'netbios', 'ntp', 'portmap', 'snmp', 'ssdp', 'syn', 'tftp', 'udp', 'webddos']
+/usr/local/lib/python3.8/dist-packages/xgboost/core.py:265: FutureWarning: Your system has an old version of glibc (< 2.28). We will stop supporting Linux distros with glibc older than 2.28 after **May 31, 2025**. Please upgrade to a recent Linux distro (with glibc 2.28+) to use future versions of XGBoost.
+Note: You have installed the 'manylinux2014' variant of XGBoost. Certain features such as GPU algorithms or federated learning are not available. To use these features, please upgrade to a recent Linux distro with glibc 2.28+, and install the 'manylinux_2_28' variant.
+  warnings.warn(
+
+Training RandomForest (sketch_adv)...
+
+[RandomForest]
+  Val accuracy:  96.83%
+  Test accuracy: 96.62%
+
+VALIDATION RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.68      1.00      0.81        59
+         dns       1.00      0.95      0.97        59
+        ldap       1.00      0.97      0.98        59
+       mixed       1.00      1.00      1.00       179
+       mssql       1.00      0.97      0.98        59
+     netbios       0.98      0.98      0.98        59
+         ntp       1.00      0.97      0.98        59
+     portmap       0.98      0.98      0.98        59
+        snmp       1.00      0.97      0.98        59
+        ssdp       1.00      0.97      0.98        59
+         syn       1.00      0.93      0.96        59
+        tftp       1.00      0.97      0.98        59
+         udp       1.00      0.93      0.96        59
+     webddos       1.00      0.92      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.97       946
+weighted avg       0.98      0.97      0.97       946
+
+
+TEST RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.69      1.00      0.81        59
+         dns       0.98      0.95      0.97        59
+        ldap       1.00      0.97      0.98        59
+       mixed       1.00      1.00      1.00       179
+       mssql       1.00      0.97      0.98        59
+     netbios       0.98      0.97      0.97        59
+         ntp       0.97      0.97      0.97        59
+     portmap       0.98      0.97      0.97        59
+        snmp       1.00      0.95      0.97        59
+        ssdp       1.00      0.97      0.98        59
+         syn       1.00      0.93      0.96        59
+        tftp       1.00      0.97      0.98        59
+         udp       1.00      0.93      0.96        59
+     webddos       1.00      0.93      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.96       946
+weighted avg       0.98      0.97      0.97       946
+
+
+SAMPLE PREDICTIONS (First 10)
+Index    True           Predicted      Confidence   OK   
+------------------------------------------------------------
+0        benign         benign             0.686   YES
+1        benign         benign             0.686   YES
+2        benign         benign             0.686   YES
+3        benign         benign             0.686   YES
+4        benign         benign             0.686   YES
+5        benign         benign             0.686   YES
+6        benign         benign             0.686   YES
+7        benign         benign             0.686   YES
+8        benign         benign             0.686   YES
+9        benign         benign             0.686   YES
+
+Training HistGradientBoosting (sketch_adv)...
+
+[HistGradientBoosting]
+  Val accuracy:  96.83%
+  Test accuracy: 96.62%
+
+VALIDATION RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.68      1.00      0.81        59
+         dns       1.00      0.95      0.97        59
+        ldap       1.00      0.98      0.99        59
+       mixed       1.00      1.00      1.00       179
+       mssql       1.00      0.95      0.97        59
+     netbios       0.98      0.97      0.97        59
+         ntp       1.00      0.97      0.98        59
+     portmap       1.00      0.98      0.99        59
+        snmp       1.00      0.97      0.98        59
+        ssdp       0.98      0.98      0.98        59
+         syn       1.00      0.93      0.96        59
+        tftp       1.00      0.97      0.98        59
+         udp       1.00      0.93      0.96        59
+     webddos       1.00      0.92      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.97       946
+weighted avg       0.98      0.97      0.97       946
+
+
+TEST RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.69      1.00      0.82        59
+         dns       0.98      0.95      0.97        59
+        ldap       1.00      0.97      0.98        59
+       mixed       1.00      1.00      1.00       179
+       mssql       0.98      0.97      0.97        59
+     netbios       0.98      0.97      0.97        59
+         ntp       0.98      0.97      0.97        59
+     portmap       0.98      0.97      0.97        59
+        snmp       1.00      0.95      0.97        59
+        ssdp       0.98      0.97      0.97        59
+         syn       1.00      0.95      0.97        59
+        tftp       1.00      0.97      0.98        59
+         udp       1.00      0.93      0.96        59
+     webddos       1.00      0.92      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.96       946
+weighted avg       0.97      0.97      0.97       946
+
+
+SAMPLE PREDICTIONS (First 10)
+Index    True           Predicted      Confidence   OK   
+------------------------------------------------------------
+0        benign         benign             0.686   YES
+1        benign         benign             0.686   YES
+2        benign         benign             0.686   YES
+3        benign         benign             0.686   YES
+4        benign         benign             0.686   YES
+5        benign         benign             0.686   YES
+6        benign         benign             0.686   YES
+7        benign         benign             0.686   YES
+8        benign         benign             0.686   YES
+9        benign         benign             0.686   YES
+
+Training MLP (sketch_adv)...
+
+[MLP]
+  Val accuracy:  96.72%
+  Test accuracy: 96.72%
+
+VALIDATION RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.68      1.00      0.81        59
+         dns       0.98      0.95      0.97        59
+        ldap       1.00      0.97      0.98        59
+       mixed       1.00      1.00      1.00       179
+       mssql       1.00      0.97      0.98        59
+     netbios       0.98      0.98      0.98        59
+         ntp       1.00      0.97      0.98        59
+     portmap       0.98      0.98      0.98        59
+        snmp       1.00      0.97      0.98        59
+        ssdp       1.00      0.95      0.97        59
+         syn       1.00      0.93      0.96        59
+        tftp       1.00      0.97      0.98        59
+         udp       1.00      0.93      0.96        59
+     webddos       1.00      0.92      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.97       946
+weighted avg       0.98      0.97      0.97       946
+
+
+TEST RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.69      1.00      0.81        59
+         dns       1.00      0.95      0.97        59
+        ldap       1.00      0.97      0.98        59
+       mixed       1.00      1.00      1.00       179
+       mssql       0.97      0.97      0.97        59
+     netbios       0.98      0.98      0.98        59
+         ntp       1.00      0.97      0.98        59
+     portmap       0.98      0.97      0.97        59
+        snmp       1.00      0.95      0.97        59
+        ssdp       1.00      0.97      0.98        59
+         syn       1.00      0.93      0.96        59
+        tftp       1.00      0.97      0.98        59
+         udp       1.00      0.93      0.96        59
+     webddos       1.00      0.93      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.97       946
+weighted avg       0.98      0.97      0.97       946
+
+
+SAMPLE PREDICTIONS (First 10)
+Index    True           Predicted      Confidence   OK   
+------------------------------------------------------------
+0        benign         benign             0.669   YES
+1        benign         benign             0.669   YES
+2        benign         benign             0.669   YES
+3        benign         benign             0.669   YES
+4        benign         benign             0.669   YES
+5        benign         benign             0.669   YES
+6        benign         benign             0.669   YES
+7        benign         benign             0.669   YES
+8        benign         benign             0.669   YES
+9        benign         benign             0.669   YES
+
+Training KNN (sketch_adv)...
+
+[KNN]
+  Val accuracy:  96.72%
+  Test accuracy: 96.72%
+
+VALIDATION RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.68      1.00      0.81        59
+         dns       1.00      0.95      0.97        59
+        ldap       1.00      0.97      0.98        59
+       mixed       1.00      1.00      1.00       179
+       mssql       1.00      0.97      0.98        59
+     netbios       0.98      0.98      0.98        59
+         ntp       1.00      0.97      0.98        59
+     portmap       0.98      0.98      0.98        59
+        snmp       0.98      0.95      0.97        59
+        ssdp       1.00      0.97      0.98        59
+         syn       1.00      0.93      0.96        59
+        tftp       1.00      0.97      0.98        59
+         udp       1.00      0.93      0.96        59
+     webddos       1.00      0.92      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.97       946
+weighted avg       0.98      0.97      0.97       946
+
+
+TEST RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.69      1.00      0.81        59
+         dns       0.98      0.95      0.97        59
+        ldap       1.00      0.97      0.98        59
+       mixed       1.00      1.00      1.00       179
+       mssql       1.00      0.97      0.98        59
+     netbios       0.97      0.98      0.97        59
+         ntp       1.00      0.97      0.98        59
+     portmap       0.98      0.97      0.97        59
+        snmp       1.00      0.95      0.97        59
+        ssdp       1.00      0.97      0.98        59
+         syn       1.00      0.93      0.96        59
+        tftp       1.00      0.97      0.98        59
+         udp       1.00      0.93      0.96        59
+     webddos       1.00      0.93      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.97       946
+weighted avg       0.98      0.97      0.97       946
+
+
+SAMPLE PREDICTIONS (First 10)
+Index    True           Predicted      Confidence   OK   
+------------------------------------------------------------
+0        benign         benign             1.000   YES
+1        benign         benign             1.000   YES
+2        benign         benign             1.000   YES
+3        benign         benign             1.000   YES
+4        benign         benign             1.000   YES
+5        benign         benign             1.000   YES
+6        benign         benign             1.000   YES
+7        benign         benign             1.000   YES
+8        benign         benign             1.000   YES
+9        benign         benign             1.000   YES
+
+Training SGDClassifier (sketch_adv)...
+
+[SGDClassifier]
+  Val accuracy:  96.62%
+  Test accuracy: 96.83%
+
+VALIDATION RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.68      1.00      0.81        59
+         dns       1.00      0.95      0.97        59
+        ldap       1.00      0.97      0.98        59
+       mixed       1.00      1.00      1.00       179
+       mssql       0.98      0.97      0.97        59
+     netbios       1.00      0.97      0.98        59
+         ntp       0.98      0.97      0.97        59
+     portmap       0.97      0.98      0.97        59
+        snmp       1.00      0.97      0.98        59
+        ssdp       1.00      0.95      0.97        59
+         syn       1.00      0.93      0.96        59
+        tftp       1.00      0.97      0.98        59
+         udp       1.00      0.93      0.96        59
+     webddos       1.00      0.92      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.96       946
+weighted avg       0.98      0.97      0.97       946
+
+
+TEST RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.69      1.00      0.82        59
+         dns       1.00      0.95      0.97        59
+        ldap       1.00      0.97      0.98        59
+       mixed       1.00      1.00      1.00       179
+       mssql       0.98      0.97      0.97        59
+     netbios       1.00      0.97      0.98        59
+         ntp       1.00      0.97      0.98        59
+     portmap       0.95      0.98      0.97        59
+        snmp       1.00      0.95      0.97        59
+        ssdp       1.00      0.97      0.98        59
+         syn       1.00      0.95      0.97        59
+        tftp       1.00      0.97      0.98        59
+         udp       1.00      0.93      0.96        59
+     webddos       1.00      0.93      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.97       946
+weighted avg       0.98      0.97      0.97       946
+
+
+SAMPLE PREDICTIONS (First 10)
+Index    True           Predicted      Confidence   OK   
+------------------------------------------------------------
+0        benign         benign             0.644   YES
+1        benign         benign             0.644   YES
+2        benign         benign             0.644   YES
+3        benign         benign             0.644   YES
+4        benign         benign             0.644   YES
+5        benign         benign             0.644   YES
+6        benign         benign             0.644   YES
+7        benign         benign             0.644   YES
+8        benign         benign             0.644   YES
+9        benign         benign             0.644   YES
+
+Training XGBoost (sketch_adv)...
+
+[XGBoost]
+  Val accuracy:  96.62%
+  Test accuracy: 96.62%
+
+VALIDATION RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.68      1.00      0.81        59
+         dns       1.00      0.95      0.97        59
+        ldap       1.00      0.95      0.97        59
+       mixed       1.00      1.00      1.00       179
+       mssql       0.98      0.97      0.97        59
+     netbios       0.98      0.97      0.97        59
+         ntp       1.00      0.97      0.98        59
+     portmap       1.00      0.98      0.99        59
+        snmp       1.00      0.97      0.98        59
+        ssdp       0.97      0.97      0.97        59
+         syn       1.00      0.93      0.96        59
+        tftp       1.00      0.97      0.98        59
+         udp       1.00      0.93      0.96        59
+     webddos       1.00      0.92      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.96       946
+weighted avg       0.98      0.97      0.97       946
+
+
+TEST RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.69      1.00      0.82        59
+         dns       0.98      0.95      0.97        59
+        ldap       1.00      0.97      0.98        59
+       mixed       1.00      1.00      1.00       179
+       mssql       0.97      0.97      0.97        59
+     netbios       1.00      0.97      0.98        59
+         ntp       0.98      0.97      0.97        59
+     portmap       0.98      0.97      0.97        59
+        snmp       1.00      0.95      0.97        59
+        ssdp       1.00      0.97      0.98        59
+         syn       1.00      0.95      0.97        59
+        tftp       1.00      0.97      0.98        59
+         udp       0.98      0.93      0.96        59
+     webddos       1.00      0.92      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.96       946
+weighted avg       0.97      0.97      0.97       946
+
+
+SAMPLE PREDICTIONS (First 10)
+Index    True           Predicted      Confidence   OK   
+------------------------------------------------------------
+0        benign         benign             0.686   YES
+1        benign         benign             0.686   YES
+2        benign         benign             0.686   YES
+3        benign         benign             0.686   YES
+4        benign         benign             0.686   YES
+5        benign         benign             0.686   YES
+6        benign         benign             0.686   YES
+7        benign         benign             0.686   YES
+8        benign         benign             0.686   YES
+9        benign         benign             0.686   YES
+
+Training LSTM (sketch_adv, seq_len=12, stride=6)...
+  [LSTM] Epoch 1/10 - loss 2.6073 - val 38.64%
+  [LSTM] Epoch 2/10 - loss 2.3704 - val 81.82%
+  [LSTM] Epoch 3/10 - loss 2.1382 - val 87.88%
+  [LSTM] Epoch 4/10 - loss 1.9078 - val 93.94%
+  [LSTM] Epoch 5/10 - loss 1.6843 - val 93.94%
+  [LSTM] Epoch 6/10 - loss 1.4604 - val 93.94%
+  [LSTM] Epoch 7/10 - loss 1.2683 - val 93.94%
+  [LSTM] Epoch 8/10 - loss 1.0752 - val 93.94%
+  [LSTM] Epoch 9/10 - loss 0.9416 - val 93.94%
+  [LSTM] Epoch 10/10 - loss 0.7872 - val 93.94%
+
+[LSTM]
+  Val accuracy:  93.94%
+  Test accuracy: 93.94%
+  Sequences: train=292 val=132 test=132
+
+LSTM VALIDATION RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.00      0.00      0.00         8
+         dns       1.00      1.00      1.00         8
+        ldap       1.00      1.00      1.00         8
+       mixed       0.78      1.00      0.88        28
+       mssql       1.00      1.00      1.00         8
+     netbios       1.00      1.00      1.00         8
+         ntp       1.00      1.00      1.00         8
+     portmap       1.00      1.00      1.00         8
+        snmp       1.00      1.00      1.00         8
+        ssdp       1.00      1.00      1.00         8
+         syn       1.00      1.00      1.00         8
+        tftp       1.00      1.00      1.00         8
+         udp       1.00      1.00      1.00         8
+     webddos       1.00      1.00      1.00         8
+
+    accuracy                           0.94       132
+   macro avg       0.91      0.93      0.92       132
+weighted avg       0.89      0.94      0.91       132
+
+
+LSTM TEST RESULTS
+----------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+      benign       0.00      0.00      0.00         8
+         dns       1.00      1.00      1.00         8
+        ldap       1.00      1.00      1.00         8
+       mixed       0.78      1.00      0.88        28
+       mssql       1.00      1.00      1.00         8
+     netbios       1.00      1.00      1.00         8
+         ntp       1.00      1.00      1.00         8
+     portmap       1.00      1.00      1.00         8
+        snmp       1.00      1.00      1.00         8
+        ssdp       1.00      1.00      1.00         8
+         syn       1.00      1.00      1.00         8
+        tftp       1.00      1.00      1.00         8
+         udp       1.00      1.00      1.00         8
+     webddos       1.00      1.00      1.00         8
+
+    accuracy                           0.94       132
+   macro avg       0.91      0.93      0.92       132
+weighted avg       0.89      0.94      0.91       132
+
+
+SAMPLE PREDICTIONS (First 10)
+Index    True           Predicted      Confidence   OK   
+------------------------------------------------------------
+0        benign         mixed              0.178   NO
+1        benign         mixed              0.178   NO
+2        benign         mixed              0.178   NO
+3        benign         mixed              0.178   NO
+4        benign         mixed              0.178   NO
+5        benign         mixed              0.178   NO
+6        benign         mixed              0.178   NO
+7        benign         mixed              0.178   NO
+8        dns            dns                0.135   YES
+9        dns            dns                0.130   YES
+
+======================================================================
+MODEL COMPARISON COMPLETE - SKETCH-ADV
+======================================================================
+
+Model                     Val Acc      Test Acc     Features  
+------------------------------------------------------------
+RandomForest                 96.83%      96.62%   64
+HistGradientBoosting         96.83%      96.62%   64
+MLP                          96.72%      96.72%   64
+KNN                          96.72%      96.72%   64
+SGDClassifier                96.62%      96.83%   64
+XGBoost                      96.62%      96.62%   64
+LSTM                         93.94%      93.94%   64
