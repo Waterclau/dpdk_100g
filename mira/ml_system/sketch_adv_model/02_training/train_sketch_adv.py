@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+"""
+Train LightGBM with Sketch-ADV Features (64 features)
+
+Uses all 64 sketch features: 14 global + 48 per-protocol + 2 packet size.
+
+Usage:
+    python3 train_sketch_adv.py \
+        --train ../datasets/splits/train.csv \
+        --val ../datasets/splits/val.csv \
+        --output ./results/sketch_adv/lightgbm/
+"""
+
+import argparse
+import sys
+import pandas as pd
+import numpy as np
+import lightgbm as lgb
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.metrics import accuracy_score, classification_report
+import json
+import pickle
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from feature_groups import get_feature_columns, SKETCH_FEATURES_ALL
+
+
+def train_and_export(train_csv, val_csv, output_dir):
+    """Train LightGBM with sketch-adv features (64)"""
+
+    print("=" * 70)
+    print("SKETCH-ADV MODEL - LightGBM Training")
+    print(f"Features: {len(SKETCH_FEATURES_ALL)} (14 global + 48 per-protocol + 2 pkt size)")
+    print("=" * 70)
+
+    df_train = pd.read_csv(train_csv)
+    df_val = pd.read_csv(val_csv)
+
+    feature_cols = [c for c in get_feature_columns(include_adv=True) if c in df_train.columns]
+    missing = [c for c in SKETCH_FEATURES_ALL if c not in df_train.columns]
+    if missing:
+        print(f"\n[WARNING] Missing: {missing[:5]}...")
+
+    X_train = df_train[feature_cols].values
+    X_val = df_val[feature_cols].values
+    y_train_labels = df_train['label'].values
+    y_val_labels = df_val['label'].values
+
+    label_encoder = LabelEncoder()
+    y_train = label_encoder.fit_transform(y_train_labels)
+    y_val = label_encoder.transform(y_val_labels)
+
+    print(f"\n[DATASET]")
+    print(f"  Train: {len(X_train)}  Val: {len(X_val)}")
+    print(f"  Features: {len(feature_cols)}")
+    print(f"  Classes: {list(label_encoder.classes_)}")
+
+    print(f"\n[CLASS DISTRIBUTION]")
+    for cls in label_encoder.classes_:
+        train_count = np.sum(y_train_labels == cls)
+        val_count = np.sum(y_val_labels == cls)
+        print(f"  {cls:15s}: Train={train_count:4d}  Val={val_count:4d}")
+
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_val_scaled = scaler.transform(X_val)
+
+    train_data = lgb.Dataset(X_train_scaled, label=y_train, feature_name=feature_cols)
+    val_data = lgb.Dataset(X_val_scaled, label=y_val, reference=train_data, feature_name=feature_cols)
+
+    dataset_size = len(X_train)
+    if dataset_size < 500:
+        params = {
+            'objective': 'multiclass', 'num_class': len(label_encoder.classes_),
+            'metric': 'multi_logloss', 'learning_rate': 0.05,
+            'max_depth': 4, 'num_leaves': 15, 'min_data_in_leaf': 5,
+            'feature_fraction': 0.8, 'bagging_fraction': 0.8, 'bagging_freq': 5,
+            'lambda_l1': 1.0, 'lambda_l2': 1.0, 'verbose': -1, 'seed': 42
+        }
+        num_boost_round = 150
+    elif dataset_size < 1000:
+        params = {
+            'objective': 'multiclass', 'num_class': len(label_encoder.classes_),
+            'metric': 'multi_logloss', 'learning_rate': 0.03,
+            'max_depth': 3, 'num_leaves': 7, 'min_data_in_leaf': 20,
+            'feature_fraction': 0.7, 'bagging_fraction': 0.7, 'bagging_freq': 5,
+            'lambda_l1': 5.0, 'lambda_l2': 10.0, 'min_gain_to_split': 1.0,
+            'verbose': -1, 'seed': 42
+        }
+        num_boost_round = 100
+    else:
+        params = {
+            'objective': 'multiclass', 'num_class': len(label_encoder.classes_),
+            'metric': 'multi_logloss', 'learning_rate': 0.05,
+            'max_depth': 8, 'num_leaves': 63, 'min_data_in_leaf': 10,
+            'feature_fraction': 0.9, 'bagging_fraction': 0.85, 'bagging_freq': 5,
+            'lambda_l1': 0.5, 'lambda_l2': 0.5, 'min_gain_to_split': 0.01,
+            'verbose': -1, 'seed': 42
+        }
+        num_boost_round = 300
+
+    early_stop_rounds = 10 if dataset_size < 1000 else 20 if dataset_size < 2000 else 30
+
+    print(f"\n[TRAINING] {len(feature_cols)} sketch-adv features, {num_boost_round} rounds...")
+    model = lgb.train(
+        params, train_data,
+        num_boost_round=num_boost_round,
+        valid_sets=[train_data, val_data],
+        valid_names=['train', 'valid'],
+        callbacks=[
+            lgb.log_evaluation(period=50),
+            lgb.early_stopping(stopping_rounds=early_stop_rounds, verbose=True)
+        ]
+    )
+
+    y_val_pred = np.argmax(model.predict(X_val_scaled), axis=1)
+    val_accuracy = accuracy_score(y_val, y_val_pred)
+
+    print(f"\n[VALIDATION] Accuracy: {val_accuracy * 100:.2f}%")
+    print(classification_report(y_val, y_val_pred, target_names=label_encoder.classes_))
+
+    # Save
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    model.save_model(str(output_path / 'lightgbm_model.txt'))
+
+    with open(output_path / 'label_mapping.json', 'w') as f:
+        json.dump({str(i): l for i, l in enumerate(label_encoder.classes_)}, f, indent=2)
+    with open(output_path / 'feature_scaler.pkl', 'wb') as f:
+        pickle.dump(scaler, f)
+    with open(output_path / 'feature_columns.json', 'w') as f:
+        json.dump(feature_cols, f, indent=2)
+    with open(output_path / 'training_metadata.json', 'w') as f:
+        json.dump({
+            'feature_group': 'sketch_adv',
+            'num_features': len(feature_cols),
+            'feature_columns': feature_cols,
+            'train_samples': len(X_train),
+            'val_samples': len(X_val),
+            'val_accuracy': float(val_accuracy),
+            'classes': list(label_encoder.classes_),
+            'best_iteration': model.best_iteration,
+        }, f, indent=2)
+
+    # Feature importance
+    importance = pd.DataFrame({
+        'feature': feature_cols,
+        'importance': model.feature_importance(importance_type='gain')
+    }).sort_values('importance', ascending=False)
+    importance.to_csv(output_path / 'feature_importance.csv', index=False)
+
+    print(f"\n[FEATURE IMPORTANCE] Top 15:")
+    for _, row in importance.head(15).iterrows():
+        print(f"  {row['feature']:30s}: {row['importance']:8.1f}")
+
+    print(f"\n[DONE] Accuracy: {val_accuracy * 100:.2f}% | Output: {output_path}")
+
+    if val_accuracy >= 0.99:
+        print("[WARNING] 99%+ accuracy may indicate overfitting")
+    elif val_accuracy >= 0.95:
+        print("[STATUS] Excellent (95-99%)")
+    elif val_accuracy >= 0.90:
+        print("[STATUS] Good (90-95%)")
+    else:
+        print("[RECOMMENDATION] < 90%. Collect more data.")
+
+    return val_accuracy
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Train LightGBM with sketch-adv features (64)')
+    parser.add_argument('--train', required=True, help='Training CSV')
+    parser.add_argument('--val', required=True, help='Validation CSV')
+    parser.add_argument('--output', required=True, help='Output directory')
+    args = parser.parse_args()
+    train_and_export(args.train, args.val, args.output)
+
+
+if __name__ == '__main__':
+    main()

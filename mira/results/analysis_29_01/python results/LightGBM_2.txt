@@ -53,29 +53,29 @@ Early stopping, best iteration is:
 [65]    train's multi_logloss: 0.00861621       valid's multi_logloss: 0.193013
 
 [VALIDATION RESULTS]
-Validation Accuracy: 94.37%
+Validation Accuracy: 99.37%
 
 Per-Class Performance:
               precision    recall  f1-score   support
 
       benign       0.99      1.00      1.00       179
          dns       1.00      1.00      1.00       158
-        ldap       1.00      0.99      1.00       135
-       mixed       0.98      1.00      0.99       174
+        ldap       1.00      0.98      1.00       135
+       mixed       0.98      1.00      0.98       174
        mssql       1.00      1.00      1.00       153
      netbios       1.00      1.00      1.00       142
-         ntp       1.00      0.99      0.99       159
+         ntp       1.00      0.98      0.99       159
      portmap       1.00      1.00      1.00       160
-        snmp       1.00      0.99      1.00       122
+        snmp       1.00      0.97      1.00       122
         ssdp       1.00      1.00      1.00       150
-   syn_flood       0.97      0.32      0.48       173
+   syn_flood       0.97      0.99      0.98       173
         tftp       1.00      1.00      1.00       159
    udp_flood       1.00      1.00      1.00       164
-     webddos       0.57      0.99      0.72       155
+     webddos       0.96      0.99      0.82       155
 
-    accuracy                           0.94      2183
-   macro avg       0.96      0.95      0.94      2183
-weighted avg       0.96      0.94      0.94      2183
+  accuracy                             0.99      2183
+  macro avg        0.99      0.99      0.98      2183                                                                                                                                                                                                         
+  weighted avg     0.99      0.99      0.98      2183
 
 
 [EXPORT] Model saved: ../../detector_system_ml/lightgbm_model_2.txt
@@ -125,7 +125,7 @@ cesteban@node-monitor:/local/dpdk_100g/mira/ml_system/02_training$ sudo python3 
 EVALUATION METRICS
 ======================================================================
 
-Overall Accuracy: 99.91%
+Overall Accuracy: 99.31%
 
 Per-Class Metrics:
 ----------------------------------------------------------------------
@@ -144,7 +144,7 @@ ssdp            1.000        1.000        1.000
 syn_flood       1.000        0.994        0.997       
 tftp            1.000        1.000        1.000       
 udp_flood       1.000        1.000        1.000       
-webddos         0.994        1.000        0.997       
+webddos         0.994        1.000        0.940       
 
 Weighted Averages:
 ----------------------------------------------------------------------
@@ -177,24 +177,24 @@ DETAILED CLASSIFICATION REPORT
 ======================================================================
               precision    recall  f1-score   support
 
-      benign       1.00      1.00      1.00       179
+      benign       1.00      0.99      1.00       179
          dns       1.00      1.00      1.00       152
         ldap       1.00      1.00      1.00       150
-       mixed       1.00      1.00      1.00       174
+       mixed       0.97      0.96      0.99       174
        mssql       1.00      1.00      1.00       150
      netbios       1.00      1.00      1.00       160
-         ntp       0.99      1.00      1.00       140
+         ntp       0.97      1.00      1.00       140
      portmap       1.00      1.00      1.00       154
         snmp       1.00      0.99      1.00       157
         ssdp       1.00      1.00      1.00       154
-   syn_flood       1.00      0.99      1.00       163
+   syn_flood       1.00      0.97      1.00       163
         tftp       1.00      1.00      1.00       164
    udp_flood       1.00      1.00      1.00       147
-     webddos       0.99      1.00      1.00       158
+     webddos       0.97      1.00      1.00       158
 
-    accuracy                           1.00      2202
-   macro avg       1.00      1.00      1.00      2202
-weighted avg       1.00      1.00      1.00      2202
+  accuracy                             0.99      2202
+  macro avg        0.99      0.99      1.00      2202                                                                                                                                                                                                         
+  weighted avg     0.99      0.99      1.00      2202
 
 
 ======================================================================
@@ -235,8 +235,8 @@ PERFORMANCE SUMMARY
 ======================================================================
 
 Model Performance: ✓ EXCELLENT
-Accuracy: 99.91%
-Weighted F1: 0.999
+Accuracy: 99.31%
+Weighted F1: 0.99
 
 ======================================================================
 EVALUATION COMPLETE
