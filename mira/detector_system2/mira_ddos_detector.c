@@ -547,6 +547,7 @@ static rte_atomic32_t g_ip_count;
 static struct detection_stats g_stats;
 static struct worker_stats g_worker_stats[NUM_RX_QUEUES] __rte_cache_aligned;
 static FILE *g_log_file = NULL;
+static const char *g_log_output_path = "../results/mira_detector_multicore.log";  /* Default log path */
 static FILE *g_binary_log_file = NULL;  /* Binary log for ML training */
 static bool g_binary_log_enabled = false;
 static bool g_sketch_adv_enabled = false;
@@ -2476,9 +2477,21 @@ int main(int argc, char *argv[])
             }
             g_sketch_adv_enabled = true;
             printf("Sketch-ADV enabled → %s\n", g_sketch_adv_path);
+        } else if (strcmp(argv[i], "--log-output") == 0) {
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                g_log_output_path = argv[i + 1];
+                i++;  /* Skip path argument */
+            } else {
+                printf("Error: --log-output requires output file path\n");
+                printf("  Example: --log-output /path/to/attack_dns_run1.log\n");
+                return 1;
+            }
+            printf("Log output → %s\n", g_log_output_path);
         } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             printf("Usage: %s [EAL options] -- [Application options]\n", argv[0]);
             printf("\nApplication options:\n");
+            printf("  --log-output <path>   Set log output file path\n");
+            printf("                        (default: ../results/mira_detector_multicore.log)\n");
             printf("  --binary-log          Enable binary logging for ML training\n");
             printf("                        (writes to ../results/mira_detector_ml.bin)\n");
             printf("  --sketch-adv <path>   Enable per-protocol sketches (64-feature ML)\n");
@@ -2521,9 +2534,11 @@ int main(int argc, char *argv[])
     if (ip_hash == NULL)
         rte_exit(EXIT_FAILURE, "Cannot create hash table\n");
 
-    g_log_file = fopen("../results/mira_detector_multicore.log", "w");
+    g_log_file = fopen(g_log_output_path, "w");
     if (!g_log_file)
-        printf("Warning: Could not open log file\n");
+        printf("Warning: Could not open log file: %s\n", g_log_output_path);
+    else
+        printf("Log file: %s\n", g_log_output_path);
 
     /* Open binary log file if enabled */
     if (g_binary_log_enabled) {
