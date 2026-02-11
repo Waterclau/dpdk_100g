@@ -1,9 +1,394 @@
+label
+benign    179
+Name: count, dtype: int64
+
+[INFO] Loaded ../datasets/processed/benign_baseline_run2.csv:
+  Rows: 179
+  Label distribution:
+label
+benign    179
+Name: count, dtype: int64
+
+[INFO] Loaded ../datasets/processed/benign_baseline_run3.csv:
+  Rows: 179
+  Label distribution:
+label
+benign    179
+Name: count, dtype: int64
+
+[INFO] Loaded ../datasets/processed/mixed_traffic_run1.csv:
+  Rows: 179
+  Label distribution:
+label
+mixed    179
+Name: count, dtype: int64
+
+[INFO] Loaded ../datasets/processed/mixed_traffic_run2.csv:
+  Rows: 179
+  Label distribution:
+label
+mixed    179
+Name: count, dtype: int64
+
+[INFO] Loaded ../datasets/processed/mixed_traffic_run3.csv:
+  Rows: 179
+  Label distribution:
+label
+mixed    179
+Name: count, dtype: int64
+
+[INFO] Combined dataset:
+  Total rows: 7780
+  Features: ['total_packets', 'total_bytes', 'udp_packets', 'tcp_packets', 'icmp_packets', 'syn_packets', 'http_requests', 'dns_queries', 'baseline_packets', 'attack_packets', 'udp_tcp_ratio', 'syn_total_ratio', 'baseline_attack_ratio', 'bytes_per_packet', 'ntp_monlist_queries', 'ntp_responses', 'avg_ntp_response_size', 'dns_any_queries', 'dns_txt_queries', 'dns_responses', 'avg_dns_response_size', 'snmp_getbulk_requests', 'snmp_responses', 'avg_snmp_response_size', 'ssdp_msearch_packets', 'ssdp_responses', 'portmap_getport_calls', 'portmap_dump_calls', 'netbios_name_queries', 'netbios_dgram_packets', 'ldap_bind_requests', 'ldap_search_requests', 'mssql_sqlbatch_packets', 'mssql_rpc_packets', 'tftp_rrq_packets', 'tftp_wrq_packets', 'ntp_amplification_factor', 'dns_amplification_factor', 'snmp_amplification_factor', 'query_response_ratio', 'fragmentation_ratio', 'syn_ack_ratio', 'label', 'run_id']
+  Label distribution:
+label
+mixed      857
+dns        537
+ldap       537
+mssql      537
+netbios    537
+ntp        537
+portmap    537
+snmp       537
+ssdp       537
+syn        537
+tftp       537
+udp        537
+benign     537
+webddos    479
+Name: count, dtype: int64
+
+[INFO] Split by run_id:
+  Train runs: ['run1', 'run2']
+  Val runs:   ['run3']
+  Test runs:  ['run3']
+
+[INFO] Split results:
+  Train set: 5332 rows
+  Val set:   2448 rows
+  Test set:  2448 rows
+
+[INFO] Train set label distribution:
+label
+mixed      678
+dns        358
+ldap       358
+mssql      358
+netbios    358
+ntp        358
+portmap    358
+snmp       358
+ssdp       358
+syn        358
+tftp       358
+udp        358
+webddos    358
+benign     358
+Name: count, dtype: int64
+
+[INFO] Val set label distribution:
+label
+dns        179
+ldap       179
+mssql      179
+netbios    179
+ntp        179
+portmap    179
+snmp       179
+ssdp       179
+syn        179
+tftp       179
+udp        179
+benign     179
+mixed      179
+webddos    121
+Name: count, dtype: int64
+
+[INFO] Test set label distribution:
+label
+dns        179
+ldap       179
+mssql      179
+netbios    179
+ntp        179
+portmap    179
+snmp       179
+ssdp       179
+syn        179
+tftp       179
+udp        179
+benign     179
+mixed      179
+webddos    121
+Name: count, dtype: int64
+
+[SUCCESS] Saved dataset splits:
+  Train: ../datasets/splits/train.csv
+  Val:   ../datasets/splits/val.csv
+  Test:  ../datasets/splits/test.csv
+
+[DONE] Dataset preparation complete!
+
+Next steps:
+1. Train model: python3 export_lightgbm_model.py --train ../datasets/splits/train.csv
+2. Evaluate model: python3 evaluate_model.py --test ../datasets/splits/test.csv
+cesteban@node-monitor:/local/dpdk_100g/mira/ml_system/02_training$ sudo python3 train_with_normalization.py --train ../datasets/splits/train.csv --val ../datasets/splits/val.csv --output ../../detector_system_ml/lightgbm_model.txt
+======================================================================
+TRAINING LIGHTGBM MODEL WITH FEATURE NORMALIZATION
+======================================================================
+
+[INFO] Loading training data: ../datasets/splits/train.csv
+[INFO] Loading validation data: ../datasets/splits/val.csv
+
+[DATASET INFO]
+  Training samples: 5332
+  Validation samples: 2448
+  Features: 42
+  Classes: ['benign', 'dns', 'ldap', 'mixed', 'mssql', 'netbios', 'ntp', 'portmap', 'snmp', 'ssdp', 'syn', 'tftp', 'udp', 'webddos']
+
+[CLASS DISTRIBUTION]
+  benign    : Train= 358 (  6.7%)  Val= 179 (  7.3%)
+  dns       : Train= 358 (  6.7%)  Val= 179 (  7.3%)
+  ldap      : Train= 358 (  6.7%)  Val= 179 (  7.3%)
+  mixed     : Train= 678 ( 12.7%)  Val= 179 (  7.3%)
+  mssql     : Train= 358 (  6.7%)  Val= 179 (  7.3%)
+  netbios   : Train= 358 (  6.7%)  Val= 179 (  7.3%)
+  ntp       : Train= 358 (  6.7%)  Val= 179 (  7.3%)
+  portmap   : Train= 358 (  6.7%)  Val= 179 (  7.3%)
+  snmp      : Train= 358 (  6.7%)  Val= 179 (  7.3%)
+  ssdp      : Train= 358 (  6.7%)  Val= 179 (  7.3%)
+  syn       : Train= 358 (  6.7%)  Val= 179 (  7.3%)
+  tftp      : Train= 358 (  6.7%)  Val= 179 (  7.3%)
+  udp       : Train= 358 (  6.7%)  Val= 179 (  7.3%)
+  webddos   : Train= 358 (  6.7%)  Val= 121 (  4.9%)
+
+[FEATURE NORMALIZATION]
+  Applying StandardScaler (mean=0, std=1)...
+
+  Feature statistics after scaling:
+    total_packets       : mean=  0.000, std=  1.000
+    total_bytes         : mean=  0.000, std=  1.000
+    udp_packets         : mean=  0.000, std=  1.000
+    tcp_packets         : mean= -0.000, std=  1.000
+    icmp_packets        : mean=  0.000, std=  1.000
+
+[INFO] Large dataset (5332 samples)
+
+[TRAINING CONFIGURATION]
+  Boosting rounds: 300
+  Max depth: 8
+  Num leaves: 63
+  Learning rate: 0.05
+  L1/L2 regularization: 0.5/0.5
+
+[TRAINING MODEL]
+  Early stopping rounds: 30 (aggressive for small datasets)
+Training until validation scores don't improve for 30 rounds
+[50]    train's multi_logloss: 0.0589694        valid's multi_logloss: 0.0662267
+[100]   train's multi_logloss: 0.0419776        valid's multi_logloss: 0.0476885
+[150]   train's multi_logloss: 0.0409938        valid's multi_logloss: 0.0471638
+[200]   train's multi_logloss: 0.0406357        valid's multi_logloss: 0.0466044
+[250]   train's multi_logloss: 0.0403941        valid's multi_logloss: 0.0465033
+Early stopping, best iteration is:
+[255]   train's multi_logloss: 0.040378 valid's multi_logloss: 0.0464519
+
+[VALIDATION RESULTS]
+Validation Accuracy: 98.41%
+
+Per-Class Performance:
+              precision    recall  f1-score   support
+
+      benign       0.99      0.97      0.98       179
+         dns       1.00      0.98      0.99       179
+        ldap       1.00      0.99      0.99       179
+       mixed       0.83      0.99      0.90       179
+       mssql       1.00      0.99      0.99       179
+     netbios       1.00      0.99      0.99       179
+         ntp       1.00      0.98      0.99       179
+     portmap       1.00      0.99      0.99       179
+        snmp       1.00      0.99      0.99       179
+        ssdp       1.00      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.99      0.99       179
+         udp       1.00      0.98      0.99       179
+     webddos       1.00      0.97      0.98       121
+
+    accuracy                           0.98      2448
+   macro avg       0.99      0.98      0.98      2448
+weighted avg       0.99      0.98      0.98      2448
+
+
+[EXPORT] Model saved: ../../detector_system_ml/lightgbm_model.txt
+[EXPORT] Label mapping saved: ../../detector_system_ml/label_mapping.json
+[EXPORT] Feature scaler saved: ../../detector_system_ml/feature_scaler.pkl
+
+[FEATURE IMPORTANCE] Top 10 features:
+  syn_total_ratio          :  28645.7
+  syn_ack_ratio            :  22349.8
+  dns_any_queries          :  16052.3
+  ntp_monlist_queries      :  15744.5
+  ssdp_msearch_packets     :  15669.0
+  netbios_name_queries     :  15345.4
+  avg_dns_response_size    :  15340.3
+  portmap_getport_calls    :  14614.1
+  tftp_rrq_packets         :  14581.5
+  mssql_sqlbatch_packets   :  14460.1
+
+======================================================================
+MODEL TRAINING COMPLETE
+======================================================================
+
+Final Validation Accuracy: 98.41%
+
+Files created:
+  1. ../../detector_system_ml/lightgbm_model.txt
+  2. ../../detector_system_ml/label_mapping.json
+  3. ../../detector_system_ml/feature_scaler.pkl
+
+[STATUS] Excellent performance (95-99%)! ✅
+cesteban@node-monitor:/local/dpdk_100g/mira/ml_system/02_training$ sudo python3 evaluate_model.py --model ../../detector_system_ml/lightgbm_model.txt --test ../datasets/splits/test.csv
+======================================================================
+LIGHTGBM MODEL EVALUATION
+======================================================================
+
+[INFO] Loading test data: ../datasets/splits/test.csv
+[INFO] Test samples: 2448
+[INFO] Features: 42
+[INFO] Classes: ['benign', 'dns', 'ldap', 'mixed', 'mssql', 'netbios', 'ntp', 'portmap', 'snmp', 'ssdp', 'syn', 'tftp', 'udp', 'webddos']
+
+[INFO] Loading model: ../../detector_system_ml/lightgbm_model.txt
+[INFO] Loading scaler: ../../detector_system_ml/feature_scaler.pkl
+
+[INFO] Making predictions...
+
+======================================================================
+EVALUATION METRICS
+======================================================================
+
+Overall Accuracy: 98.41%
+
+Per-Class Metrics:
+----------------------------------------------------------------------
+Class           Precision    Recall       F1-Score    
+----------------------------------------------------------------------
+benign          0.989        0.972        0.980       
+dns             1.000        0.983        0.992       
+ldap            1.000        0.989        0.994       
+mixed           0.827        0.989        0.901       
+mssql           1.000        0.989        0.994       
+netbios         1.000        0.989        0.994       
+ntp             1.000        0.983        0.992       
+portmap         1.000        0.989        0.994       
+snmp            1.000        0.989        0.994       
+ssdp            1.000        0.983        0.992       
+syn             1.000        0.978        0.989       
+tftp            1.000        0.989        0.994       
+udp             1.000        0.983        0.992       
+webddos         1.000        0.967        0.983       
+
+Weighted Averages:
+----------------------------------------------------------------------
+Precision: 0.987
+Recall:    0.984
+F1-Score:  0.985
+
+======================================================================
+CONFUSION MATRIX
+======================================================================
+True\Pred      benign      dns         ldap        mixed       mssql       netbios     ntp         portmap     snmp        ssdp        syn         tftp        udp         webddos     
+----------------------------------------------------------------------
+benign         174         0           0           5           0           0           0           0           0           0           0           0           0           0           
+dns            0           176         0           3           0           0           0           0           0           0           0           0           0           0           
+ldap           0           0           177         2           0           0           0           0           0           0           0           0           0           0           
+mixed          2           0           0           177         0           0           0           0           0           0           0           0           0           0           
+mssql          0           0           0           2           177         0           0           0           0           0           0           0           0           0           
+netbios        0           0           0           2           0           177         0           0           0           0           0           0           0           0           
+ntp            0           0           0           3           0           0           176         0           0           0           0           0           0           0           
+portmap        0           0           0           2           0           0           0           177         0           0           0           0           0           0           
+snmp           0           0           0           2           0           0           0           0           177         0           0           0           0           0           
+ssdp           0           0           0           3           0           0           0           0           0           176         0           0           0           0           
+syn            0           0           0           4           0           0           0           0           0           0           175         0           0           0           
+tftp           0           0           0           2           0           0           0           0           0           0           0           177         0           0           
+udp            0           0           0           3           0           0           0           0           0           0           0           0           176         0           
+webddos        0           0           0           4           0           0           0           0           0           0           0           0           0           117         
+
+======================================================================
+DETAILED CLASSIFICATION REPORT
+======================================================================
+              precision    recall  f1-score   support
+
+      benign       0.99      0.97      0.98       179
+         dns       1.00      0.98      0.99       179
+        ldap       1.00      0.99      0.99       179
+       mixed       0.83      0.99      0.90       179
+       mssql       1.00      0.99      0.99       179
+     netbios       1.00      0.99      0.99       179
+         ntp       1.00      0.98      0.99       179
+     portmap       1.00      0.99      0.99       179
+        snmp       1.00      0.99      0.99       179
+        ssdp       1.00      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.99      0.99       179
+         udp       1.00      0.98      0.99       179
+     webddos       1.00      0.97      0.98       121
+
+    accuracy                           0.98      2448
+   macro avg       0.99      0.98      0.98      2448
+weighted avg       0.99      0.98      0.98      2448
+
+
+======================================================================
+SAMPLE PREDICTIONS (First 10)
+======================================================================
+Index    True Label      Predicted       Confidence   Correct   
+----------------------------------------------------------------------
+0        dns             mixed           0.117        ✗         
+1        dns             mixed           0.117        ✗         
+2        dns             mixed           0.117        ✗         
+3        dns             dns             0.946        ✓         
+4        dns             dns             0.998        ✓         
+5        dns             dns             0.998        ✓         
+6        dns             dns             0.999        ✓         
+7        dns             dns             0.999        ✓         
+8        dns             dns             0.999        ✓         
+9        dns             dns             0.999        ✓         
+
+[INFO] Label mapping found: ../../detector_system_ml/label_mapping.json
+[INFO] Label mapping:
+  0: benign
+  1: dns
+  2: ldap
+  3: mixed
+  4: mssql
+  5: netbios
+  6: ntp
+  7: portmap
+  8: snmp
+  9: ssdp
+  10: syn
+  11: tftp
+  12: udp
+  13: webddos
+
+======================================================================
+PERFORMANCE SUMMARY
+======================================================================
+
+Model Performance: ✓ EXCELLENT
+Accuracy: 98.41%
+Weighted F1: 0.985
+
+======================================================================
+EVALUATION COMPLETE
+======================================================================
+cesteban@node-monitor:/local/dpdk_100g/mira/ml_system/02_training$ cd /local/dpdk_100g/mira/ml_system/02_training/model_compare
+cesteban@node-monitor:/local/dpdk_100g/mira/ml_system/02_training/model_compare$ sudo python3 run_compare.py --train ../../datasets/splits/train.csv --val ../../datasets/splits/val.csv --test ../../datasets/splits/test.csv --output-dir ../../../detector_system_ml/alt_model --sequence-models --seq-len 12 --stride 6 --epochs 10 --seq-output-dir ../../../detector_system_ml/alt_model_sequence
 ======================================================================
 MODEL COMPARISON (NON-LIGHTGBM)
 ======================================================================
 
 [DATASET]
-  Train: 5446  Val: 1167  Test: 1167
+  Train: 5332  Val: 2448  Test: 2448
   Features: 42  Classes: ['benign', 'dns', 'ldap', 'mixed', 'mssql', 'netbios', 'ntp', 'portmap', 'snmp', 'ssdp', 'syn', 'tftp', 'udp', 'webddos']
 /usr/local/lib/python3.8/dist-packages/xgboost/core.py:265: FutureWarning: Your system has an old version of glibc (< 2.28). We will stop supporting Linux distros with glibc older than 2.28 after **May 31, 2025**. Please upgrade to a recent Linux distro (with glibc 2.28+) to use future versions of XGBoost.
 Note: You have installed the 'manylinux2014' variant of XGBoost. Certain features such as GPU algorithms or federated learning are not available. To use these features, please upgrade to a recent Linux distro with glibc 2.28+, and install the 'manylinux_2_28' variant.
@@ -12,591 +397,605 @@ Note: You have installed the 'manylinux2014' variant of XGBoost. Certain feature
 Training RandomForest...
 
 [RandomForest]
-  Val accuracy:  98.37%
-  Test accuracy: 99.14%
+  Val accuracy:  98.41%
+  Test accuracy: 98.41%
 
 VALIDATION RESULTS
 ----------------------------------------------------------------------
               precision    recall  f1-score   support
 
-      benign       1.00      0.96      0.98        81
-         dns       1.00      0.97      0.99        80
-        ldap       1.00      1.00      1.00        81
-       mixed       0.87      1.00      0.93       128
-       mssql       1.00      0.97      0.99        80
-     netbios       1.00      0.99      0.99        81
-         ntp       1.00      0.98      0.99        81
-     portmap       1.00      0.99      0.99        80
-        snmp       1.00      0.97      0.99        80
-        ssdp       1.00      0.98      0.99        81
-         syn       1.00      0.99      0.99        81
-        tftp       1.00      0.98      0.99        81
-         udp       1.00      1.00      1.00        80
-     webddos       1.00      0.99      0.99        72
+      benign       0.99      0.97      0.98       179
+         dns       1.00      0.98      0.99       179
+        ldap       1.00      0.99      0.99       179
+       mixed       0.83      0.99      0.90       179
+       mssql       1.00      0.99      0.99       179
+     netbios       1.00      0.99      0.99       179
+         ntp       1.00      0.98      0.99       179
+     portmap       1.00      0.99      0.99       179
+        snmp       1.00      0.99      0.99       179
+        ssdp       1.00      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.99      0.99       179
+         udp       1.00      0.98      0.99       179
+     webddos       1.00      0.97      0.98       121
 
-    accuracy                           0.98      1167
-   macro avg       0.99      0.98      0.99      1167
-weighted avg       0.99      0.98      0.98      1167
+    accuracy                           0.98      2448
+   macro avg       0.99      0.98      0.98      2448
+weighted avg       0.99      0.98      0.98      2448
 
 CONFUSION MATRIX
-[[ 78   0   0   3   0   0   0   0   0   0   0   0   0   0]
- [  0  78   0   2   0   0   0   0   0   0   0   0   0   0]
- [  0   0  81   0   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0 128   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0   2  78   0   0   0   0   0   0   0   0   0]
- [  0   0   0   1   0  80   0   0   0   0   0   0   0   0]
- [  0   0   0   2   0   0  79   0   0   0   0   0   0   0]
- [  0   0   0   1   0   0   0  79   0   0   0   0   0   0]
- [  0   0   0   2   0   0   0   0  78   0   0   0   0   0]
- [  0   0   0   2   0   0   0   0   0  79   0   0   0   0]
- [  0   0   0   1   0   0   0   0   0   0  80   0   0   0]
- [  0   0   0   2   0   0   0   0   0   0   0  79   0   0]
- [  0   0   0   0   0   0   0   0   0   0   0   0  80   0]
- [  0   0   0   1   0   0   0   0   0   0   0   0   0  71]]
+[[174   0   0   5   0   0   0   0   0   0   0   0   0   0]
+ [  0 176   0   3   0   0   0   0   0   0   0   0   0   0]
+ [  0   0 177   2   0   0   0   0   0   0   0   0   0   0]
+ [  2   0   0 177   0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   2 177   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   2   0 177   0   0   0   0   0   0   0   0]
+ [  0   0   0   3   0   0 176   0   0   0   0   0   0   0]
+ [  0   0   0   2   0   0   0 177   0   0   0   0   0   0]
+ [  0   0   0   2   0   0   0   0 177   0   0   0   0   0]
+ [  0   0   0   3   0   0   0   0   0 176   0   0   0   0]
+ [  0   0   0   4   0   0   0   0   0   0 175   0   0   0]
+ [  0   0   0   2   0   0   0   0   0   0   0 177   0   0]
+ [  0   0   0   3   0   0   0   0   0   0   0   0 176   0]
+ [  0   0   0   4   0   0   0   0   0   0   0   0   0 117]]
 
 TEST RESULTS
 ----------------------------------------------------------------------
               precision    recall  f1-score   support
 
-      benign       1.00      0.95      0.97        80
-         dns       1.00      1.00      1.00        81
-        ldap       1.00      0.99      0.99        80
-       mixed       0.93      1.00      0.96       129
-       mssql       1.00      0.99      0.99        81
-     netbios       1.00      1.00      1.00        80
-         ntp       1.00      1.00      1.00        81
-     portmap       1.00      0.99      0.99        81
-        snmp       1.00      1.00      1.00        81
-        ssdp       1.00      1.00      1.00        80
-         syn       1.00      0.99      0.99        80
-        tftp       1.00      1.00      1.00        80
-         udp       1.00      0.99      0.99        81
-     webddos       1.00      0.99      0.99        72
+      benign       0.99      0.97      0.98       179
+         dns       1.00      0.98      0.99       179
+        ldap       1.00      0.99      0.99       179
+       mixed       0.83      0.99      0.90       179
+       mssql       1.00      0.99      0.99       179
+     netbios       1.00      0.99      0.99       179
+         ntp       1.00      0.98      0.99       179
+     portmap       1.00      0.99      0.99       179
+        snmp       1.00      0.99      0.99       179
+        ssdp       1.00      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.99      0.99       179
+         udp       1.00      0.98      0.99       179
+     webddos       1.00      0.97      0.98       121
 
-    accuracy                           0.99      1167
-   macro avg       0.99      0.99      0.99      1167
-weighted avg       0.99      0.99      0.99      1167
+    accuracy                           0.98      2448
+   macro avg       0.99      0.98      0.98      2448
+weighted avg       0.99      0.98      0.98      2448
 
 CONFUSION MATRIX
-[[ 76   0   0   4   0   0   0   0   0   0   0   0   0   0]
- [  0  81   0   0   0   0   0   0   0   0   0   0   0   0]
- [  0   0  79   1   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0 129   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0   1  80   0   0   0   0   0   0   0   0   0]
- [  0   0   0   0   0  80   0   0   0   0   0   0   0   0]
- [  0   0   0   0   0   0  81   0   0   0   0   0   0   0]
- [  0   0   0   1   0   0   0  80   0   0   0   0   0   0]
- [  0   0   0   0   0   0   0   0  81   0   0   0   0   0]
- [  0   0   0   0   0   0   0   0   0  80   0   0   0   0]
- [  0   0   0   1   0   0   0   0   0   0  79   0   0   0]
- [  0   0   0   0   0   0   0   0   0   0   0  80   0   0]
- [  0   0   0   1   0   0   0   0   0   0   0   0  80   0]
- [  0   0   0   1   0   0   0   0   0   0   0   0   0  71]]
+[[174   0   0   5   0   0   0   0   0   0   0   0   0   0]
+ [  0 176   0   3   0   0   0   0   0   0   0   0   0   0]
+ [  0   0 177   2   0   0   0   0   0   0   0   0   0   0]
+ [  2   0   0 177   0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   2 177   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   2   0 177   0   0   0   0   0   0   0   0]
+ [  0   0   0   3   0   0 176   0   0   0   0   0   0   0]
+ [  0   0   0   2   0   0   0 177   0   0   0   0   0   0]
+ [  0   0   0   2   0   0   0   0 177   0   0   0   0   0]
+ [  0   0   0   3   0   0   0   0   0 176   0   0   0   0]
+ [  0   0   0   4   0   0   0   0   0   0 175   0   0   0]
+ [  0   0   0   2   0   0   0   0   0   0   0 177   0   0]
+ [  0   0   0   3   0   0   0   0   0   0   0   0 176   0]
+ [  0   0   0   4   0   0   0   0   0   0   0   0   0 117]]
 
 SAMPLE PREDICTIONS (First 10)
 Index    True Label      Predicted       Confidence   Correct
 ----------------------------------------------------------------------
-0        snmp           snmp               1.000   YES
-1        ntp            ntp                1.000   YES
-2        syn            syn                1.000   YES
-3        netbios        netbios            1.000   YES
-4        ldap           ldap               1.000   YES
-5        benign         benign             0.930   YES
-6        netbios        netbios            0.997   YES
-7        snmp           snmp               1.000   YES
-8        portmap        portmap            1.000   YES
-9        udp            udp                1.000   YES
+0        dns            mixed              0.122   NO
+1        dns            mixed              0.122   NO
+2        dns            mixed              0.122   NO
+3        dns            dns                0.741   YES
+4        dns            dns                1.000   YES
+5        dns            dns                1.000   YES
+6        dns            dns                1.000   YES
+7        dns            dns                1.000   YES
+8        dns            dns                1.000   YES
+9        dns            dns                1.000   YES
 
 Training HistGradientBoosting...
 
 [HistGradientBoosting]
-  Val accuracy:  98.46%
-  Test accuracy: 99.14%
+  Val accuracy:  98.41%
+  Test accuracy: 98.41%
 
 VALIDATION RESULTS
 ----------------------------------------------------------------------
               precision    recall  f1-score   support
 
-      benign       0.99      0.98      0.98        81
-         dns       1.00      0.97      0.99        80
-        ldap       1.00      1.00      1.00        81
-       mixed       0.99      0.99      0.99       128
-       mssql       1.00      0.97      0.99        80
-     netbios       1.00      0.99      0.99        81
-         ntp       1.00      0.98      0.99        81
-     portmap       1.00      0.99      0.99        80
-        snmp       1.00      0.97      0.99        80
-        ssdp       1.00      0.98      0.99        81
-         syn       1.00      0.99      0.99        81
-        tftp       1.00      0.98      0.99        81
-         udp       1.00      1.00      1.00        80
-     webddos       0.82      1.00      0.90        72
+      benign       0.99      0.97      0.98       179
+         dns       1.00      0.98      0.99       179
+        ldap       1.00      0.99      0.99       179
+       mixed       0.83      0.99      0.90       179
+       mssql       1.00      0.99      0.99       179
+     netbios       1.00      0.99      0.99       179
+         ntp       1.00      0.98      0.99       179
+     portmap       1.00      0.99      0.99       179
+        snmp       1.00      0.99      0.99       179
+        ssdp       1.00      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.99      0.99       179
+         udp       1.00      0.98      0.99       179
+     webddos       1.00      0.97      0.98       121
 
-    accuracy                           0.98      1167
-   macro avg       0.99      0.98      0.98      1167
-weighted avg       0.99      0.98      0.99      1167
+    accuracy                           0.98      2448
+   macro avg       0.99      0.98      0.98      2448
+weighted avg       0.99      0.98      0.98      2448
 
 CONFUSION MATRIX
-[[ 79   0   0   1   0   0   0   0   0   0   0   0   0   1]
- [  0  78   0   0   0   0   0   0   0   0   0   0   0   2]
- [  0   0  81   0   0   0   0   0   0   0   0   0   0   0]
- [  1   0   0 127   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0   0  78   0   0   0   0   0   0   0   0   2]
- [  0   0   0   0   0  80   0   0   0   0   0   0   0   1]
- [  0   0   0   0   0   0  79   0   0   0   0   0   0   2]
- [  0   0   0   0   0   0   0  79   0   0   0   0   0   1]
- [  0   0   0   0   0   0   0   0  78   0   0   0   0   2]
- [  0   0   0   0   0   0   0   0   0  79   0   0   0   2]
- [  0   0   0   0   0   0   0   0   0   0  80   0   0   1]
- [  0   0   0   0   0   0   0   0   0   0   0  79   0   2]
- [  0   0   0   0   0   0   0   0   0   0   0   0  80   0]
- [  0   0   0   0   0   0   0   0   0   0   0   0   0  72]]
+[[174   0   0   5   0   0   0   0   0   0   0   0   0   0]
+ [  0 176   0   3   0   0   0   0   0   0   0   0   0   0]
+ [  0   0 177   2   0   0   0   0   0   0   0   0   0   0]
+ [  2   0   0 177   0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   2 177   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   2   0 177   0   0   0   0   0   0   0   0]
+ [  0   0   0   3   0   0 176   0   0   0   0   0   0   0]
+ [  0   0   0   2   0   0   0 177   0   0   0   0   0   0]
+ [  0   0   0   2   0   0   0   0 177   0   0   0   0   0]
+ [  0   0   0   3   0   0   0   0   0 176   0   0   0   0]
+ [  0   0   0   4   0   0   0   0   0   0 175   0   0   0]
+ [  0   0   0   2   0   0   0   0   0   0   0 177   0   0]
+ [  0   0   0   3   0   0   0   0   0   0   0   0 176   0]
+ [  0   0   0   4   0   0   0   0   0   0   0   0   0 117]]
 
 TEST RESULTS
 ----------------------------------------------------------------------
               precision    recall  f1-score   support
 
-      benign       1.00      0.95      0.97        80
-         dns       1.00      1.00      1.00        81
-        ldap       1.00      0.99      0.99        80
-       mixed       0.98      0.99      0.99       129
-       mssql       1.00      0.99      0.99        81
-     netbios       1.00      1.00      1.00        80
-         ntp       1.00      1.00      1.00        81
-     portmap       1.00      0.99      0.99        81
-        snmp       1.00      1.00      1.00        81
-        ssdp       1.00      1.00      1.00        80
-         syn       1.00      0.99      0.99        80
-        tftp       1.00      1.00      1.00        80
-         udp       1.00      0.99      0.99        81
-     webddos       0.90      1.00      0.95        72
+      benign       0.99      0.97      0.98       179
+         dns       1.00      0.98      0.99       179
+        ldap       1.00      0.99      0.99       179
+       mixed       0.83      0.99      0.90       179
+       mssql       1.00      0.99      0.99       179
+     netbios       1.00      0.99      0.99       179
+         ntp       1.00      0.98      0.99       179
+     portmap       1.00      0.99      0.99       179
+        snmp       1.00      0.99      0.99       179
+        ssdp       1.00      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.99      0.99       179
+         udp       1.00      0.98      0.99       179
+     webddos       1.00      0.97      0.98       121
 
-    accuracy                           0.99      1167
-   macro avg       0.99      0.99      0.99      1167
-weighted avg       0.99      0.99      0.99      1167
+    accuracy                           0.98      2448
+   macro avg       0.99      0.98      0.98      2448
+weighted avg       0.99      0.98      0.98      2448
 
 CONFUSION MATRIX
-[[ 76   0   0   2   0   0   0   0   0   0   0   0   0   2]
- [  0  81   0   0   0   0   0   0   0   0   0   0   0   0]
- [  0   0  79   0   0   0   0   0   0   0   0   0   0   1]
- [  0   0   0 128   0   0   0   0   0   0   0   0   0   1]
- [  0   0   0   0  80   0   0   0   0   0   0   0   0   1]
- [  0   0   0   0   0  80   0   0   0   0   0   0   0   0]
- [  0   0   0   0   0   0  81   0   0   0   0   0   0   0]
- [  0   0   0   0   0   0   0  80   0   0   0   0   0   1]
- [  0   0   0   0   0   0   0   0  81   0   0   0   0   0]
- [  0   0   0   0   0   0   0   0   0  80   0   0   0   0]
- [  0   0   0   0   0   0   0   0   0   0  79   0   0   1]
- [  0   0   0   0   0   0   0   0   0   0   0  80   0   0]
- [  0   0   0   0   0   0   0   0   0   0   0   0  80   1]
- [  0   0   0   0   0   0   0   0   0   0   0   0   0  72]]
+[[174   0   0   5   0   0   0   0   0   0   0   0   0   0]
+ [  0 176   0   3   0   0   0   0   0   0   0   0   0   0]
+ [  0   0 177   2   0   0   0   0   0   0   0   0   0   0]
+ [  2   0   0 177   0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   2 177   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   2   0 177   0   0   0   0   0   0   0   0]
+ [  0   0   0   3   0   0 176   0   0   0   0   0   0   0]
+ [  0   0   0   2   0   0   0 177   0   0   0   0   0   0]
+ [  0   0   0   2   0   0   0   0 177   0   0   0   0   0]
+ [  0   0   0   3   0   0   0   0   0 176   0   0   0   0]
+ [  0   0   0   4   0   0   0   0   0   0 175   0   0   0]
+ [  0   0   0   2   0   0   0   0   0   0   0 177   0   0]
+ [  0   0   0   3   0   0   0   0   0   0   0   0 176   0]
+ [  0   0   0   4   0   0   0   0   0   0   0   0   0 117]]
 
 SAMPLE PREDICTIONS (First 10)
 Index    True Label      Predicted       Confidence   Correct
 ----------------------------------------------------------------------
-0        snmp           snmp               1.000   YES
-1        ntp            ntp                1.000   YES
-2        syn            syn                1.000   YES
-3        netbios        netbios            1.000   YES
-4        ldap           ldap               1.000   YES
-5        benign         benign             1.000   YES
-6        netbios        netbios            1.000   YES
-7        snmp           snmp               1.000   YES
-8        portmap        portmap            1.000   YES
-9        udp            udp                1.000   YES
+0        dns            mixed              0.123   NO
+1        dns            mixed              0.123   NO
+2        dns            mixed              0.123   NO
+3        dns            dns                1.000   YES
+4        dns            dns                1.000   YES
+5        dns            dns                1.000   YES
+6        dns            dns                1.000   YES
+7        dns            dns                1.000   YES
+8        dns            dns                1.000   YES
+9        dns            dns                1.000   YES
 
 Training MLP...
 
 [MLP]
-  Val accuracy:  98.46%
-  Test accuracy: 99.14%
+  Val accuracy:  98.28%
+  Test accuracy: 98.28%
 
 VALIDATION RESULTS
 ----------------------------------------------------------------------
               precision    recall  f1-score   support
 
-      benign       0.99      0.99      0.99        81
-         dns       0.84      1.00      0.91        80
-        ldap       1.00      0.99      0.99        81
-       mixed       1.00      0.99      1.00       128
-       mssql       1.00      0.97      0.99        80
-     netbios       1.00      0.99      0.99        81
-         ntp       1.00      0.98      0.99        81
-     portmap       1.00      0.97      0.99        80
-        snmp       0.97      0.97      0.97        80
-        ssdp       1.00      0.98      0.99        81
-         syn       1.00      0.99      0.99        81
-        tftp       1.00      0.98      0.99        81
-         udp       1.00      1.00      1.00        80
-     webddos       1.00      0.99      0.99        72
+      benign       0.98      0.98      0.98       179
+         dns       1.00      0.98      0.99       179
+        ldap       0.98      0.99      0.99       179
+       mixed       1.00      0.97      0.99       179
+       mssql       0.99      0.99      0.99       179
+     netbios       1.00      0.99      0.99       179
+         ntp       0.84      1.00      0.91       179
+     portmap       1.00      0.98      0.99       179
+        snmp       1.00      0.98      0.99       179
+        ssdp       1.00      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.98      0.99       179
+         udp       1.00      0.98      0.99       179
+     webddos       1.00      0.97      0.98       121
 
-    accuracy                           0.98      1167
-   macro avg       0.99      0.98      0.98      1167
-weighted avg       0.99      0.98      0.99      1167
+    accuracy                           0.98      2448
+   macro avg       0.99      0.98      0.98      2448
+weighted avg       0.99      0.98      0.98      2448
 
 CONFUSION MATRIX
-[[ 80   1   0   0   0   0   0   0   0   0   0   0   0   0]
- [  0  80   0   0   0   0   0   0   0   0   0   0   0   0]
- [  0   0  80   0   0   0   0   0   1   0   0   0   0   0]
- [  1   0   0 127   0   0   0   0   0   0   0   0   0   0]
- [  0   2   0   0  78   0   0   0   0   0   0   0   0   0]
- [  0   1   0   0   0  80   0   0   0   0   0   0   0   0]
- [  0   2   0   0   0   0  79   0   0   0   0   0   0   0]
- [  0   1   0   0   0   0   0  78   1   0   0   0   0   0]
- [  0   2   0   0   0   0   0   0  78   0   0   0   0   0]
- [  0   2   0   0   0   0   0   0   0  79   0   0   0   0]
- [  0   1   0   0   0   0   0   0   0   0  80   0   0   0]
- [  0   2   0   0   0   0   0   0   0   0   0  79   0   0]
- [  0   0   0   0   0   0   0   0   0   0   0   0  80   0]
- [  0   1   0   0   0   0   0   0   0   0   0   0   0  71]]
+[[176   0   0   0   0   0   3   0   0   0   0   0   0   0]
+ [  0 176   0   0   0   0   3   0   0   0   0   0   0   0]
+ [  0   0 177   0   0   0   2   0   0   0   0   0   0   0]
+ [  3   0   0 174   0   0   2   0   0   0   0   0   0   0]
+ [  0   0   0   0 177   0   2   0   0   0   0   0   0   0]
+ [  0   0   0   0   0 177   2   0   0   0   0   0   0   0]
+ [  0   0   0   0   0   0 179   0   0   0   0   0   0   0]
+ [  0   0   2   0   0   0   2 175   0   0   0   0   0   0]
+ [  0   0   1   0   0   0   2   0 176   0   0   0   0   0]
+ [  0   0   0   0   0   0   3   0   0 176   0   0   0   0]
+ [  0   0   0   0   0   0   4   0   0   0 175   0   0   0]
+ [  0   0   0   0   2   0   2   0   0   0   0 175   0   0]
+ [  0   0   0   0   0   0   3   0   0   0   0   0 176   0]
+ [  0   0   0   0   0   0   4   0   0   0   0   0   0 117]]
 
 TEST RESULTS
 ----------------------------------------------------------------------
               precision    recall  f1-score   support
 
-      benign       1.00      0.97      0.99        80
-         dns       0.90      1.00      0.95        81
-        ldap       1.00      0.99      0.99        80
-       mixed       1.00      0.99      1.00       129
-       mssql       1.00      0.99      0.99        81
-     netbios       1.00      1.00      1.00        80
-         ntp       1.00      1.00      1.00        81
-     portmap       1.00      0.98      0.99        81
-        snmp       0.99      1.00      0.99        81
-        ssdp       1.00      1.00      1.00        80
-         syn       1.00      0.99      0.99        80
-        tftp       1.00      1.00      1.00        80
-         udp       1.00      0.99      0.99        81
-     webddos       1.00      0.99      0.99        72
+      benign       0.98      0.98      0.98       179
+         dns       1.00      0.98      0.99       179
+        ldap       0.98      0.99      0.99       179
+       mixed       1.00      0.97      0.99       179
+       mssql       0.99      0.99      0.99       179
+     netbios       1.00      0.99      0.99       179
+         ntp       0.84      1.00      0.91       179
+     portmap       1.00      0.98      0.99       179
+        snmp       1.00      0.98      0.99       179
+        ssdp       1.00      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.98      0.99       179
+         udp       1.00      0.98      0.99       179
+     webddos       1.00      0.97      0.98       121
 
-    accuracy                           0.99      1167
-   macro avg       0.99      0.99      0.99      1167
-weighted avg       0.99      0.99      0.99      1167
+    accuracy                           0.98      2448
+   macro avg       0.99      0.98      0.98      2448
+weighted avg       0.99      0.98      0.98      2448
 
 CONFUSION MATRIX
-[[ 78   2   0   0   0   0   0   0   0   0   0   0   0   0]
- [  0  81   0   0   0   0   0   0   0   0   0   0   0   0]
- [  0   1  79   0   0   0   0   0   0   0   0   0   0   0]
- [  0   1   0 128   0   0   0   0   0   0   0   0   0   0]
- [  0   1   0   0  80   0   0   0   0   0   0   0   0   0]
- [  0   0   0   0   0  80   0   0   0   0   0   0   0   0]
- [  0   0   0   0   0   0  81   0   0   0   0   0   0   0]
- [  0   1   0   0   0   0   0  79   1   0   0   0   0   0]
- [  0   0   0   0   0   0   0   0  81   0   0   0   0   0]
- [  0   0   0   0   0   0   0   0   0  80   0   0   0   0]
- [  0   1   0   0   0   0   0   0   0   0  79   0   0   0]
- [  0   0   0   0   0   0   0   0   0   0   0  80   0   0]
- [  0   1   0   0   0   0   0   0   0   0   0   0  80   0]
- [  0   1   0   0   0   0   0   0   0   0   0   0   0  71]]
+[[176   0   0   0   0   0   3   0   0   0   0   0   0   0]
+ [  0 176   0   0   0   0   3   0   0   0   0   0   0   0]
+ [  0   0 177   0   0   0   2   0   0   0   0   0   0   0]
+ [  3   0   0 174   0   0   2   0   0   0   0   0   0   0]
+ [  0   0   0   0 177   0   2   0   0   0   0   0   0   0]
+ [  0   0   0   0   0 177   2   0   0   0   0   0   0   0]
+ [  0   0   0   0   0   0 179   0   0   0   0   0   0   0]
+ [  0   0   2   0   0   0   2 175   0   0   0   0   0   0]
+ [  0   0   1   0   0   0   2   0 176   0   0   0   0   0]
+ [  0   0   0   0   0   0   3   0   0 176   0   0   0   0]
+ [  0   0   0   0   0   0   4   0   0   0 175   0   0   0]
+ [  0   0   0   0   2   0   2   0   0   0   0 175   0   0]
+ [  0   0   0   0   0   0   3   0   0   0   0   0 176   0]
+ [  0   0   0   0   0   0   4   0   0   0   0   0   0 117]]
 
 SAMPLE PREDICTIONS (First 10)
 Index    True Label      Predicted       Confidence   Correct
 ----------------------------------------------------------------------
-0        snmp           snmp               1.000   YES
-1        ntp            ntp                1.000   YES
-2        syn            syn                1.000   YES
-3        netbios        netbios            1.000   YES
-4        ldap           ldap               1.000   YES
-5        benign         benign             0.944   YES
-6        netbios        netbios            1.000   YES
-7        snmp           snmp               1.000   YES
-8        portmap        portmap            1.000   YES
-9        udp            udp                1.000   YES
+0        dns            ntp                0.175   NO
+1        dns            ntp                0.175   NO
+2        dns            ntp                0.175   NO
+3        dns            dns                0.534   YES
+4        dns            dns                0.860   YES
+5        dns            dns                0.968   YES
+6        dns            dns                0.991   YES
+7        dns            dns                0.997   YES
+8        dns            dns                0.999   YES
+9        dns            dns                1.000   YES
 
 Training KNN...
 
 [KNN]
-  Val accuracy:  98.20%
-  Test accuracy: 99.23%
+  Val accuracy:  98.49%
+  Test accuracy: 98.49%
 
 VALIDATION RESULTS
 ----------------------------------------------------------------------
               precision    recall  f1-score   support
 
-      benign       0.99      0.96      0.97        81
-         dns       1.00      0.97      0.99        80
-        ldap       0.99      1.00      0.99        81
-       mixed       0.87      0.99      0.93       128
-       mssql       1.00      0.97      0.99        80
-     netbios       1.00      0.99      0.99        81
-         ntp       1.00      0.98      0.99        81
-     portmap       1.00      0.97      0.99        80
-        snmp       1.00      0.97      0.99        80
-        ssdp       1.00      0.98      0.99        81
-         syn       1.00      0.99      0.99        81
-        tftp       1.00      0.98      0.99        81
-         udp       1.00      1.00      1.00        80
-     webddos       1.00      0.99      0.99        72
+      benign       0.98      0.98      0.98       179
+         dns       0.84      1.00      0.91       179
+        ldap       1.00      0.99      0.99       179
+       mixed       1.00      0.97      0.99       179
+       mssql       1.00      0.99      0.99       179
+     netbios       1.00      0.99      0.99       179
+         ntp       1.00      0.98      0.99       179
+     portmap       1.00      0.99      0.99       179
+        snmp       1.00      0.99      0.99       179
+        ssdp       1.00      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.99      0.99       179
+         udp       1.00      0.98      0.99       179
+     webddos       1.00      0.97      0.98       121
 
-    accuracy                           0.98      1167
-   macro avg       0.99      0.98      0.98      1167
-weighted avg       0.98      0.98      0.98      1167
+    accuracy                           0.98      2448
+   macro avg       0.99      0.98      0.99      2448
+weighted avg       0.99      0.98      0.99      2448
 
 CONFUSION MATRIX
-[[ 78   0   0   3   0   0   0   0   0   0   0   0   0   0]
- [  0  78   0   2   0   0   0   0   0   0   0   0   0   0]
- [  0   0  81   0   0   0   0   0   0   0   0   0   0   0]
- [  1   0   0 127   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0   2  78   0   0   0   0   0   0   0   0   0]
- [  0   0   0   1   0  80   0   0   0   0   0   0   0   0]
- [  0   0   0   2   0   0  79   0   0   0   0   0   0   0]
- [  0   0   1   1   0   0   0  78   0   0   0   0   0   0]
- [  0   0   0   2   0   0   0   0  78   0   0   0   0   0]
- [  0   0   0   2   0   0   0   0   0  79   0   0   0   0]
- [  0   0   0   1   0   0   0   0   0   0  80   0   0   0]
- [  0   0   0   2   0   0   0   0   0   0   0  79   0   0]
- [  0   0   0   0   0   0   0   0   0   0   0   0  80   0]
- [  0   0   0   1   0   0   0   0   0   0   0   0   0  71]]
+[[176   3   0   0   0   0   0   0   0   0   0   0   0   0]
+ [  0 179   0   0   0   0   0   0   0   0   0   0   0   0]
+ [  0   2 177   0   0   0   0   0   0   0   0   0   0   0]
+ [  3   2   0 174   0   0   0   0   0   0   0   0   0   0]
+ [  0   2   0   0 177   0   0   0   0   0   0   0   0   0]
+ [  0   2   0   0   0 177   0   0   0   0   0   0   0   0]
+ [  0   3   0   0   0   0 176   0   0   0   0   0   0   0]
+ [  0   2   0   0   0   0   0 177   0   0   0   0   0   0]
+ [  0   2   0   0   0   0   0   0 177   0   0   0   0   0]
+ [  0   3   0   0   0   0   0   0   0 176   0   0   0   0]
+ [  0   4   0   0   0   0   0   0   0   0 175   0   0   0]
+ [  0   2   0   0   0   0   0   0   0   0   0 177   0   0]
+ [  0   3   0   0   0   0   0   0   0   0   0   0 176   0]
+ [  0   4   0   0   0   0   0   0   0   0   0   0   0 117]]
 
 TEST RESULTS
 ----------------------------------------------------------------------
               precision    recall  f1-score   support
 
-      benign       1.00      0.96      0.98        80
-         dns       1.00      1.00      1.00        81
-        ldap       1.00      0.99      0.99        80
-       mixed       0.93      1.00      0.97       129
-       mssql       1.00      0.99      0.99        81
-     netbios       1.00      1.00      1.00        80
-         ntp       1.00      1.00      1.00        81
-     portmap       1.00      0.99      0.99        81
-        snmp       1.00      1.00      1.00        81
-        ssdp       1.00      1.00      1.00        80
-         syn       1.00      0.99      0.99        80
-        tftp       1.00      1.00      1.00        80
-         udp       1.00      0.99      0.99        81
-     webddos       1.00      0.99      0.99        72
+      benign       0.98      0.98      0.98       179
+         dns       0.84      1.00      0.91       179
+        ldap       1.00      0.99      0.99       179
+       mixed       1.00      0.97      0.99       179
+       mssql       1.00      0.99      0.99       179
+     netbios       1.00      0.99      0.99       179
+         ntp       1.00      0.98      0.99       179
+     portmap       1.00      0.99      0.99       179
+        snmp       1.00      0.99      0.99       179
+        ssdp       1.00      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.99      0.99       179
+         udp       1.00      0.98      0.99       179
+     webddos       1.00      0.97      0.98       121
 
-    accuracy                           0.99      1167
-   macro avg       1.00      0.99      0.99      1167
-weighted avg       0.99      0.99      0.99      1167
+    accuracy                           0.98      2448
+   macro avg       0.99      0.98      0.99      2448
+weighted avg       0.99      0.98      0.99      2448
 
 CONFUSION MATRIX
-[[ 77   0   0   3   0   0   0   0   0   0   0   0   0   0]
- [  0  81   0   0   0   0   0   0   0   0   0   0   0   0]
- [  0   0  79   1   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0 129   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0   1  80   0   0   0   0   0   0   0   0   0]
- [  0   0   0   0   0  80   0   0   0   0   0   0   0   0]
- [  0   0   0   0   0   0  81   0   0   0   0   0   0   0]
- [  0   0   0   1   0   0   0  80   0   0   0   0   0   0]
- [  0   0   0   0   0   0   0   0  81   0   0   0   0   0]
- [  0   0   0   0   0   0   0   0   0  80   0   0   0   0]
- [  0   0   0   1   0   0   0   0   0   0  79   0   0   0]
- [  0   0   0   0   0   0   0   0   0   0   0  80   0   0]
- [  0   0   0   1   0   0   0   0   0   0   0   0  80   0]
- [  0   0   0   1   0   0   0   0   0   0   0   0   0  71]]
+[[176   3   0   0   0   0   0   0   0   0   0   0   0   0]
+ [  0 179   0   0   0   0   0   0   0   0   0   0   0   0]
+ [  0   2 177   0   0   0   0   0   0   0   0   0   0   0]
+ [  3   2   0 174   0   0   0   0   0   0   0   0   0   0]
+ [  0   2   0   0 177   0   0   0   0   0   0   0   0   0]
+ [  0   2   0   0   0 177   0   0   0   0   0   0   0   0]
+ [  0   3   0   0   0   0 176   0   0   0   0   0   0   0]
+ [  0   2   0   0   0   0   0 177   0   0   0   0   0   0]
+ [  0   2   0   0   0   0   0   0 177   0   0   0   0   0]
+ [  0   3   0   0   0   0   0   0   0 176   0   0   0   0]
+ [  0   4   0   0   0   0   0   0   0   0 175   0   0   0]
+ [  0   2   0   0   0   0   0   0   0   0   0 177   0   0]
+ [  0   3   0   0   0   0   0   0   0   0   0   0 176   0]
+ [  0   4   0   0   0   0   0   0   0   0   0   0   0 117]]
 
 SAMPLE PREDICTIONS (First 10)
 Index    True Label      Predicted       Confidence   Correct
 ----------------------------------------------------------------------
-0        snmp           snmp               1.000   YES
-1        ntp            ntp                1.000   YES
-2        syn            syn                1.000   YES
-3        netbios        netbios            1.000   YES
-4        ldap           ldap               1.000   YES
-5        benign         benign             0.841   YES
-6        netbios        netbios            1.000   YES
-7        snmp           snmp               1.000   YES
-8        portmap        portmap            1.000   YES
-9        udp            udp                1.000   YES
+0        dns            dns                0.533   YES
+1        dns            dns                0.533   YES
+2        dns            dns                0.533   YES
+3        dns            dns                0.829   YES
+4        dns            dns                0.979   YES
+5        dns            dns                1.000   YES
+6        dns            dns                1.000   YES
+7        dns            dns                1.000   YES
+8        dns            dns                1.000   YES
+9        dns            dns                1.000   YES
 
 Training SGDClassifier...
 
 [SGDClassifier]
-  Val accuracy:  98.20%
-  Test accuracy: 99.23%
+  Val accuracy:  98.08%
+  Test accuracy: 98.08%
 
 VALIDATION RESULTS
 ----------------------------------------------------------------------
               precision    recall  f1-score   support
 
-      benign       0.99      0.99      0.99        81
-         dns       1.00      0.96      0.98        80
-        ldap       1.00      0.99      0.99        81
-       mixed       1.00      0.99      1.00       128
-       mssql       0.82      1.00      0.90        80
-     netbios       0.99      0.99      0.99        81
-         ntp       1.00      0.98      0.99        81
-     portmap       0.99      0.99      0.99        80
-        snmp       1.00      0.97      0.99        80
-        ssdp       1.00      0.98      0.99        81
-         syn       1.00      0.99      0.99        81
-        tftp       1.00      0.94      0.97        81
-         udp       1.00      1.00      1.00        80
-     webddos       1.00      0.99      0.99        72
+      benign       0.99      0.97      0.98       179
+         dns       1.00      0.98      0.99       179
+        ldap       1.00      0.98      0.99       179
+       mixed       1.00      0.97      0.99       179
+       mssql       0.83      1.00      0.91       179
+     netbios       1.00      0.98      0.99       179
+         ntp       1.00      0.97      0.99       179
+     portmap       1.00      0.98      0.99       179
+        snmp       0.99      0.99      0.99       179
+        ssdp       1.00      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.98      0.99       179
+         udp       0.98      0.98      0.98       179
+     webddos       0.97      0.97      0.97       121
 
-    accuracy                           0.98      1167
-   macro avg       0.98      0.98      0.98      1167
-weighted avg       0.98      0.98      0.98      1167
+    accuracy                           0.98      2448
+   macro avg       0.98      0.98      0.98      2448
+weighted avg       0.98      0.98      0.98      2448
 
 CONFUSION MATRIX
-[[ 80   0   0   0   1   0   0   0   0   0   0   0   0   0]
- [  0  77   0   0   2   0   0   1   0   0   0   0   0   0]
- [  0   0  80   0   0   1   0   0   0   0   0   0   0   0]
- [  1   0   0 127   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0   0  80   0   0   0   0   0   0   0   0   0]
- [  0   0   0   0   1  80   0   0   0   0   0   0   0   0]
- [  0   0   0   0   2   0  79   0   0   0   0   0   0   0]
- [  0   0   0   0   1   0   0  79   0   0   0   0   0   0]
- [  0   0   0   0   2   0   0   0  78   0   0   0   0   0]
- [  0   0   0   0   2   0   0   0   0  79   0   0   0   0]
- [  0   0   0   0   1   0   0   0   0   0  80   0   0   0]
- [  0   0   0   0   5   0   0   0   0   0   0  76   0   0]
- [  0   0   0   0   0   0   0   0   0   0   0   0  80   0]
- [  0   0   0   0   1   0   0   0   0   0   0   0   0  71]]
+[[174   0   0   0   3   0   0   0   0   0   0   0   2   0]
+ [  0 175   0   0   3   0   0   0   1   0   0   0   0   0]
+ [  0   0 176   0   2   0   0   0   1   0   0   0   0   0]
+ [  1   0   0 174   2   0   0   0   0   0   0   0   2   0]
+ [  0   0   0   0 179   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   0   2 176   0   0   0   0   0   0   0   1]
+ [  0   0   0   0   3   0 174   0   0   0   0   0   0   2]
+ [  0   0   0   0   2   0   0 176   0   0   0   0   0   1]
+ [  0   0   0   0   2   0   0   0 177   0   0   0   0   0]
+ [  0   0   0   0   3   0   0   0   0 176   0   0   0   0]
+ [  0   0   0   0   4   0   0   0   0   0 175   0   0   0]
+ [  0   0   0   0   3   0   0   0   0   0   0 176   0   0]
+ [  0   0   0   0   3   0   0   0   0   0   0   0 176   0]
+ [  0   0   0   0   4   0   0   0   0   0   0   0   0 117]]
 
 TEST RESULTS
 ----------------------------------------------------------------------
               precision    recall  f1-score   support
 
-      benign       1.00      0.97      0.99        80
-         dns       1.00      1.00      1.00        81
-        ldap       1.00      0.99      0.99        80
-       mixed       1.00      0.99      1.00       129
-       mssql       0.90      1.00      0.95        81
-     netbios       1.00      1.00      1.00        80
-         ntp       1.00      1.00      1.00        81
-     portmap       1.00      0.99      0.99        81
-        snmp       1.00      1.00      1.00        81
-        ssdp       1.00      1.00      1.00        80
-         syn       1.00      0.99      0.99        80
-        tftp       1.00      0.99      0.99        80
-         udp       1.00      0.99      0.99        81
-     webddos       1.00      0.99      0.99        72
+      benign       0.99      0.97      0.98       179
+         dns       1.00      0.98      0.99       179
+        ldap       1.00      0.98      0.99       179
+       mixed       1.00      0.97      0.99       179
+       mssql       0.83      1.00      0.91       179
+     netbios       1.00      0.98      0.99       179
+         ntp       1.00      0.97      0.99       179
+     portmap       1.00      0.98      0.99       179
+        snmp       0.99      0.99      0.99       179
+        ssdp       1.00      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.98      0.99       179
+         udp       0.98      0.98      0.98       179
+     webddos       0.97      0.97      0.97       121
 
-    accuracy                           0.99      1167
-   macro avg       0.99      0.99      0.99      1167
-weighted avg       0.99      0.99      0.99      1167
+    accuracy                           0.98      2448
+   macro avg       0.98      0.98      0.98      2448
+weighted avg       0.98      0.98      0.98      2448
 
 CONFUSION MATRIX
-[[ 78   0   0   0   2   0   0   0   0   0   0   0   0   0]
- [  0  81   0   0   0   0   0   0   0   0   0   0   0   0]
- [  0   0  79   0   1   0   0   0   0   0   0   0   0   0]
- [  0   0   0 128   1   0   0   0   0   0   0   0   0   0]
- [  0   0   0   0  81   0   0   0   0   0   0   0   0   0]
- [  0   0   0   0   0  80   0   0   0   0   0   0   0   0]
- [  0   0   0   0   0   0  81   0   0   0   0   0   0   0]
- [  0   0   0   0   1   0   0  80   0   0   0   0   0   0]
- [  0   0   0   0   0   0   0   0  81   0   0   0   0   0]
- [  0   0   0   0   0   0   0   0   0  80   0   0   0   0]
- [  0   0   0   0   1   0   0   0   0   0  79   0   0   0]
- [  0   0   0   0   1   0   0   0   0   0   0  79   0   0]
- [  0   0   0   0   1   0   0   0   0   0   0   0  80   0]
- [  0   0   0   0   1   0   0   0   0   0   0   0   0  71]]
+[[174   0   0   0   3   0   0   0   0   0   0   0   2   0]
+ [  0 175   0   0   3   0   0   0   1   0   0   0   0   0]
+ [  0   0 176   0   2   0   0   0   1   0   0   0   0   0]
+ [  1   0   0 174   2   0   0   0   0   0   0   0   2   0]
+ [  0   0   0   0 179   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   0   2 176   0   0   0   0   0   0   0   1]
+ [  0   0   0   0   3   0 174   0   0   0   0   0   0   2]
+ [  0   0   0   0   2   0   0 176   0   0   0   0   0   1]
+ [  0   0   0   0   2   0   0   0 177   0   0   0   0   0]
+ [  0   0   0   0   3   0   0   0   0 176   0   0   0   0]
+ [  0   0   0   0   4   0   0   0   0   0 175   0   0   0]
+ [  0   0   0   0   3   0   0   0   0   0   0 176   0   0]
+ [  0   0   0   0   3   0   0   0   0   0   0   0 176   0]
+ [  0   0   0   0   4   0   0   0   0   0   0   0   0 117]]
 
 SAMPLE PREDICTIONS (First 10)
 Index    True Label      Predicted       Confidence   Correct
 ----------------------------------------------------------------------
-0        snmp           snmp               1.000   YES
-1        ntp            ntp                1.000   YES
-2        syn            syn                0.766   YES
-3        netbios        netbios            1.000   YES
-4        ldap           ldap               1.000   YES
-5        benign         benign             0.867   YES
-6        netbios        netbios            1.000   YES
-7        snmp           snmp               1.000   YES
-8        portmap        portmap            1.000   YES
-9        udp            udp                1.000   YES
+0        dns            mssql              0.376   NO
+1        dns            mssql              0.376   NO
+2        dns            mssql              0.376   NO
+3        dns            snmp               0.177   NO
+4        dns            dns                0.211   YES
+5        dns            dns                0.440   YES
+6        dns            dns                0.704   YES
+7        dns            dns                0.877   YES
+8        dns            dns                0.954   YES
+9        dns            dns                0.984   YES
 
 Training XGBoost...
 
 [XGBoost]
   Val accuracy:  98.37%
-  Test accuracy: 99.14%
+  Test accuracy: 98.37%
 
 VALIDATION RESULTS
 ----------------------------------------------------------------------
               precision    recall  f1-score   support
 
-      benign       1.00      0.96      0.98        81
-         dns       1.00      0.97      0.99        80
-        ldap       1.00      1.00      1.00        81
-       mixed       0.87      1.00      0.93       128
-       mssql       1.00      0.97      0.99        80
-     netbios       1.00      0.99      0.99        81
-         ntp       1.00      0.98      0.99        81
-     portmap       1.00      0.99      0.99        80
-        snmp       1.00      0.97      0.99        80
-        ssdp       1.00      0.98      0.99        81
-         syn       1.00      0.99      0.99        81
-        tftp       1.00      0.98      0.99        81
-         udp       1.00      1.00      1.00        80
-     webddos       1.00      0.99      0.99        72
+      benign       1.00      0.97      0.99       179
+         dns       1.00      0.98      0.99       179
+        ldap       1.00      0.99      0.99       179
+       mixed       0.83      1.00      0.91       179
+       mssql       1.00      0.99      0.99       179
+     netbios       1.00      0.99      0.99       179
+         ntp       1.00      0.98      0.99       179
+     portmap       1.00      0.99      0.99       179
+        snmp       1.00      0.99      0.99       179
+        ssdp       0.99      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.99      0.99       179
+         udp       1.00      0.97      0.98       179
+     webddos       0.99      0.97      0.98       121
 
-    accuracy                           0.98      1167
-   macro avg       0.99      0.98      0.99      1167
-weighted avg       0.99      0.98      0.98      1167
+    accuracy                           0.98      2448
+   macro avg       0.99      0.98      0.98      2448
+weighted avg       0.99      0.98      0.98      2448
 
 CONFUSION MATRIX
-[[ 78   0   0   3   0   0   0   0   0   0   0   0   0   0]
- [  0  78   0   2   0   0   0   0   0   0   0   0   0   0]
- [  0   0  81   0   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0 128   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0   2  78   0   0   0   0   0   0   0   0   0]
- [  0   0   0   1   0  80   0   0   0   0   0   0   0   0]
- [  0   0   0   2   0   0  79   0   0   0   0   0   0   0]
- [  0   0   0   1   0   0   0  79   0   0   0   0   0   0]
- [  0   0   0   2   0   0   0   0  78   0   0   0   0   0]
- [  0   0   0   2   0   0   0   0   0  79   0   0   0   0]
- [  0   0   0   1   0   0   0   0   0   0  80   0   0   0]
- [  0   0   0   2   0   0   0   0   0   0   0  79   0   0]
- [  0   0   0   0   0   0   0   0   0   0   0   0  80   0]
- [  0   0   0   1   0   0   0   0   0   0   0   0   0  71]]
+[[174   0   0   5   0   0   0   0   0   0   0   0   0   0]
+ [  0 176   0   3   0   0   0   0   0   0   0   0   0   0]
+ [  0   0 177   2   0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0 179   0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   2 177   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   2   0 177   0   0   0   0   0   0   0   0]
+ [  0   0   0   3   0   0 176   0   0   0   0   0   0   0]
+ [  0   0   0   2   0   0   0 177   0   0   0   0   0   0]
+ [  0   0   0   2   0   0   0   0 177   0   0   0   0   0]
+ [  0   0   0   3   0   0   0   0   0 176   0   0   0   0]
+ [  0   0   0   4   0   0   0   0   0   0 175   0   0   0]
+ [  0   0   0   2   0   0   0   0   0   0   0 177   0   0]
+ [  0   0   0   3   0   0   0   0   0   2   0   0 173   1]
+ [  0   0   0   4   0   0   0   0   0   0   0   0   0 117]]
 
 TEST RESULTS
 ----------------------------------------------------------------------
               precision    recall  f1-score   support
 
-      benign       1.00      0.95      0.97        80
-         dns       1.00      1.00      1.00        81
-        ldap       1.00      0.99      0.99        80
-       mixed       0.93      1.00      0.96       129
-       mssql       1.00      0.99      0.99        81
-     netbios       1.00      1.00      1.00        80
-         ntp       1.00      1.00      1.00        81
-     portmap       1.00      0.99      0.99        81
-        snmp       1.00      1.00      1.00        81
-        ssdp       1.00      1.00      1.00        80
-         syn       1.00      0.99      0.99        80
-        tftp       1.00      1.00      1.00        80
-         udp       1.00      0.99      0.99        81
-     webddos       1.00      0.99      0.99        72
+      benign       1.00      0.97      0.99       179
+         dns       1.00      0.98      0.99       179
+        ldap       1.00      0.99      0.99       179
+       mixed       0.83      1.00      0.91       179
+       mssql       1.00      0.99      0.99       179
+     netbios       1.00      0.99      0.99       179
+         ntp       1.00      0.98      0.99       179
+     portmap       1.00      0.99      0.99       179
+        snmp       1.00      0.99      0.99       179
+        ssdp       0.99      0.98      0.99       179
+         syn       1.00      0.98      0.99       179
+        tftp       1.00      0.99      0.99       179
+         udp       1.00      0.97      0.98       179
+     webddos       0.99      0.97      0.98       121
 
-    accuracy                           0.99      1167
-   macro avg       0.99      0.99      0.99      1167
-weighted avg       0.99      0.99      0.99      1167
+    accuracy                           0.98      2448
+   macro avg       0.99      0.98      0.98      2448
+weighted avg       0.99      0.98      0.98      2448
 
 CONFUSION MATRIX
-[[ 76   0   0   4   0   0   0   0   0   0   0   0   0   0]
- [  0  81   0   0   0   0   0   0   0   0   0   0   0   0]
- [  0   0  79   1   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0 129   0   0   0   0   0   0   0   0   0   0]
- [  0   0   0   1  80   0   0   0   0   0   0   0   0   0]
- [  0   0   0   0   0  80   0   0   0   0   0   0   0   0]
- [  0   0   0   0   0   0  81   0   0   0   0   0   0   0]
- [  0   0   0   1   0   0   0  80   0   0   0   0   0   0]
- [  0   0   0   0   0   0   0   0  81   0   0   0   0   0]
- [  0   0   0   0   0   0   0   0   0  80   0   0   0   0]
- [  0   0   0   1   0   0   0   0   0   0  79   0   0   0]
- [  0   0   0   0   0   0   0   0   0   0   0  80   0   0]
- [  0   0   0   1   0   0   0   0   0   0   0   0  80   0]
- [  0   0   0   1   0   0   0   0   0   0   0   0   0  71]]
+[[174   0   0   5   0   0   0   0   0   0   0   0   0   0]
+ [  0 176   0   3   0   0   0   0   0   0   0   0   0   0]
+ [  0   0 177   2   0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0 179   0   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   2 177   0   0   0   0   0   0   0   0   0]
+ [  0   0   0   2   0 177   0   0   0   0   0   0   0   0]
+ [  0   0   0   3   0   0 176   0   0   0   0   0   0   0]
+ [  0   0   0   2   0   0   0 177   0   0   0   0   0   0]
+ [  0   0   0   2   0   0   0   0 177   0   0   0   0   0]
+ [  0   0   0   3   0   0   0   0   0 176   0   0   0   0]
+ [  0   0   0   4   0   0   0   0   0   0 175   0   0   0]
+ [  0   0   0   2   0   0   0   0   0   0   0 177   0   0]
+ [  0   0   0   3   0   0   0   0   0   2   0   0 173   1]
+ [  0   0   0   4   0   0   0   0   0   0   0   0   0 117]]
 
 SAMPLE PREDICTIONS (First 10)
 Index    True Label      Predicted       Confidence   Correct
 ----------------------------------------------------------------------
-0        snmp           snmp               0.999   YES
-1        ntp            ntp                0.999   YES
-2        syn            syn                0.999   YES
-3        netbios        netbios            0.999   YES
-4        ldap           ldap               0.999   YES
-5        benign         benign             0.998   YES
-6        netbios        netbios            0.999   YES
-7        snmp           snmp               0.999   YES
-8        portmap        portmap            0.999   YES
-9        udp            udp                0.999   YES
+0        dns            mixed              0.127   NO
+1        dns            mixed              0.127   NO
+2        dns            mixed              0.127   NO
+3        dns            dns                0.249   YES
+4        dns            dns                0.998   YES
+5        dns            dns                0.998   YES
+6        dns            dns                0.999   YES
+7        dns            dns                0.999   YES
+8        dns            dns                0.999   YES
+9        dns            dns                0.999   YES
 
 ======================================================================
 MODEL COMPARISON COMPLETE
 ======================================================================
+Saved results under: ../../../detector_system_ml/alt_model
+
+Running sequence models (LSTM/Transformer)...
+[LSTM] Epoch 1/10 - loss 2.5050 - val 79.11%
+[LSTM] Epoch 2/10 - loss 2.1546 - val 90.86%
+[LSTM] Epoch 3/10 - loss 1.7651 - val 90.86%
+[LSTM] Epoch 4/10 - loss 1.3169 - val 92.95%
+[LSTM] Epoch 5/10 - loss 0.8893 - val 95.04%
+[LSTM] Epoch 6/10 - loss 0.5768 - val 97.91%
+[LSTM] Epoch 7/10 - loss 0.3988 - val 98.43%
+[LSTM] Epoch 8/10 - loss 0.2929 - val 98.96%
+[LSTM] Epoch 9/10 - loss 0.2381 - val 98.96%
+[LSTM] Epoch 10/10 - loss 0.1852 - val 98.69%
+[LSTM] Test accuracy: 98.96%

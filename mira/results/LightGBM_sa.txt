@@ -1,0 +1,137 @@
+======================================================================
+SKETCH-ADV MODEL - LightGBM Training
+Features: 64 (14 global + 48 per-protocol + 2 pkt size)
+======================================================================
+
+[DATASET]
+  Train: 1892  Val: 946
+  Features: 64
+  Classes: ['benign', 'dns', 'ldap', 'mixed', 'mssql', 'netbios', 'ntp', 'portmap', 'snmp', 'ssdp', 'syn', 'tftp', 'udp', 'webddos']
+
+[CLASS DISTRIBUTION]
+  benign         : Train= 118  Val=  59
+  dns            : Train= 118  Val=  59
+  ldap           : Train= 118  Val=  59
+  mixed          : Train= 358  Val= 179
+  mssql          : Train= 118  Val=  59
+  netbios        : Train= 118  Val=  59
+  ntp            : Train= 118  Val=  59
+  portmap        : Train= 118  Val=  59
+  snmp           : Train= 118  Val=  59
+  ssdp           : Train= 118  Val=  59
+  syn            : Train= 118  Val=  59
+  tftp           : Train= 118  Val=  59
+  udp            : Train= 118  Val=  59
+  webddos        : Train= 118  Val=  59
+
+[TRAINING] 64 sketch-adv features, 300 rounds...
+Training until validation scores don't improve for 20 rounds
+[50]    train's multi_logloss: 0.157845 valid's multi_logloss: 0.201864
+[100]   train's multi_logloss: 0.132597 valid's multi_logloss: 0.179196
+Early stopping, best iteration is:
+[120]   train's multi_logloss: 0.131051 valid's multi_logloss: 0.178525
+
+[VALIDATION] Accuracy: 96.83%
+              precision    recall  f1-score   support
+
+      benign       0.68      1.00      0.81        59
+         dns       1.00      0.95      0.97        59
+        ldap       1.00      0.98      0.99        59
+       mixed       1.00      1.00      1.00       179
+       mssql       1.00      0.97      0.98        59
+     netbios       0.98      0.97      0.97        59
+         ntp       1.00      0.97      0.98        59
+     portmap       1.00      0.98      0.99        59
+        snmp       1.00      0.97      0.98        59
+        ssdp       0.98      0.97      0.97        59
+         syn       1.00      0.93      0.96        59
+        tftp       1.00      0.97      0.98        59
+         udp       1.00      0.93      0.96        59
+     webddos       1.00      0.92      0.96        59
+
+    accuracy                           0.97       946
+   macro avg       0.97      0.96      0.97       946
+weighted avg       0.98      0.97      0.97       946
+
+
+[FEATURE IMPORTANCE] Top 15:
+  attack_entropy                :  13157.9
+  pps_netbios                   :   5253.7
+  pps_portmap                   :   5197.3
+  pps_mssql                     :   4988.7
+  pps_ssdp                      :   4872.0
+  ratio_vs_total_snmp           :   4745.6
+  pps_ldap                      :   4470.1
+  delta_pps_5w                  :   4398.5
+  pps_tftp                      :   4021.3
+  pps_dns                       :   3856.1
+  pps_http                      :   3337.3
+  ratio_vs_total_ntp            :   2798.8
+  ratio_vs_total_syn            :   2675.1
+  pps_ntp                       :   2614.1
+  pps_syn                       :   2443.1
+
+[DONE] Accuracy: 96.83% | Output: /local/dpdk_100g/mira/ml_system/sketch_adv_model/02_training/results/sketch_adv/lightgbm
+[STATUS] Excellent (95-99%)
+cesteban@node-monitor:/local/dpdk_100g/mira/ml_system/sketch_adv_model$ sudo python3 02_training/evaluate_sketch_adv.py \
+>     --model /local/dpdk_100g/mira/ml_system/sketch_adv_model/02_training/results/sketch_adv/lightgbm/lightgbm_model.txt \
+>     --test /local/dpdk_100g/mira/ml_system/sketch_adv_model/datasets/splits/test.csv
+======================================================================
+EVALUATION - SKETCH_ADV (64 features)
+======================================================================
+  Test: 946 samples, 64 features
+  Classes: ['benign', 'dns', 'ldap', 'mixed', 'mssql', 'netbios', 'ntp', 'portmap', 'snmp', 'ssdp', 'syn', 'tftp', 'udp', 'webddos']
+
+  Overall Accuracy: 96.72%
+
+  Class           Precision    Recall       F1          
+  --------------------------------------------------
+  benign          0.694        1.000        0.819       
+  dns             1.000        0.949        0.974       
+  ldap            1.000        0.983        0.991       
+  mixed           1.000        1.000        1.000       
+  mssql           0.966        0.966        0.966       
+  netbios         1.000        0.966        0.983       
+  ntp             0.983        0.966        0.974       
+  portmap         0.983        0.966        0.974       
+  snmp            1.000        0.949        0.974       
+  ssdp            1.000        0.966        0.983       
+  syn             1.000        0.949        0.974       
+  tftp            1.000        0.966        0.983       
+  udp             0.982        0.932        0.957       
+  webddos         1.000        0.915        0.956       
+
+  Weighted F1: 0.969 | Macro F1: 0.965
+
+  Confusion Matrix:
+  True\Pred   benign    dns       ldap      mixed     mssql     netbios   ntp       portmap   snmp      ssdp      syn       tftp      udp       webddos   
+  benign      59        0         0         0         0         0         0         0         0         0         0         0         0         0         
+  dns         2         56        0         0         0         0         1         0         0         0         0         0         0         0         
+  ldap        1         0         58        0         0         0         0         0         0         0         0         0         0         0         
+  mixed       0         0         0         179       0         0         0         0         0         0         0         0         0         0         
+  mssql       2         0         0         0         57        0         0         0         0         0         0         0         0         0         
+  netbios     1         0         0         0         1         57        0         0         0         0         0         0         0         0         
+  ntp         2         0         0         0         0         0         57        0         0         0         0         0         0         0         
+  portmap     1         0         0         0         1         0         0         57        0         0         0         0         0         0         
+  snmp        3         0         0         0         0         0         0         0         56        0         0         0         0         0         
+  ssdp        1         0         0         0         0         0         0         1         0         57        0         0         0         0         
+  syn         3         0         0         0         0         0         0         0         0         0         56        0         0         0         
+  tftp        2         0         0         0         0         0         0         0         0         0         0         57        0         0         
+  udp         4         0         0         0         0         0         0         0         0         0         0         0         55        0         
+  webddos     4         0         0         0         0         0         0         0         0         0         0         0         1         54        
+
+  #    True         Pred         Conf     OK
+  ----------------------------------------
+  0    benign       benign       0.693    YES
+  1    benign       benign       0.693    YES
+  2    benign       benign       0.693    YES
+  3    benign       benign       0.693    YES
+  4    benign       benign       0.693    YES
+  5    benign       benign       0.693    YES
+  6    benign       benign       0.693    YES
+  7    benign       benign       0.693    YES
+  8    benign       benign       0.693    YES
+  9    benign       benign       0.693    YES
+
+  [EXCELLENT] 96.72% accuracy | 0.969 weighted F1
+  Saved: /local/dpdk_100g/mira/ml_system/sketch_adv_model/02_training/results/sketch_adv/lightgbm/evaluation_results.json
