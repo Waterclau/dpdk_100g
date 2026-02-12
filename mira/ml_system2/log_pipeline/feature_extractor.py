@@ -282,7 +282,7 @@ class LogParser:
         match = re.search(r'PPS Variance:\s+([\d.]+)', window_text)
         features['pps_variance'] = float(match.group(1)) if match else 0.0
 
-        match = re.search(r'Running baseline \(ML\):\s+([\d.]+) pps', window_text)
+        match = re.search(r'Running baseline(?:\s*\(ML\))?:\s+([\d.]+) pps', window_text)
         features['pps_baseline'] = float(match.group(1)) if match else 0.0
 
         match = re.search(r'Ratio vs Baseline:\s+([\d.]+)x', window_text)
