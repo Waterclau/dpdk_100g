@@ -18,10 +18,19 @@ Binary record format (528 bytes, packed):
   - double  packet_size_variance
 
 Labeling (time-based, for structured experiments):
-  50s baseline -> 100s attack -> 50s baseline (200s total)
-  - 0-50s:    label = benign
-  - 50-150s:  label = <attack_type>
-  - 150-200s: label = benign
+  Actual timing from detector's perspective (210s total):
+    - Detector starts at t=0
+    - Benign traffic arrives at ~t=10 (pcap load delay)
+    - Attack arrives at ~t=70 (launched at t=50, 10s ramp-up,
+      starts when benign has sent 60s)
+    - Attack stops at ~t=150 (80s of effective attack traffic)
+    - Benign stops at ~t=200
+    - Detector timeout at t=210
+
+  Default labeling (--baseline-before 70, --attack-duration 80, --baseline-after 60):
+    - 0-70s:    label = benign  (no traffic + benign only)
+    - 70-150s:  label = <attack_type>  (attack active)
+    - 150-210s: label = benign  (benign only + no traffic)
 
 Usage:
     python3 bin_to_csv.py \
@@ -34,7 +43,7 @@ Usage:
         --input /tmp/experiment.bin \
         --output ../datasets/processed/ntp_run1.csv \
         --attack-type ntp \
-        --baseline-before 30 --attack-duration 120 --baseline-after 30
+        --baseline-before 70 --attack-duration 80 --baseline-after 60
 """
 
 import argparse
@@ -201,12 +210,12 @@ Supported attack types:
     parser.add_argument('--input', required=True, help='Input binary .bin file')
     parser.add_argument('--output', required=True, help='Output CSV file')
     parser.add_argument('--attack-type', required=True, help='Attack type label')
-    parser.add_argument('--baseline-before', type=float, default=50.0,
-                        help='Baseline before attack in seconds (default: 50)')
-    parser.add_argument('--attack-duration', type=float, default=100.0,
-                        help='Attack duration in seconds (default: 100)')
-    parser.add_argument('--baseline-after', type=float, default=50.0,
-                        help='Baseline after attack in seconds (default: 50)')
+    parser.add_argument('--baseline-before', type=float, default=70.0,
+                        help='Baseline before attack in seconds (default: 70)')
+    parser.add_argument('--attack-duration', type=float, default=80.0,
+                        help='Attack duration in seconds (default: 80)')
+    parser.add_argument('--baseline-after', type=float, default=60.0,
+                        help='Baseline after attack in seconds (default: 60)')
 
     args = parser.parse_args()
 

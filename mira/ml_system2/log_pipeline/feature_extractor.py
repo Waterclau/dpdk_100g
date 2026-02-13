@@ -46,19 +46,36 @@ class LogParser:
     def __init__(self):
         self.feature_records = []
 
-    def parse_log_file(self, log_path: str, label: str) -> pd.DataFrame:
+    def parse_log_file(self, log_path: str, label: str,
+                       baseline_before: float = None,
+                       attack_duration: float = None,
+                       baseline_after: float = None) -> pd.DataFrame:
         """
         Parse detector log file and extract features
 
         Args:
             log_path: Path to log file
-            label: Label for the data (benign, attack, mixed)
+            label: Label for the data (attack type for temporal labeling, or fixed label)
+            baseline_before: Seconds of benign before attack (enables temporal labeling)
+            attack_duration: Seconds of attack traffic
+            baseline_after: Seconds of benign after attack
 
         Returns:
             DataFrame with extracted features
         """
         print(f"[INFO] Parsing log file: {log_path}")
         print(f"[INFO] Label: {label}")
+
+        # Temporal labeling mode
+        temporal = (baseline_before is not None and attack_duration is not None
+                    and baseline_after is not None)
+        if temporal:
+            attack_start = baseline_before
+            attack_end = baseline_before + attack_duration
+            total_duration = attack_end + baseline_after
+            print(f"[INFO] Temporal labeling: {baseline_before}s benign → "
+                  f"{attack_duration}s {label} → {baseline_after}s benign "
+                  f"(total {total_duration}s)")
 
         with open(log_path, 'r', encoding='utf-8', errors='ignore') as f:
             log_content = f.read()
@@ -68,18 +85,48 @@ class LogParser:
 
         print(f"[INFO] Found {len(windows)-1} detection windows in log")
 
+        stats = {'benign': 0, 'attack': 0, 'no_time': 0}
         for idx, window in enumerate(windows[1:], 1):  # Skip first empty split
-            features = self._extract_features_from_window(window, label)
+            # Determine label for this window
+            window_label = label
+            if temporal:
+                elapsed = self._extract_elapsed_time(window)
+                if elapsed is not None:
+                    if elapsed < attack_start or elapsed >= attack_end:
+                        window_label = 'benign'
+                        stats['benign'] += 1
+                    else:
+                        window_label = label
+                        stats['attack'] += 1
+                else:
+                    stats['no_time'] += 1
+                    continue  # Skip windows without timestamp
+
+            features = self._extract_features_from_window(window, window_label)
             if features:
                 self.feature_records.append(features)
                 if idx % 100 == 0:
                     print(f"[PROGRESS] Processed {idx} windows...")
 
         print(f"[INFO] Extracted {len(self.feature_records)} feature records")
+        if temporal:
+            print(f"[LABELING] Benign: {stats['benign']}  "
+                  f"Attack ({label}): {stats['attack']}  "
+                  f"No timestamp: {stats['no_time']}")
 
         # Convert to DataFrame
         df = pd.DataFrame(self.feature_records)
         return df
+
+    def _extract_elapsed_time(self, window_text: str) -> Optional[float]:
+        """Extract elapsed seconds from cumulative traffic section.
+
+        Matches: 'Since first packet (77.1s)' or 'Since first packet (123.4s)'
+        """
+        match = re.search(r'Since first packet \(([\d.]+)s\)', window_text)
+        if match:
+            return float(match.group(1))
+        return None
 
     def _extract_features_from_window(self, window_text: str, label: str) -> Optional[Dict]:
         """Extract 40+ features from a single detection window"""
@@ -531,22 +578,24 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # LEGACY MODE (3 classes - all attacks mixed):
+  # FIXED LABEL (all windows get the same label):
   python3 feature_extractor.py \\
-      --input ../datasets/raw_logs/benign_baseline.log \\
-      --output ../datasets/processed/benign_baseline.csv \\
-      --label benign
+      --input attack_dns_run1.log \\
+      --output ../datasets/processed/dns_run1.csv \\
+      --label dns
 
+  # TEMPORAL LABELING (200s experiment: 70s benign + 80s attack + 60s benign):
   python3 feature_extractor.py \\
-      --input ../datasets/raw_logs/attack_mixed.log \\
-      --output ../datasets/processed/attack_mixed.csv \\
-      --label attack    # <-- Generic attack (all types mixed)
+      --input attack_dns_run1.log \\
+      --output ../datasets/processed/dns_run1.csv \\
+      --label dns \\
+      --baseline-before 70 --attack-duration 80 --baseline-after 60
 
-  # MULTI-CLASS MODE (specific attack types):
-  python3 feature_extractor.py \\
-      --input ../datasets/raw_logs/ntp_attack.log \\
-      --output ../datasets/processed/ntp_attack.csv \\
-      --label ntp       # <-- Specific attack type
+  Timing diagram (detector_system2, 210s run):
+    t=0     t=10    t=70              t=150   t=200  t=210
+    |  no   | benign |    attack       | benign | no  |
+    |traffic| only   |    active       | only   |traf.|
+    |<------benign------>|<--attack-->|<----benign---->|
 
 Supported labels:
   - Legacy (3 classes): benign, attack, mixed
@@ -562,6 +611,12 @@ Supported labels:
     parser.add_argument('--label', type=str, required=True,
                        choices=ALL_LABELS,
                        help='Traffic label (benign/attack/mixed OR specific attack type)')
+    parser.add_argument('--baseline-before', type=float, default=None,
+                       help='Seconds of benign before attack (default: None = no temporal labeling)')
+    parser.add_argument('--attack-duration', type=float, default=None,
+                       help='Seconds of attack traffic (default: None)')
+    parser.add_argument('--baseline-after', type=float, default=None,
+                       help='Seconds of benign after attack (default: None)')
 
     args = parser.parse_args()
 
@@ -573,9 +628,20 @@ Supported labels:
         print(f"[ERROR] Input file not found: {args.input}")
         sys.exit(1)
 
+    # Validate temporal labeling args (all or none)
+    temporal_args = [args.baseline_before, args.attack_duration, args.baseline_after]
+    if any(a is not None for a in temporal_args) and not all(a is not None for a in temporal_args):
+        print("[ERROR] --baseline-before, --attack-duration, --baseline-after must all be specified together")
+        sys.exit(1)
+
     # Parse log file
     parser_obj = LogParser()
-    df = parser_obj.parse_log_file(args.input, args.label)
+    df = parser_obj.parse_log_file(
+        args.input, args.label,
+        baseline_before=args.baseline_before,
+        attack_duration=args.attack_duration,
+        baseline_after=args.baseline_after
+    )
 
     if df.empty:
         print("[ERROR] No features extracted. Check log file format.")
