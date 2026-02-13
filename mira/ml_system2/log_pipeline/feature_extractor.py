@@ -535,7 +535,7 @@ class LogParser:
         # Print summary statistics
         print("\n[SUMMARY STATISTICS]")
         print(f"  Total records:     {len(df)}")
-        print(f"  Label:             {df['label'].iloc[0]}")
+        print(f"  Labels:            {dict(df['label'].value_counts())}")
         print(f"  Avg packets/win:   {df['total_packets'].mean():.0f}")
         print(f"  Avg bytes/win:     {df['total_bytes'].mean():.0f}")
         print(f"  UDP/TCP ratio:     {df['udp_tcp_ratio'].mean():.3f}")
