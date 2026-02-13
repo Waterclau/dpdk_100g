@@ -95,7 +95,8 @@
 
 /* Time windows */
 #define FAST_DETECTION_INTERVAL 0.05
-#define STATS_INTERVAL_SEC 5.0
+#define STATS_INTERVAL_SEC 0.1                /* 100ms - log/bin output window */
+#define STATS_SCREEN_INTERVAL_SEC 5.0         /* 5s - screen output (every 50 windows) */
 #define DETECTION_WINDOW_SEC 5.0
 
 /* IP tracking - CLOUDLAB INTERNAL NETWORK (10.x.x.x) */
@@ -557,6 +558,7 @@ static bool g_binary_log_enabled = false;
 static bool g_sketch_adv_enabled = false;
 static FILE *g_sketch_adv_file = NULL;     /* Binary output for sketch-adv ML training */
 static const char *g_sketch_adv_path = NULL;
+static bool g_reset_detect_windows = false;  /* Signal detect_attacks() to reinit _start vars after per-window reset */
 static struct rte_hash *ip_hash = NULL;
 
 /* OctoSketch - Per-worker sketches (NO atomics, NO contention) */
@@ -1044,7 +1046,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             total_tftp_wrq += g_worker_stats[i].tftp_wrq_packets;
         }
 
-        if (!window_totals_init) {
+        if (!window_totals_init || g_reset_detect_windows) {
             window_ntp_monlist_start = total_ntp_monlist;
             window_dns_any_start = total_dns_any;
             window_dns_txt_start = total_dns_txt;
@@ -1066,6 +1068,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             window_http_start = total_http_reqs;
             window_dns_start = total_dns_queries;
             window_totals_init = true;
+            g_reset_detect_windows = false;
         }
 
         uint64_t window_ntp_monlist = total_ntp_monlist - window_ntp_monlist_start;
@@ -1385,6 +1388,55 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         g_stats.http_payload_packets += g_worker_stats[i].http_payload_packets;
         /* ======================================================== */
     }
+
+    /* ========== PER-WINDOW RESET: zero worker DPI counters after aggregation ========== */
+    /* Workers use local vars that flush to g_worker_stats with +=, then reset locals.   */
+    /* By zeroing g_worker_stats here, next aggregation only gets the new window's data.  */
+    /* Tiny race (one burst may be lost at boundary) is negligible at 100Gbps rates.      */
+    for (int i = 0; i < NUM_RX_QUEUES; i++) {
+        g_worker_stats[i].total_packets = 0;
+        g_worker_stats[i].total_bytes = 0;
+        g_worker_stats[i].baseline_packets = 0;
+        g_worker_stats[i].attack_packets = 0;
+        g_worker_stats[i].tcp_packets = 0;
+        g_worker_stats[i].udp_packets = 0;
+        g_worker_stats[i].icmp_packets = 0;
+        g_worker_stats[i].syn_packets = 0;
+        g_worker_stats[i].syn_ack_packets = 0;
+        g_worker_stats[i].syn_only_packets = 0;
+        g_worker_stats[i].http_requests = 0;
+        g_worker_stats[i].http_payload_packets = 0;
+        g_worker_stats[i].dns_queries = 0;
+        g_worker_stats[i].baseline_bytes = 0;
+        g_worker_stats[i].attack_bytes = 0;
+        g_worker_stats[i].rx_bursts_total = 0;
+        g_worker_stats[i].rx_bursts_empty = 0;
+        /* Protocol-specific */
+        g_worker_stats[i].ntp_monlist_queries = 0;
+        g_worker_stats[i].ntp_responses = 0;
+        g_worker_stats[i].ntp_response_size_sum = 0;
+        g_worker_stats[i].dns_any_queries = 0;
+        g_worker_stats[i].dns_txt_queries = 0;
+        g_worker_stats[i].dns_responses = 0;
+        g_worker_stats[i].dns_response_size_sum = 0;
+        g_worker_stats[i].snmp_getbulk_requests = 0;
+        g_worker_stats[i].snmp_responses = 0;
+        g_worker_stats[i].snmp_response_size_sum = 0;
+        g_worker_stats[i].ssdp_msearch_packets = 0;
+        g_worker_stats[i].ssdp_responses = 0;
+        g_worker_stats[i].portmap_getport_calls = 0;
+        g_worker_stats[i].portmap_dump_calls = 0;
+        g_worker_stats[i].netbios_name_queries = 0;
+        g_worker_stats[i].netbios_dgram_packets = 0;
+        g_worker_stats[i].ldap_bind_requests = 0;
+        g_worker_stats[i].ldap_search_requests = 0;
+        g_worker_stats[i].mssql_sqlbatch_packets = 0;
+        g_worker_stats[i].mssql_rpc_packets = 0;
+        g_worker_stats[i].tftp_rrq_packets = 0;
+        g_worker_stats[i].tftp_wrq_packets = 0;
+    }
+    g_reset_detect_windows = true;  /* Tell detect_attacks() to reinit _start vars */
+    /* ================================================================================= */
 
     double window_duration = (double)(cur_tsc - last_window_reset_tsc) / hz;
 
@@ -1872,9 +1924,17 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
 
     #undef APPEND
 
-    printf("%s", buffer);
-    fflush(stdout);  /* Force immediate write to stdout (no buffering) */
+    /* Screen output: only every ~5s (throttled) */
+    static uint64_t last_screen_tsc = 0;
+    double screen_elapsed = (last_screen_tsc == 0) ? STATS_SCREEN_INTERVAL_SEC
+                            : (double)(cur_tsc - last_screen_tsc) / hz;
+    if (screen_elapsed >= STATS_SCREEN_INTERVAL_SEC) {
+        printf("%s", buffer);
+        fflush(stdout);
+        last_screen_tsc = cur_tsc;
+    }
 
+    /* Log file: every window (100ms) */
     if (g_log_file) {
         fprintf(g_log_file, "%s", buffer);
         fflush(g_log_file);
@@ -2400,7 +2460,8 @@ static int coordinator_thread(__rte_unused void *arg)
 
     printf("\nCoordinator thread on lcore %u\n", rte_lcore_id());
     printf("TSC frequency: %" PRIu64 " Hz\n", hz);
-    printf("Detection granularity: %.0f ms (vs MULTI-LF: 1000 ms)\n\n", FAST_DETECTION_INTERVAL * 1000);
+    printf("Detection granularity: %.0f ms (vs MULTI-LF: 1000 ms)\n", FAST_DETECTION_INTERVAL * 1000);
+    printf("Stats window: %.0f ms (screen output every %.0f s)\n\n", STATS_INTERVAL_SEC * 1000, STATS_SCREEN_INTERVAL_SEC);
 
     /* g_start_tsc will be set by first packet received in worker threads */
     uint64_t init_tsc = rte_rdtsc();

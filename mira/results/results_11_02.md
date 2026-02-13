@@ -286,8 +286,8 @@ DPI+Sketch - Top 10:                    Sketch-ADV - Top 15:
 ```
                     DPI+Sketch (56f)    Sketch-ADV (64f)
                     ────────────────    ────────────────
-  XGBoost           ██████████ 99.86%
-  HistGBM           ██████████ 99.64%
+  XGBoost           ██████████ 99.36%
+  HistGBM           ██████████ 99.34%
   LightGBM          █████████▉ 99.31%
   LSTM (dpi)        █████████▊ 98.56%
   RandomForest      █████████▊ 98.00%
@@ -301,7 +301,7 @@ DPI+Sketch - Top 10:                    Sketch-ADV - Top 15:
   HistGBM (SA)                          █████████▋ 96.62%
   XGBoost (SA)                          █████████▋ 96.62%
   KNN               █████████▋ 96.46%
-  LSTM (SA)                             █████████▍ 93.94%
+  LSTM (SA)                             █████████▍ 95.94%
 ```
 
 ### 3.4 Critical Issue: Benign Classification in Sketch-ADV
