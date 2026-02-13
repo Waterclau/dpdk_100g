@@ -3,7 +3,7 @@
 Model Comparison (ml_system2 - shared)
 
 Trains multiple ML algorithms and compares performance.
-Algorithms: Random Forest, Histogram Gradient Boosting, MLP, KNN, SGD
+Algorithms: Random Forest, Histogram Gradient Boosting, MLP, KNN, SGD, LSTM
 
 Usage:
     python3 run_compare.py \
@@ -24,6 +24,95 @@ from sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassif
 from sklearn.neural_network import MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import SGDClassifier
+
+try:
+    import torch
+    import torch.nn as nn
+    from torch.utils.data import DataLoader, TensorDataset
+    HAS_TORCH = True
+except ImportError:
+    HAS_TORCH = False
+
+
+class LSTMClassifier(nn.Module):
+    def __init__(self, input_size, hidden_size, num_classes, num_layers=2, dropout=0.3):
+        super().__init__()
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers=num_layers,
+                            batch_first=True, dropout=dropout if num_layers > 1 else 0)
+        self.dropout = nn.Dropout(dropout)
+        self.fc = nn.Linear(hidden_size, num_classes)
+
+    def forward(self, x):
+        # x: (batch, 1, features) - single timestep per sample
+        out, _ = self.lstm(x)
+        out = self.dropout(out[:, -1, :])
+        return self.fc(out)
+
+
+def train_lstm(X_train, y_train, X_val, y_val, num_classes, device='cpu'):
+    """Train LSTM classifier and return trained model"""
+    input_size = X_train.shape[1]
+    hidden_size = 128
+    batch_size = 64
+    num_epochs = 100
+    patience = 10
+
+    model = LSTMClassifier(input_size, hidden_size, num_classes).to(device)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, factor=0.5)
+
+    # Reshape: (N, features) -> (N, 1, features) for LSTM
+    X_tr = torch.FloatTensor(X_train).unsqueeze(1).to(device)
+    y_tr = torch.LongTensor(y_train).to(device)
+    X_v = torch.FloatTensor(X_val).unsqueeze(1).to(device)
+    y_v = torch.LongTensor(y_val).to(device)
+
+    train_ds = TensorDataset(X_tr, y_tr)
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
+
+    best_val_acc = 0
+    best_state = None
+    no_improve = 0
+
+    for epoch in range(num_epochs):
+        model.train()
+        for batch_x, batch_y in train_loader:
+            optimizer.zero_grad()
+            outputs = model(batch_x)
+            loss = criterion(outputs, batch_y)
+            loss.backward()
+            optimizer.step()
+
+        model.eval()
+        with torch.no_grad():
+            val_pred = model(X_v).argmax(dim=1)
+            val_acc = (val_pred == y_v).float().mean().item()
+        scheduler.step(1 - val_acc)
+
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            best_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
+            no_improve = 0
+        else:
+            no_improve += 1
+
+        if no_improve >= patience:
+            print(f"    Early stop at epoch {epoch+1} (best val: {best_val_acc*100:.2f}%)")
+            break
+
+    if best_state:
+        model.load_state_dict(best_state)
+    model.to(device)
+    return model
+
+
+def predict_lstm(model, X, device='cpu'):
+    """Predict with LSTM model"""
+    model.eval()
+    X_t = torch.FloatTensor(X).unsqueeze(1).to(device)
+    with torch.no_grad():
+        return model(X_t).argmax(dim=1).cpu().numpy()
 
 
 def main():
@@ -92,6 +181,31 @@ def main():
             'test_accuracy': float(test_acc),
             'test_report': report,
         }
+
+    # LSTM
+    if HAS_TORCH:
+        print(f"\n--- LSTM ---")
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        print(f"    Device: {device}")
+        num_classes = len(le.classes_)
+        lstm_model = train_lstm(X_train_s, y_train, X_val_s, y_val, num_classes, device)
+
+        val_pred_lstm = predict_lstm(lstm_model, X_val_s, device)
+        val_acc = accuracy_score(y_val, val_pred_lstm)
+        test_pred_lstm = predict_lstm(lstm_model, X_test_s, device)
+        test_acc = accuracy_score(y_test, test_pred_lstm)
+        test_f1 = f1_score(y_test, test_pred_lstm, average='weighted', zero_division=0)
+        report = classification_report(y_test, test_pred_lstm, target_names=le.classes_, output_dict=True)
+
+        print(f"  Val: {val_acc*100:.2f}% | Test: {test_acc*100:.2f}% (F1={test_f1:.3f})")
+
+        results['models']['LSTM'] = {
+            'val_accuracy': float(val_acc),
+            'test_accuracy': float(test_acc),
+            'test_report': report,
+        }
+    else:
+        print("\n[WARNING] PyTorch not available, skipping LSTM")
 
     # Summary
     print(f"\n{'='*60}")
