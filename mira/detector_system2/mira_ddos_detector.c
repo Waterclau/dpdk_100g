@@ -147,7 +147,9 @@ struct worker_stats {
     /* Attack-specific counters */
     uint64_t syn_packets;
     uint64_t syn_ack_packets;
+    uint64_t syn_only_packets;       /* SYN without HTTP (not port 80/443) */
     uint64_t http_requests;
+    uint64_t http_payload_packets;   /* TCP to 80/443 with payload > 0 */
     uint64_t dns_queries;
 
     /* Bytes counters */
@@ -215,7 +217,9 @@ struct detection_stats {
     /* Aggregated attack-specific counters */
     uint64_t syn_packets;
     uint64_t syn_ack_packets;
+    uint64_t syn_only_packets;
     uint64_t http_requests;
+    uint64_t http_payload_packets;
     uint64_t dns_queries;
 
     /* Aggregated bytes counters */
@@ -1333,6 +1337,8 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     g_stats.mssql_rpc_packets = 0;
     g_stats.tftp_rrq_packets = 0;
     g_stats.tftp_wrq_packets = 0;
+    g_stats.syn_only_packets = 0;
+    g_stats.http_payload_packets = 0;
     /* ================================================== */
 
     for (int i = 0; i < NUM_RX_QUEUES; i++) {
@@ -1375,6 +1381,8 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         g_stats.mssql_rpc_packets += g_worker_stats[i].mssql_rpc_packets;
         g_stats.tftp_rrq_packets += g_worker_stats[i].tftp_rrq_packets;
         g_stats.tftp_wrq_packets += g_worker_stats[i].tftp_wrq_packets;
+        g_stats.syn_only_packets += g_worker_stats[i].syn_only_packets;
+        g_stats.http_payload_packets += g_worker_stats[i].http_payload_packets;
         /* ======================================================== */
     }
 
@@ -1488,16 +1496,38 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
     uint64_t http_reqs = g_stats.http_requests;
     uint64_t dns_qs = g_stats.dns_queries;
 
+    uint64_t syn_only_pkts = g_stats.syn_only_packets;
+    uint64_t http_payload_pkts = g_stats.http_payload_packets;
+
+    /* Count active attack protocols (for mixed detection) */
+    int active_attack_protocols = 0;
+    if (g_stats.ntp_monlist_queries > 0) active_attack_protocols++;
+    if (g_stats.dns_any_queries > 0) active_attack_protocols++;
+    if (g_stats.snmp_getbulk_requests > 0) active_attack_protocols++;
+    if (g_stats.ssdp_msearch_packets > 0) active_attack_protocols++;
+    if (g_stats.portmap_getport_calls > 0) active_attack_protocols++;
+    if (g_stats.netbios_name_queries > 0) active_attack_protocols++;
+    if (g_stats.ldap_search_requests > 0) active_attack_protocols++;
+    if (g_stats.mssql_sqlbatch_packets > 0) active_attack_protocols++;
+    if (g_stats.tftp_rrq_packets > 0) active_attack_protocols++;
+    if (syn_only_pkts > 0) active_attack_protocols++;
+    if (http_payload_pkts > 0) active_attack_protocols++;
+    if (dns_qs > 0 && g_stats.dns_any_queries == 0) active_attack_protocols++; /* DNS generic (not amplification) */
+
     APPEND(
         "[ATTACK-SPECIFIC COUNTERS]\n"
         "  SYN packets:        %" PRIu64 "\n"
         "  SYN-ACK packets:    %" PRIu64 "\n"
         "  SYN/ACK ratio:      %.2f\n"
         "  HTTP requests:      %" PRIu64 "\n"
-        "  DNS queries:        %" PRIu64 "\n\n",
+        "  DNS queries:        %" PRIu64 "\n"
+        "  SYN-only (non-HTTP):%" PRIu64 "\n"
+        "  HTTP with payload:  %" PRIu64 "\n"
+        "  Active protocols:   %d\n\n",
         syn_pkts, syn_ack_pkts,
         syn_ack_pkts > 0 ? (double)syn_pkts / syn_ack_pkts : 0.0,
-        http_reqs, dns_qs);
+        http_reqs, dns_qs,
+        syn_only_pkts, http_payload_pkts, active_attack_protocols);
 
     /* Calculate average response sizes */
     uint32_t avg_ntp_resp_size = g_stats.ntp_responses > 0 ?
@@ -1922,8 +1952,8 @@ static int worker_thread(void *arg)
     uint64_t local_total_pkts = 0, local_total_bytes = 0;
     uint64_t local_baseline_pkts = 0, local_attack_pkts = 0;
     uint64_t local_tcp_pkts = 0, local_udp_pkts = 0, local_icmp_pkts = 0;
-    uint64_t local_syn_pkts = 0, local_syn_ack_pkts = 0;
-    uint64_t local_http_reqs = 0, local_dns_queries = 0;
+    uint64_t local_syn_pkts = 0, local_syn_ack_pkts = 0, local_syn_only_pkts = 0;
+    uint64_t local_http_reqs = 0, local_http_payload_pkts = 0, local_dns_queries = 0;
     uint64_t local_baseline_bytes = 0, local_attack_bytes = 0;
     uint64_t local_bursts_total = 0, local_bursts_empty = 0;
     uint64_t local_cycles = 0;
@@ -2024,11 +2054,21 @@ static int worker_thread(void *arg)
                 if (unlikely(tcp_flags & RTE_TCP_SYN_FLAG)) {
                     local_syn_pkts++;
                     local_syn_ack_pkts += (tcp_flags & RTE_TCP_ACK_FLAG) ? 1 : 0;
+                    /* SYN-only: SYN to non-HTTP ports (pure SYN flood indicator) */
+                    if (tcp_dst_port != 80 && tcp_dst_port != 443) {
+                        local_syn_only_pkts++;
+                    }
                 }
 
                 /* WebDDoS / HTTP detection (ports 80, 443) */
                 if (tcp_dst_port == 80 || tcp_dst_port == 443) {
                     local_http_reqs++;
+                    /* HTTP with payload: real HTTP traffic (not just SYN) */
+                    uint16_t tcp_hdr_len = (tcp_hdr->data_off >> 4) * 4;
+                    uint16_t ip_total_len = rte_be_to_cpu_16(ip_hdr->total_length);
+                    if (ip_total_len > (sizeof(struct rte_ipv4_hdr) + tcp_hdr_len)) {
+                        local_http_payload_pkts++;
+                    }
                 }
                 /* LDAP TCP detection (ports 389, 636) */
                 else if (tcp_dst_port == 389 || tcp_dst_port == 636) {
@@ -2246,7 +2286,9 @@ static int worker_thread(void *arg)
         ws->icmp_packets += local_icmp_pkts;
         ws->syn_packets += local_syn_pkts;
         ws->syn_ack_packets += local_syn_ack_pkts;
+        ws->syn_only_packets += local_syn_only_pkts;
         ws->http_requests += local_http_reqs;
+        ws->http_payload_packets += local_http_payload_pkts;
         ws->dns_queries += local_dns_queries;
         ws->baseline_bytes += local_baseline_bytes;
         ws->attack_bytes += local_attack_bytes;
@@ -2288,8 +2330,8 @@ static int worker_thread(void *arg)
         local_total_pkts = local_total_bytes = 0;
         local_baseline_pkts = local_attack_pkts = 0;
         local_tcp_pkts = local_udp_pkts = local_icmp_pkts = 0;
-        local_syn_pkts = local_syn_ack_pkts = 0;
-        local_http_reqs = local_dns_queries = 0;
+        local_syn_pkts = local_syn_ack_pkts = local_syn_only_pkts = 0;
+        local_http_reqs = local_http_payload_pkts = local_dns_queries = 0;
         local_baseline_bytes = local_attack_bytes = 0;
         local_bursts_total = local_bursts_empty = 0;
 
@@ -2317,7 +2359,9 @@ static int worker_thread(void *arg)
     ws->icmp_packets += local_icmp_pkts;
     ws->syn_packets += local_syn_pkts;
     ws->syn_ack_packets += local_syn_ack_pkts;
+    ws->syn_only_packets += local_syn_only_pkts;
     ws->http_requests += local_http_reqs;
+    ws->http_payload_packets += local_http_payload_pkts;
     ws->dns_queries += local_dns_queries;
 
     /* ========== Final Protocol-Specific Stats Update ========== */
