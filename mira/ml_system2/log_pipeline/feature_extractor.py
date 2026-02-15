@@ -46,10 +46,46 @@ class LogParser:
     def __init__(self):
         self.feature_records = []
 
+    def _auto_detect_boundaries(self, windows, threshold_ratio=0.05):
+        """Auto-detect attack start/end by analyzing attack_packets per window.
+
+        Scans all windows and finds when attack_packets / total_packets exceeds
+        threshold_ratio, indicating actual attack traffic is present.
+
+        Returns:
+            (attack_start_time, attack_end_time) in seconds, or (None, None)
+        """
+        time_attack = []  # list of (elapsed, attack_pkt, total_pkt)
+        for window in windows[1:]:
+            elapsed = self._extract_elapsed_time(window)
+            if elapsed is None:
+                continue
+            m_attack = re.search(r'Attack \(10\.10\.3\.x\):\s*(\d+)', window)
+            m_total = re.search(r'Total packets:\s*(\d+)', window)
+            attack_pkt = int(m_attack.group(1)) if m_attack else 0
+            total_pkt = int(m_total.group(1)) if m_total else 1
+            time_attack.append((elapsed, attack_pkt, total_pkt))
+
+        if not time_attack:
+            return None, None
+
+        # Find first and last window where attack ratio > threshold
+        attack_start = None
+        attack_end = None
+        for elapsed, attack_pkt, total_pkt in time_attack:
+            ratio = attack_pkt / total_pkt if total_pkt > 0 else 0
+            if ratio >= threshold_ratio:
+                if attack_start is None:
+                    attack_start = elapsed
+                attack_end = elapsed
+
+        return attack_start, attack_end
+
     def parse_log_file(self, log_path: str, label: str,
                        baseline_before: float = None,
                        attack_duration: float = None,
-                       baseline_after: float = None) -> pd.DataFrame:
+                       baseline_after: float = None,
+                       auto_label: bool = False) -> pd.DataFrame:
         """
         Parse detector log file and extract features
 
@@ -59,23 +95,13 @@ class LogParser:
             baseline_before: Seconds of benign before attack (enables temporal labeling)
             attack_duration: Seconds of attack traffic
             baseline_after: Seconds of benign after attack
+            auto_label: Auto-detect attack boundaries from attack_packets ratio
 
         Returns:
             DataFrame with extracted features
         """
         print(f"[INFO] Parsing log file: {log_path}")
         print(f"[INFO] Label: {label}")
-
-        # Temporal labeling mode
-        temporal = (baseline_before is not None and attack_duration is not None
-                    and baseline_after is not None)
-        if temporal:
-            attack_start = baseline_before
-            attack_end = baseline_before + attack_duration
-            total_duration = attack_end + baseline_after
-            print(f"[INFO] Temporal labeling: {baseline_before}s benign → "
-                  f"{attack_duration}s {label} → {baseline_after}s benign "
-                  f"(total {total_duration}s)")
 
         with open(log_path, 'r', encoding='utf-8', errors='ignore') as f:
             log_content = f.read()
@@ -84,6 +110,29 @@ class LogParser:
         windows = re.split(r'\[PACKET COUNTERS - GLOBAL\]', log_content)
 
         print(f"[INFO] Found {len(windows)-1} detection windows in log")
+
+        # Determine labeling mode
+        if auto_label:
+            attack_start, attack_end = self._auto_detect_boundaries(windows)
+            if attack_start is not None:
+                print(f"[AUTO-LABEL] Attack detected: {attack_start:.1f}s - {attack_end:.1f}s "
+                      f"(duration: {attack_end - attack_start:.1f}s)")
+                temporal = True
+            else:
+                print(f"[AUTO-LABEL] No attack traffic detected, labeling all as benign")
+                temporal = True
+                attack_start = float('inf')
+                attack_end = float('inf')
+        else:
+            temporal = (baseline_before is not None and attack_duration is not None
+                        and baseline_after is not None)
+            if temporal:
+                attack_start = baseline_before
+                attack_end = baseline_before + attack_duration
+                total_duration = attack_end + baseline_after
+                print(f"[INFO] Temporal labeling: {baseline_before}s benign → "
+                      f"{attack_duration}s {label} → {baseline_after}s benign "
+                      f"(total {total_duration}s)")
 
         stats = {'benign': 0, 'attack': 0, 'no_time': 0}
         for idx, window in enumerate(windows[1:], 1):  # Skip first empty split
@@ -656,6 +705,9 @@ Supported labels:
                        help='Seconds of attack traffic (default: None)')
     parser.add_argument('--baseline-after', type=float, default=None,
                        help='Seconds of benign after attack (default: None)')
+    parser.add_argument('--auto-label', action='store_true',
+                       help='Auto-detect attack boundaries from attack_packets ratio '
+                            '(replaces fixed --baseline-before/--attack-duration/--baseline-after)')
 
     args = parser.parse_args()
 
@@ -667,11 +719,12 @@ Supported labels:
         print(f"[ERROR] Input file not found: {args.input}")
         sys.exit(1)
 
-    # Validate temporal labeling args (all or none)
-    temporal_args = [args.baseline_before, args.attack_duration, args.baseline_after]
-    if any(a is not None for a in temporal_args) and not all(a is not None for a in temporal_args):
-        print("[ERROR] --baseline-before, --attack-duration, --baseline-after must all be specified together")
-        sys.exit(1)
+    # Validate temporal labeling args (all or none) - skip if auto-label
+    if not args.auto_label:
+        temporal_args = [args.baseline_before, args.attack_duration, args.baseline_after]
+        if any(a is not None for a in temporal_args) and not all(a is not None for a in temporal_args):
+            print("[ERROR] --baseline-before, --attack-duration, --baseline-after must all be specified together")
+            sys.exit(1)
 
     # Parse log file
     parser_obj = LogParser()
@@ -679,7 +732,8 @@ Supported labels:
         args.input, args.label,
         baseline_before=args.baseline_before,
         attack_duration=args.attack_duration,
-        baseline_after=args.baseline_after
+        baseline_after=args.baseline_after,
+        auto_label=args.auto_label
     )
 
     if df.empty:

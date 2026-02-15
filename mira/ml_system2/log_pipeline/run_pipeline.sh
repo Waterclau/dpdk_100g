@@ -19,7 +19,7 @@ SPLITS="$ML2/datasets/splits"
 EXTRACT="$BASE/feature_extractor.py"
 TRAIN_DIR="$ML2/training"
 
-mkdir -p "$PROC" "$SPLITS"
+mkdir -p "$PROC/${MODE}" "$SPLITS"
 
 echo "===== LOG PIPELINE (mode=$MODE) ====="
 echo "Logs: $LOGS_DIR"
@@ -52,24 +52,25 @@ for f in "$LOGS_DIR"/*.log; do
         *) echo "[SKIP] No label for: $base"; continue ;;
     esac
 
-    echo "[EXTRACT] $base -> $label"
+    echo "[EXTRACT] $base -> $label (auto-label)"
     python3 "$EXTRACT" \
         --input "$f" \
-        --output "$PROC/${base}.csv" \
-        --label "$label"
+        --output "$PROC/${MODE}/${base}.csv" \
+        --label "$label" \
+        --auto-label
 done
 
-csv_count=$(ls "$PROC"/*.csv 2>/dev/null | wc -l)
+csv_count=$(ls "$PROC/${MODE}"/*.csv 2>/dev/null | wc -l)
 if [ "$csv_count" -eq 0 ]; then
     echo "[ERROR] No CSVs generados"
     exit 1
 fi
-echo "[INFO] $csv_count CSVs en $PROC/"
+echo "[INFO] $csv_count CSVs en $PROC/${MODE}/"
 
 echo ""
 echo "===== STEP 2: Preparar dataset ====="
 python3 "$TRAIN_DIR/prepare_dataset.py" \
-    --input $PROC/*.csv \
+    --input $PROC/${MODE}/*.csv \
     --output "$SPLITS/" \
     --mode "$MODE"
 
