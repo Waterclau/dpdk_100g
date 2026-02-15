@@ -191,7 +191,7 @@ def main():
     parser.add_argument('--train', required=True, help='Training CSV')
     parser.add_argument('--val', required=True, help='Validation CSV')
     parser.add_argument('--mode', required=True,
-                        choices=['dpi_sketch', 'sketch', 'sketch_adv'],
+                        choices=['dpi_sketch', 'dpi_ratios', 'sketch', 'sketch_adv'],
                         help='Feature mode')
     parser.add_argument('--output', required=True, help='Output directory')
     args = parser.parse_args()

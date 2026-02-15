@@ -113,7 +113,7 @@ def main():
     parser.add_argument('--output', type=str, required=True,
                         help='Output directory for splits')
     parser.add_argument('--mode', type=str, default='sketch_adv',
-                        choices=['dpi_sketch', 'sketch', 'sketch_adv'],
+                        choices=['dpi_sketch', 'dpi_ratios', 'sketch', 'sketch_adv'],
                         help='Feature mode (default: sketch_adv)')
     parser.add_argument('--train-ratio', type=float, default=0.7)
     parser.add_argument('--val-ratio', type=float, default=0.15)

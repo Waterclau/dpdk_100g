@@ -68,6 +68,27 @@ DPI_FEATURES = [
 DPI_SKETCH_FEATURES = DPI_FEATURES + SKETCH_FEATURES
 
 # ============================================================
+# DPI RATIOS-ONLY (31) - Volume-invariant features for cross-run generalization
+# ============================================================
+DPI_RATIOS_FEATURES = [
+    # Basic ratios (4)
+    'udp_tcp_ratio', 'syn_total_ratio', 'baseline_attack_ratio', 'bytes_per_packet',
+    # Amplification ratios (6)
+    'ntp_amplification_factor', 'dns_amplification_factor', 'snmp_amplification_factor',
+    'query_response_ratio', 'fragmentation_ratio', 'syn_ack_ratio',
+    # SYN/WebDDoS discrimination (2)
+    'active_attack_protocols', 'syn_http_ratio',
+    # Normalized protocol ratios (13)
+    'syn_only_ratio', 'http_payload_ratio', 'dns_query_ratio',
+    'ntp_monlist_ratio', 'snmp_ratio', 'ssdp_ratio', 'icmp_ratio',
+    'http_request_ratio', 'portmap_ratio', 'netbios_ratio',
+    'ldap_ratio', 'mssql_ratio', 'tftp_ratio',
+    # Sketch ratios (6)
+    'ratio_vs_baseline', 'ratio_50ms_1min',
+    'num_heavy_hitters', 'ip_concentration', 'new_ips_ratio', 'attack_entropy',
+]
+
+# ============================================================
 # SKETCH-ADV PER-PROTOCOL FEATURES (50)
 # ============================================================
 SKETCH_ADV_PROTOCOLS = [
@@ -93,16 +114,18 @@ def get_feature_columns(mode='sketch_adv'):
     """Return feature column names for a given mode.
 
     Args:
-        mode: 'dpi_sketch' (73), 'sketch' (14), or 'sketch_adv' (64)
+        mode: 'dpi_sketch' (73), 'sketch' (14), 'sketch_adv' (64), or 'dpi_ratios' (31)
     """
     if mode == 'dpi_sketch':
         return list(DPI_SKETCH_FEATURES)
+    elif mode == 'dpi_ratios':
+        return list(DPI_RATIOS_FEATURES)
     elif mode == 'sketch':
         return list(SKETCH_FEATURES)
     elif mode == 'sketch_adv':
         return list(SKETCH_FEATURES_ALL)
     else:
-        raise ValueError(f"Unknown mode: {mode}. Use 'dpi_sketch', 'sketch', or 'sketch_adv'")
+        raise ValueError(f"Unknown mode: {mode}. Use 'dpi_sketch', 'dpi_ratios', 'sketch', or 'sketch_adv'")
 
 
 def filter_dataframe(df, mode='sketch_adv'):
