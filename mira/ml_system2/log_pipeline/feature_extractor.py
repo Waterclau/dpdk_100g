@@ -2,7 +2,7 @@
 """
 Feature Extractor for MIRA Detector Logs (Multi-Class Version)
 Parses detector output logs and extracts ML features for CIC-DDoS-2019 multi-attack detection
-Supports 14 attack classes and 60 features (46 base + 14 temporal/multi-scale)
+Supports 14 attack classes and 73 features (59 base + 14 temporal/multi-scale)
 """
 
 import re
@@ -333,6 +333,22 @@ class LogParser:
         http_p = features['http_payload_packets']
         features['syn_http_ratio'] = syn_o / http_p if http_p > 0 else (float(syn_o) if syn_o > 0 else 0.0)
 
+        # ========== NORMALIZED FEATURES (volume-invariant ratios) ==========
+        total = features['total_packets'] if features['total_packets'] > 0 else 1
+        features['syn_only_ratio'] = features['syn_only_packets'] / total
+        features['http_payload_ratio'] = features['http_payload_packets'] / total
+        features['dns_query_ratio'] = features['dns_queries'] / total
+        features['ntp_monlist_ratio'] = features['ntp_monlist_queries'] / total
+        features['snmp_ratio'] = features['snmp_getbulk_requests'] / total
+        features['ssdp_ratio'] = features['ssdp_msearch_packets'] / total
+        features['icmp_ratio'] = features['icmp_packets'] / total
+        features['http_request_ratio'] = features['http_requests'] / total
+        features['portmap_ratio'] = features['portmap_getport_calls'] / total
+        features['netbios_ratio'] = features['netbios_name_queries'] / total
+        features['ldap_ratio'] = features['ldap_search_requests'] / total
+        features['mssql_ratio'] = features['mssql_sqlbatch_packets'] / total
+        features['tftp_ratio'] = features['tftp_rrq_packets'] / total
+
         # ========== NEW: 14 TEMPORAL & MULTI-SCALE FEATURES ==========
         # Temporal Features (from Ring Buffer) - Features 43-47
         match = re.search(r'Delta PPS \(250ms\):\s+([+-]?[\d.]+)', window_text)
@@ -514,7 +530,12 @@ class LogParser:
             # SYN/WebDDoS discrimination + mixed detection (43-46)
             'syn_only_packets', 'http_payload_packets', 'active_attack_protocols',
             'syn_http_ratio',
-            # NEW: Temporal features from Ring Buffer (43-47)
+            # Normalized ratios (volume-invariant) (47-59)
+            'syn_only_ratio', 'http_payload_ratio', 'dns_query_ratio',
+            'ntp_monlist_ratio', 'snmp_ratio', 'ssdp_ratio', 'icmp_ratio',
+            'http_request_ratio', 'portmap_ratio', 'netbios_ratio',
+            'ldap_ratio', 'mssql_ratio', 'tftp_ratio',
+            # Temporal features from Ring Buffer
             'delta_pps_5w', 'delta_pps_10w', 'pps_variance',
             'pps_baseline', 'ratio_vs_baseline',
             # NEW: Multi-scale features from Sketches (48-56)

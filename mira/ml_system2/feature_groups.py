@@ -3,7 +3,7 @@
 Feature Definitions for ml_system2
 
 Three feature sets:
-  - DPI+Sketch (60):  46 DPI + 14 sketch  (from .log, detector_system original)
+  - DPI+Sketch (73):  59 DPI + 14 sketch  (from .log, detector_system original)
   - Sketch-only (14): 14 sketch            (from .log, detector_system2 sin --sketch-adv)
   - Sketch-ADV (64):  14 global + 48 per-protocol + 2 pkt size (from .bin)
 """
@@ -31,7 +31,7 @@ SKETCH_FEATURES = [
 ]
 
 # ============================================================
-# DPI FEATURES (46) - Deep Packet Inspection counters + ratios
+# DPI FEATURES (59) - Deep Packet Inspection counters + ratios + normalized
 # ============================================================
 DPI_FEATURES = [
     # Original 14 counters + ratios
@@ -57,9 +57,14 @@ DPI_FEATURES = [
     # SYN/WebDDoS discrimination + mixed detection (4)
     'syn_only_packets', 'http_payload_packets', 'active_attack_protocols',
     'syn_http_ratio',
+    # Normalized ratios - volume-invariant (13)
+    'syn_only_ratio', 'http_payload_ratio', 'dns_query_ratio',
+    'ntp_monlist_ratio', 'snmp_ratio', 'ssdp_ratio', 'icmp_ratio',
+    'http_request_ratio', 'portmap_ratio', 'netbios_ratio',
+    'ldap_ratio', 'mssql_ratio', 'tftp_ratio',
 ]
 
-# DPI + Sketch = 46 + 14 = 60
+# DPI + Sketch = 59 + 14 = 73
 DPI_SKETCH_FEATURES = DPI_FEATURES + SKETCH_FEATURES
 
 # ============================================================
@@ -88,7 +93,7 @@ def get_feature_columns(mode='sketch_adv'):
     """Return feature column names for a given mode.
 
     Args:
-        mode: 'dpi_sketch' (59), 'sketch' (14), or 'sketch_adv' (64)
+        mode: 'dpi_sketch' (73), 'sketch' (14), or 'sketch_adv' (64)
     """
     if mode == 'dpi_sketch':
         return list(DPI_SKETCH_FEATURES)
