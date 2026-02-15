@@ -529,6 +529,19 @@ class LogParser:
         features['new_ips_ratio'] = active_types / float(len(attack_signals))
         features['adaptive_threshold'] = 0.0  # Calculated but not used for detection
 
+        # Protocol diversity features (mixed vs pure discrimination)
+        protocol_ratios = [
+            features['dns_query_ratio'], features['ntp_monlist_ratio'],
+            features['snmp_ratio'], features['ssdp_ratio'],
+            features['portmap_ratio'], features['netbios_ratio'],
+            features['ldap_ratio'], features['mssql_ratio'],
+            features['tftp_ratio'], features['syn_only_ratio'],
+            features['http_payload_ratio'], features['icmp_ratio'],
+        ]
+        nonzero_ratios = [r for r in protocol_ratios if r > 0.001]
+        features['max_protocol_ratio'] = max(protocol_ratios) if protocol_ratios else 0.0
+        features['protocol_diversity'] = len(nonzero_ratios)
+
         # Filter: for specific attack labels, drop windows without attack traffic
         if label not in LEGACY_LABELS and label != 'mixed':
             if features['attack_packets'] == 0:
@@ -591,6 +604,8 @@ class LogParser:
             'top_ip_pps_50ms', 'top_ip_pps_1s', 'top_ip_pps_1min',
             'ratio_50ms_1min', 'num_heavy_hitters', 'ip_concentration',
             'new_ips_ratio', 'attack_entropy', 'adaptive_threshold',
+            # Protocol diversity (mixed vs pure)
+            'max_protocol_ratio', 'protocol_diversity',
         ]
 
         # SKETCH-ADV: Add per-protocol features if present in data

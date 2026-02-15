@@ -3,7 +3,7 @@
 Feature Definitions for ml_system2
 
 Three feature sets:
-  - DPI+Sketch (73):  59 DPI + 14 sketch  (from .log, detector_system original)
+  - DPI+Sketch (75):  61 DPI + 14 sketch  (from .log, detector_system original)
   - Sketch-only (14): 14 sketch            (from .log, detector_system2 sin --sketch-adv)
   - Sketch-ADV (64):  14 global + 48 per-protocol + 2 pkt size (from .bin)
 """
@@ -31,7 +31,7 @@ SKETCH_FEATURES = [
 ]
 
 # ============================================================
-# DPI FEATURES (59) - Deep Packet Inspection counters + ratios + normalized
+# DPI FEATURES (61) - Deep Packet Inspection counters + ratios + normalized
 # ============================================================
 DPI_FEATURES = [
     # Original 14 counters + ratios
@@ -62,13 +62,16 @@ DPI_FEATURES = [
     'ntp_monlist_ratio', 'snmp_ratio', 'ssdp_ratio', 'icmp_ratio',
     'http_request_ratio', 'portmap_ratio', 'netbios_ratio',
     'ldap_ratio', 'mssql_ratio', 'tftp_ratio',
+    # Protocol diversity - mixed vs pure discrimination (2)
+    'max_protocol_ratio',    # Highest protocol ratio (high=pure, low=mixed)
+    'protocol_diversity',    # Number of active protocols (>0.1%) (high=mixed, low=pure)
 ]
 
-# DPI + Sketch = 59 + 14 = 73
+# DPI + Sketch = 61 + 14 = 75
 DPI_SKETCH_FEATURES = DPI_FEATURES + SKETCH_FEATURES
 
 # ============================================================
-# DPI RATIOS-ONLY (31) - Volume-invariant features for cross-run generalization
+# DPI RATIOS-ONLY (33) - Volume-invariant features for cross-run generalization
 # ============================================================
 DPI_RATIOS_FEATURES = [
     # Basic ratios (4)
@@ -86,6 +89,8 @@ DPI_RATIOS_FEATURES = [
     # Sketch ratios (6)
     'ratio_vs_baseline', 'ratio_50ms_1min',
     'num_heavy_hitters', 'ip_concentration', 'new_ips_ratio', 'attack_entropy',
+    # Protocol diversity - mixed vs pure (2)
+    'max_protocol_ratio', 'protocol_diversity',
 ]
 
 # ============================================================
@@ -114,7 +119,7 @@ def get_feature_columns(mode='sketch_adv'):
     """Return feature column names for a given mode.
 
     Args:
-        mode: 'dpi_sketch' (73), 'sketch' (14), 'sketch_adv' (64), or 'dpi_ratios' (31)
+        mode: 'dpi_sketch' (75), 'sketch' (14), 'sketch_adv' (64), or 'dpi_ratios' (33)
     """
     if mode == 'dpi_sketch':
         return list(DPI_SKETCH_FEATURES)
