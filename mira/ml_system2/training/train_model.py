@@ -109,13 +109,13 @@ def train_and_export(train_csv, val_csv, mode, output_dir):
     else:
         params = {
             'objective': 'multiclass', 'num_class': len(label_encoder.classes_),
-            'metric': 'multi_logloss', 'learning_rate': 0.05,
-            'max_depth': 8, 'num_leaves': 63, 'min_data_in_leaf': 10,
-            'feature_fraction': 0.9, 'bagging_fraction': 0.85, 'bagging_freq': 5,
-            'lambda_l1': 0.5, 'lambda_l2': 0.5, 'min_gain_to_split': 0.01,
+            'metric': 'multi_logloss', 'learning_rate': 0.02,
+            'max_depth': 4, 'num_leaves': 15, 'min_data_in_leaf': 50,
+            'feature_fraction': 0.6, 'bagging_fraction': 0.7, 'bagging_freq': 5,
+            'lambda_l1': 5.0, 'lambda_l2': 10.0, 'min_gain_to_split': 0.5,
             'verbose': -1, 'seed': 42
         }
-        num_rounds = 300
+        num_rounds = 500
 
     early_stop = 10 if n < 1000 else 20 if n < 2000 else 30
 
