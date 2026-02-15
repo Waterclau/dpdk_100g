@@ -1,15 +1,24 @@
 #!/bin/bash
 # Pipeline .bin: convertir binarios sketch-adv -> CSV -> split -> entrenar
 #
+# Soporta archivos de ataque y benign:
+#   - Nombres con "benign": label=benign (todo el fichero)
+#   - Nombres con tipo de ataque: auto-detect boundaries del sketch
+#   - Nombres con "mixed": auto-detect boundaries (mixed)
+#
 # Uso:
-#   bash run_pipeline.sh /ruta/con/archivos.bin
+#   bash run_pipeline.sh /ruta/con/archivos.bin [subsample]
+#
+# Ejemplo:
+#   bash run_pipeline.sh /tmp/captures/ 5
 set -e
 
-BINS_DIR="${1:?Uso: $0 <bins_dir>}"
+BINS_DIR="${1:?Uso: $0 <bins_dir> [subsample]}"
+SUBSAMPLE="${2:-1}"
 
 BASE="$(cd "$(dirname "$0")" && pwd)"
 ML2="$(dirname "$BASE")"
-PROC="$ML2/datasets/processed"
+PROC="$ML2/datasets/processed/sketch_adv"
 SPLITS="$ML2/datasets/splits"
 BIN2CSV="$BASE/bin_to_csv.py"
 TRAIN_DIR="$ML2/training"
@@ -18,6 +27,7 @@ mkdir -p "$PROC" "$SPLITS"
 
 echo "===== BIN PIPELINE (sketch-adv, 64 features) ====="
 echo "Bins: $BINS_DIR"
+echo "Subsample: $SUBSAMPLE"
 echo ""
 
 echo "===== STEP 1: Convertir .bin a CSV ====="
@@ -27,36 +37,31 @@ for f in "$BINS_DIR"/*.bin; do
     fname=$(basename "$f" .bin)
 
     # Inferir tipo de ataque del nombre
-    attack_type="unknown"
+    attack_type=""
     case "$fname" in
-        *dns*)     attack_type="dns" ;;
-        *ntp*)     attack_type="ntp" ;;
-        *snmp*)    attack_type="snmp" ;;
-        *ssdp*)    attack_type="ssdp" ;;
-        *portmap*) attack_type="portmap" ;;
-        *netbios*) attack_type="netbios" ;;
-        *ldap*)    attack_type="ldap" ;;
-        *mssql*)   attack_type="mssql" ;;
-        *tftp*)    attack_type="tftp" ;;
-        *syn*)     attack_type="syn" ;;
-        *udp*)     attack_type="udp" ;;
-        *http*|*web*) attack_type="webddos" ;;
-        *mixed*)   attack_type="mixed" ;;
+        benign_baseline_*|benign_*) attack_type="benign" ;;
+        mixed_traffic_*|mixed_*)    attack_type="mixed" ;;
+        attack_dns_*|*_dns_*)       attack_type="dns" ;;
+        attack_ntp_*|*_ntp_*)       attack_type="ntp" ;;
+        attack_snmp_*|*_snmp_*)     attack_type="snmp" ;;
+        attack_ssdp_*|*_ssdp_*)     attack_type="ssdp" ;;
+        attack_portmap_*|*_portmap_*) attack_type="portmap" ;;
+        attack_netbios_*|*_netbios_*) attack_type="netbios" ;;
+        attack_ldap_*|*_ldap_*)     attack_type="ldap" ;;
+        attack_mssql_*|*_mssql_*)   attack_type="mssql" ;;
+        attack_tftp_*|*_tftp_*)     attack_type="tftp" ;;
+        attack_syn_*|*_syn_*)       attack_type="syn" ;;
+        attack_udp_*|*_udp_*)       attack_type="udp" ;;
+        attack_webddos_*|*_web_*)   attack_type="webddos" ;;
+        *) echo "[SKIP] No se pudo inferir tipo de ataque: $fname"; continue ;;
     esac
 
-    if [ "$attack_type" = "unknown" ]; then
-        echo "[SKIP] No se pudo inferir tipo de ataque: $fname"
-        continue
-    fi
-
-    echo "[CONVERT] $fname -> $attack_type"
+    echo "[CONVERT] $fname -> $attack_type (auto-label)"
     python3 "$BIN2CSV" \
         --input "$f" \
         --output "$PROC/${fname}.csv" \
         --attack-type "$attack_type" \
-        --baseline-before 50 \
-        --attack-duration 100 \
-        --baseline-after 50
+        --auto-label
 done
 
 csv_count=$(ls "$PROC"/*.csv 2>/dev/null | wc -l)
@@ -68,10 +73,16 @@ echo "[INFO] $csv_count CSVs en $PROC/"
 
 echo ""
 echo "===== STEP 2: Preparar dataset ====="
+SUBSAMPLE_ARG=""
+if [ "$SUBSAMPLE" -gt 1 ]; then
+    SUBSAMPLE_ARG="--subsample $SUBSAMPLE"
+fi
+
 python3 "$TRAIN_DIR/prepare_dataset.py" \
     --input $PROC/*.csv \
     --output "$SPLITS/" \
-    --mode sketch_adv
+    --mode sketch_adv \
+    $SUBSAMPLE_ARG
 
 echo ""
 echo "===== STEP 3: Entrenar ====="

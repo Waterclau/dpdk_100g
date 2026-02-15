@@ -176,3 +176,47 @@ Etiquetado automatico por `bin_to_csv.py` basado en `timestamp_ns`.
 | 2 | sketch | 14 | detector_system2 | log_pipeline |
 | 3 | sketch_adv | 64 | detector_system2 --sketch-adv | bin_pipeline |
 | 4 | sketch_adv | 64 | detector_system2 --sketch-adv (otro ataque) | bin_pipeline |
+Paso 1: Re-extraer CSVs (con las 2 features nuevas)
+
+# Ataques puros
+sudo bash -c 'for attack in dns ntp snmp ssdp portmap netbios ldap mssql tftp syn udp webddos; do for run in 1 2 3 4; do python3 log_pipeline/feature_extractor.py --input datasets/logs/attack_${attack}_run${run}.log --output datasets/processed/dpi_sketch/${attack}_run${run}.csv --label ${attack} --auto-label; done; done'
+
+# Mixed
+sudo bash -c 'for run in 1 2 3 4; do python3 log_pipeline/feature_extractor.py --input datasets/logs/mixed_traffic_run${run}.log --output datasets/processed/dpi_sketch/mixed_run${run}.csv --label mixed --auto-label; done'
+
+# Benign
+sudo bash -c 'for run in 1 2 3 4; do python3 log_pipeline/feature_extractor.py --input datasets/logs/benign_baseline_run${run}.log --output datasets/processed/dpi_sketch/benign_run${run}.csv --label benign --auto-label; done'
+Paso 2: Entrenar dpi_ratios (33 features)
+
+sudo python3 training/prepare_dataset.py \
+    --input datasets/processed/dpi_sketch/*.csv \
+    --output datasets/splits/ \
+    --mode dpi_ratios \
+    --subsample 5
+
+sudo python3 training/train_model.py \
+    --train datasets/splits/train.csv \
+    --val datasets/splits/val.csv \
+    --mode dpi_ratios \
+    --output training/results/dpi_ratios/
+
+sudo python3 training/evaluate_model.py \
+    --model training/results/dpi_ratios/lightgbm_model.txt \
+    --test datasets/splits/test.csv
+Paso 3: Entrenar dpi_sketch (75 features) para comparar
+
+sudo python3 training/prepare_dataset.py \
+    --input datasets/processed/dpi_sketch/*.csv \
+    --output datasets/splits/ \
+    --mode dpi_sketch \
+    --subsample 5
+
+sudo python3 training/train_model.py \
+    --train datasets/splits/train.csv \
+    --val datasets/splits/val.csv \
+    --mode dpi_sketch \
+    --output training/results/dpi_sketch/
+
+sudo python3 training/evaluate_model.py \
+    --model training/results/dpi_sketch/lightgbm_model.txt \
+    --test datasets/splits/test.csv

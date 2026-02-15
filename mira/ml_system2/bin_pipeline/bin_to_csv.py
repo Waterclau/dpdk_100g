@@ -3,7 +3,7 @@
 Binary Sketch-ADV to CSV Converter
 
 Reads binary .bin files produced by detector_system2 (--sketch-adv mode)
-and converts them to CSV with time-based labeling for ML training.
+and converts them to CSV with labeling for ML training.
 
 Binary record format (528 bytes, packed):
   - uint32  magic          (0x534B4156 = "SKAV")
@@ -17,32 +17,20 @@ Binary record format (528 bytes, packed):
   - double  avg_packet_size
   - double  packet_size_variance
 
-Labeling (time-based, for structured experiments):
-  Actual timing from detector's perspective (210s total):
-    - Detector starts at t=0
-    - Benign traffic arrives at ~t=10 (pcap load delay)
-    - Attack arrives at ~t=70 (launched at t=50, 10s ramp-up,
-      starts when benign has sent 60s)
-    - Attack stops at ~t=150 (80s of effective attack traffic)
-    - Benign stops at ~t=200
-    - Detector timeout at t=210
+Labeling modes:
+  --auto-label (recommended): Auto-detect attack boundaries from sketch features.
+    Uses ratio_vs_baseline and per-protocol PPS spikes to find when attack
+    traffic starts/ends. Equivalent to .log pipeline auto-label.
 
-  Default labeling (--baseline-before 70, --attack-duration 80, --baseline-after 60):
-    - 0-70s:    label = benign  (no traffic + benign only)
-    - 70-150s:  label = <attack_type>  (attack active)
-    - 150-210s: label = benign  (benign only + no traffic)
+  Time-based (manual): Fixed timing with --baseline-before, --attack-duration,
+    --baseline-after for experiments with known timing.
 
 Usage:
-    python3 bin_to_csv.py \
-        --input /tmp/run3_sketch_adv.bin \
-        --output ../datasets/processed/dns_run1.csv \
-        --attack-type dns
+    # Auto-label (recommended)
+    python3 bin_to_csv.py --input /tmp/dns_run1.bin --output dns_run1.csv --attack-type dns --auto-label
 
-    # Custom timing
-    python3 bin_to_csv.py \
-        --input /tmp/experiment.bin \
-        --output ../datasets/processed/ntp_run1.csv \
-        --attack-type ntp \
+    # Time-based
+    python3 bin_to_csv.py --input /tmp/dns_run1.bin --output dns_run1.csv --attack-type dns \
         --baseline-before 70 --attack-duration 80 --baseline-after 60
 """
 
@@ -77,6 +65,11 @@ GLOBAL_FEATURES = [
     'ratio_50ms_1min', 'num_heavy_hitters', 'ip_concentration',
     'new_ips_ratio', 'attack_entropy', 'adaptive_threshold',
 ]
+
+# Feature indices in the 64-double array
+IDX_PPS_BASELINE = 3       # pps_baseline
+IDX_RATIO_VS_BASELINE = 4  # ratio_vs_baseline
+IDX_PPS_PROTO_START = 14   # pps_proto[0] = pps_dns
 
 # Per-protocol feature types (4 per protocol)
 PER_PROTO_TYPES = ['pps', 'heavy_hitters', 'ip_concentration', 'ratio_vs_total']
@@ -146,6 +139,79 @@ def read_binary_file(bin_path):
     return records
 
 
+def auto_detect_boundaries(records, threshold_ratio=2.0, min_pps=100.0):
+    """Auto-detect attack start/end from sketch features.
+
+    Uses two signals:
+      1. ratio_vs_baseline > threshold (global PPS spike vs running average)
+      2. Sum of per-protocol PPS > min_pps (ensures real traffic, not noise)
+
+    Equivalent to .log pipeline's auto-label using attack_packets ratio.
+
+    Returns:
+        (attack_start_sec, attack_end_sec) or (None, None) if no attack detected
+    """
+    attack_start = None
+    attack_end = None
+
+    for timestamp_ns, features in records:
+        t_sec = timestamp_ns / 1e9
+        ratio = features[IDX_RATIO_VS_BASELINE]
+        pps_baseline = features[IDX_PPS_BASELINE]
+
+        # Sum per-protocol PPS (12 values starting at index 14)
+        total_proto_pps = sum(features[IDX_PPS_PROTO_START:IDX_PPS_PROTO_START + 12])
+
+        # Attack detected when: significant PPS spike AND real traffic present
+        is_attack = (ratio >= threshold_ratio and pps_baseline > min_pps) or \
+                    (total_proto_pps > min_pps * 5)
+
+        if is_attack:
+            if attack_start is None:
+                attack_start = t_sec
+            attack_end = t_sec
+
+    return attack_start, attack_end
+
+
+def apply_auto_labels(records, attack_type, threshold_ratio=2.0, min_pps=100.0):
+    """Apply auto-detected labels based on sketch feature analysis.
+
+    Like .log pipeline: windows before attack_start = benign,
+    during attack = attack_type, after attack_end = benign.
+    """
+    attack_start, attack_end = auto_detect_boundaries(
+        records, threshold_ratio, min_pps
+    )
+
+    labeled = []
+    stats = {'benign': 0, 'attack': 0}
+
+    if attack_start is None:
+        # No attack detected - all benign
+        print(f"\n[AUTO-LABEL] No attack traffic detected, labeling all as benign")
+        for timestamp_ns, features in records:
+            labeled.append((features, 'benign'))
+            stats['benign'] += 1
+    else:
+        print(f"\n[AUTO-LABEL] Attack detected: {attack_start:.1f}s - {attack_end:.1f}s "
+              f"(duration: {attack_end - attack_start:.1f}s)")
+        for timestamp_ns, features in records:
+            t_sec = timestamp_ns / 1e9
+            if t_sec < attack_start or t_sec > attack_end:
+                label = 'benign'
+                stats['benign'] += 1
+            else:
+                label = attack_type
+                stats['attack'] += 1
+            labeled.append((features, label))
+
+    print(f"  Benign:  {stats['benign']}")
+    print(f"  Attack:  {stats['attack']} ({attack_type})")
+
+    return labeled
+
+
 def apply_time_labels(records, attack_type, baseline_before, attack_duration, baseline_after):
     """Apply time-based labels to records"""
     attack_start_ns = baseline_before * 1_000_000_000
@@ -199,17 +265,28 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python3 bin_to_csv.py --input /tmp/dns_run1.bin --output ../datasets/processed/dns_run1.csv --attack-type dns
-  python3 bin_to_csv.py --input /tmp/ntp.bin --output ntp.csv --attack-type ntp --baseline-before 30 --attack-duration 120
+  # Auto-label (recommended - detects attack boundaries from sketch features)
+  python3 bin_to_csv.py --input /tmp/dns_run1.bin --output dns_run1.csv --attack-type dns --auto-label
+
+  # Benign-only file (auto-label detects no attack, labels all as benign)
+  python3 bin_to_csv.py --input /tmp/benign_run1.bin --output benign_run1.csv --attack-type benign --auto-label
+
+  # Time-based labeling
+  python3 bin_to_csv.py --input /tmp/ntp.bin --output ntp.csv --attack-type ntp \\
+      --baseline-before 70 --attack-duration 80 --baseline-after 60
 
 Supported attack types:
-  dns, ntp, snmp, ssdp, portmap, netbios, ldap, mssql, tftp, syn, udp, webddos, mixed
+  benign, dns, ntp, snmp, ssdp, portmap, netbios, ldap, mssql, tftp, syn, udp, webddos, mixed
         """
     )
 
     parser.add_argument('--input', required=True, help='Input binary .bin file')
     parser.add_argument('--output', required=True, help='Output CSV file')
-    parser.add_argument('--attack-type', required=True, help='Attack type label')
+    parser.add_argument('--attack-type', required=True,
+                        help='Attack type label (benign for benign-only captures)')
+    parser.add_argument('--auto-label', action='store_true',
+                        help='Auto-detect attack boundaries from sketch features '
+                             '(like .log pipeline auto-label)')
     parser.add_argument('--baseline-before', type=float, default=70.0,
                         help='Baseline before attack in seconds (default: 70)')
     parser.add_argument('--attack-duration', type=float, default=80.0,
@@ -229,7 +306,10 @@ Supported attack types:
     print(f"  Input:  {args.input}")
     print(f"  Output: {args.output}")
     print(f"  Attack: {args.attack_type}")
-    print(f"  Timing: {args.baseline_before}s + {args.attack_duration}s + {args.baseline_after}s")
+    if args.auto_label:
+        print(f"  Mode:   AUTO-LABEL (detect attack from sketch features)")
+    else:
+        print(f"  Mode:   TIME-BASED ({args.baseline_before}s + {args.attack_duration}s + {args.baseline_after}s)")
 
     records = read_binary_file(args.input)
     if not records:
@@ -240,14 +320,41 @@ Supported attack types:
     ts_max = records[-1][0] / 1e9
     print(f"\n[INFO] Timestamp range: {ts_min:.1f}s - {ts_max:.1f}s ({ts_max - ts_min:.1f}s span)")
 
-    labeled = apply_time_labels(
-        records, args.attack_type,
-        args.baseline_before, args.attack_duration, args.baseline_after
-    )
+    # Apply labeling
+    if args.auto_label:
+        if args.attack_type == 'benign':
+            # Benign-only: label everything as benign
+            labeled = [(features, 'benign') for _, features in records]
+            print(f"\n[AUTO-LABEL] Benign-only file, all {len(labeled)} records labeled as benign")
+        else:
+            labeled = apply_auto_labels(records, args.attack_type)
+    else:
+        labeled = apply_time_labels(
+            records, args.attack_type,
+            args.baseline_before, args.attack_duration, args.baseline_after
+        )
 
     if not labeled:
         print("[ERROR] No records after labeling")
         sys.exit(1)
+
+    # Filter: for attack files, drop windows where no protocol PPS activity
+    # (equivalent to .log pipeline filtering attack_packets == 0)
+    if args.attack_type not in ('benign', 'mixed'):
+        before = len(labeled)
+        filtered = []
+        for features, label in labeled:
+            if label == 'benign':
+                filtered.append((features, label))
+            else:
+                # Check that at least some per-protocol PPS is active
+                total_proto_pps = sum(features[IDX_PPS_PROTO_START:IDX_PPS_PROTO_START + 12])
+                if total_proto_pps > 0:
+                    filtered.append((features, label))
+        dropped = before - len(filtered)
+        if dropped > 0:
+            print(f"[FILTER] Dropped {dropped} attack windows with zero protocol PPS")
+        labeled = filtered
 
     column_names = build_column_names()
     df = to_dataframe(labeled, column_names)
