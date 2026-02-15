@@ -38,7 +38,7 @@ SPECIFIC_ATTACK_TYPES = [
 # Combined: accept both legacy (3 classes) and specific attack types
 ALL_LABELS = LEGACY_LABELS + SPECIFIC_ATTACK_TYPES
 
-MIXED_MIN_SHARE = 0.10
+MIXED_MIN_SHARE = 0.25  # A protocol must contribute >=25% of attack traffic to count as "active"
 
 class LogParser:
     """Parses MIRA detector logs and extracts features"""
