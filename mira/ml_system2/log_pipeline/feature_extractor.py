@@ -2,7 +2,7 @@
 """
 Feature Extractor for MIRA Detector Logs (Multi-Class Version)
 Parses detector output logs and extracts ML features for CIC-DDoS-2019 multi-attack detection
-Supports 14 attack classes and 59 features (45 base + 14 temporal/multi-scale)
+Supports 14 attack classes and 60 features (46 base + 14 temporal/multi-scale)
 """
 
 import re
@@ -328,6 +328,11 @@ class LogParser:
         match = re.search(r'Active protocols:\s+(\d+)', window_text)
         features['active_attack_protocols'] = int(match.group(1)) if match else 0
 
+        # Derived ratio: SYN-only / HTTP-payload (discriminates SYN flood vs WebDDoS)
+        syn_o = features['syn_only_packets']
+        http_p = features['http_payload_packets']
+        features['syn_http_ratio'] = syn_o / http_p if http_p > 0 else (float(syn_o) if syn_o > 0 else 0.0)
+
         # ========== NEW: 14 TEMPORAL & MULTI-SCALE FEATURES ==========
         # Temporal Features (from Ring Buffer) - Features 43-47
         match = re.search(r'Delta PPS \(250ms\):\s+([+-]?[\d.]+)', window_text)
@@ -506,8 +511,9 @@ class LogParser:
             # Derived amplification features (37-42)
             'ntp_amplification_factor', 'dns_amplification_factor', 'snmp_amplification_factor',
             'query_response_ratio', 'fragmentation_ratio', 'syn_ack_ratio',
-            # SYN/WebDDoS discrimination + mixed detection (43-45)
+            # SYN/WebDDoS discrimination + mixed detection (43-46)
             'syn_only_packets', 'http_payload_packets', 'active_attack_protocols',
+            'syn_http_ratio',
             # NEW: Temporal features from Ring Buffer (43-47)
             'delta_pps_5w', 'delta_pps_10w', 'pps_variance',
             'pps_baseline', 'ratio_vs_baseline',

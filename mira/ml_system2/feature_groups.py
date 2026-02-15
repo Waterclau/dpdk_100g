@@ -3,7 +3,7 @@
 Feature Definitions for ml_system2
 
 Three feature sets:
-  - DPI+Sketch (59):  45 DPI + 14 sketch  (from .log, detector_system original)
+  - DPI+Sketch (60):  46 DPI + 14 sketch  (from .log, detector_system original)
   - Sketch-only (14): 14 sketch            (from .log, detector_system2 sin --sketch-adv)
   - Sketch-ADV (64):  14 global + 48 per-protocol + 2 pkt size (from .bin)
 """
@@ -31,7 +31,7 @@ SKETCH_FEATURES = [
 ]
 
 # ============================================================
-# DPI FEATURES (45) - Deep Packet Inspection counters + ratios
+# DPI FEATURES (46) - Deep Packet Inspection counters + ratios
 # ============================================================
 DPI_FEATURES = [
     # Original 14 counters + ratios
@@ -54,11 +54,12 @@ DPI_FEATURES = [
     # Derived amplification ratios (6)
     'ntp_amplification_factor', 'dns_amplification_factor', 'snmp_amplification_factor',
     'query_response_ratio', 'fragmentation_ratio', 'syn_ack_ratio',
-    # SYN/WebDDoS discrimination + mixed detection (3)
+    # SYN/WebDDoS discrimination + mixed detection (4)
     'syn_only_packets', 'http_payload_packets', 'active_attack_protocols',
+    'syn_http_ratio',
 ]
 
-# DPI + Sketch = 45 + 14 = 59
+# DPI + Sketch = 46 + 14 = 60
 DPI_SKETCH_FEATURES = DPI_FEATURES + SKETCH_FEATURES
 
 # ============================================================

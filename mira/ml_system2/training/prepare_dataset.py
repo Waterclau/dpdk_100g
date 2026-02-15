@@ -123,6 +123,8 @@ def main():
     parser.add_argument('--train-runs', type=str, default='')
     parser.add_argument('--val-runs', type=str, default='')
     parser.add_argument('--test-runs', type=str, default='')
+    parser.add_argument('--subsample', type=int, default=1,
+                        help='Take 1 every N windows to reduce temporal autocorrelation (default: 1 = no subsampling)')
 
     args = parser.parse_args()
 
@@ -133,6 +135,15 @@ def main():
     if combined.isnull().any().any():
         print("[WARNING] Missing values -> filling with 0")
         combined = combined.fillna(0)
+
+    # Subsample: take 1 every N windows per source file to reduce temporal autocorrelation
+    if args.subsample > 1:
+        before = len(combined)
+        combined = combined.groupby(
+            ['label'] + (['run_id'] if 'run_id' in combined.columns else []),
+            group_keys=False
+        ).apply(lambda g: g.iloc[::args.subsample]).reset_index(drop=True)
+        print(f"[SUBSAMPLE] 1/{args.subsample}: {before} -> {len(combined)} rows")
 
     # Filter to selected features
     expected = get_feature_columns(args.mode)
