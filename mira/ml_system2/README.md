@@ -198,10 +198,10 @@ sudo python3 training/train_model.py \
     --train datasets/splits/train.csv \
     --val datasets/splits/val.csv \
     --mode dpi_ratios \
-    --output training/results/dpi_ratios/
+    --output training/results/dpi_ratios/complete/
 
 sudo python3 training/evaluate_model.py \
-    --model training/results/dpi_ratios/lightgbm_model.txt \
+    --model training/results/dpi_ratios/complete/lightgbm_model.txt \
     --test datasets/splits/test.csv
 Paso 3: Entrenar dpi_sketch (75 features) para comparar
 
@@ -215,8 +215,8 @@ sudo python3 training/train_model.py \
     --train datasets/splits/train.csv \
     --val datasets/splits/val.csv \
     --mode dpi_sketch \
-    --output training/results/dpi_sketch/
+    --output training/results/dpi_sketch/complete/
 
 sudo python3 training/evaluate_model.py \
-    --model training/results/dpi_sketch/lightgbm_model.txt \
+    --model training/results/dpi_sketch/complete/lightgbm_model.txt \
     --test datasets/splits/test.csv
