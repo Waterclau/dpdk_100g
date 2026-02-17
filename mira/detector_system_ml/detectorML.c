@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <math.h>
 #include <signal.h>
 #include <time.h>
 
@@ -97,6 +98,25 @@ static int safe_snprintf(char *buf, size_t size, const char *fmt, ...)
 #define ACK_FLOOD_THRESHOLD 4000000   /* 4M ACK pps */
 #define FRAG_THRESHOLD      1000000   /* 1M fragmented pps */
 
+/* Feature mode selection */
+typedef enum {
+    ML_MODE_DPI_SKETCH = 0,   /* 75 features: 61 DPI + 14 sketch */
+    ML_MODE_SKETCH_ADV = 1,   /* 64 features: 14 sketch + 50 per-proto */
+} ml_mode_t;
+
+#define DPI_SKETCH_NUM_FEATURES 75
+#define SKETCH_ADV_NUM_FEATURES 64
+#define SKETCH_ADV_NUM_PROTOS 12
+
+/* OctoSketch Heavy-Hitter Detection */
+#define HEAVY_HITTER_PPS_THRESHOLD 5000   /* Single IP exceeding 5K pps = heavy hitter */
+#define HEAVY_HITTER_TOP_K 5              /* Track top 5 attackers */
+
+/* Adaptive threshold parameters */
+#define ATTACK_TOTAL_PPS_THRESHOLD 7000000 /* Fallback until baseline ready */
+#define ADAPTIVE_SIGMA 3.0                /* 3-sigma for anomaly detection */
+#define MIN_BASELINE_SAMPLES 20           /* Minimum samples before adaptive threshold */
+
 /* Time windows */
 #define FAST_DETECTION_INTERVAL 0.05
 #define STATS_INTERVAL_SEC 5.0
@@ -159,7 +179,9 @@ struct worker_stats {
     /* Attack-specific counters */
     uint64_t syn_packets;
     uint64_t syn_ack_packets;
+    uint64_t syn_only_packets;       /* SYN without HTTP (not port 80/443) */
     uint64_t http_requests;
+    uint64_t http_payload_packets;   /* TCP to 80/443 with payload > 0 */
     uint64_t dns_queries;
 
     /* Bytes counters */
@@ -227,7 +249,9 @@ struct detection_stats {
     /* Aggregated attack-specific counters */
     uint64_t syn_packets;
     uint64_t syn_ack_packets;
+    uint64_t syn_only_packets;
     uint64_t http_requests;
+    uint64_t http_payload_packets;
     uint64_t dns_queries;
 
     /* Aggregated bytes counters */
@@ -288,6 +312,12 @@ struct detection_stats {
     uint64_t ack_flood_detections;
     uint64_t frag_attack_detections;
 
+    /* OctoSketch Heavy-Hitter Detection */
+    uint64_t heavy_hitter_detections;
+    uint32_t top_attacker_ips[HEAVY_HITTER_TOP_K];
+    uint32_t top_attacker_counts[HEAVY_HITTER_TOP_K];
+    uint32_t num_heavy_hitters;
+
     /* Timestamps */
     uint64_t window_start_tsc;
     uint64_t last_stats_tsc;
@@ -336,6 +366,74 @@ struct detection_stats {
 #define COLOR_YELLOW  "\033[1;33m"
 #define COLOR_RED     "\033[1;31m"
 
+/* ========== RING BUFFER STRUCTURE ========== */
+struct feature_window {
+    uint64_t timestamp_tsc;
+    uint64_t window_id;
+
+    /* Base features - stored for temporal analysis */
+    float total_packets;
+    float total_bytes;
+    float udp_packets;
+    float tcp_packets;
+    float icmp_packets;
+    float syn_packets;
+    float http_requests;
+    float dns_queries;
+    float baseline_packets;
+    float attack_packets;
+
+    /* Extended features (14) - temporal + multi-scale */
+    float delta_pps_5w;
+    float delta_pps_10w;
+    float pps_variance;
+    float pps_baseline;
+    float ratio_vs_baseline;
+    float top_ip_pps_50ms;
+    float top_ip_pps_1s;
+    float top_ip_pps_1min;
+    float ratio_50ms_1min;
+    float num_heavy_hitters;
+    float ip_concentration;
+    float new_ips_ratio;
+    float attack_entropy;
+    float adaptive_threshold;
+
+    /* Detection results */
+    uint8_t threshold_detected;
+    uint8_t ml_predicted_class;
+    float ml_confidence;
+} __attribute__((packed));
+
+/* Ring buffer for temporal analysis */
+struct ring_buffer {
+    struct feature_window windows[RING_BUFFER_SIZE];
+    uint32_t write_idx;
+    uint32_t count;
+    uint64_t total_windows;
+
+    /* Running statistics for adaptive thresholds */
+    double sum_pps;
+    double sum_pps_sq;
+
+    /* Multi-scale aggregates */
+    float baseline_1s;
+    float baseline_10s;
+    float baseline_1min;
+} __rte_cache_aligned;
+
+/* Multi-scale sketch structure */
+struct multiscale_sketches {
+    struct octosketch sketch_50ms;
+    struct octosketch sketch_1s;
+    struct octosketch sketch_10s;
+    struct octosketch sketch_1min;
+
+    uint32_t windows_since_1s_reset;
+    uint32_t windows_since_10s_reset;
+    uint32_t windows_since_1min_reset;
+} __rte_cache_aligned;
+
 /* Instantaneous metrics - per-worker (lock-free) */
 static uint64_t window_baseline_pkts[NUM_RX_QUEUES];
 static uint64_t window_attack_pkts[NUM_RX_QUEUES];
@@ -354,16 +452,54 @@ static uint64_t last_ml_alert_tsc = 0;
 static FILE *g_log_file = NULL;
 static struct rte_hash *ip_hash = NULL;
 
+/* Global ring buffer and multi-scale sketches */
+static struct ring_buffer g_ring_buffer __rte_cache_aligned;
+static struct multiscale_sketches g_multiscale[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct multiscale_sketches g_merged_multiscale __rte_cache_aligned;
+
 /* OctoSketch - Per-worker sketches (NO atomics, NO contention) */
 static struct octosketch g_worker_sketch_attack[NUM_RX_QUEUES] __rte_cache_aligned; /* Attack traffic per worker */
 
 /* OctoSketch - Coordinator merged sketches (for analysis) */
 static struct octosketch g_merged_sketch_attack __rte_cache_aligned;  /* Merged attack sketch */
 
-/* ========== ML INTEGRATION: Global model handle ========== */
+/* ========== Per-protocol sketches (12 protocols) - for sketch_adv mode ========== */
+static struct octosketch g_worker_sketch_dns[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_ntp[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_snmp[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_ssdp[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_portmap[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_netbios[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_ldap[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_mssql[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_tftp[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_syn[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_http[NUM_RX_QUEUES] __rte_cache_aligned;
+static struct octosketch g_worker_sketch_udp_other[NUM_RX_QUEUES] __rte_cache_aligned;
+
+static struct octosketch g_merged_sketch_dns __rte_cache_aligned;
+static struct octosketch g_merged_sketch_ntp __rte_cache_aligned;
+static struct octosketch g_merged_sketch_snmp __rte_cache_aligned;
+static struct octosketch g_merged_sketch_ssdp __rte_cache_aligned;
+static struct octosketch g_merged_sketch_portmap __rte_cache_aligned;
+static struct octosketch g_merged_sketch_netbios __rte_cache_aligned;
+static struct octosketch g_merged_sketch_ldap __rte_cache_aligned;
+static struct octosketch g_merged_sketch_mssql __rte_cache_aligned;
+static struct octosketch g_merged_sketch_tftp __rte_cache_aligned;
+static struct octosketch g_merged_sketch_syn __rte_cache_aligned;
+static struct octosketch g_merged_sketch_http __rte_cache_aligned;
+static struct octosketch g_merged_sketch_udp_other __rte_cache_aligned;
+
+/* Per-worker packet size sum-of-squares for variance (sketch_adv) */
+static uint64_t g_worker_pktlen_sq_sum[NUM_RX_QUEUES] __rte_cache_aligned;
+/* ========== END Per-protocol sketches ========== */
+
+/* ========== ML INTEGRATION ========== */
 static ml_model_handle g_ml_model = NULL;
 #define ML_CONFIDENCE_THRESHOLD 0.75f
-/* ========================================================== */
+static ml_mode_t g_ml_mode = ML_MODE_DPI_SKETCH;
+static char g_model_dir[512] = "./model_dpi_sketch";
+/* ===================================== */
 
 /* Sampling configuration */
 #define SKETCH_SAMPLE_RATE 32  /* Update sketch every N packets (1 in 32) */
@@ -439,6 +575,220 @@ static struct ip_stats* get_ip_stats(uint32_t ip_addr)
     return new_entry;
 }
 
+/* ========== RING BUFFER HELPER FUNCTIONS ========== */
+
+/* Get window at offset from current (0 = current, -1 = previous, etc.) */
+static inline struct feature_window* ring_buffer_get(int offset)
+{
+    if (g_ring_buffer.count == 0) return NULL;
+    int idx = (int)g_ring_buffer.write_idx + offset;
+    while (idx < 0) idx += RING_BUFFER_SIZE;
+    idx = idx % RING_BUFFER_SIZE;
+    if (offset < 0 && (uint32_t)(-offset) > g_ring_buffer.count) return NULL;
+    return &g_ring_buffer.windows[idx];
+}
+
+/* Calculate adaptive threshold based on historical data */
+static inline float calculate_adaptive_threshold(void)
+{
+    if (g_ring_buffer.count < MIN_BASELINE_SAMPLES) {
+        return ATTACK_TOTAL_PPS_THRESHOLD;
+    }
+
+    double mean = g_ring_buffer.sum_pps / g_ring_buffer.count;
+    double variance = (g_ring_buffer.sum_pps_sq / g_ring_buffer.count) - (mean * mean);
+    double stddev = sqrt(variance > 0 ? variance : 0);
+
+    return (float)(mean + ADAPTIVE_SIGMA * stddev);
+}
+
+/* Calculate temporal features from ring buffer */
+static void calculate_temporal_features(struct feature_window *current)
+{
+    struct feature_window *prev_5 = ring_buffer_get(-5);
+    if (prev_5) {
+        current->delta_pps_5w = current->attack_packets - prev_5->attack_packets;
+    } else {
+        current->delta_pps_5w = 0;
+    }
+
+    struct feature_window *prev_10 = ring_buffer_get(-10);
+    if (prev_10) {
+        current->delta_pps_10w = current->attack_packets - prev_10->attack_packets;
+    } else {
+        current->delta_pps_10w = 0;
+    }
+
+    /* Variance over last 20 windows */
+    float sum = 0, sum_sq = 0;
+    int count = 0;
+    for (int i = -1; i >= -20 && i >= -(int)g_ring_buffer.count; i--) {
+        struct feature_window *w = ring_buffer_get(i);
+        if (w) {
+            sum += w->attack_packets;
+            sum_sq += w->attack_packets * w->attack_packets;
+            count++;
+        }
+    }
+    if (count > 1) {
+        float mean = sum / count;
+        current->pps_variance = (sum_sq / count) - (mean * mean);
+    } else {
+        current->pps_variance = 0;
+    }
+
+    /* Baseline (running average) */
+    current->pps_baseline = (g_ring_buffer.count > 0) ?
+        (float)(g_ring_buffer.sum_pps / g_ring_buffer.count) : 0;
+
+    /* Ratio vs baseline */
+    current->ratio_vs_baseline = (current->pps_baseline > 0) ?
+        current->attack_packets / current->pps_baseline : 1.0f;
+
+    /* Adaptive threshold */
+    current->adaptive_threshold = calculate_adaptive_threshold();
+}
+
+/* Calculate multi-scale features from merged sketches */
+static void calculate_multiscale_features(struct feature_window *current, double window_sec)
+{
+    struct heavy_hitter top_50ms[1], top_1s[1], top_1min[1];
+
+    octosketch_top_k(&g_merged_multiscale.sketch_50ms, 1, top_50ms);
+    octosketch_top_k(&g_merged_multiscale.sketch_1s, 1, top_1s);
+    octosketch_top_k(&g_merged_multiscale.sketch_1min, 1, top_1min);
+
+    current->top_ip_pps_50ms = (window_sec > 0 && top_50ms[0].count > 0) ?
+        (float)top_50ms[0].count / window_sec : 0;
+    current->top_ip_pps_1s = (top_1s[0].count > 0) ?
+        (float)top_1s[0].count / 1.0f : 0;
+    current->top_ip_pps_1min = (top_1min[0].count > 0) ?
+        (float)top_1min[0].count / 60.0f : 0;
+
+    current->ratio_50ms_1min = (current->top_ip_pps_1min > 0) ?
+        current->top_ip_pps_50ms / current->top_ip_pps_1min : 1.0f;
+
+    /* Count heavy hitters */
+    struct heavy_hitter top_5[5];
+    octosketch_top_k(&g_merged_multiscale.sketch_50ms, 5, top_5);
+    int hh_count = 0;
+    for (int i = 0; i < 5; i++) {
+        if (top_5[i].count > 0) {
+            float ip_pps = (float)top_5[i].count / (window_sec > 0 ? window_sec : 0.05f);
+            if (ip_pps > HEAVY_HITTER_PPS_THRESHOLD) hh_count++;
+        }
+    }
+    current->num_heavy_hitters = (float)hh_count;
+
+    /* IP concentration */
+    uint64_t total = octosketch_get_total(&g_merged_multiscale.sketch_50ms);
+    current->ip_concentration = (total > 0) ?
+        (float)top_50ms[0].count / total : 0;
+
+    current->new_ips_ratio = 0;
+    current->attack_entropy = 1.0f - current->ip_concentration;
+}
+
+/* Push current features to ring buffer */
+static void ring_buffer_push(struct feature_window *window)
+{
+    uint32_t idx = g_ring_buffer.write_idx;
+
+    memcpy(&g_ring_buffer.windows[idx], window, sizeof(struct feature_window));
+
+    if (g_ring_buffer.count >= RING_BUFFER_SIZE) {
+        struct feature_window *oldest = &g_ring_buffer.windows[(idx + 1) % RING_BUFFER_SIZE];
+        g_ring_buffer.sum_pps -= oldest->attack_packets;
+        g_ring_buffer.sum_pps_sq -= oldest->attack_packets * oldest->attack_packets;
+    }
+    g_ring_buffer.sum_pps += window->attack_packets;
+    g_ring_buffer.sum_pps_sq += window->attack_packets * window->attack_packets;
+
+    g_ring_buffer.write_idx = (idx + 1) % RING_BUFFER_SIZE;
+    if (g_ring_buffer.count < RING_BUFFER_SIZE) {
+        g_ring_buffer.count++;
+    }
+    g_ring_buffer.total_windows++;
+}
+
+/* Merge multi-scale sketches from all workers */
+static void merge_multiscale_sketches(void)
+{
+    struct octosketch *workers_50ms[NUM_RX_QUEUES];
+    struct octosketch *workers_1s[NUM_RX_QUEUES];
+    struct octosketch *workers_10s[NUM_RX_QUEUES];
+    struct octosketch *workers_1min[NUM_RX_QUEUES];
+
+    for (int i = 0; i < NUM_RX_QUEUES; i++) {
+        workers_50ms[i] = &g_multiscale[i].sketch_50ms;
+        workers_1s[i] = &g_multiscale[i].sketch_1s;
+        workers_10s[i] = &g_multiscale[i].sketch_10s;
+        workers_1min[i] = &g_multiscale[i].sketch_1min;
+    }
+
+    octosketch_merge(&g_merged_multiscale.sketch_50ms, workers_50ms, NUM_RX_QUEUES);
+    octosketch_merge(&g_merged_multiscale.sketch_1s, workers_1s, NUM_RX_QUEUES);
+    octosketch_merge(&g_merged_multiscale.sketch_10s, workers_10s, NUM_RX_QUEUES);
+    octosketch_merge(&g_merged_multiscale.sketch_1min, workers_1min, NUM_RX_QUEUES);
+}
+
+/* Merge per-protocol sketches from all workers (sketch_adv mode) */
+static void merge_protocol_sketches(void)
+{
+    struct {
+        struct octosketch (*workers)[NUM_RX_QUEUES];
+        struct octosketch *merged;
+    } protos[12] = {
+        { &g_worker_sketch_dns,       &g_merged_sketch_dns },
+        { &g_worker_sketch_ntp,       &g_merged_sketch_ntp },
+        { &g_worker_sketch_snmp,      &g_merged_sketch_snmp },
+        { &g_worker_sketch_ssdp,      &g_merged_sketch_ssdp },
+        { &g_worker_sketch_portmap,   &g_merged_sketch_portmap },
+        { &g_worker_sketch_netbios,   &g_merged_sketch_netbios },
+        { &g_worker_sketch_ldap,      &g_merged_sketch_ldap },
+        { &g_worker_sketch_mssql,     &g_merged_sketch_mssql },
+        { &g_worker_sketch_tftp,      &g_merged_sketch_tftp },
+        { &g_worker_sketch_syn,       &g_merged_sketch_syn },
+        { &g_worker_sketch_http,      &g_merged_sketch_http },
+        { &g_worker_sketch_udp_other, &g_merged_sketch_udp_other },
+    };
+
+    for (int p = 0; p < 12; p++) {
+        struct octosketch *src[NUM_RX_QUEUES];
+        for (int i = 0; i < NUM_RX_QUEUES; i++) {
+            src[i] = &(*protos[p].workers)[i];
+        }
+        octosketch_merge(protos[p].merged, src, NUM_RX_QUEUES);
+    }
+}
+
+/* Reset multi-scale sketches based on time */
+static void reset_multiscale_sketches_if_needed(void)
+{
+    for (int i = 0; i < NUM_RX_QUEUES; i++) {
+        g_multiscale[i].windows_since_1s_reset++;
+        g_multiscale[i].windows_since_10s_reset++;
+        g_multiscale[i].windows_since_1min_reset++;
+
+        octosketch_reset(&g_multiscale[i].sketch_50ms);
+
+        if (g_multiscale[i].windows_since_1s_reset >= SCALE_1S_WINDOWS) {
+            octosketch_reset(&g_multiscale[i].sketch_1s);
+            g_multiscale[i].windows_since_1s_reset = 0;
+        }
+        if (g_multiscale[i].windows_since_10s_reset >= SCALE_10S_WINDOWS) {
+            octosketch_reset(&g_multiscale[i].sketch_10s);
+            g_multiscale[i].windows_since_10s_reset = 0;
+        }
+        if (g_multiscale[i].windows_since_1min_reset >= SCALE_1MIN_WINDOWS) {
+            octosketch_reset(&g_multiscale[i].sketch_1min);
+            g_multiscale[i].windows_since_1min_reset = 0;
+        }
+    }
+}
+
+/* ========== END RING BUFFER HELPER FUNCTIONS ========== */
+
 /* Attack detection logic - COORDINATOR ONLY - AGGREGATE MODE */
 static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 {
@@ -477,100 +827,104 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
         /* Calculate PPS rates */
         double attack_pps = (double)window_att_pkts / window_sec;
-        double baseline_pps = (double)window_base_pkts / window_sec;
         double syn_pps = (double)window_syn_pkts / window_sec;
         double udp_pps = (double)window_udp_pkts / window_sec;
         double icmp_pps = (double)window_icmp_pkts / window_sec;
         double http_pps = (double)window_http_reqs / window_sec;
 
-        /* DETECTION LOGIC - Threshold-based anomaly detection (ML classifies attack type)
-         * No IP-based filtering - evaluates ALL traffic */
+        /* Threshold-based anomaly detection */
         {
-            /* Anomaly detection - triggers ML classification */
             bool threshold_anomaly = false;
 
-            /* UDP Anomaly */
             if (udp_pps > ANOMALY_UDP_THRESHOLD) {
                 g_stats.udp_flood_detections++;
                 threshold_anomaly = true;
             }
-
-            /* SYN Anomaly */
             if (syn_pps > ANOMALY_SYN_THRESHOLD) {
                 g_stats.syn_flood_detections++;
                 threshold_anomaly = true;
             }
-
-            /* ICMP Anomaly */
             if (icmp_pps > ANOMALY_ICMP_THRESHOLD) {
                 g_stats.icmp_flood_detections++;
                 threshold_anomaly = true;
             }
-
-            /* HTTP Anomaly */
             if (http_pps > ANOMALY_HTTP_THRESHOLD) {
                 g_stats.http_flood_detections++;
                 threshold_anomaly = true;
             }
 
-            /* If any threshold exceeded, mark as anomaly for ML to classify */
             if (threshold_anomaly) {
                 attack_detected = true;
                 g_stats.alert_level = ALERT_MEDIUM;
-                /* Don't set alert_reason here - ML will classify the specific attack type */
             }
         }
 
-        /* ========== ML INTEGRATION: ML Prediction ========== */
+        /* ========== Merge sketches and compute ring buffer features ========== */
+        /* Merge global + multi-scale sketches */
+        {
+            struct octosketch *worker_sketches[NUM_RX_QUEUES];
+            for (int i = 0; i < NUM_RX_QUEUES; i++) {
+                worker_sketches[i] = &g_worker_sketch_attack[i];
+            }
+            octosketch_merge(&g_merged_sketch_attack, worker_sketches, NUM_RX_QUEUES);
+        }
+        merge_multiscale_sketches();
+
+        /* Merge per-protocol sketches for sketch_adv mode */
+        if (g_ml_mode == ML_MODE_SKETCH_ADV) {
+            merge_protocol_sketches();
+        }
+
+        /* Build feature window for ring buffer */
+        struct feature_window fw;
+        memset(&fw, 0, sizeof(fw));
+        fw.timestamp_tsc = cur_tsc;
+        fw.window_id = g_ring_buffer.total_windows;
+        fw.total_packets = (float)(window_base_pkts + window_att_pkts);
+        fw.attack_packets = (float)window_att_pkts;
+        fw.baseline_packets = (float)window_base_pkts;
+        fw.udp_packets = (float)window_udp_pkts;
+        fw.tcp_packets = (float)(window_syn_pkts);  /* approximate */
+        fw.icmp_packets = (float)window_icmp_pkts;
+        fw.syn_packets = (float)window_syn_pkts;
+        fw.http_requests = (float)window_http_reqs;
+        fw.dns_queries = (float)window_dns_queries;
+
+        /* Calculate temporal + multi-scale features */
+        calculate_temporal_features(&fw);
+        calculate_multiscale_features(&fw, window_sec);
+
+        /* Push to ring buffer */
+        ring_buffer_push(&fw);
+
+        /* Reset multi-scale sketches */
+        reset_multiscale_sketches_if_needed();
+
+        /* ========== ML PREDICTION ========== */
         bool ml_alert = false;
         const char *ml_class_name = "unknown";
         float ml_confidence = 0.0f;
         struct ml_prediction ml_pred;
-        uint64_t window_total_pkts = window_base_pkts + window_att_pkts;
-        uint64_t window_total_bytes = 0;
+        memset(&ml_pred, 0, sizeof(ml_pred));
 
-        // Calculate total bytes
-        for (int i = 0; i < NUM_RX_QUEUES; i++) {
-            window_total_bytes += window_baseline_bytes[i] + window_attack_bytes[i];
-        }
+        uint64_t window_total_pkts = window_base_pkts + window_att_pkts;
 
         if (g_ml_model != NULL && window_total_pkts > 100) {
-            // Build features from cumulative statistics (matches non-ML logs)
-            struct ml_features features;
-            uint64_t ml_total_packets = 0;
-            uint64_t ml_total_bytes = 0;
-            uint64_t ml_udp_packets = 0;
-            uint64_t ml_tcp_packets = 0;
-            uint64_t ml_icmp_packets = 0;
-            uint64_t ml_syn_packets = 0;
-            uint64_t ml_syn_ack_packets = 0;
-            uint64_t ml_http_requests = 0;
-            uint64_t ml_dns_queries = 0;
-            uint64_t ml_baseline_packets = 0;
-            uint64_t ml_attack_packets = 0;
-
-            uint64_t ml_ntp_monlist_queries = 0;
-            uint64_t ml_ntp_responses = 0;
-            uint64_t ml_ntp_response_size_sum = 0;
-            uint64_t ml_dns_any_queries = 0;
-            uint64_t ml_dns_txt_queries = 0;
-            uint64_t ml_dns_responses = 0;
-            uint64_t ml_dns_response_size_sum = 0;
-            uint64_t ml_snmp_getbulk_requests = 0;
-            uint64_t ml_snmp_responses = 0;
-            uint64_t ml_snmp_response_size_sum = 0;
-            uint64_t ml_ssdp_msearch_packets = 0;
-            uint64_t ml_ssdp_responses = 0;
-            uint64_t ml_portmap_getport_calls = 0;
-            uint64_t ml_portmap_dump_calls = 0;
-            uint64_t ml_netbios_name_queries = 0;
-            uint64_t ml_netbios_dgram_packets = 0;
-            uint64_t ml_ldap_bind_requests = 0;
-            uint64_t ml_ldap_search_requests = 0;
-            uint64_t ml_mssql_sqlbatch_packets = 0;
-            uint64_t ml_mssql_rpc_packets = 0;
-            uint64_t ml_tftp_rrq_packets = 0;
-            uint64_t ml_tftp_wrq_packets = 0;
+            /* Aggregate cumulative stats from all workers */
+            uint64_t ml_total_packets = 0, ml_total_bytes = 0;
+            uint64_t ml_udp_packets = 0, ml_tcp_packets = 0, ml_icmp_packets = 0;
+            uint64_t ml_syn_packets = 0, ml_syn_ack_packets = 0, ml_syn_only_packets = 0;
+            uint64_t ml_http_requests = 0, ml_http_payload_packets = 0, ml_dns_queries = 0;
+            uint64_t ml_baseline_packets = 0, ml_attack_packets = 0;
+            uint64_t ml_ntp_monlist = 0, ml_ntp_responses = 0, ml_ntp_resp_size_sum = 0;
+            uint64_t ml_dns_any = 0, ml_dns_txt = 0, ml_dns_responses = 0, ml_dns_resp_size_sum = 0;
+            uint64_t ml_snmp_getbulk = 0, ml_snmp_responses = 0, ml_snmp_resp_size_sum = 0;
+            uint64_t ml_ssdp_msearch = 0, ml_ssdp_responses = 0;
+            uint64_t ml_portmap_getport = 0, ml_portmap_dump = 0;
+            uint64_t ml_netbios_name = 0, ml_netbios_dgram = 0;
+            uint64_t ml_ldap_bind = 0, ml_ldap_search = 0;
+            uint64_t ml_mssql_sqlbatch = 0, ml_mssql_rpc = 0;
+            uint64_t ml_tftp_rrq = 0, ml_tftp_wrq = 0;
 
             for (int i = 0; i < NUM_RX_QUEUES; i++) {
                 struct worker_stats *ws = &g_worker_stats[i];
@@ -581,144 +935,246 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                 ml_icmp_packets += ws->icmp_packets;
                 ml_syn_packets += ws->syn_packets;
                 ml_syn_ack_packets += ws->syn_ack_packets;
+                ml_syn_only_packets += ws->syn_only_packets;
                 ml_http_requests += ws->http_requests;
+                ml_http_payload_packets += ws->http_payload_packets;
                 ml_dns_queries += ws->dns_queries;
                 ml_baseline_packets += ws->baseline_packets;
                 ml_attack_packets += ws->attack_packets;
-
-                ml_ntp_monlist_queries += ws->ntp_monlist_queries;
+                ml_ntp_monlist += ws->ntp_monlist_queries;
                 ml_ntp_responses += ws->ntp_responses;
-                ml_ntp_response_size_sum += ws->ntp_response_size_sum;
-                ml_dns_any_queries += ws->dns_any_queries;
-                ml_dns_txt_queries += ws->dns_txt_queries;
+                ml_ntp_resp_size_sum += ws->ntp_response_size_sum;
+                ml_dns_any += ws->dns_any_queries;
+                ml_dns_txt += ws->dns_txt_queries;
                 ml_dns_responses += ws->dns_responses;
-                ml_dns_response_size_sum += ws->dns_response_size_sum;
-                ml_snmp_getbulk_requests += ws->snmp_getbulk_requests;
+                ml_dns_resp_size_sum += ws->dns_response_size_sum;
+                ml_snmp_getbulk += ws->snmp_getbulk_requests;
                 ml_snmp_responses += ws->snmp_responses;
-                ml_snmp_response_size_sum += ws->snmp_response_size_sum;
-                ml_ssdp_msearch_packets += ws->ssdp_msearch_packets;
+                ml_snmp_resp_size_sum += ws->snmp_response_size_sum;
+                ml_ssdp_msearch += ws->ssdp_msearch_packets;
                 ml_ssdp_responses += ws->ssdp_responses;
-                ml_portmap_getport_calls += ws->portmap_getport_calls;
-                ml_portmap_dump_calls += ws->portmap_dump_calls;
-                ml_netbios_name_queries += ws->netbios_name_queries;
-                ml_netbios_dgram_packets += ws->netbios_dgram_packets;
-                ml_ldap_bind_requests += ws->ldap_bind_requests;
-                ml_ldap_search_requests += ws->ldap_search_requests;
-                ml_mssql_sqlbatch_packets += ws->mssql_sqlbatch_packets;
-                ml_mssql_rpc_packets += ws->mssql_rpc_packets;
-                ml_tftp_rrq_packets += ws->tftp_rrq_packets;
-                ml_tftp_wrq_packets += ws->tftp_wrq_packets;
+                ml_portmap_getport += ws->portmap_getport_calls;
+                ml_portmap_dump += ws->portmap_dump_calls;
+                ml_netbios_name += ws->netbios_name_queries;
+                ml_netbios_dgram += ws->netbios_dgram_packets;
+                ml_ldap_bind += ws->ldap_bind_requests;
+                ml_ldap_search += ws->ldap_search_requests;
+                ml_mssql_sqlbatch += ws->mssql_sqlbatch_packets;
+                ml_mssql_rpc += ws->mssql_rpc_packets;
+                ml_tftp_rrq += ws->tftp_rrq_packets;
+                ml_tftp_wrq += ws->tftp_wrq_packets;
             }
 
-            float avg_ntp_response_size = (ml_ntp_responses > 0)
-                ? (float)ml_ntp_response_size_sum / (float)ml_ntp_responses
-                : 0.0f;
-            float avg_dns_response_size = (ml_dns_responses > 0)
-                ? (float)ml_dns_response_size_sum / (float)ml_dns_responses
-                : 0.0f;
-            float avg_snmp_response_size = (ml_snmp_responses > 0)
-                ? (float)ml_snmp_response_size_sum / (float)ml_snmp_responses
-                : 0.0f;
+            double features[ML_MAX_FEATURES];
+            int num_features = 0;
+            int fi = 0;
 
-            uint64_t total_queries = ml_ntp_monlist_queries + ml_dns_any_queries +
-                ml_dns_txt_queries + ml_snmp_getbulk_requests;
-            uint64_t total_responses = ml_ntp_responses + ml_dns_responses +
-                ml_snmp_responses;
+            if (g_ml_mode == ML_MODE_DPI_SKETCH) {
+                /* ========== DPI+SKETCH MODE: 75 features ========== */
+                num_features = DPI_SKETCH_NUM_FEATURES;
 
-            features.total_packets = (float)ml_total_packets;
-            features.total_bytes = (float)ml_total_bytes;
-            features.udp_packets = (float)ml_udp_packets;
-            features.tcp_packets = (float)ml_tcp_packets;
-            features.icmp_packets = (float)ml_icmp_packets;
-            features.syn_packets = (float)ml_syn_packets;
-            features.http_requests = (float)ml_http_requests;
-            features.dns_queries = (float)ml_dns_queries;
-            features.baseline_packets = (float)ml_baseline_packets;
-            features.attack_packets = (float)ml_attack_packets;
+                /* DPI Features (61) */
+                /* Raw counters (10) */
+                features[fi++] = (double)ml_total_packets;
+                features[fi++] = (double)ml_total_bytes;
+                features[fi++] = (double)ml_udp_packets;
+                features[fi++] = (double)ml_tcp_packets;
+                features[fi++] = (double)ml_icmp_packets;
+                features[fi++] = (double)ml_syn_packets;
+                features[fi++] = (double)ml_http_requests;
+                features[fi++] = (double)ml_dns_queries;
+                features[fi++] = (double)ml_baseline_packets;
+                features[fi++] = (double)ml_attack_packets;
 
-            features.udp_tcp_ratio = (ml_tcp_packets > 0)
-                ? (float)ml_udp_packets / (float)ml_tcp_packets
-                : 0.0f;
-            features.syn_total_ratio = (ml_total_packets > 0)
-                ? (float)ml_syn_packets / (float)ml_total_packets
-                : 0.0f;
-            features.baseline_attack_ratio = (ml_attack_packets > 0)
-                ? (float)ml_baseline_packets / (float)ml_attack_packets
-                : 999.0f;
-            features.bytes_per_packet = (ml_total_packets > 0)
-                ? (float)ml_total_bytes / (float)ml_total_packets
-                : 0.0f;
+                /* Basic ratios (4) */
+                features[fi++] = (ml_tcp_packets > 0) ? (double)ml_udp_packets / ml_tcp_packets : 0.0;
+                features[fi++] = (ml_total_packets > 0) ? (double)ml_syn_packets / ml_total_packets : 0.0;
+                features[fi++] = (ml_attack_packets > 0) ? (double)ml_baseline_packets / ml_attack_packets : 999.0;
+                features[fi++] = (ml_total_packets > 0) ? (double)ml_total_bytes / ml_total_packets : 0.0;
 
-            features.ntp_monlist_queries = (float)ml_ntp_monlist_queries;
-            features.ntp_responses = (float)ml_ntp_responses;
-            features.avg_ntp_response_size = avg_ntp_response_size;
-            features.dns_any_queries = (float)ml_dns_any_queries;
-            features.dns_txt_queries = (float)ml_dns_txt_queries;
-            features.dns_responses = (float)ml_dns_responses;
-            features.avg_dns_response_size = avg_dns_response_size;
-            features.snmp_getbulk_requests = (float)ml_snmp_getbulk_requests;
-            features.snmp_responses = (float)ml_snmp_responses;
-            features.avg_snmp_response_size = avg_snmp_response_size;
-            features.ssdp_msearch_packets = (float)ml_ssdp_msearch_packets;
-            features.ssdp_responses = (float)ml_ssdp_responses;
-            features.portmap_getport_calls = (float)ml_portmap_getport_calls;
-            features.portmap_dump_calls = (float)ml_portmap_dump_calls;
-            features.netbios_name_queries = (float)ml_netbios_name_queries;
-            features.netbios_dgram_packets = (float)ml_netbios_dgram_packets;
-            features.ldap_bind_requests = (float)ml_ldap_bind_requests;
-            features.ldap_search_requests = (float)ml_ldap_search_requests;
-            features.mssql_sqlbatch_packets = (float)ml_mssql_sqlbatch_packets;
-            features.mssql_rpc_packets = (float)ml_mssql_rpc_packets;
-            features.tftp_rrq_packets = (float)ml_tftp_rrq_packets;
-            features.tftp_wrq_packets = (float)ml_tftp_wrq_packets;
+                /* Protocol-specific counters (22) */
+                double avg_ntp_resp = (ml_ntp_responses > 0) ? (double)ml_ntp_resp_size_sum / ml_ntp_responses : 0.0;
+                double avg_dns_resp = (ml_dns_responses > 0) ? (double)ml_dns_resp_size_sum / ml_dns_responses : 0.0;
+                double avg_snmp_resp = (ml_snmp_responses > 0) ? (double)ml_snmp_resp_size_sum / ml_snmp_responses : 0.0;
 
-            features.ntp_amplification_factor = (ml_ntp_monlist_queries > 0)
-                ? avg_ntp_response_size / 48.0f
-                : 0.0f;
-            features.dns_amplification_factor = (ml_dns_any_queries > 0 || ml_dns_txt_queries > 0)
-                ? avg_dns_response_size / 60.0f
-                : 0.0f;
-            features.snmp_amplification_factor = (ml_snmp_getbulk_requests > 0)
-                ? avg_snmp_response_size / 150.0f
-                : 0.0f;
-            features.query_response_ratio = (total_responses > 0)
-                ? (float)total_queries / (float)total_responses
-                : 0.0f;
-            features.fragmentation_ratio = 0.0f;
-            features.syn_ack_ratio = (ml_syn_ack_packets > 0)
-                ? (float)ml_syn_packets / (float)ml_syn_ack_packets
-                : 0.0f;
+                features[fi++] = (double)ml_ntp_monlist;
+                features[fi++] = (double)ml_ntp_responses;
+                features[fi++] = avg_ntp_resp;
+                features[fi++] = (double)ml_dns_any;
+                features[fi++] = (double)ml_dns_txt;
+                features[fi++] = (double)ml_dns_responses;
+                features[fi++] = avg_dns_resp;
+                features[fi++] = (double)ml_snmp_getbulk;
+                features[fi++] = (double)ml_snmp_responses;
+                features[fi++] = avg_snmp_resp;
+                features[fi++] = (double)ml_ssdp_msearch;
+                features[fi++] = (double)ml_ssdp_responses;
+                features[fi++] = (double)ml_portmap_getport;
+                features[fi++] = (double)ml_portmap_dump;
+                features[fi++] = (double)ml_netbios_name;
+                features[fi++] = (double)ml_netbios_dgram;
+                features[fi++] = (double)ml_ldap_bind;
+                features[fi++] = (double)ml_ldap_search;
+                features[fi++] = (double)ml_mssql_sqlbatch;
+                features[fi++] = (double)ml_mssql_rpc;
+                features[fi++] = (double)ml_tftp_rrq;
+                features[fi++] = (double)ml_tftp_wrq;
 
-            /* NEW: Temporal features (43-47) - from Ring Buffer
-             * TODO: Implement ring buffer logic for accurate values
-             * For now, using simplified calculations */
-            features.delta_pps_5w = 0.0f;       /* Would need ring buffer history */
-            features.delta_pps_10w = 0.0f;      /* Would need ring buffer history */
-            features.pps_variance = 0.0f;       /* Would need ring buffer history */
-            features.pps_baseline = (float)ml_total_packets / window_sec;
-            features.ratio_vs_baseline = 1.0f;  /* Would need baseline tracking */
+                /* Amplification ratios (6) */
+                features[fi++] = (ml_ntp_monlist > 0) ? avg_ntp_resp / 48.0 : 0.0;
+                features[fi++] = (ml_dns_any > 0 || ml_dns_txt > 0) ? avg_dns_resp / 60.0 : 0.0;
+                features[fi++] = (ml_snmp_getbulk > 0) ? avg_snmp_resp / 150.0 : 0.0;
+                uint64_t tq = ml_ntp_monlist + ml_dns_any + ml_dns_txt + ml_snmp_getbulk;
+                uint64_t tr = ml_ntp_responses + ml_dns_responses + ml_snmp_responses;
+                features[fi++] = (tr > 0) ? (double)tq / tr : 0.0;
+                features[fi++] = 0.0;  /* fragmentation_ratio */
+                features[fi++] = (ml_syn_ack_packets > 0) ? (double)ml_syn_packets / ml_syn_ack_packets : 0.0;
 
-            /* NEW: Multi-scale features (48-56) - from Sketches
-             * TODO: Implement multi-scale sketch merging for accurate values
-             * For now, using simplified calculations */
-            features.top_ip_pps_50ms = 0.0f;    /* Would need sketch analysis */
-            features.top_ip_pps_1s = 0.0f;      /* Would need sketch analysis */
-            features.top_ip_pps_1min = 0.0f;    /* Would need sketch analysis */
-            features.ratio_50ms_1min = 1.0f;    /* Would need multi-scale */
-            features.num_heavy_hitters = 0.0f;  /* Would need sketch analysis */
-            features.ip_concentration = 0.0f;   /* Would need sketch analysis */
-            features.new_ips_ratio = 0.0f;      /* Placeholder */
-            features.attack_entropy = 1.0f;     /* 1 - concentration */
-            features.adaptive_threshold = 0.0f; /* Not used for detection */
+                /* SYN/WebDDoS discrimination (4) */
+                features[fi++] = (double)ml_syn_only_packets;
+                features[fi++] = (double)ml_http_payload_packets;
+                /* active_attack_protocols: count protocols with > 0.1% share */
+                double proto_ratios[13];
+                proto_ratios[0] = (ml_total_packets > 0) ? (double)ml_syn_only_packets / ml_total_packets : 0.0;
+                proto_ratios[1] = (ml_total_packets > 0) ? (double)ml_http_payload_packets / ml_total_packets : 0.0;
+                proto_ratios[2] = (ml_total_packets > 0) ? (double)ml_dns_queries / ml_total_packets : 0.0;
+                proto_ratios[3] = (ml_total_packets > 0) ? (double)ml_ntp_monlist / ml_total_packets : 0.0;
+                proto_ratios[4] = (ml_total_packets > 0) ? (double)(ml_snmp_getbulk + ml_snmp_responses) / ml_total_packets : 0.0;
+                proto_ratios[5] = (ml_total_packets > 0) ? (double)(ml_ssdp_msearch + ml_ssdp_responses) / ml_total_packets : 0.0;
+                proto_ratios[6] = (ml_total_packets > 0) ? (double)ml_icmp_packets / ml_total_packets : 0.0;
+                proto_ratios[7] = (ml_total_packets > 0) ? (double)ml_http_requests / ml_total_packets : 0.0;
+                proto_ratios[8] = (ml_total_packets > 0) ? (double)(ml_portmap_getport + ml_portmap_dump) / ml_total_packets : 0.0;
+                proto_ratios[9] = (ml_total_packets > 0) ? (double)(ml_netbios_name + ml_netbios_dgram) / ml_total_packets : 0.0;
+                proto_ratios[10] = (ml_total_packets > 0) ? (double)(ml_ldap_bind + ml_ldap_search) / ml_total_packets : 0.0;
+                proto_ratios[11] = (ml_total_packets > 0) ? (double)(ml_mssql_sqlbatch + ml_mssql_rpc) / ml_total_packets : 0.0;
+                proto_ratios[12] = (ml_total_packets > 0) ? (double)(ml_tftp_rrq + ml_tftp_wrq) / ml_total_packets : 0.0;
 
-            // Run ML prediction (LOCAL, in-process)
-            int ret = ml_predict(g_ml_model, &features, &ml_pred);
+                double active_protocols = 0;
+                double max_ratio = 0.0;
+                for (int j = 0; j < 13; j++) {
+                    if (proto_ratios[j] > 0.001) active_protocols++;
+                    if (proto_ratios[j] > max_ratio) max_ratio = proto_ratios[j];
+                }
+                features[fi++] = active_protocols;
+                features[fi++] = (ml_http_payload_packets > 0) ?
+                    (double)ml_syn_only_packets / ml_http_payload_packets : 0.0;
+
+                /* Normalized ratios (13) - matching feature_groups.py order */
+                features[fi++] = proto_ratios[0];   /* syn_only_ratio */
+                features[fi++] = proto_ratios[1];   /* http_payload_ratio */
+                features[fi++] = proto_ratios[2];   /* dns_query_ratio */
+                features[fi++] = proto_ratios[3];   /* ntp_monlist_ratio */
+                features[fi++] = proto_ratios[4];   /* snmp_ratio */
+                features[fi++] = proto_ratios[5];   /* ssdp_ratio */
+                features[fi++] = proto_ratios[6];   /* icmp_ratio */
+                features[fi++] = proto_ratios[7];   /* http_request_ratio */
+                features[fi++] = proto_ratios[8];   /* portmap_ratio */
+                features[fi++] = proto_ratios[9];   /* netbios_ratio */
+                features[fi++] = proto_ratios[10];  /* ldap_ratio */
+                features[fi++] = proto_ratios[11];  /* mssql_ratio */
+                features[fi++] = proto_ratios[12];  /* tftp_ratio */
+
+                /* Protocol diversity (2) */
+                features[fi++] = max_ratio;          /* max_protocol_ratio */
+                features[fi++] = active_protocols;   /* protocol_diversity */
+
+                /* Sketch features (14) from ring buffer */
+                features[fi++] = (double)fw.delta_pps_5w;
+                features[fi++] = (double)fw.delta_pps_10w;
+                features[fi++] = (double)fw.pps_variance;
+                features[fi++] = (double)fw.pps_baseline;
+                features[fi++] = (double)fw.ratio_vs_baseline;
+                features[fi++] = (double)fw.top_ip_pps_50ms;
+                features[fi++] = (double)fw.top_ip_pps_1s;
+                features[fi++] = (double)fw.top_ip_pps_1min;
+                features[fi++] = (double)fw.ratio_50ms_1min;
+                features[fi++] = (double)fw.num_heavy_hitters;
+                features[fi++] = (double)fw.ip_concentration;
+                features[fi++] = (double)fw.new_ips_ratio;
+                features[fi++] = (double)fw.attack_entropy;
+                features[fi++] = (double)fw.adaptive_threshold;
+
+            } else {
+                /* ========== SKETCH_ADV MODE: 64 features ========== */
+                num_features = SKETCH_ADV_NUM_FEATURES;
+
+                /* Global sketch features (14) from ring buffer */
+                features[fi++] = (double)fw.delta_pps_5w;
+                features[fi++] = (double)fw.delta_pps_10w;
+                features[fi++] = (double)fw.pps_variance;
+                features[fi++] = (double)fw.pps_baseline;
+                features[fi++] = (double)fw.ratio_vs_baseline;
+                features[fi++] = (double)fw.top_ip_pps_50ms;
+                features[fi++] = (double)fw.top_ip_pps_1s;
+                features[fi++] = (double)fw.top_ip_pps_1min;
+                features[fi++] = (double)fw.ratio_50ms_1min;
+                features[fi++] = (double)fw.num_heavy_hitters;
+                features[fi++] = (double)fw.ip_concentration;
+                features[fi++] = (double)fw.new_ips_ratio;
+                features[fi++] = (double)fw.attack_entropy;
+                features[fi++] = (double)fw.adaptive_threshold;
+
+                /* Per-protocol features (48 = 12 protocols × 4 features) */
+                struct octosketch *proto_merged[SKETCH_ADV_NUM_PROTOS] = {
+                    &g_merged_sketch_dns, &g_merged_sketch_ntp, &g_merged_sketch_snmp,
+                    &g_merged_sketch_ssdp, &g_merged_sketch_portmap, &g_merged_sketch_netbios,
+                    &g_merged_sketch_ldap, &g_merged_sketch_mssql, &g_merged_sketch_tftp,
+                    &g_merged_sketch_syn, &g_merged_sketch_http, &g_merged_sketch_udp_other,
+                };
+                uint64_t total_global = octosketch_get_total(&g_merged_sketch_attack);
+
+                for (int p = 0; p < SKETCH_ADV_NUM_PROTOS; p++) {
+                    uint64_t total_proto = octosketch_get_total(proto_merged[p]);
+                    struct heavy_hitter top1[1];
+                    octosketch_top_k(proto_merged[p], 1, top1);
+
+                    /* pps_<proto> */
+                    features[fi++] = (window_sec > 0) ? (double)total_proto / window_sec : 0.0;
+
+                    /* heavy_hitters_<proto> */
+                    struct heavy_hitter top5[5];
+                    octosketch_top_k(proto_merged[p], 5, top5);
+                    int hh = 0;
+                    for (int j = 0; j < 5; j++) {
+                        if (top5[j].count > 0) {
+                            double pps_j = (double)top5[j].count / (window_sec > 0 ? window_sec : 0.05);
+                            if (pps_j > HEAVY_HITTER_PPS_THRESHOLD) hh++;
+                        }
+                    }
+                    features[fi++] = (double)hh;
+
+                    /* ip_concentration_<proto> */
+                    features[fi++] = (total_proto > 0) ? (double)top1[0].count / total_proto : 0.0;
+
+                    /* ratio_vs_total_<proto> */
+                    features[fi++] = (total_global > 0) ? (double)total_proto / total_global : 0.0;
+                }
+
+                /* Packet size features (2) */
+                features[fi++] = (ml_total_packets > 0) ? (double)ml_total_bytes / ml_total_packets : 0.0;
+
+                /* Packet size variance: E[x²] - E[x]² from sampled data */
+                uint64_t total_pktlen_sq = 0;
+                for (int i = 0; i < NUM_RX_QUEUES; i++) {
+                    total_pktlen_sq += g_worker_pktlen_sq_sum[i];
+                }
+                uint64_t total_sampled = octosketch_get_total(&g_merged_sketch_attack);
+                if (total_sampled > 0) {
+                    double avg_sq = (double)total_pktlen_sq / total_sampled;
+                    double avg_pkt = (ml_total_packets > 0) ? (double)ml_total_bytes / ml_total_packets : 0.0;
+                    features[fi++] = avg_sq - avg_pkt * avg_pkt;
+                } else {
+                    features[fi++] = 0.0;
+                }
+            }
+
+            /* Run ML prediction */
+            int ret = ml_predict(g_ml_model, features, num_features, &ml_pred);
 
             if (ret == 0) {
-                ml_class_name = ml_get_class_name(ml_pred.predicted_class);
+                ml_class_name = ml_get_class_name(g_ml_model, ml_pred.predicted_class);
                 ml_confidence = ml_pred.confidence;
 
-                // ML detects attack if NOT benign and confidence above threshold
                 if (ml_pred.predicted_class != 0 && ml_confidence >= ML_CONFIDENCE_THRESHOLD) {
                     ml_alert = true;
                 }
@@ -735,122 +1191,110 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                 : (double)(cur_tsc - last_ml_alert_tsc) / hz;
             bool should_log_ml = since_last_ml_alert >= 1.0;
 
-            // Determine alert type based on agreement
             const char *alert_type = "UNKNOWN";
             if (original_attack_detected && ml_alert) {
-                alert_type = "CRITICAL";  // Both agree: high confidence
+                alert_type = "CRITICAL";
                 g_stats.alert_level = ALERT_HIGH;
             } else if (original_attack_detected && !ml_alert) {
-                alert_type = "HIGH";      // Only thresholds
+                alert_type = "HIGH";
                 g_stats.alert_level = ALERT_MEDIUM;
             } else if (!original_attack_detected && ml_alert) {
-                alert_type = "ANOMALY";   // Only ML: subtle attack
+                alert_type = "ANOMALY";
                 g_stats.alert_level = ALERT_LOW;
             }
 
-            // Set alert_reason with ML classification
             safe_snprintf(g_stats.alert_reason, sizeof(g_stats.alert_reason),
                           "[%s] ML: %s (%.1f%%)", alert_type, ml_class_name, ml_confidence * 100);
 
-            // Log ML prediction details
             if (should_log_ml) {
                 last_ml_alert_tsc = cur_tsc;
+                int num_classes = ml_get_num_classes(g_ml_model);
                 printf("\n[%s ALERT] Threshold: %s | ML: %s (%.2f%%) | Class probs: ",
                        alert_type,
                        original_attack_detected ? "DETECT" : "NONE",
                        ml_class_name, ml_confidence * 100);
 
-                for (int i = 0; i < ML_NUM_CLASSES; i++) {
-                    printf("%s:%.1f%% ", ml_get_class_name(i), ml_pred.probabilities[i] * 100);
+                for (int i = 0; i < num_classes; i++) {
+                    printf("%s:%.1f%% ", ml_get_class_name(g_ml_model, i),
+                           ml_pred.probabilities[i] * 100);
                 }
                 printf("\n");
             }
         } else if (attack_detected && !g_ml_model) {
-            // No ML model loaded - set generic alert reason based on thresholds
             safe_snprintf(g_stats.alert_reason, sizeof(g_stats.alert_reason),
                           "[THRESHOLD] ANOMALY detected (no ML model)");
         }
-        /* ========================================================== */
 
-        /* Detection timestamp tracking - EVERY detection */
+        /* Detection timestamp tracking */
         if (attack_detected) {
             g_stats.total_detection_events++;
 
-            /* Calculate current detection latency from first attack packet */
             double current_latency_ms = 0.0;
             if (g_stats.first_attack_packet_tsc > 0) {
                 uint64_t latency_cycles = cur_tsc - g_stats.first_attack_packet_tsc;
                 current_latency_ms = (double)latency_cycles * 1000.0 / hz;
             }
 
-            /* First detection - initialize metrics */
             if (!g_stats.detection_triggered) {
                 g_stats.first_detection_tsc = cur_tsc;
-                g_stats.last_detection_tsc = cur_tsc;  /* Initialize last detection timestamp */
+                g_stats.last_detection_tsc = cur_tsc;
                 g_stats.detection_triggered = true;
                 g_stats.packets_until_detection = g_stats.total_packets;
                 g_stats.bytes_until_detection = g_stats.total_bytes;
                 g_stats.detection_latency_ms = current_latency_ms;
-
-                /* Initialize min/max with first detection latency */
                 g_stats.min_detection_latency_ms = current_latency_ms;
                 g_stats.max_detection_latency_ms = current_latency_ms;
                 g_stats.sum_detection_latencies_ms = current_latency_ms;
             } else {
-                /* Subsequent detections - calculate latency from LAST detection */
                 uint64_t inter_detection_cycles = cur_tsc - g_stats.last_detection_tsc;
                 double inter_detection_ms = (double)inter_detection_cycles * 1000.0 / hz;
 
-                /* Update min/max with inter-detection latency */
-                if (inter_detection_ms < g_stats.min_detection_latency_ms) {
+                if (inter_detection_ms < g_stats.min_detection_latency_ms)
                     g_stats.min_detection_latency_ms = inter_detection_ms;
-                }
-                if (inter_detection_ms > g_stats.max_detection_latency_ms) {
+                if (inter_detection_ms > g_stats.max_detection_latency_ms)
                     g_stats.max_detection_latency_ms = inter_detection_ms;
-                }
 
-                /* Sum inter-detection latencies for average */
                 g_stats.sum_detection_latencies_ms += inter_detection_ms;
 
-                /* Histogram bins based on inter-detection latency */
-                if (inter_detection_ms < 20.0) {
+                if (inter_detection_ms < 20.0)
                     g_stats.detections_under_20ms++;
-                } else if (inter_detection_ms < 30.0) {
+                else if (inter_detection_ms < 30.0)
                     g_stats.detections_20_30ms++;
-                } else if (inter_detection_ms < 40.0) {
+                else if (inter_detection_ms < 40.0)
                     g_stats.detections_30_40ms++;
-                } else if (inter_detection_ms < 50.0) {
+                else if (inter_detection_ms < 50.0)
                     g_stats.detections_40_50ms++;
-                } else {
+                else
                     g_stats.detections_over_50ms++;
-                }
 
-                /* Update last detection timestamp */
                 g_stats.last_detection_tsc = cur_tsc;
             }
-        }
-
-        /* OctoSketch: Merge per-worker sketches for analysis (slow path) */
-        if (window_att_pkts > 0) {
-            /* Merge all worker sketches into global merged sketch */
-            struct octosketch *worker_sketches[NUM_RX_QUEUES];
-            for (int i = 0; i < NUM_RX_QUEUES; i++) {
-                worker_sketches[i] = &g_worker_sketch_attack[i];
-            }
-            octosketch_merge(&g_merged_sketch_attack, worker_sketches, NUM_RX_QUEUES);
-
-            /* Heavy hitter analysis could go here (optional for reporting) */
-            /* struct heavy_hitter top_attackers[10]; */
-            /* octosketch_top_k(&g_merged_sketch_attack, 10, top_attackers); */
         }
 
         /* Reset detection window */
         if (window_sec >= DETECTION_WINDOW_SEC) {
             g_stats.window_start_tsc = cur_tsc;
 
-            /* Reset per-worker sketches (will be done by workers on next batch) */
             for (int i = 0; i < NUM_RX_QUEUES; i++) {
                 octosketch_reset(&g_worker_sketch_attack[i]);
+            }
+
+            /* Reset per-protocol sketches if in sketch_adv mode */
+            if (g_ml_mode == ML_MODE_SKETCH_ADV) {
+                const char *proto_names[] = {"dns","ntp","snmp","ssdp","portmap","netbios","ldap","mssql","tftp","syn","http","udp_other"};
+                struct octosketch (*proto_arrays[])[NUM_RX_QUEUES] = {
+                    &g_worker_sketch_dns, &g_worker_sketch_ntp, &g_worker_sketch_snmp,
+                    &g_worker_sketch_ssdp, &g_worker_sketch_portmap, &g_worker_sketch_netbios,
+                    &g_worker_sketch_ldap, &g_worker_sketch_mssql, &g_worker_sketch_tftp,
+                    &g_worker_sketch_syn, &g_worker_sketch_http, &g_worker_sketch_udp_other,
+                };
+                (void)proto_names;
+                for (int p = 0; p < SKETCH_ADV_NUM_PROTOS; p++) {
+                    for (int i = 0; i < NUM_RX_QUEUES; i++) {
+                        octosketch_reset(&(*proto_arrays[p])[i]);
+                    }
+                }
+                memset(g_worker_pktlen_sq_sum, 0, sizeof(g_worker_pktlen_sq_sum));
             }
         }
     }
@@ -1336,8 +1780,8 @@ static int worker_thread(void *arg)
     uint64_t local_total_pkts = 0, local_total_bytes = 0;
     uint64_t local_baseline_pkts = 0, local_attack_pkts = 0;
     uint64_t local_tcp_pkts = 0, local_udp_pkts = 0, local_icmp_pkts = 0;
-    uint64_t local_syn_pkts = 0, local_syn_ack_pkts = 0;
-    uint64_t local_http_reqs = 0, local_dns_queries = 0;
+    uint64_t local_syn_pkts = 0, local_syn_ack_pkts = 0, local_syn_only_pkts = 0;
+    uint64_t local_http_reqs = 0, local_http_payload_pkts = 0, local_dns_queries = 0;
     uint64_t local_baseline_bytes = 0, local_attack_bytes = 0;
     uint64_t local_bursts_total = 0, local_bursts_empty = 0;
     uint64_t local_cycles = 0;
@@ -1356,6 +1800,7 @@ static int worker_thread(void *arg)
 
     /* Per-worker sketch (local, no atomics) */
     struct octosketch *my_sketch = &g_worker_sketch_attack[queue_id];
+    struct multiscale_sketches *my_multiscale = &g_multiscale[queue_id];
 
     /* Sampling counter for sketch updates */
     uint64_t sample_counter = 0;
@@ -1432,14 +1877,27 @@ static int worker_thread(void *arg)
                 uint16_t dst_port_raw = tcp_hdr->dst_port;
                 uint16_t tcp_dst_port = rte_be_to_cpu_16(dst_port_raw);
 
-                /* SYN detection - single branch */
+                /* SYN detection */
                 if (unlikely(tcp_flags & RTE_TCP_SYN_FLAG)) {
                     local_syn_pkts++;
                     local_syn_ack_pkts += (tcp_flags & RTE_TCP_ACK_FLAG) ? 1 : 0;
+                    if (tcp_dst_port != 80 && tcp_dst_port != 443) {
+                        local_syn_only_pkts++;
+                    }
                 }
 
-                /* HTTP detection - use raw port (avoid byte swap if possible) */
-                local_http_reqs += (dst_port_raw == rte_cpu_to_be_16(80)) ? 1 : 0;
+                /* HTTP detection */
+                if (tcp_dst_port == 80 || tcp_dst_port == 443) {
+                    local_http_reqs++;
+                    /* HTTP payload: TCP to 80/443 with data */
+                    uint16_t ip_total_len = rte_be_to_cpu_16(ip_hdr->total_length);
+                    uint16_t ip_hdr_len = (ip_hdr->version_ihl & 0x0f) * 4;
+                    uint8_t tcp_data_offset = (tcp_hdr->data_off >> 4) * 4;
+                    int payload_len = (int)ip_total_len - ip_hdr_len - tcp_data_offset;
+                    if (payload_len > 0) {
+                        local_http_payload_pkts++;
+                    }
+                }
 
                 /* ========== NEW: TCP Protocol Detection ========== */
                 /* LDAP detection (ports 389, 636) */
@@ -1555,6 +2013,68 @@ static int worker_thread(void *arg)
                     /* Update per-worker sketch (LOCAL, no atomics, no contention) */
                     octosketch_update_ip(my_sketch, src_ip, SKETCH_SAMPLE_RATE);
                     octosketch_update_bytes(my_sketch, pkt_len * SKETCH_SAMPLE_RATE);
+
+                    /* Update multi-scale sketches (all scales simultaneously) */
+                    octosketch_update_ip(&my_multiscale->sketch_50ms, src_ip, SKETCH_SAMPLE_RATE);
+                    octosketch_update_ip(&my_multiscale->sketch_1s, src_ip, SKETCH_SAMPLE_RATE);
+                    octosketch_update_ip(&my_multiscale->sketch_10s, src_ip, SKETCH_SAMPLE_RATE);
+                    octosketch_update_ip(&my_multiscale->sketch_1min, src_ip, SKETCH_SAMPLE_RATE);
+
+                    /* Per-protocol sketch routing (sketch_adv mode) */
+                    if (unlikely(g_ml_mode == ML_MODE_SKETCH_ADV)) {
+                        struct octosketch *proto_sketch = NULL;
+                        uint16_t dst_port = 0;
+
+                        if (proto == IPPROTO_TCP) {
+                            struct rte_tcp_hdr *th = (struct rte_tcp_hdr *)((uint8_t *)ip_hdr + sizeof(struct rte_ipv4_hdr));
+                            dst_port = rte_be_to_cpu_16(th->dst_port);
+                            uint8_t tf = th->tcp_flags;
+
+                            if (tf & RTE_TCP_SYN_FLAG) {
+                                proto_sketch = &g_worker_sketch_syn[queue_id];
+                            } else if (dst_port == 80 || dst_port == 443) {
+                                proto_sketch = &g_worker_sketch_http[queue_id];
+                            } else if (dst_port == 389 || dst_port == 636) {
+                                proto_sketch = &g_worker_sketch_ldap[queue_id];
+                            } else if (dst_port == 1433) {
+                                proto_sketch = &g_worker_sketch_mssql[queue_id];
+                            } else if (dst_port == 111) {
+                                proto_sketch = &g_worker_sketch_portmap[queue_id];
+                            }
+                        } else if (proto == IPPROTO_UDP) {
+                            struct rte_udp_hdr *uh = (struct rte_udp_hdr *)((uint8_t *)ip_hdr + sizeof(struct rte_ipv4_hdr));
+                            dst_port = rte_be_to_cpu_16(uh->dst_port);
+
+                            if (dst_port == 53) {
+                                proto_sketch = &g_worker_sketch_dns[queue_id];
+                            } else if (dst_port == 123) {
+                                proto_sketch = &g_worker_sketch_ntp[queue_id];
+                            } else if (dst_port == 161) {
+                                proto_sketch = &g_worker_sketch_snmp[queue_id];
+                            } else if (dst_port == 1900) {
+                                proto_sketch = &g_worker_sketch_ssdp[queue_id];
+                            } else if (dst_port == 111) {
+                                proto_sketch = &g_worker_sketch_portmap[queue_id];
+                            } else if (dst_port == 137 || dst_port == 138) {
+                                proto_sketch = &g_worker_sketch_netbios[queue_id];
+                            } else if (dst_port == 389) {
+                                proto_sketch = &g_worker_sketch_ldap[queue_id];
+                            } else if (dst_port == 1434) {
+                                proto_sketch = &g_worker_sketch_mssql[queue_id];
+                            } else if (dst_port == 69) {
+                                proto_sketch = &g_worker_sketch_tftp[queue_id];
+                            } else {
+                                proto_sketch = &g_worker_sketch_udp_other[queue_id];
+                            }
+                        }
+
+                        if (proto_sketch) {
+                            octosketch_update_ip(proto_sketch, src_ip, SKETCH_SAMPLE_RATE);
+                        }
+
+                        /* Track packet size squared for variance */
+                        g_worker_pktlen_sq_sum[queue_id] += (uint64_t)pkt_len * pkt_len * SKETCH_SAMPLE_RATE;
+                    }
                 }
             }
 
@@ -1572,14 +2092,16 @@ static int worker_thread(void *arg)
         ws->icmp_packets += local_icmp_pkts;
         ws->syn_packets += local_syn_pkts;
         ws->syn_ack_packets += local_syn_ack_pkts;
+        ws->syn_only_packets += local_syn_only_pkts;
         ws->http_requests += local_http_reqs;
+        ws->http_payload_packets += local_http_payload_pkts;
         ws->dns_queries += local_dns_queries;
         ws->baseline_bytes += local_baseline_bytes;
         ws->attack_bytes += local_attack_bytes;
         ws->rx_bursts_total += local_bursts_total;
         ws->rx_bursts_empty += local_bursts_empty;
 
-        /* ========== NEW: Protocol-Specific Stats Update ========== */
+        /* Protocol-Specific Stats Update */
         ws->ntp_monlist_queries += local_ntp_monlist;
         ws->ntp_responses += local_ntp_responses;
         ws->ntp_response_size_sum += local_ntp_resp_size_sum;
@@ -1602,7 +2124,6 @@ static int worker_thread(void *arg)
         ws->mssql_rpc_packets += local_mssql_rpc;
         ws->tftp_rrq_packets += local_tftp_rrq;
         ws->tftp_wrq_packets += local_tftp_wrq;
-        /* ========================================================= */
 
         /* Update window stats */
         window_baseline_pkts[queue_id] += local_baseline_pkts;
@@ -1614,12 +2135,12 @@ static int worker_thread(void *arg)
         local_total_pkts = local_total_bytes = 0;
         local_baseline_pkts = local_attack_pkts = 0;
         local_tcp_pkts = local_udp_pkts = local_icmp_pkts = 0;
-        local_syn_pkts = local_syn_ack_pkts = 0;
-        local_http_reqs = local_dns_queries = 0;
+        local_syn_pkts = local_syn_ack_pkts = local_syn_only_pkts = 0;
+        local_http_reqs = local_http_payload_pkts = local_dns_queries = 0;
         local_baseline_bytes = local_attack_bytes = 0;
         local_bursts_total = local_bursts_empty = 0;
 
-        /* ========== NEW: Reset Protocol-Specific Counters ========== */
+        /* Reset Protocol-Specific Counters */
         local_ntp_monlist = local_ntp_responses = local_ntp_resp_size_sum = 0;
         local_dns_any = local_dns_txt = local_dns_responses = local_dns_resp_size_sum = 0;
         local_snmp_getbulk = local_snmp_responses = local_snmp_resp_size_sum = 0;
@@ -1629,7 +2150,6 @@ static int worker_thread(void *arg)
         local_ldap_bind = local_ldap_search = 0;
         local_mssql_sqlbatch = local_mssql_rpc = 0;
         local_tftp_rrq = local_tftp_wrq = 0;
-        /* ============================================================ */
     }
 
     /* Final update before exit */
@@ -1643,10 +2163,11 @@ static int worker_thread(void *arg)
     ws->icmp_packets += local_icmp_pkts;
     ws->syn_packets += local_syn_pkts;
     ws->syn_ack_packets += local_syn_ack_pkts;
+    ws->syn_only_packets += local_syn_only_pkts;
     ws->http_requests += local_http_reqs;
+    ws->http_payload_packets += local_http_payload_pkts;
     ws->dns_queries += local_dns_queries;
 
-    /* ========== NEW: Final Protocol-Specific Updates ========== */
     ws->ntp_monlist_queries += local_ntp_monlist;
     ws->ntp_responses += local_ntp_responses;
     ws->ntp_response_size_sum += local_ntp_resp_size_sum;
@@ -1669,7 +2190,6 @@ static int worker_thread(void *arg)
     ws->mssql_rpc_packets += local_mssql_rpc;
     ws->tftp_rrq_packets += local_tftp_rrq;
     ws->tftp_wrq_packets += local_tftp_wrq;
-    /* ========================================================== */
 
     return 0;
 }
@@ -1787,6 +2307,33 @@ int main(int argc, char *argv[])
     argc -= ret;
     argv += ret;
 
+    /* Parse application arguments (after EAL --) */
+    for (int i = 0; i < argc; i++) {
+        if (strcmp(argv[i], "--mode") == 0 && i + 1 < argc) {
+            if (strcmp(argv[i + 1], "dpi_sketch") == 0) {
+                g_ml_mode = ML_MODE_DPI_SKETCH;
+                snprintf(g_model_dir, sizeof(g_model_dir),
+                         "../ml_system2/training/results/dpi_sketch/complete");
+            } else if (strcmp(argv[i + 1], "sketch_adv") == 0) {
+                g_ml_mode = ML_MODE_SKETCH_ADV;
+                snprintf(g_model_dir, sizeof(g_model_dir),
+                         "../ml_system2/training/results/sketch_adv");
+            } else {
+                printf("[ERROR] Unknown mode: %s (use dpi_sketch or sketch_adv)\n", argv[i + 1]);
+                return -1;
+            }
+            i++;
+        } else if (strcmp(argv[i], "--model") == 0 && i + 1 < argc) {
+            snprintf(g_model_dir, sizeof(g_model_dir), "%s", argv[i + 1]);
+            i++;
+        }
+    }
+
+    printf("[CONFIG] Mode: %s (%d features)\n",
+           g_ml_mode == ML_MODE_DPI_SKETCH ? "dpi_sketch" : "sketch_adv",
+           g_ml_mode == ML_MODE_DPI_SKETCH ? DPI_SKETCH_NUM_FEATURES : SKETCH_ADV_NUM_FEATURES);
+    printf("[CONFIG] Model directory: %s\n\n", g_model_dir);
+
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
 
@@ -1841,14 +2388,102 @@ int main(int argc, char *argv[])
     }
     octosketch_init(&g_merged_sketch_attack, "Attack-Merged");
 
+    /* Initialize ring buffer for temporal features */
+    memset(&g_ring_buffer, 0, sizeof(g_ring_buffer));
+
+    /* Initialize multi-scale sketches (per-worker) */
+    for (int i = 0; i < NUM_RX_QUEUES; i++) {
+        char name[32];
+        snprintf(name, sizeof(name), "MS50ms-W%d", i);
+        octosketch_init(&g_multiscale[i].sketch_50ms, name);
+        snprintf(name, sizeof(name), "MS1s-W%d", i);
+        octosketch_init(&g_multiscale[i].sketch_1s, name);
+        snprintf(name, sizeof(name), "MS10s-W%d", i);
+        octosketch_init(&g_multiscale[i].sketch_10s, name);
+        snprintf(name, sizeof(name), "MS1m-W%d", i);
+        octosketch_init(&g_multiscale[i].sketch_1min, name);
+        g_multiscale[i].windows_since_1s_reset = 0;
+        g_multiscale[i].windows_since_10s_reset = 0;
+        g_multiscale[i].windows_since_1min_reset = 0;
+    }
+    /* Initialize merged multi-scale sketches */
+    octosketch_init(&g_merged_multiscale.sketch_50ms, "MS50ms-Merged");
+    octosketch_init(&g_merged_multiscale.sketch_1s, "MS1s-Merged");
+    octosketch_init(&g_merged_multiscale.sketch_10s, "MS10s-Merged");
+    octosketch_init(&g_merged_multiscale.sketch_1min, "MS1min-Merged");
+
+    /* Initialize per-protocol sketches (only for sketch_adv mode) */
+    int proto_sketch_count = 0;
+    if (g_ml_mode == ML_MODE_SKETCH_ADV) {
+        for (int i = 0; i < NUM_RX_QUEUES; i++) {
+            char name[32];
+            snprintf(name, sizeof(name), "DNS-W%d", i);
+            octosketch_init(&g_worker_sketch_dns[i], name);
+            snprintf(name, sizeof(name), "NTP-W%d", i);
+            octosketch_init(&g_worker_sketch_ntp[i], name);
+            snprintf(name, sizeof(name), "SNMP-W%d", i);
+            octosketch_init(&g_worker_sketch_snmp[i], name);
+            snprintf(name, sizeof(name), "SSDP-W%d", i);
+            octosketch_init(&g_worker_sketch_ssdp[i], name);
+            snprintf(name, sizeof(name), "PMAP-W%d", i);
+            octosketch_init(&g_worker_sketch_portmap[i], name);
+            snprintf(name, sizeof(name), "NBIOS-W%d", i);
+            octosketch_init(&g_worker_sketch_netbios[i], name);
+            snprintf(name, sizeof(name), "LDAP-W%d", i);
+            octosketch_init(&g_worker_sketch_ldap[i], name);
+            snprintf(name, sizeof(name), "MSSQL-W%d", i);
+            octosketch_init(&g_worker_sketch_mssql[i], name);
+            snprintf(name, sizeof(name), "TFTP-W%d", i);
+            octosketch_init(&g_worker_sketch_tftp[i], name);
+            snprintf(name, sizeof(name), "SYN-W%d", i);
+            octosketch_init(&g_worker_sketch_syn[i], name);
+            snprintf(name, sizeof(name), "HTTP-W%d", i);
+            octosketch_init(&g_worker_sketch_http[i], name);
+            snprintf(name, sizeof(name), "UDPo-W%d", i);
+            octosketch_init(&g_worker_sketch_udp_other[i], name);
+        }
+        /* Merged per-protocol sketches */
+        octosketch_init(&g_merged_sketch_dns, "DNS-Merged");
+        octosketch_init(&g_merged_sketch_ntp, "NTP-Merged");
+        octosketch_init(&g_merged_sketch_snmp, "SNMP-Merged");
+        octosketch_init(&g_merged_sketch_ssdp, "SSDP-Merged");
+        octosketch_init(&g_merged_sketch_portmap, "PMAP-Merged");
+        octosketch_init(&g_merged_sketch_netbios, "NBIOS-Merged");
+        octosketch_init(&g_merged_sketch_ldap, "LDAP-Merged");
+        octosketch_init(&g_merged_sketch_mssql, "MSSQL-Merged");
+        octosketch_init(&g_merged_sketch_tftp, "TFTP-Merged");
+        octosketch_init(&g_merged_sketch_syn, "SYN-Merged");
+        octosketch_init(&g_merged_sketch_http, "HTTP-Merged");
+        octosketch_init(&g_merged_sketch_udp_other, "UDPo-Merged");
+        proto_sketch_count = SKETCH_ADV_NUM_PROTOS;
+        memset(g_worker_pktlen_sq_sum, 0, sizeof(g_worker_pktlen_sq_sum));
+    }
+
     size_t per_worker_mem = octosketch_memory_size();
-    size_t total_sketch_mem = per_worker_mem * (NUM_RX_QUEUES + 1);  /* Workers + merged */
+    /* Global attack sketch: workers + merged */
+    size_t global_sketch_mem = per_worker_mem * (NUM_RX_QUEUES + 1);
+    /* Multi-scale: 4 scales × (workers + merged) */
+    size_t multiscale_mem = per_worker_mem * 4 * (NUM_RX_QUEUES + 1);
+    /* Per-protocol: 12 protocols × (workers + merged) */
+    size_t proto_mem = (proto_sketch_count > 0) ?
+        per_worker_mem * proto_sketch_count * (NUM_RX_QUEUES + 1) : 0;
+    size_t total_sketch_mem = global_sketch_mem + multiscale_mem + proto_mem;
+
     printf("\n[OctoSketch Initialized - Optimized Architecture]\n");
     printf("  Per-worker sketches:     %d × %.1f KB = %.1f KB\n",
            NUM_RX_QUEUES, per_worker_mem / 1024.0, (per_worker_mem * NUM_RX_QUEUES) / 1024.0);
     printf("  Merged sketch:           1 × %.1f KB = %.1f KB\n",
            per_worker_mem / 1024.0, per_worker_mem / 1024.0);
-    printf("  Total memory:            %.1f KB\n", total_sketch_mem / 1024.0);
+    printf("  Multi-scale sketches:    4 scales × %d workers = %.1f MB\n",
+           NUM_RX_QUEUES, multiscale_mem / (1024.0 * 1024.0));
+    if (proto_sketch_count > 0) {
+        printf("  Per-protocol sketches:   %d protos × %d workers = %.1f MB\n",
+               proto_sketch_count, NUM_RX_QUEUES, proto_mem / (1024.0 * 1024.0));
+    }
+    printf("  Total sketch memory:     %.1f MB\n", total_sketch_mem / (1024.0 * 1024.0));
+    printf("  Ring buffer:             %d windows × %zu bytes = %.1f KB\n",
+           RING_BUFFER_SIZE, sizeof(struct feature_window),
+           (RING_BUFFER_SIZE * sizeof(struct feature_window)) / 1024.0);
     printf("  Configuration:           %d rows × %d columns per sketch\n",
            SKETCH_ROWS, SKETCH_COLS);
     printf("  Architecture:            Per-worker (NO atomics, NO contention)\n");
@@ -1857,13 +2492,15 @@ int main(int argc, char *argv[])
     printf("  Update policy:           Attack traffic only\n\n");
 
     /* ========== ML INTEGRATION: Load model ========== */
-    printf("[ML] Loading machine learning model...\n");
-    g_ml_model = ml_init("./lightgbm_model.txt");
+    printf("[ML] Loading machine learning model from: %s\n", g_model_dir);
+    g_ml_model = ml_init(g_model_dir);
     if (!g_ml_model) {
         printf("[ML] Warning: Model failed to load, continuing without ML\n");
         printf("[ML] Detector will use threshold-based detection only\n");
     } else {
         printf("[ML] Model loaded successfully - ML-enhanced detection enabled\n");
+        printf("[ML] Features expected: %d  Classes: %d\n",
+               ml_get_num_features(g_ml_model), ml_get_num_classes(g_ml_model));
         printf("[ML] Confidence threshold: %.2f\n", ML_CONFIDENCE_THRESHOLD);
         printf("[ML] Hybrid mode: Thresholds + LightGBM classifier\n");
     }
@@ -1871,15 +2508,21 @@ int main(int argc, char *argv[])
     /* ================================================= */
 
     printf("╔═══════════════════════════════════════════════════════════════════════╗\n");
-    printf("║  MIRA DDoS DETECTOR - DPDK + OCTOSKETCH (%d workers + 1 coord)       ║\n", NUM_RX_QUEUES);
-    printf("║  Optimized: Per-worker sketches + Sampling + Attack-only             ║\n");
+    printf("║  MIRA DDoS DETECTOR - DPDK + OCTOSKETCH + ML (%d workers + 1 coord)  ║\n", NUM_RX_QUEUES);
+    printf("║  Mode: %-12s  Features: %-3d  Model: %-25s ║\n",
+           g_ml_mode == ML_MODE_DPI_SKETCH ? "dpi_sketch" : "sketch_adv",
+           g_ml_mode == ML_MODE_DPI_SKETCH ? DPI_SKETCH_NUM_FEATURES : SKETCH_ADV_NUM_FEATURES,
+           g_model_dir);
     printf("╚═══════════════════════════════════════════════════════════════════════╝\n\n");
-    printf("Comparing against MULTI-LF (2025):\n");
-    printf("  - MULTI-LF detection latency: 866 ms\n");
-    printf("  - MIRA detection latency:     <50 ms (17-170× faster)\n");
-    printf("  - DPDK architecture:          %d RX workers + 1 coordinator\n", NUM_RX_QUEUES);
-    printf("  - OctoSketch advantage:       O(1) memory, per-worker (no atomics)\n");
-    printf("  - Sketch overhead:            <3%% (sampled updates)\n\n");
+    printf("Architecture:\n");
+    printf("  - DPDK:            %d RX workers + 1 coordinator\n", NUM_RX_QUEUES);
+    printf("  - OctoSketch:      O(1) memory, per-worker (no atomics)\n");
+    printf("  - Multi-scale:     50ms / 1s / 10s / 1min IP tracking\n");
+    if (g_ml_mode == ML_MODE_SKETCH_ADV) {
+        printf("  - Per-protocol:    12 protocol-specific sketches\n");
+    }
+    printf("  - ML classifier:   LightGBM (embedded, no HTTP/sockets)\n");
+    printf("  - Detection:       Threshold anomaly + ML classification\n\n");
     printf("Press Ctrl+C to exit...\n\n");
 
     /* Launch worker threads on lcores 1-%d and coordinator on last lcore */
@@ -1917,6 +2560,12 @@ int main(int argc, char *argv[])
 
     if (g_log_file)
         fclose(g_log_file);
+
+    /* ML cleanup (also done in signal handler, but safe to double-check) */
+    if (g_ml_model) {
+        ml_cleanup(g_ml_model);
+        g_ml_model = NULL;
+    }
 
     rte_hash_free(ip_hash);
     printf("\nShutting down...\n");

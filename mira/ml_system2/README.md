@@ -220,3 +220,4 @@ sudo python3 training/train_model.py \
 sudo python3 training/evaluate_model.py \
     --model training/results/dpi_sketch/complete/lightgbm_model.txt \
     --test datasets/splits/test.csv
+

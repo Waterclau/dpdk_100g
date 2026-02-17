@@ -147,6 +147,14 @@ def train_and_export(train_csv, val_csv, mode, output_dir):
         json.dump({str(i): l for i, l in enumerate(label_encoder.classes_)}, f, indent=2)
     with open(output_path / 'feature_scaler.pkl', 'wb') as f:
         pickle.dump(scaler, f)
+    # Export scaler as JSON for C inference (mean + std per feature)
+    with open(output_path / 'feature_scaler.json', 'w') as f:
+        json.dump({
+            'num_features': len(feature_cols),
+            'feature_names': feature_cols,
+            'mean': scaler.mean_.tolist(),
+            'scale': scaler.scale_.tolist(),
+        }, f, indent=2)
     with open(output_path / 'feature_columns.json', 'w') as f:
         json.dump(feature_cols, f, indent=2)
     with open(output_path / 'training_metadata.json', 'w') as f:

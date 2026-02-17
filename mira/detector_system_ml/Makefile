@@ -10,7 +10,7 @@ LDFLAGS_SHARED = $(shell $(PKGCONF) --libs libdpdk)
 
 # LightGBM flags (embedded ML)
 CFLAGS += -I/usr/local/include
-LDFLAGS_SHARED += -L/usr/local/lib -l_lightgbm
+LDFLAGS_SHARED += -L/usr/local/lib -l_lightgbm -lm
 
 # Source files
 SRCS = detectorML.c ml_inference.c
@@ -23,7 +23,8 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS_SHARED)
 	@echo "Build complete: $(TARGET)"
-	@echo "Run with: sudo ./$(TARGET) -l 0-15 -n 4 -w <PCI_ADDR> -- -p 0"
+	@echo "Run with: sudo ./$(TARGET) -l 0-15 -n 4 -w <PCI_ADDR> -- --mode dpi_sketch --model ./model_dpi_sketch"
+	@echo "Modes: dpi_sketch (75 features), sketch_adv (64 features)"
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
