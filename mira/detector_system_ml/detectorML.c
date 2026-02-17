@@ -498,7 +498,26 @@ static uint64_t g_worker_pktlen_sq_sum[NUM_RX_QUEUES] __rte_cache_aligned;
 static ml_model_handle g_ml_model = NULL;
 #define ML_CONFIDENCE_THRESHOLD 0.75f
 static ml_mode_t g_ml_mode = ML_MODE_DPI_SKETCH;
-static char g_model_dir[512] = "./model_dpi_sketch";
+static char g_model_dir[512] = "../ml_system2/training/results/dpi_sketch/complete";
+
+/* Per-window snapshot: stores cumulative totals at window boundary.
+ * delta = current_cumulative - snapshot → per-window values for thresholds & ML */
+static struct {
+    uint64_t total_packets, total_bytes;
+    uint64_t udp_packets, tcp_packets, icmp_packets;
+    uint64_t syn_packets, syn_ack_packets, syn_only_packets;
+    uint64_t http_requests, http_payload_packets, dns_queries;
+    uint64_t baseline_packets, attack_packets;
+    uint64_t ntp_monlist_queries, ntp_responses, ntp_response_size_sum;
+    uint64_t dns_any_queries, dns_txt_queries, dns_responses, dns_response_size_sum;
+    uint64_t snmp_getbulk_requests, snmp_responses, snmp_response_size_sum;
+    uint64_t ssdp_msearch_packets, ssdp_responses;
+    uint64_t portmap_getport_calls, portmap_dump_calls;
+    uint64_t netbios_name_queries, netbios_dgram_packets;
+    uint64_t ldap_bind_requests, ldap_search_requests;
+    uint64_t mssql_sqlbatch_packets, mssql_rpc_packets;
+    uint64_t tftp_rrq_packets, tftp_wrq_packets;
+} g_window_snapshot;
 /* ===================================== */
 
 /* Sampling configuration */
@@ -806,29 +825,79 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
 
         bool attack_detected = false;
 
-        /* AGGREGATE DETECTION - Use worker stats (exact counters) */
+        /* Per-window counters (baseline/attack arrays already reset each stats window) */
         uint64_t window_base_pkts = 0, window_att_pkts = 0;
-        uint64_t window_syn_pkts = 0, window_udp_pkts = 0, window_icmp_pkts = 0;
-        uint64_t window_http_reqs = 0, window_dns_queries = 0;
-
         for (int i = 0; i < NUM_RX_QUEUES; i++) {
             window_base_pkts += window_baseline_pkts[i];
             window_att_pkts += window_attack_pkts[i];
         }
 
-        /* Aggregate protocol stats from workers */
+        /* Aggregate ALL cumulative counters from workers (once, shared by thresholds + ML) */
+        uint64_t cum_total_packets = 0, cum_total_bytes = 0;
+        uint64_t cum_udp = 0, cum_tcp = 0, cum_icmp = 0;
+        uint64_t cum_syn = 0, cum_syn_ack = 0, cum_syn_only = 0;
+        uint64_t cum_http = 0, cum_http_payload = 0, cum_dns = 0;
+        uint64_t cum_baseline = 0, cum_attack = 0;
+        uint64_t cum_ntp_monlist = 0, cum_ntp_resp = 0, cum_ntp_resp_sz = 0;
+        uint64_t cum_dns_any = 0, cum_dns_txt = 0, cum_dns_resp = 0, cum_dns_resp_sz = 0;
+        uint64_t cum_snmp_bulk = 0, cum_snmp_resp = 0, cum_snmp_resp_sz = 0;
+        uint64_t cum_ssdp_ms = 0, cum_ssdp_resp = 0;
+        uint64_t cum_pmap_gp = 0, cum_pmap_dump = 0;
+        uint64_t cum_nbios_name = 0, cum_nbios_dgram = 0;
+        uint64_t cum_ldap_bind = 0, cum_ldap_search = 0;
+        uint64_t cum_mssql_batch = 0, cum_mssql_rpc = 0;
+        uint64_t cum_tftp_rrq = 0, cum_tftp_wrq = 0;
+
         for (int i = 0; i < NUM_RX_QUEUES; i++) {
-            window_syn_pkts += g_worker_stats[i].syn_packets;
-            window_udp_pkts += g_worker_stats[i].udp_packets;
-            window_icmp_pkts += g_worker_stats[i].icmp_packets;
-            window_http_reqs += g_worker_stats[i].http_requests;
-            window_dns_queries += g_worker_stats[i].dns_queries;
+            struct worker_stats *ws = &g_worker_stats[i];
+            cum_total_packets += ws->total_packets;
+            cum_total_bytes += ws->total_bytes;
+            cum_udp += ws->udp_packets;
+            cum_tcp += ws->tcp_packets;
+            cum_icmp += ws->icmp_packets;
+            cum_syn += ws->syn_packets;
+            cum_syn_ack += ws->syn_ack_packets;
+            cum_syn_only += ws->syn_only_packets;
+            cum_http += ws->http_requests;
+            cum_http_payload += ws->http_payload_packets;
+            cum_dns += ws->dns_queries;
+            cum_baseline += ws->baseline_packets;
+            cum_attack += ws->attack_packets;
+            cum_ntp_monlist += ws->ntp_monlist_queries;
+            cum_ntp_resp += ws->ntp_responses;
+            cum_ntp_resp_sz += ws->ntp_response_size_sum;
+            cum_dns_any += ws->dns_any_queries;
+            cum_dns_txt += ws->dns_txt_queries;
+            cum_dns_resp += ws->dns_responses;
+            cum_dns_resp_sz += ws->dns_response_size_sum;
+            cum_snmp_bulk += ws->snmp_getbulk_requests;
+            cum_snmp_resp += ws->snmp_responses;
+            cum_snmp_resp_sz += ws->snmp_response_size_sum;
+            cum_ssdp_ms += ws->ssdp_msearch_packets;
+            cum_ssdp_resp += ws->ssdp_responses;
+            cum_pmap_gp += ws->portmap_getport_calls;
+            cum_pmap_dump += ws->portmap_dump_calls;
+            cum_nbios_name += ws->netbios_name_queries;
+            cum_nbios_dgram += ws->netbios_dgram_packets;
+            cum_ldap_bind += ws->ldap_bind_requests;
+            cum_ldap_search += ws->ldap_search_requests;
+            cum_mssql_batch += ws->mssql_sqlbatch_packets;
+            cum_mssql_rpc += ws->mssql_rpc_packets;
+            cum_tftp_rrq += ws->tftp_rrq_packets;
+            cum_tftp_wrq += ws->tftp_wrq_packets;
         }
 
-        /* Calculate PPS rates */
-        double attack_pps = (double)window_att_pkts / window_sec;
-        double syn_pps = (double)window_syn_pkts / window_sec;
+        /* Per-window DELTAS = current_cumulative - snapshot_at_window_start */
+        uint64_t window_udp_pkts = cum_udp - g_window_snapshot.udp_packets;
+        uint64_t window_tcp_pkts = cum_tcp - g_window_snapshot.tcp_packets;
+        uint64_t window_icmp_pkts = cum_icmp - g_window_snapshot.icmp_packets;
+        uint64_t window_syn_pkts = cum_syn - g_window_snapshot.syn_packets;
+        uint64_t window_http_reqs = cum_http - g_window_snapshot.http_requests;
+        uint64_t window_dns_queries = cum_dns - g_window_snapshot.dns_queries;
+
+        /* Calculate PPS rates from per-window deltas */
         double udp_pps = (double)window_udp_pkts / window_sec;
+        double syn_pps = (double)window_syn_pkts / window_sec;
         double icmp_pps = (double)window_icmp_pkts / window_sec;
         double http_pps = (double)window_http_reqs / window_sec;
 
@@ -880,11 +949,12 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         memset(&fw, 0, sizeof(fw));
         fw.timestamp_tsc = cur_tsc;
         fw.window_id = g_ring_buffer.total_windows;
-        fw.total_packets = (float)(window_base_pkts + window_att_pkts);
+        uint64_t window_total_all = cum_total_packets - g_window_snapshot.total_packets;
+        fw.total_packets = (float)window_total_all;
         fw.attack_packets = (float)window_att_pkts;
         fw.baseline_packets = (float)window_base_pkts;
         fw.udp_packets = (float)window_udp_pkts;
-        fw.tcp_packets = (float)(window_syn_pkts);  /* approximate */
+        fw.tcp_packets = (float)window_tcp_pkts;
         fw.icmp_packets = (float)window_icmp_pkts;
         fw.syn_packets = (float)window_syn_pkts;
         fw.http_requests = (float)window_http_reqs;
@@ -907,63 +977,45 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         struct ml_prediction ml_pred;
         memset(&ml_pred, 0, sizeof(ml_pred));
 
-        uint64_t window_total_pkts = window_base_pkts + window_att_pkts;
+        uint64_t window_total_pkts = window_total_all;
 
         if (g_ml_model != NULL && window_total_pkts > 100) {
-            /* Aggregate cumulative stats from all workers */
-            uint64_t ml_total_packets = 0, ml_total_bytes = 0;
-            uint64_t ml_udp_packets = 0, ml_tcp_packets = 0, ml_icmp_packets = 0;
-            uint64_t ml_syn_packets = 0, ml_syn_ack_packets = 0, ml_syn_only_packets = 0;
-            uint64_t ml_http_requests = 0, ml_http_payload_packets = 0, ml_dns_queries = 0;
-            uint64_t ml_baseline_packets = 0, ml_attack_packets = 0;
-            uint64_t ml_ntp_monlist = 0, ml_ntp_responses = 0, ml_ntp_resp_size_sum = 0;
-            uint64_t ml_dns_any = 0, ml_dns_txt = 0, ml_dns_responses = 0, ml_dns_resp_size_sum = 0;
-            uint64_t ml_snmp_getbulk = 0, ml_snmp_responses = 0, ml_snmp_resp_size_sum = 0;
-            uint64_t ml_ssdp_msearch = 0, ml_ssdp_responses = 0;
-            uint64_t ml_portmap_getport = 0, ml_portmap_dump = 0;
-            uint64_t ml_netbios_name = 0, ml_netbios_dgram = 0;
-            uint64_t ml_ldap_bind = 0, ml_ldap_search = 0;
-            uint64_t ml_mssql_sqlbatch = 0, ml_mssql_rpc = 0;
-            uint64_t ml_tftp_rrq = 0, ml_tftp_wrq = 0;
-
-            for (int i = 0; i < NUM_RX_QUEUES; i++) {
-                struct worker_stats *ws = &g_worker_stats[i];
-                ml_total_packets += ws->total_packets;
-                ml_total_bytes += ws->total_bytes;
-                ml_udp_packets += ws->udp_packets;
-                ml_tcp_packets += ws->tcp_packets;
-                ml_icmp_packets += ws->icmp_packets;
-                ml_syn_packets += ws->syn_packets;
-                ml_syn_ack_packets += ws->syn_ack_packets;
-                ml_syn_only_packets += ws->syn_only_packets;
-                ml_http_requests += ws->http_requests;
-                ml_http_payload_packets += ws->http_payload_packets;
-                ml_dns_queries += ws->dns_queries;
-                ml_baseline_packets += ws->baseline_packets;
-                ml_attack_packets += ws->attack_packets;
-                ml_ntp_monlist += ws->ntp_monlist_queries;
-                ml_ntp_responses += ws->ntp_responses;
-                ml_ntp_resp_size_sum += ws->ntp_response_size_sum;
-                ml_dns_any += ws->dns_any_queries;
-                ml_dns_txt += ws->dns_txt_queries;
-                ml_dns_responses += ws->dns_responses;
-                ml_dns_resp_size_sum += ws->dns_response_size_sum;
-                ml_snmp_getbulk += ws->snmp_getbulk_requests;
-                ml_snmp_responses += ws->snmp_responses;
-                ml_snmp_resp_size_sum += ws->snmp_response_size_sum;
-                ml_ssdp_msearch += ws->ssdp_msearch_packets;
-                ml_ssdp_responses += ws->ssdp_responses;
-                ml_portmap_getport += ws->portmap_getport_calls;
-                ml_portmap_dump += ws->portmap_dump_calls;
-                ml_netbios_name += ws->netbios_name_queries;
-                ml_netbios_dgram += ws->netbios_dgram_packets;
-                ml_ldap_bind += ws->ldap_bind_requests;
-                ml_ldap_search += ws->ldap_search_requests;
-                ml_mssql_sqlbatch += ws->mssql_sqlbatch_packets;
-                ml_mssql_rpc += ws->mssql_rpc_packets;
-                ml_tftp_rrq += ws->tftp_rrq_packets;
-                ml_tftp_wrq += ws->tftp_wrq_packets;
-            }
+            /* Per-window DELTA values for ML features (reuse cumulative aggregation above) */
+            uint64_t ml_total_packets = cum_total_packets - g_window_snapshot.total_packets;
+            uint64_t ml_total_bytes = cum_total_bytes - g_window_snapshot.total_bytes;
+            uint64_t ml_udp_packets = window_udp_pkts;
+            uint64_t ml_tcp_packets = window_tcp_pkts;
+            uint64_t ml_icmp_packets = window_icmp_pkts;
+            uint64_t ml_syn_packets = window_syn_pkts;
+            uint64_t ml_syn_ack_packets = cum_syn_ack - g_window_snapshot.syn_ack_packets;
+            uint64_t ml_syn_only_packets = cum_syn_only - g_window_snapshot.syn_only_packets;
+            uint64_t ml_http_requests = window_http_reqs;
+            uint64_t ml_http_payload_packets = cum_http_payload - g_window_snapshot.http_payload_packets;
+            uint64_t ml_dns_queries = window_dns_queries;
+            uint64_t ml_baseline_packets = cum_baseline - g_window_snapshot.baseline_packets;
+            uint64_t ml_attack_packets = cum_attack - g_window_snapshot.attack_packets;
+            uint64_t ml_ntp_monlist = cum_ntp_monlist - g_window_snapshot.ntp_monlist_queries;
+            uint64_t ml_ntp_responses = cum_ntp_resp - g_window_snapshot.ntp_responses;
+            uint64_t ml_ntp_resp_size_sum = cum_ntp_resp_sz - g_window_snapshot.ntp_response_size_sum;
+            uint64_t ml_dns_any = cum_dns_any - g_window_snapshot.dns_any_queries;
+            uint64_t ml_dns_txt = cum_dns_txt - g_window_snapshot.dns_txt_queries;
+            uint64_t ml_dns_responses = cum_dns_resp - g_window_snapshot.dns_responses;
+            uint64_t ml_dns_resp_size_sum = cum_dns_resp_sz - g_window_snapshot.dns_response_size_sum;
+            uint64_t ml_snmp_getbulk = cum_snmp_bulk - g_window_snapshot.snmp_getbulk_requests;
+            uint64_t ml_snmp_responses = cum_snmp_resp - g_window_snapshot.snmp_responses;
+            uint64_t ml_snmp_resp_size_sum = cum_snmp_resp_sz - g_window_snapshot.snmp_response_size_sum;
+            uint64_t ml_ssdp_msearch = cum_ssdp_ms - g_window_snapshot.ssdp_msearch_packets;
+            uint64_t ml_ssdp_responses = cum_ssdp_resp - g_window_snapshot.ssdp_responses;
+            uint64_t ml_portmap_getport = cum_pmap_gp - g_window_snapshot.portmap_getport_calls;
+            uint64_t ml_portmap_dump = cum_pmap_dump - g_window_snapshot.portmap_dump_calls;
+            uint64_t ml_netbios_name = cum_nbios_name - g_window_snapshot.netbios_name_queries;
+            uint64_t ml_netbios_dgram = cum_nbios_dgram - g_window_snapshot.netbios_dgram_packets;
+            uint64_t ml_ldap_bind = cum_ldap_bind - g_window_snapshot.ldap_bind_requests;
+            uint64_t ml_ldap_search = cum_ldap_search - g_window_snapshot.ldap_search_requests;
+            uint64_t ml_mssql_sqlbatch = cum_mssql_batch - g_window_snapshot.mssql_sqlbatch_packets;
+            uint64_t ml_mssql_rpc = cum_mssql_rpc - g_window_snapshot.mssql_rpc_packets;
+            uint64_t ml_tftp_rrq = cum_tftp_rrq - g_window_snapshot.tftp_rrq_packets;
+            uint64_t ml_tftp_wrq = cum_tftp_wrq - g_window_snapshot.tftp_wrq_packets;
 
             double features[ML_MAX_FEATURES];
             int num_features = 0;
@@ -1189,7 +1241,7 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
             double since_last_ml_alert = (last_ml_alert_tsc == 0)
                 ? 1e9
                 : (double)(cur_tsc - last_ml_alert_tsc) / hz;
-            bool should_log_ml = since_last_ml_alert >= 1.0;
+            bool should_log_ml = since_last_ml_alert >= STATS_INTERVAL_SEC;
 
             const char *alert_type = "UNKNOWN";
             if (original_attack_detected && ml_alert) {
@@ -1296,6 +1348,43 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                 }
                 memset(g_worker_pktlen_sq_sum, 0, sizeof(g_worker_pktlen_sq_sum));
             }
+
+            /* Update snapshot: save current cumulative totals as new window baseline */
+            g_window_snapshot.total_packets = cum_total_packets;
+            g_window_snapshot.total_bytes = cum_total_bytes;
+            g_window_snapshot.udp_packets = cum_udp;
+            g_window_snapshot.tcp_packets = cum_tcp;
+            g_window_snapshot.icmp_packets = cum_icmp;
+            g_window_snapshot.syn_packets = cum_syn;
+            g_window_snapshot.syn_ack_packets = cum_syn_ack;
+            g_window_snapshot.syn_only_packets = cum_syn_only;
+            g_window_snapshot.http_requests = cum_http;
+            g_window_snapshot.http_payload_packets = cum_http_payload;
+            g_window_snapshot.dns_queries = cum_dns;
+            g_window_snapshot.baseline_packets = cum_baseline;
+            g_window_snapshot.attack_packets = cum_attack;
+            g_window_snapshot.ntp_monlist_queries = cum_ntp_monlist;
+            g_window_snapshot.ntp_responses = cum_ntp_resp;
+            g_window_snapshot.ntp_response_size_sum = cum_ntp_resp_sz;
+            g_window_snapshot.dns_any_queries = cum_dns_any;
+            g_window_snapshot.dns_txt_queries = cum_dns_txt;
+            g_window_snapshot.dns_responses = cum_dns_resp;
+            g_window_snapshot.dns_response_size_sum = cum_dns_resp_sz;
+            g_window_snapshot.snmp_getbulk_requests = cum_snmp_bulk;
+            g_window_snapshot.snmp_responses = cum_snmp_resp;
+            g_window_snapshot.snmp_response_size_sum = cum_snmp_resp_sz;
+            g_window_snapshot.ssdp_msearch_packets = cum_ssdp_ms;
+            g_window_snapshot.ssdp_responses = cum_ssdp_resp;
+            g_window_snapshot.portmap_getport_calls = cum_pmap_gp;
+            g_window_snapshot.portmap_dump_calls = cum_pmap_dump;
+            g_window_snapshot.netbios_name_queries = cum_nbios_name;
+            g_window_snapshot.netbios_dgram_packets = cum_nbios_dgram;
+            g_window_snapshot.ldap_bind_requests = cum_ldap_bind;
+            g_window_snapshot.ldap_search_requests = cum_ldap_search;
+            g_window_snapshot.mssql_sqlbatch_packets = cum_mssql_batch;
+            g_window_snapshot.mssql_rpc_packets = cum_mssql_rpc;
+            g_window_snapshot.tftp_rrq_packets = cum_tftp_rrq;
+            g_window_snapshot.tftp_wrq_packets = cum_tftp_wrq;
         }
     }
 }
@@ -1626,15 +1715,6 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
             g_stats.packets_until_detection,
             g_stats.bytes_until_detection,
             g_stats.bytes_until_detection / (1024.0 * 1024.0));
-
-        len += snprintf(buffer + len, sizeof(buffer) - len,
-            "  DPDK + OctoSketch Advantages:\n"
-            "    ✓ Real-time detection (50ms granularity)\n"
-            "    ✓ No training required (vs ML models)\n"
-            "    ✓ Line-rate processing (multi-core DPDK)\n"
-            "    ✓ O(1) memory (sketch-based, constant size)\n"
-            "    ✓ Lock-free updates (atomic operations)\n"
-            "    ✓ Heavy-hitter detection (Top-K IPs)\n\n");
 
         /* OctoSketch Metrics - Per-worker + Sampling */
         size_t sketch_total_memory = octosketch_memory_size() * NUM_RX_QUEUES;
@@ -2379,6 +2459,7 @@ int main(int argc, char *argv[])
     memset(window_attack_pkts, 0, sizeof(window_attack_pkts));
     memset(window_baseline_bytes, 0, sizeof(window_baseline_bytes));
     memset(window_attack_bytes, 0, sizeof(window_attack_bytes));
+    memset(&g_window_snapshot, 0, sizeof(g_window_snapshot));
 
     /* Initialize OctoSketches - Per-worker architecture (NO atomics) */
     for (int i = 0; i < NUM_RX_QUEUES; i++) {
