@@ -55,7 +55,7 @@ def export_scaler(model_dir):
 
 def main():
     parser = argparse.ArgumentParser(description='Export feature_scaler.json from .pkl')
-    parser.add_argument('--model-dir', required=True, nargs='+',
+    parser.add_argument('--model-dir', required=True, nargs='+', action='extend',
                         help='Model directory/directories containing feature_scaler.pkl')
     args = parser.parse_args()
 
