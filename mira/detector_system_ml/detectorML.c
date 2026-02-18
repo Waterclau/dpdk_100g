@@ -141,9 +141,9 @@ typedef enum {
 /* Alert levels */
 typedef enum {
     ALERT_NONE = 0,
-    ALERT_LOW = 1,
-    ALERT_MEDIUM = 2,
-    ALERT_HIGH = 3
+    ALERT_LOW = 1,       /* ML-only (anomaly) */
+    ALERT_HIGH = 2,      /* Threshold-only */
+    ALERT_CRITICAL = 3   /* Threshold + ML confirmed */
 } alert_level_t;
 
 /* Per-IP statistics - ATOMIC for multi-core safety */
@@ -503,7 +503,6 @@ static uint64_t g_worker_pktlen_sq_sum[NUM_RX_QUEUES] __rte_cache_aligned;
 
 /* ========== ML INTEGRATION ========== */
 static ml_model_handle g_ml_model = NULL;
-#define ML_CONFIDENCE_THRESHOLD 0.75f
 static ml_mode_t g_ml_mode = ML_MODE_DPI_SKETCH;
 static char g_model_dir[512] = "../ml_system2/training/results/dpi_sketch/complete";
 
@@ -908,31 +907,16 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
         double icmp_pps = (double)window_icmp_pkts / window_sec;
         double http_pps = (double)window_http_reqs / window_sec;
 
-        /* Threshold-based anomaly detection */
+        /* Threshold counters - stats only, NO alert triggering (ML decides) */
         {
-            bool threshold_anomaly = false;
-
-            if (udp_pps > ANOMALY_UDP_THRESHOLD) {
+            if (udp_pps > ANOMALY_UDP_THRESHOLD)
                 g_stats.udp_flood_detections++;
-                threshold_anomaly = true;
-            }
-            if (syn_pps > ANOMALY_SYN_THRESHOLD) {
+            if (syn_pps > ANOMALY_SYN_THRESHOLD)
                 g_stats.syn_flood_detections++;
-                threshold_anomaly = true;
-            }
-            if (icmp_pps > ANOMALY_ICMP_THRESHOLD) {
+            if (icmp_pps > ANOMALY_ICMP_THRESHOLD)
                 g_stats.icmp_flood_detections++;
-                threshold_anomaly = true;
-            }
-            if (http_pps > ANOMALY_HTTP_THRESHOLD) {
+            if (http_pps > ANOMALY_HTTP_THRESHOLD)
                 g_stats.http_flood_detections++;
-                threshold_anomaly = true;
-            }
-
-            if (threshold_anomaly) {
-                attack_detected = true;
-                g_stats.alert_level = ALERT_MEDIUM;
-            }
         }
 
         /* ========== Merge sketches and compute ring buffer features ========== */
@@ -1242,44 +1226,42 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                     g_stats.ml_last_probs[ci] = ml_pred.probabilities[ci];
                 g_stats.ml_predicted = true;
 
-                if (ml_pred.predicted_class != 0 && ml_confidence >= ML_CONFIDENCE_THRESHOLD) {
+                /* Alert if model predicts any attack class (not benign) */
+                if (ml_pred.predicted_class != 0) {
                     ml_alert = true;
                 }
             }
         }
 
-        /* ========== HYBRID DECISION: Combine Threshold + ML ========== */
-        bool original_attack_detected = attack_detected;
-        attack_detected = attack_detected || ml_alert;
+        /* ========== ML-ONLY DECISION ========== */
+        /* The ML model is the sole classifier - no threshold-based alerts */
+        if (ml_alert) {
+            attack_detected = true;
 
-        if (attack_detected && g_ml_model) {
-            double since_last_ml_alert = (last_ml_alert_tsc == 0)
-                ? 1e9
-                : (double)(cur_tsc - last_ml_alert_tsc) / hz;
-            bool should_log_ml = since_last_ml_alert >= STATS_INTERVAL_SEC;
-
-            const char *alert_type = "UNKNOWN";
-            if (original_attack_detected && ml_alert) {
-                alert_type = "CRITICAL";
+            /* Alert level based on ML confidence */
+            if (ml_confidence >= 0.75f) {
+                g_stats.alert_level = ALERT_CRITICAL;
+            } else if (ml_confidence >= 0.50f) {
                 g_stats.alert_level = ALERT_HIGH;
-            } else if (original_attack_detected && !ml_alert) {
-                alert_type = "HIGH";
-                g_stats.alert_level = ALERT_MEDIUM;
-            } else if (!original_attack_detected && ml_alert) {
-                alert_type = "ANOMALY";
+            } else {
                 g_stats.alert_level = ALERT_LOW;
             }
 
-            safe_snprintf(g_stats.alert_reason, sizeof(g_stats.alert_reason),
-                          "[%s] ML: %s (%.1f%%)", alert_type, ml_class_name, ml_confidence * 100);
+            const char *level_str = (ml_confidence >= 0.75f) ? "CRITICAL" :
+                                    (ml_confidence >= 0.50f) ? "HIGH" : "ANOMALY";
 
-            if (should_log_ml) {
+            safe_snprintf(g_stats.alert_reason, sizeof(g_stats.alert_reason),
+                          "ML: %s (%.1f%%)", ml_class_name, ml_confidence * 100);
+
+            double since_last_ml_alert = (last_ml_alert_tsc == 0)
+                ? 1e9
+                : (double)(cur_tsc - last_ml_alert_tsc) / hz;
+
+            if (since_last_ml_alert >= STATS_INTERVAL_SEC) {
                 last_ml_alert_tsc = cur_tsc;
                 int num_classes = ml_get_num_classes(g_ml_model);
-                printf("\n[%s ALERT] Threshold: %s | ML: %s (%.2f%%) | Class probs: ",
-                       alert_type,
-                       original_attack_detected ? "DETECT" : "NONE",
-                       ml_class_name, ml_confidence * 100);
+                printf("\n[%s ALERT] ML: %s (%.2f%%) | Class probs: ",
+                       level_str, ml_class_name, ml_confidence * 100);
 
                 for (int i = 0; i < num_classes; i++) {
                     printf("%s:%.1f%% ", ml_get_class_name(g_ml_model, i),
@@ -1287,9 +1269,6 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                 }
                 printf("\n");
             }
-        } else if (attack_detected && !g_ml_model) {
-            safe_snprintf(g_stats.alert_reason, sizeof(g_stats.alert_reason),
-                          "[THRESHOLD] ANOMALY detected (no ML model)");
         }
 
         /* Detection timestamp tracking */
@@ -1694,18 +1673,97 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         g_stats.frag_attack_detections,
         g_stats.total_flood_detections);
 
+    /* SKETCH-ADV: Per-protocol features log section */
+    if (g_ml_mode == ML_MODE_SKETCH_ADV) {
+        double win_sec = (window_duration > 0.001) ? window_duration : 1.0;
+        uint64_t global_total = octosketch_get_total(&g_merged_sketch_attack);
+        double global_pps = (win_sec > 0.001) ? (double)global_total / win_sec : 0.0;
+
+        len += snprintf(buffer + len, sizeof(buffer) - len,
+            "[SKETCH-ADV PER-PROTOCOL FEATURES]\n"
+            "=== Per-Protocol Sketch Analysis (12 sketches) ===\n\n");
+
+        struct {
+            const char *name;
+            const char *port_info;
+            struct octosketch *sketch;
+        } proto_list[12] = {
+            { "DNS",       "port 53",     &g_merged_sketch_dns },
+            { "NTP",       "port 123",    &g_merged_sketch_ntp },
+            { "SNMP",      "port 161",    &g_merged_sketch_snmp },
+            { "SSDP",      "port 1900",   &g_merged_sketch_ssdp },
+            { "PortMap",   "port 111",    &g_merged_sketch_portmap },
+            { "NetBIOS",   "port 137/138",&g_merged_sketch_netbios },
+            { "LDAP",      "port 389",    &g_merged_sketch_ldap },
+            { "MSSQL",     "port 1433/4", &g_merged_sketch_mssql },
+            { "TFTP",      "port 69",     &g_merged_sketch_tftp },
+            { "SYN",       "TCP SYN",     &g_merged_sketch_syn },
+            { "HTTP",      "port 80/443", &g_merged_sketch_http },
+            { "UDP-Other", "other UDP",   &g_merged_sketch_udp_other },
+        };
+
+        for (int p = 0; p < 12; p++) {
+            uint64_t total = octosketch_get_total(proto_list[p].sketch);
+            double pps = (double)total / win_sec;
+
+            int hh_count = 0;
+            double hh_threshold = HEAVY_HITTER_PPS_THRESHOLD * win_sec;
+            for (uint32_t idx = 0; idx < 65536; idx++) {
+                if (proto_list[p].sketch->ip_counts[idx] >= (uint32_t)hh_threshold &&
+                    proto_list[p].sketch->ip_addrs[idx] != 0) {
+                    hh_count++;
+                }
+            }
+
+            struct heavy_hitter top1[1];
+            octosketch_top_k(proto_list[p].sketch, 1, top1);
+            double concentration = (total > 0) ? (double)top1[0].count * 100.0 / total : 0.0;
+            double ratio = (global_pps > 0.0) ? pps / global_pps : 0.0;
+
+            len += snprintf(buffer + len, sizeof(buffer) - len,
+                "  [%s (%s)]\n"
+                "    PPS:              %.1f\n"
+                "    Heavy-hitters:    %d\n"
+                "    IP Concentration: %.1f%%\n"
+                "    Ratio vs Total:   %.2f\n\n",
+                proto_list[p].name, proto_list[p].port_info,
+                pps, hh_count, concentration, ratio);
+        }
+
+        /* Packet size features */
+        uint64_t global_bytes = octosketch_get_bytes(&g_merged_sketch_attack);
+        double avg_pkt_size = (global_total > 0) ? (double)global_bytes / global_total : 0.0;
+
+        uint64_t total_sq_sum = 0;
+        for (int i = 0; i < NUM_RX_QUEUES; i++) {
+            total_sq_sum += g_worker_pktlen_sq_sum[i];
+        }
+        double pkt_size_var = 0.0;
+        if (global_total > 0) {
+            double mean_sq = (double)total_sq_sum / global_total;
+            pkt_size_var = mean_sq - (avg_pkt_size * avg_pkt_size);
+            if (pkt_size_var < 0.0) pkt_size_var = 0.0;
+        }
+
+        len += snprintf(buffer + len, sizeof(buffer) - len,
+            "  [Packet Size]\n"
+            "    Avg Packet Size:      %.1f\n"
+            "    Packet Size Variance: %.1f\n\n",
+            avg_pkt_size, pkt_size_var);
+    }
+
     const char *alert_color = COLOR_RESET;
     const char *alert_text = "NONE";
 
-    if (g_stats.alert_level == ALERT_HIGH) {
+    if (g_stats.alert_level == ALERT_CRITICAL) {
         alert_color = COLOR_RED;
-        alert_text = "HIGH";
-    } else if (g_stats.alert_level == ALERT_MEDIUM) {
+        alert_text = "CRITICAL";
+    } else if (g_stats.alert_level == ALERT_HIGH) {
         alert_color = COLOR_YELLOW;
-        alert_text = "MEDIUM";
+        alert_text = "HIGH";
     } else if (g_stats.alert_level == ALERT_LOW) {
         alert_color = COLOR_WHITE;
-        alert_text = "LOW";
+        alert_text = "ANOMALY";
     }
 
     len += snprintf(buffer + len, sizeof(buffer) - len,
@@ -2625,14 +2683,15 @@ int main(int argc, char *argv[])
     printf("[ML] Loading machine learning model from: %s\n", g_model_dir);
     g_ml_model = ml_init(g_model_dir);
     if (!g_ml_model) {
-        printf("[ML] Warning: Model failed to load, continuing without ML\n");
-        printf("[ML] Detector will use threshold-based detection only\n");
+        printf("[ML] ERROR: Model failed to load from %s\n", g_model_dir);
+        printf("[ML] Cannot run without ML model. Check path and files.\n");
+        return -1;
     } else {
-        printf("[ML] Model loaded successfully - ML-enhanced detection enabled\n");
-        printf("[ML] Features expected: %d  Classes: %d\n",
+        printf("[ML] Model loaded successfully\n");
+        printf("[ML] Features: %d  Classes: %d\n",
                ml_get_num_features(g_ml_model), ml_get_num_classes(g_ml_model));
-        printf("[ML] Confidence threshold: %.2f\n", ML_CONFIDENCE_THRESHOLD);
-        printf("[ML] Hybrid mode: Thresholds + LightGBM classifier\n");
+        printf("[ML] Mode: ML-only classification (LightGBM)\n");
+        printf("[ML] Alert levels: CRITICAL (>=75%%), HIGH (>=50%%), ANOMALY (<50%%)\n");
     }
     printf("\n");
     /* ================================================= */
