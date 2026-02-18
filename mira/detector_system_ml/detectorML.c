@@ -358,6 +358,13 @@ struct detection_stats {
     /* Alert - written only by coordinator */
     alert_level_t alert_level;
     char alert_reason[512];
+
+    /* ML classification - last prediction (always updated when model is loaded) */
+    char ml_last_class[32];
+    float ml_last_confidence;
+    float ml_last_probs[ML_MAX_CLASSES];
+    int ml_num_classes;
+    bool ml_predicted;
 } __rte_cache_aligned;
 
 /* ANSI colors */
@@ -1227,6 +1234,14 @@ static void detect_attacks(uint64_t cur_tsc, uint64_t hz)
                 ml_class_name = ml_get_class_name(g_ml_model, ml_pred.predicted_class);
                 ml_confidence = ml_pred.confidence;
 
+                /* Always store prediction for stats display */
+                snprintf(g_stats.ml_last_class, sizeof(g_stats.ml_last_class), "%s", ml_class_name);
+                g_stats.ml_last_confidence = ml_confidence;
+                g_stats.ml_num_classes = ml_get_num_classes(g_ml_model);
+                for (int ci = 0; ci < g_stats.ml_num_classes && ci < ML_MAX_CLASSES; ci++)
+                    g_stats.ml_last_probs[ci] = ml_pred.probabilities[ci];
+                g_stats.ml_predicted = true;
+
                 if (ml_pred.predicted_class != 0 && ml_confidence >= ML_CONFIDENCE_THRESHOLD) {
                     ml_alert = true;
                 }
@@ -1701,6 +1716,40 @@ static void print_stats(uint16_t port, uint64_t cur_tsc, uint64_t hz)
         strlen(g_stats.alert_reason) > 0 ? alert_color : "",
         strlen(g_stats.alert_reason) > 0 ? g_stats.alert_reason : "None",
         strlen(g_stats.alert_reason) > 0 ? COLOR_RESET : "");
+
+    /* ML Classification - always show when model is loaded */
+    if (g_ml_model) {
+        if (g_stats.ml_predicted) {
+            const char *ml_color = COLOR_RESET;
+            if (strcmp(g_stats.ml_last_class, "benign") == 0)
+                ml_color = "\033[1;32m";  /* green */
+            else
+                ml_color = COLOR_RED;
+
+            len += snprintf(buffer + len, sizeof(buffer) - len,
+                "[ML CLASSIFICATION]\n"
+                "  Model:              %s (%d features)\n"
+                "  Prediction:         %s%s%s (%.2f%%)\n"
+                "  Class probabilities:",
+                g_ml_mode == ML_MODE_DPI_SKETCH ? "dpi_sketch" : "sketch_adv",
+                ml_get_num_features(g_ml_model),
+                ml_color, g_stats.ml_last_class, COLOR_RESET,
+                g_stats.ml_last_confidence * 100);
+
+            for (int i = 0; i < g_stats.ml_num_classes && i < ML_MAX_CLASSES; i++) {
+                len += snprintf(buffer + len, sizeof(buffer) - len,
+                    " %s:%.1f%%",
+                    ml_get_class_name(g_ml_model, i),
+                    g_stats.ml_last_probs[i] * 100);
+            }
+            len += snprintf(buffer + len, sizeof(buffer) - len, "\n\n");
+        } else {
+            len += snprintf(buffer + len, sizeof(buffer) - len,
+                "[ML CLASSIFICATION]\n"
+                "  Model:              %s (loaded, waiting for data)\n\n",
+                g_ml_mode == ML_MODE_DPI_SKETCH ? "dpi_sketch" : "sketch_adv");
+        }
+    }
 
     if (g_stats.detection_triggered) {
         len += snprintf(buffer + len, sizeof(buffer) - len,
