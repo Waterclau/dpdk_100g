@@ -221,3 +221,16 @@ sudo python3 training/evaluate_model.py \
     --model training/results/dpi_sketch/complete/lightgbm_model.txt \
     --test datasets/splits/test.csv
 
+sudo python3 export_scaler_json.py \
+    --model-dir ./results/dpi_sketch/complete/ \
+    --model-dir ./results/sketch_adv/
+
+# DPI+Sketch (75 features)
+sudo ./detectorML -l 0-15 -n 4 -w 0000:41:00.0 -- \
+    --mode dpi_sketch \
+    --model ../ml_system2/training/results/dpi_sketch/complete/
+
+# Sketch-ADV (64 features)  
+sudo ./detectorML -l 0-15 -n 4 -w 0000:41:00.0 -- \
+    --mode sketch_adv \
+    --model ../ml_system2/training/results/sketch_adv/

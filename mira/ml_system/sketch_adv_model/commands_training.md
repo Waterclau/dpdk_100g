@@ -32,7 +32,7 @@ python3 02_training/prepare_dataset.py \
 ## 3. Entrenar LightGBM
 
 ```bash
-python3 02_training/train_sketch_adv.py \
+sudo python3 02_training/train_sketch_adv.py \
     --train /local/dpdk_100g/mira/ml_system/sketch_adv_model/datasets/splits/train.csv \
     --val /local/dpdk_100g/mira/ml_system/sketch_adv_model/datasets/splits/val.csv \
     --output /local/dpdk_100g/mira/ml_system/sketch_adv_model/02_training/results/sketch_adv/lightgbm/
@@ -41,15 +41,15 @@ python3 02_training/train_sketch_adv.py \
 ## 4. Evaluar en test set
 
 ```bash
-python3 02_training/evaluate_sketch_adv.py \
+sudo python3 02_training/evaluate_sketch_adv.py \
     --model /local/dpdk_100g/mira/ml_system/sketch_adv_model/02_training/results/sketch_adv/lightgbm/lightgbm_model.txt \
     --test /local/dpdk_100g/mira/ml_system/sketch_adv_model/datasets/splits/test.csv
 ```
 
-## 5. Comparar modelos (RF, HistGBM, MLP, KNN, SGD, XGBoost, LSTM)
+## 5. Comparar modelos (RF, HistGBM, MLP, KNN, SGD, XGBoost)
 
 ```bash
-python3 02_training/model_compare/run_compare.py \
+sudo python3 02_training/model_compare/run_compare.py \
     --train /local/dpdk_100g/mira/ml_system/sketch_adv_model/datasets/splits/train.csv \
     --val /local/dpdk_100g/mira/ml_system/sketch_adv_model/datasets/splits/val.csv \
     --test /local/dpdk_100g/mira/ml_system/sketch_adv_model/datasets/splits/test.csv \
