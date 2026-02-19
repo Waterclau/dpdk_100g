@@ -1,0 +1,103 @@
+{
+  "val_accuracy": 0.9895561357702349,
+  "test_accuracy": 0.9895561357702349,
+  "report": {
+    "benign": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 28.0
+    },
+    "dns": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 28.0
+    },
+    "ldap": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 28.0
+    },
+    "mixed": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 28.0
+    },
+    "mssql": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 28.0
+    },
+    "netbios": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 28.0
+    },
+    "ntp": {
+      "precision": 0.9310344827586207,
+      "recall": 0.9642857142857143,
+      "f1-score": 0.9473684210526316,
+      "support": 28.0
+    },
+    "portmap": {
+      "precision": 1.0,
+      "recall": 0.9642857142857143,
+      "f1-score": 0.9818181818181818,
+      "support": 28.0
+    },
+    "snmp": {
+      "precision": 0.9333333333333333,
+      "recall": 1.0,
+      "f1-score": 0.9655172413793104,
+      "support": 28.0
+    },
+    "ssdp": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 28.0
+    },
+    "syn": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 28.0
+    },
+    "tftp": {
+      "precision": 1.0,
+      "recall": 0.9285714285714286,
+      "f1-score": 0.962962962962963,
+      "support": 28.0
+    },
+    "udp": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 28.0
+    },
+    "webddos": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 19.0
+    },
+    "accuracy": 0.9895561357702349,
+    "macro avg": {
+      "precision": 0.990311986863711,
+      "recall": 0.9897959183673469,
+      "f1-score": 0.9898333433723634,
+      "support": 383.0
+    },
+    "weighted avg": {
+      "precision": 0.9900843312025449,
+      "recall": 0.9895561357702349,
+      "f1-score": 0.9895944402140116,
+      "support": 383.0
+    }
+  }
+}

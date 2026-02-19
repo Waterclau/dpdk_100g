@@ -1,0 +1,7 @@
+{
+  "seq_len": 12,
+  "stride": 6,
+  "input_dim": 64,
+  "num_classes": 14,
+  "hidden_dim": 64
+}

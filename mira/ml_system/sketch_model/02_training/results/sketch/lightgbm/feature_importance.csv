@@ -1,0 +1,15 @@
+feature,importance
+attack_entropy,43098.17853650078
+delta_pps_5w,25195.95000424981
+pps_variance,18079.65465117246
+new_ips_ratio,15754.054130136967
+delta_pps_10w,12654.591793268919
+num_heavy_hitters,3212.9320068359375
+top_ip_pps_50ms,1862.2608101963997
+top_ip_pps_1min,1664.133788540028
+ip_concentration,1345.425513356924
+pps_baseline,877.7554368469864
+ratio_vs_baseline,405.74087842553854
+ratio_50ms_1min,285.50552931427956
+top_ip_pps_1s,0.0
+adaptive_threshold,0.0

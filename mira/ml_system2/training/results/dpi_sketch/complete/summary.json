@@ -1,0 +1,623 @@
+{
+  "num_features": 75,
+  "models": {
+    "RandomForest": {
+      "val_accuracy": 0.9851671171468126,
+      "test_accuracy": 0.9844419539851011,
+      "test_report": {
+        "benign": {
+          "precision": 0.9998907223254289,
+          "recall": 0.9994538503549972,
+          "f1-score": 0.9996722386102916,
+          "support": 9155.0
+        },
+        "dns": {
+          "precision": 0.9337474120082816,
+          "recall": 1.0,
+          "f1-score": 0.9657387580299786,
+          "support": 451.0
+        },
+        "ldap": {
+          "precision": 0.9877049180327869,
+          "recall": 0.9979296066252588,
+          "f1-score": 0.9927909371781669,
+          "support": 483.0
+        },
+        "mixed": {
+          "precision": 0.972972972972973,
+          "recall": 0.4580152671755725,
+          "f1-score": 0.6228373702422144,
+          "support": 393.0
+        },
+        "mssql": {
+          "precision": 0.9898580121703854,
+          "recall": 1.0,
+          "f1-score": 0.9949031600407746,
+          "support": 488.0
+        },
+        "netbios": {
+          "precision": 0.9679358717434869,
+          "recall": 1.0,
+          "f1-score": 0.9837067209775967,
+          "support": 483.0
+        },
+        "ntp": {
+          "precision": 0.8968253968253969,
+          "recall": 1.0,
+          "f1-score": 0.9456066945606695,
+          "support": 452.0
+        },
+        "portmap": {
+          "precision": 0.9678714859437751,
+          "recall": 0.9979296066252588,
+          "f1-score": 0.9826707441386341,
+          "support": 483.0
+        },
+        "snmp": {
+          "precision": 0.9653061224489796,
+          "recall": 1.0,
+          "f1-score": 0.9823468328141225,
+          "support": 473.0
+        },
+        "ssdp": {
+          "precision": 0.8805970149253731,
+          "recall": 1.0,
+          "f1-score": 0.9365079365079364,
+          "support": 472.0
+        },
+        "syn": {
+          "precision": 0.9977973568281938,
+          "recall": 1.0,
+          "f1-score": 0.9988974641675854,
+          "support": 453.0
+        },
+        "tftp": {
+          "precision": 0.9979879275653923,
+          "recall": 1.0,
+          "f1-score": 0.9989929506545822,
+          "support": 496.0
+        },
+        "udp": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 441.0
+        },
+        "webddos": {
+          "precision": 0.9555555555555556,
+          "recall": 0.9641255605381166,
+          "f1-score": 0.9598214285714286,
+          "support": 446.0
+        },
+        "accuracy": 0.9844419539851011,
+        "macro avg": {
+          "precision": 0.965289340667572,
+          "recall": 0.9583895636656574,
+          "f1-score": 0.9546066597495703,
+          "support": 15169.0
+        },
+        "weighted avg": {
+          "precision": 0.9851924202002079,
+          "recall": 0.9844419539851011,
+          "f1-score": 0.9821538088925913,
+          "support": 15169.0
+        }
+      }
+    },
+    "HistGradientBoosting": {
+      "val_accuracy": 0.9989452172193289,
+      "test_accuracy": 0.9990770650669127,
+      "test_report": {
+        "benign": {
+          "precision": 1.0,
+          "recall": 0.9996723102129984,
+          "f1-score": 0.999836128256951,
+          "support": 9155.0
+        },
+        "dns": {
+          "precision": 0.9912087912087912,
+          "recall": 1.0,
+          "f1-score": 0.9955849889624724,
+          "support": 451.0
+        },
+        "ldap": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 483.0
+        },
+        "mixed": {
+          "precision": 0.9974025974025974,
+          "recall": 0.9770992366412213,
+          "f1-score": 0.987146529562982,
+          "support": 393.0
+        },
+        "mssql": {
+          "precision": 0.9979550102249489,
+          "recall": 1.0,
+          "f1-score": 0.9989764585465711,
+          "support": 488.0
+        },
+        "netbios": {
+          "precision": 0.9979338842975206,
+          "recall": 1.0,
+          "f1-score": 0.998965873836608,
+          "support": 483.0
+        },
+        "ntp": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 452.0
+        },
+        "portmap": {
+          "precision": 0.9958762886597938,
+          "recall": 1.0,
+          "f1-score": 0.9979338842975207,
+          "support": 483.0
+        },
+        "snmp": {
+          "precision": 0.9978902953586498,
+          "recall": 1.0,
+          "f1-score": 0.9989440337909187,
+          "support": 473.0
+        },
+        "ssdp": {
+          "precision": 0.991578947368421,
+          "recall": 0.9978813559322034,
+          "f1-score": 0.9947201689545934,
+          "support": 472.0
+        },
+        "syn": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 453.0
+        },
+        "tftp": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 496.0
+        },
+        "udp": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 441.0
+        },
+        "webddos": {
+          "precision": 1.0,
+          "recall": 0.9977578475336323,
+          "f1-score": 0.9988776655443322,
+          "support": 446.0
+        },
+        "accuracy": 0.9990770650669127,
+        "macro avg": {
+          "precision": 0.9978461296086231,
+          "recall": 0.9980293393085755,
+          "f1-score": 0.9979275522680678,
+          "support": 15169.0
+        },
+        "weighted avg": {
+          "precision": 0.9990806326722316,
+          "recall": 0.9990770650669127,
+          "f1-score": 0.9990749655115477,
+          "support": 15169.0
+        }
+      }
+    },
+    "MLP": {
+      "val_accuracy": 0.9984837497527853,
+      "test_accuracy": 0.9988792932955369,
+      "test_report": {
+        "benign": {
+          "precision": 1.0,
+          "recall": 0.9997815401419989,
+          "f1-score": 0.9998907581385187,
+          "support": 9155.0
+        },
+        "dns": {
+          "precision": 0.9868421052631579,
+          "recall": 0.9977827050997783,
+          "f1-score": 0.9922822491730982,
+          "support": 451.0
+        },
+        "ldap": {
+          "precision": 1.0,
+          "recall": 0.9979296066252588,
+          "f1-score": 0.9989637305699481,
+          "support": 483.0
+        },
+        "mixed": {
+          "precision": 0.9973821989528796,
+          "recall": 0.9694656488549618,
+          "f1-score": 0.983225806451613,
+          "support": 393.0
+        },
+        "mssql": {
+          "precision": 0.9959183673469387,
+          "recall": 1.0,
+          "f1-score": 0.9979550102249488,
+          "support": 488.0
+        },
+        "netbios": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 483.0
+        },
+        "ntp": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 452.0
+        },
+        "portmap": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 483.0
+        },
+        "snmp": {
+          "precision": 0.9978902953586498,
+          "recall": 1.0,
+          "f1-score": 0.9989440337909187,
+          "support": 473.0
+        },
+        "ssdp": {
+          "precision": 0.9853862212943633,
+          "recall": 1.0,
+          "f1-score": 0.992639327024185,
+          "support": 472.0
+        },
+        "syn": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 453.0
+        },
+        "tftp": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 496.0
+        },
+        "udp": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 441.0
+        },
+        "webddos": {
+          "precision": 1.0,
+          "recall": 0.9977578475336323,
+          "f1-score": 0.9988776655443322,
+          "support": 446.0
+        },
+        "accuracy": 0.9988792932955369,
+        "macro avg": {
+          "precision": 0.9973870848725707,
+          "recall": 0.9973369534468307,
+          "f1-score": 0.9973413272083974,
+          "support": 15169.0
+        },
+        "weighted avg": {
+          "precision": 0.9988891530808262,
+          "recall": 0.9988792932955369,
+          "f1-score": 0.998876272865518,
+          "support": 15169.0
+        }
+      }
+    },
+    "KNN": {
+      "val_accuracy": 0.9896499439646648,
+      "test_accuracy": 0.9907706506691278,
+      "test_report": {
+        "benign": {
+          "precision": 0.9998907223254289,
+          "recall": 0.9994538503549972,
+          "f1-score": 0.9996722386102916,
+          "support": 9155.0
+        },
+        "dns": {
+          "precision": 0.9452631578947368,
+          "recall": 0.9955654101995566,
+          "f1-score": 0.9697624190064795,
+          "support": 451.0
+        },
+        "ldap": {
+          "precision": 0.9876796714579056,
+          "recall": 0.9958592132505176,
+          "f1-score": 0.9917525773195877,
+          "support": 483.0
+        },
+        "mixed": {
+          "precision": 0.9593220338983051,
+          "recall": 0.7201017811704835,
+          "f1-score": 0.8226744186046512,
+          "support": 393.0
+        },
+        "mssql": {
+          "precision": 0.9918032786885246,
+          "recall": 0.9918032786885246,
+          "f1-score": 0.9918032786885246,
+          "support": 488.0
+        },
+        "netbios": {
+          "precision": 0.9717171717171718,
+          "recall": 0.9958592132505176,
+          "f1-score": 0.983640081799591,
+          "support": 483.0
+        },
+        "ntp": {
+          "precision": 0.9719827586206896,
+          "recall": 0.9977876106194691,
+          "f1-score": 0.9847161572052402,
+          "support": 452.0
+        },
+        "portmap": {
+          "precision": 0.9658634538152611,
+          "recall": 0.9958592132505176,
+          "f1-score": 0.980632008154944,
+          "support": 483.0
+        },
+        "snmp": {
+          "precision": 0.9895397489539749,
+          "recall": 1.0,
+          "f1-score": 0.9947423764458464,
+          "support": 473.0
+        },
+        "ssdp": {
+          "precision": 0.9533468559837728,
+          "recall": 0.9957627118644068,
+          "f1-score": 0.9740932642487047,
+          "support": 472.0
+        },
+        "syn": {
+          "precision": 0.9955849889624724,
+          "recall": 0.9955849889624724,
+          "f1-score": 0.9955849889624724,
+          "support": 453.0
+        },
+        "tftp": {
+          "precision": 0.9860834990059643,
+          "recall": 1.0,
+          "f1-score": 0.9929929929929929,
+          "support": 496.0
+        },
+        "udp": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 441.0
+        },
+        "webddos": {
+          "precision": 0.9776785714285714,
+          "recall": 0.9820627802690582,
+          "f1-score": 0.9798657718120806,
+          "support": 446.0
+        },
+        "accuracy": 0.9907706506691278,
+        "macro avg": {
+          "precision": 0.9782682794823413,
+          "recall": 0.9761214322771801,
+          "f1-score": 0.975852326703672,
+          "support": 15169.0
+        },
+        "weighted avg": {
+          "precision": 0.9907533662343212,
+          "recall": 0.9907706506691278,
+          "f1-score": 0.990266641363829,
+          "support": 15169.0
+        }
+      }
+    },
+    "SGD": {
+      "val_accuracy": 0.9661151031709407,
+      "test_accuracy": 0.9653240160854374,
+      "test_report": {
+        "benign": {
+          "precision": 0.9662233481106185,
+          "recall": 0.9998907700709995,
+          "f1-score": 0.9827688013312577,
+          "support": 9155.0
+        },
+        "dns": {
+          "precision": 0.9369747899159664,
+          "recall": 0.9889135254988913,
+          "f1-score": 0.9622437971952534,
+          "support": 451.0
+        },
+        "ldap": {
+          "precision": 0.9873417721518988,
+          "recall": 0.968944099378882,
+          "f1-score": 0.9780564263322885,
+          "support": 483.0
+        },
+        "mixed": {
+          "precision": 0.9438202247191011,
+          "recall": 0.42748091603053434,
+          "f1-score": 0.5884413309982487,
+          "support": 393.0
+        },
+        "mssql": {
+          "precision": 0.9785407725321889,
+          "recall": 0.9344262295081968,
+          "f1-score": 0.9559748427672956,
+          "support": 488.0
+        },
+        "netbios": {
+          "precision": 0.9194214876033058,
+          "recall": 0.9213250517598344,
+          "f1-score": 0.9203722854188211,
+          "support": 483.0
+        },
+        "ntp": {
+          "precision": 0.9649890590809628,
+          "recall": 0.9756637168141593,
+          "f1-score": 0.9702970297029703,
+          "support": 452.0
+        },
+        "portmap": {
+          "precision": 0.9546436285097192,
+          "recall": 0.9151138716356108,
+          "f1-score": 0.93446088794926,
+          "support": 483.0
+        },
+        "snmp": {
+          "precision": 0.9726651480637813,
+          "recall": 0.9027484143763214,
+          "f1-score": 0.9364035087719299,
+          "support": 473.0
+        },
+        "ssdp": {
+          "precision": 0.9360341151385928,
+          "recall": 0.9300847457627118,
+          "f1-score": 0.9330499468650372,
+          "support": 472.0
+        },
+        "syn": {
+          "precision": 0.970917225950783,
+          "recall": 0.9580573951434879,
+          "f1-score": 0.9644444444444444,
+          "support": 453.0
+        },
+        "tftp": {
+          "precision": 0.9835728952772074,
+          "recall": 0.9657258064516129,
+          "f1-score": 0.9745676500508648,
+          "support": 496.0
+        },
+        "udp": {
+          "precision": 1.0,
+          "recall": 0.9795918367346939,
+          "f1-score": 0.9896907216494846,
+          "support": 441.0
+        },
+        "webddos": {
+          "precision": 0.9739952718676123,
+          "recall": 0.9237668161434978,
+          "f1-score": 0.9482163406214038,
+          "support": 446.0
+        },
+        "accuracy": 0.9653240160854374,
+        "macro avg": {
+          "precision": 0.9635099813515527,
+          "recall": 0.9136952282363879,
+          "f1-score": 0.9313562867213256,
+          "support": 15169.0
+        },
+        "weighted avg": {
+          "precision": 0.9651257483879901,
+          "recall": 0.9653240160854374,
+          "f1-score": 0.9624107619255751,
+          "support": 15169.0
+        }
+      }
+    },
+    "LSTM": {
+      "val_accuracy": 0.9976267387434901,
+      "test_accuracy": 0.9976267387434901,
+      "test_report": {
+        "benign": {
+          "precision": 0.9998907462034305,
+          "recall": 0.9996723102129984,
+          "f1-score": 0.9997815162770373,
+          "support": 9155.0
+        },
+        "dns": {
+          "precision": 0.9698275862068966,
+          "recall": 0.9977827050997783,
+          "f1-score": 0.9836065573770492,
+          "support": 451.0
+        },
+        "ldap": {
+          "precision": 0.9979338842975206,
+          "recall": 1.0,
+          "f1-score": 0.998965873836608,
+          "support": 483.0
+        },
+        "mixed": {
+          "precision": 0.9738219895287958,
+          "recall": 0.9465648854961832,
+          "f1-score": 0.9600000000000001,
+          "support": 393.0
+        },
+        "mssql": {
+          "precision": 0.9979508196721312,
+          "recall": 0.9979508196721312,
+          "f1-score": 0.9979508196721312,
+          "support": 488.0
+        },
+        "netbios": {
+          "precision": 1.0,
+          "recall": 0.9875776397515528,
+          "f1-score": 0.99375,
+          "support": 483.0
+        },
+        "ntp": {
+          "precision": 0.9955947136563876,
+          "recall": 1.0,
+          "f1-score": 0.9977924944812362,
+          "support": 452.0
+        },
+        "portmap": {
+          "precision": 1.0,
+          "recall": 0.9979296066252588,
+          "f1-score": 0.9989637305699481,
+          "support": 483.0
+        },
+        "snmp": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 473.0
+        },
+        "ssdp": {
+          "precision": 0.9957627118644068,
+          "recall": 0.9957627118644068,
+          "f1-score": 0.9957627118644068,
+          "support": 472.0
+        },
+        "syn": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 453.0
+        },
+        "tftp": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 496.0
+        },
+        "udp": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1-score": 1.0,
+          "support": 441.0
+        },
+        "webddos": {
+          "precision": 0.9888888888888889,
+          "recall": 0.9977578475336323,
+          "f1-score": 0.9933035714285715,
+          "support": 446.0
+        },
+        "accuracy": 0.9976267387434901,
+        "macro avg": {
+          "precision": 0.9942622385941756,
+          "recall": 0.9943570375897102,
+          "f1-score": 0.9942769482504991,
+          "support": 15169.0
+        },
+        "weighted avg": {
+          "precision": 0.997637246086714,
+          "recall": 0.9976267387434901,
+          "f1-score": 0.9976190380502574,
+          "support": 15169.0
+        }
+      }
+    }
+  }
+}

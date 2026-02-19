@@ -1,0 +1,16 @@
+[
+  "delta_pps_5w",
+  "delta_pps_10w",
+  "pps_variance",
+  "pps_baseline",
+  "ratio_vs_baseline",
+  "top_ip_pps_50ms",
+  "top_ip_pps_1s",
+  "top_ip_pps_1min",
+  "ratio_50ms_1min",
+  "num_heavy_hitters",
+  "ip_concentration",
+  "new_ips_ratio",
+  "attack_entropy",
+  "adaptive_threshold"
+]

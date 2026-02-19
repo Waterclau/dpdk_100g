@@ -1,0 +1,16 @@
+{
+  "0": "benign",
+  "1": "dns",
+  "2": "ldap",
+  "3": "mixed",
+  "4": "mssql",
+  "5": "netbios",
+  "6": "ntp",
+  "7": "portmap",
+  "8": "snmp",
+  "9": "ssdp",
+  "10": "syn_flood",
+  "11": "tftp",
+  "12": "udp_flood",
+  "13": "webddos"
+}

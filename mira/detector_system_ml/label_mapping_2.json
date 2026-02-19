@@ -1,0 +1,17 @@
+{
+  "0": "attack",
+  "1": "benign",
+  "2": "dns",
+  "3": "ldap",
+  "4": "mixed",
+  "5": "mssql",
+  "6": "netbios",
+  "7": "ntp",
+  "8": "portmap",
+  "9": "snmp",
+  "10": "ssdp",
+  "11": "syn_flood",
+  "12": "tftp",
+  "13": "udp_flood",
+  "14": "webddos"
+}
