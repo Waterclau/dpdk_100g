@@ -1,6 +1,0 @@
-__pycache__/
-*.pyc
-datasets/
-logs/
-bin/
-*.pkl
